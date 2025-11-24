@@ -10,8 +10,8 @@ export interface ModuleOptions {
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
-    name: 'nuxt-auto-crud',
-    configKey: 'autoCrud'
+    name: 'nuxt-ghost-api',
+    configKey: 'ghostApi'
   },
   defaults: {
     schemaPath: 'server/database/schema'
