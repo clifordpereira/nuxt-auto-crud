@@ -7,7 +7,8 @@ export default defineNuxtConfig({
   },
   
   // Ghost API configuration
-  ghostApi: {
+  // Auto CRUD configuration
+  autoCrud: {
     schemaPath: 'server/database/schema',
   },
   

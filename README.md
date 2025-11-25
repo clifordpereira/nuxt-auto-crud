@@ -1,4 +1,4 @@
-# Nuxt Ghost API
+# Nuxt Auto CRUD
 
 [![npm version][npm-version-src]][npm-version-href]
 [![npm downloads][npm-downloads-src]][npm-downloads-href]
@@ -40,7 +40,7 @@ export default defineNuxtConfig({
     database: true,
   },
 
-  ghostApi: {
+  autoCrud: {
     schemaPath: "server/database/schema", // default value
   },
 });
@@ -156,7 +156,7 @@ await $fetch("/api/users/1", {
 
 ```typescript
 export default defineNuxtConfig({
-  ghostApi: {
+  autoCrud: {
     // Path to your database schema file (relative to project root)
     schemaPath: "server/database/schema", // default
   },
