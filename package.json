@@ -43,6 +43,11 @@
   "dependencies": {
     "@nuxt/kit": "^4.2.1"
   },
+  "peerDependencies": {
+    "drizzle-orm": "^0.30.0",
+    "pluralize": "^8.0.0",
+    "scule": "^1.0.0"
+  },
   "devDependencies": {
     "@nuxt/devtools": "^3.1.0",
     "@nuxt/eslint-config": "^1.10.0",
