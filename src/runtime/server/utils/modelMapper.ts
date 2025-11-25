@@ -3,6 +3,8 @@
 import * as schema from '#site/schema'
 import pluralize from 'pluralize'
 import { pascalCase } from 'scule'
+import { getTableColumns as getDrizzleTableColumns } from 'drizzle-orm'
+import { createError } from 'h3'
 
 /**
  * Fields that should never be updatable via PATCH requests
@@ -80,18 +82,13 @@ export function getTableForModel(modelName: string) {
  * Returns all fields except protected ones (id, createdAt, etc.)
  */
 function getTableColumns(table: any): string[] {
-  if (!table || !table._) return []
-  
-  const columns: string[] = []
-  
-  // Get columns from the table definition
-  if (table._.columns) {
-    for (const [columnName] of Object.entries(table._.columns)) {
-      columns.push(columnName)
-    }
+  try {
+    const columns = getDrizzleTableColumns(table)
+    return Object.keys(columns)
+  } catch (e) {
+    console.error('[getTableColumns] Error getting columns:', e)
+    return []
   }
-  
-  return columns
 }
 
 /**
@@ -107,6 +104,7 @@ export function getUpdatableFields(modelName: string): string[] {
   
   // Auto-detect from table schema
   const table = modelTableMap[modelName]
+  
   if (!table) return []
   
   const allColumns = getTableColumns(table)
