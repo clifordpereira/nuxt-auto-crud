@@ -1,13 +1,18 @@
 {
-  "name": "nuxt-ghost-api",
+  "name": "nuxt-auto-crud",
   "version": "1.0.0",
   "description": "Exposes RESTful CRUD APIs for your Nuxt app based solely on your database migrations.",
   "author": "Cliford Pereira",
   "license": "MIT",
-  "keywords": ["nuxt", "nuxt-module", "crud", "auto-crud", "ghost", "ghost-api"],
+  "keywords": [
+    "nuxt",
+    "nuxt-module",
+    "crud",
+    "auto-crud"
+  ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/clifordpereira/nuxt-ghost-api"
+    "url": "https://github.com/clifordpereira/nuxt-auto-crud"
   },
   "type": "module",
   "exports": {

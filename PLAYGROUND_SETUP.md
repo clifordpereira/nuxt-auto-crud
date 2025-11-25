@@ -1,6 +1,6 @@
 # Playground Setup Summary
 
-This document summarizes the playground setup for the `nuxt-ghost-api` module.
+This document summarizes the playground setup for the `nuxt-auto-crud` module.
 
 ## What Was Added
 
@@ -26,6 +26,7 @@ Created a comprehensive sample schema with three tables:
 ### 3. Configuration (`playground/nuxt.config.ts`)
 
 Updated to include:
+
 - NuxtHub module for database support
 - Ghost API module configuration
 - Database enablement
@@ -43,6 +44,7 @@ Created a beautiful, interactive playground UI featuring:
 - **Next Steps** - Guidance for customization
 
 Design features:
+
 - Modern gradient background
 - Glassmorphism effects
 - Smooth animations
@@ -55,6 +57,7 @@ Design features:
 Created comprehensive documentation:
 
 - **`playground/README.md`** - Detailed playground usage guide with:
+
   - Quick start instructions
   - API testing examples (cURL and JavaScript)
   - Customization guide
@@ -63,6 +66,7 @@ Created comprehensive documentation:
 - **`playground/.env.example`** - Environment variable template
 
 - **`README.md`** (root) - Complete module documentation with:
+
   - Feature list
   - Installation instructions
   - Usage examples
@@ -88,16 +92,17 @@ Added Drizzle Kit configuration and scripts:
   - `bun run db:studio` - Open Drizzle Studio (visual database browser)
 
 These tools allow users to:
+
 - Visually explore the database with Drizzle Studio
 - Generate and manage migrations
 - Quickly iterate on schema changes during development
-
 
 ## Auto-Generated APIs
 
 With the sample schema, the following endpoints are automatically available:
 
 ### Users
+
 - `GET /api/users` - List all users
 - `POST /api/users` - Create a new user
 - `GET /api/users/:id` - Get user by ID
@@ -105,6 +110,7 @@ With the sample schema, the following endpoints are automatically available:
 - `DELETE /api/users/:id` - Delete user
 
 ### Posts
+
 - `GET /api/posts` - List all posts
 - `POST /api/posts` - Create a new post
 - `GET /api/posts/:id` - Get post by ID
@@ -112,6 +118,7 @@ With the sample schema, the following endpoints are automatically available:
 - `DELETE /api/posts/:id` - Delete post
 
 ### Comments
+
 - `GET /api/comments` - List all comments
 - `POST /api/comments` - Create a new comment
 - `GET /api/comments/:id` - Get comment by ID
@@ -123,12 +130,14 @@ With the sample schema, the following endpoints are automatically available:
 ### For End Users (Testing the Module)
 
 1. Clone the repository:
+
    ```bash
-   git clone https://github.com/clifordpereira/nuxt-ghost-api.git
-   cd nuxt-ghost-api
+   git clone https://github.com/clifordpereira/nuxt-auto-crud.git
+   cd nuxt-auto-crud
    ```
 
 2. Install dependencies:
+
    ```bash
    bun install
    cd playground
@@ -136,6 +145,7 @@ With the sample schema, the following endpoints are automatically available:
    ```
 
 3. Run the playground:
+
    ```bash
    bun run dev
    ```

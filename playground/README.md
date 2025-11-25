@@ -1,6 +1,6 @@
 # Nuxt Ghost API - Playground
 
-This is the playground/demo application for the **nuxt-ghost-api** module.
+This is the playground/demo application for the **nuxt-auto-crud** module.
 
 ## 🚀 Quick Start
 
@@ -20,14 +20,16 @@ The playground will be available at `http://localhost:3000`
 
 ## 📋 What's Included
 
-This playground demonstrates the **nuxt-ghost-api** module with:
+This playground demonstrates the **nuxt-auto-crud** module with:
 
 - **Sample Database Schema** (`server/database/schema.ts`)
+
   - Users table
   - Posts table
   - Comments table
 
 - **Auto-Generated CRUD APIs**
+
   - `GET /api/users` - List all users
   - `POST /api/users` - Create a new user
   - `GET /api/users/:id` - Get user by ID
@@ -69,29 +71,29 @@ curl -X DELETE http://localhost:3000/api/users/1
 
 ```typescript
 // Create a user
-const user = await $fetch('/api/users', {
-  method: 'POST',
+const user = await $fetch("/api/users", {
+  method: "POST",
   body: {
-    name: 'Jane Doe',
-    email: 'jane@example.com',
-    bio: 'Designer'
-  }
-})
+    name: "Jane Doe",
+    email: "jane@example.com",
+    bio: "Designer",
+  },
+});
 
 // Get all users
-const users = await $fetch('/api/users')
+const users = await $fetch("/api/users");
 
 // Get user by ID
-const user = await $fetch('/api/users/1')
+const user = await $fetch("/api/users/1");
 
 // Update a user
-const updated = await $fetch('/api/users/1', {
-  method: 'PATCH',
-  body: { bio: 'Updated bio' }
-})
+const updated = await $fetch("/api/users/1", {
+  method: "PATCH",
+  body: { bio: "Updated bio" },
+});
 
 // Delete a user
-await $fetch('/api/users/1', { method: 'DELETE' })
+await $fetch("/api/users/1", { method: "DELETE" });
 ```
 
 ## 🔧 Customization
@@ -106,16 +108,19 @@ await $fetch('/api/users/1', { method: 'DELETE' })
 Example:
 
 ```typescript
-export const products = sqliteTable('products', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
-  name: text('name').notNull(),
-  price: integer('price').notNull(),
-  description: text('description'),
-  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
-})
+export const products = sqliteTable("products", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull(),
+  price: integer("price").notNull(),
+  description: text("description"),
+  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(
+    () => new Date()
+  ),
+});
 ```
 
 This will automatically create:
+
 - `GET /api/products`
 - `POST /api/products`
 - `GET /api/products/:id`
@@ -160,8 +165,7 @@ For quick development iterations, use `bun run db:push` to sync schema changes d
 
 ## 📚 Learn More
 
-
-- [Nuxt Ghost API Documentation](https://github.com/clifordpereira/nuxt-ghost-api)
+- [Nuxt Ghost API Documentation](https://github.com/clifordpereira/nuxt-auto-crud)
 - [Drizzle ORM Documentation](https://orm.drizzle.team/)
 - [NuxtHub Documentation](https://hub.nuxt.com/)
 
@@ -174,4 +178,4 @@ For quick development iterations, use `bun run db:push` to sync schema changes d
 
 ## 🐛 Issues?
 
-If you encounter any issues, please report them on the [GitHub repository](https://github.com/clifordpereira/nuxt-ghost-api/issues).
+If you encounter any issues, please report them on the [GitHub repository](https://github.com/clifordpereira/nuxt-auto-crud/issues).

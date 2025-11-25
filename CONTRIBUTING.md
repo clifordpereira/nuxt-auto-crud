@@ -13,12 +13,14 @@ Thank you for your interest in contributing to Nuxt Ghost API! 🎉
 
 1. Fork the repository
 2. Clone your fork:
+
    ```bash
-   git clone https://github.com/clifordpereira/nuxt-ghost-api.git
-   cd nuxt-ghost-api
+   git clone https://github.com/clifordpereira/nuxt-auto-crud.git
+   cd nuxt-auto-crud
    ```
 
 3. Install dependencies:
+
    ```bash
    bun install
    ```
@@ -43,6 +45,7 @@ This will start the playground at `http://localhost:3000`
 ### Making Changes
 
 1. Create a new branch:
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
@@ -52,6 +55,7 @@ This will start the playground at `http://localhost:3000`
 3. Test your changes using the playground
 
 4. Run linting:
+
    ```bash
    bun run lint
    ```
@@ -64,7 +68,7 @@ This will start the playground at `http://localhost:3000`
 ### Project Structure
 
 ```
-nuxt-ghost-api/
+nuxt-auto-crud/
 ├── src/
 │   ├── module.ts                    # Main module definition
 │   └── runtime/
@@ -102,12 +106,14 @@ nuxt-ghost-api/
 ## Submitting Changes
 
 1. Commit your changes:
+
    ```bash
    git add .
    git commit -m "feat: add amazing feature"
    ```
 
    We follow [Conventional Commits](https://www.conventionalcommits.org/):
+
    - `feat:` - New features
    - `fix:` - Bug fixes
    - `docs:` - Documentation changes
@@ -116,6 +122,7 @@ nuxt-ghost-api/
    - `test:` - Test updates
 
 2. Push to your fork:
+
    ```bash
    git push origin feature/your-feature-name
    ```

@@ -3,7 +3,9 @@
     <header class="header">
       <div class="header-content">
         <h1>🚀 Nuxt Ghost API Playground</h1>
-        <p class="subtitle">Auto-generated RESTful CRUD APIs from your database schema</p>
+        <p class="subtitle">
+          Auto-generated RESTful CRUD APIs from your database schema
+        </p>
       </div>
     </header>
 
@@ -12,12 +14,14 @@
       <section class="section intro-section">
         <h2>Welcome to the Playground!</h2>
         <p>
-          This playground demonstrates the <strong>nuxt-ghost-api</strong> module in action.
-          The module automatically generates RESTful CRUD APIs based on your database schema.
+          This playground demonstrates the
+          <strong>nuxt-auto-crud</strong> module in action. The module
+          automatically generates RESTful CRUD APIs based on your database
+          schema.
         </p>
         <p>
-          Check out the <code>server/database/schema.ts</code> file to see the sample schema,
-          and explore the auto-generated API endpoints below.
+          Check out the <code>server/database/schema.ts</code> file to see the
+          sample schema, and explore the auto-generated API endpoints below.
         </p>
       </section>
 
@@ -90,7 +94,7 @@
       <!-- API Examples Section -->
       <section class="section examples-section">
         <h2>💡 API Usage Examples</h2>
-        
+
         <div class="example-card">
           <h3>Create a User</h3>
           <pre><code>// POST /api/users
@@ -153,7 +157,9 @@ await $fetch('/api/users/1', {
           <div class="feature">
             <div class="feature-icon">📝</div>
             <h3>Full CRUD</h3>
-            <p>Complete Create, Read, Update, Delete operations out of the box</p>
+            <p>
+              Complete Create, Read, Update, Delete operations out of the box
+            </p>
           </div>
           <div class="feature">
             <div class="feature-icon">🎯</div>
@@ -167,23 +173,42 @@ await $fetch('/api/users/1', {
       <section class="section next-steps-section">
         <h2>📚 Next Steps</h2>
         <ul>
-          <li>Modify <code>server/database/schema.ts</code> to add your own tables</li>
-          <li>Restart the dev server to see your new APIs automatically generated</li>
-          <li>Check out the <a href="https://github.com/clifordpereira/nuxt-ghost-api" target="_blank">GitHub repository</a> for more documentation</li>
-          <li>Install in your own project: <code>bun add nuxt-ghost-api</code></li>
+          <li>
+            Modify <code>server/database/schema.ts</code> to add your own tables
+          </li>
+          <li>
+            Restart the dev server to see your new APIs automatically generated
+          </li>
+          <li>
+            Check out the
+            <a
+              href="https://github.com/clifordpereira/nuxt-auto-crud"
+              target="_blank"
+              >GitHub repository</a
+            >
+            for more documentation
+          </li>
+          <li>
+            Install in your own project: <code>bun add nuxt-auto-crud</code>
+          </li>
         </ul>
       </section>
     </main>
 
     <footer class="footer">
-      <p>Made with ❤️ by <a href="https://github.com/clifordpereira" target="_blank">Cliford Pereira</a></p>
+      <p>
+        Made with ❤️ by
+        <a href="https://github.com/clifordpereira" target="_blank"
+          >Cliford Pereira</a
+        >
+      </p>
     </footer>
   </div>
 </template>
 
 <script setup>
 // Sample models from the schema
-const models = ['users', 'posts', 'comments']
+const models = ["users", "posts", "comments"];
 </script>
 
 <style scoped>
@@ -194,7 +219,8 @@ const models = ['users', 'posts', 'comments']
 .playground-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, sans-serif;
   color: #333;
 }
 
@@ -264,7 +290,7 @@ const models = ['users', 'posts', 'comments']
   background: #f5f5f5;
   padding: 0.2rem 0.5rem;
   border-radius: 4px;
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   color: #667eea;
 }
 
@@ -391,7 +417,7 @@ const models = ['users', 'posts', 'comments']
 }
 
 .step-content code {
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   color: #667eea;
 }
 
@@ -419,7 +445,7 @@ const models = ['users', 'posts', 'comments']
 }
 
 .example-card code {
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   font-size: 0.9rem;
   line-height: 1.5;
 }
@@ -435,7 +461,11 @@ const models = ['users', 'posts', 'comments']
   text-align: center;
   padding: 1.5rem;
   border-radius: 8px;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.1) 0%,
+    rgba(118, 75, 162, 0.1) 100%
+  );
   transition: transform 0.3s ease;
 }
 
@@ -470,7 +500,7 @@ const models = ['users', 'posts', 'comments']
   background: #f5f5f5;
   padding: 0.2rem 0.5rem;
   border-radius: 4px;
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   color: #667eea;
 }
 
@@ -504,15 +534,15 @@ const models = ['users', 'posts', 'comments']
   .header-content h1 {
     font-size: 1.8rem;
   }
-  
+
   .subtitle {
     font-size: 1rem;
   }
-  
+
   .section {
     padding: 1.5rem;
   }
-  
+
   .models-grid,
   .steps,
   .features-grid {
@@ -520,4 +550,3 @@ const models = ['users', 'posts', 'comments']
   }
 }
 </style>
-
