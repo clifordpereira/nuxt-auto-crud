@@ -4,6 +4,7 @@ import * as schema from '#site/schema'
 import pluralize from 'pluralize'
 import { pascalCase } from 'scule'
 import { getTableColumns as getDrizzleTableColumns } from 'drizzle-orm'
+import type { SQLiteTable } from 'drizzle-orm/sqlite-core'
 import { createError } from 'h3'
 
 /**
@@ -63,7 +64,7 @@ export const modelTableMap = buildModelTableMap()
  * @returns The corresponding database table
  * @throws Error if model is not found
  */
-export function getTableForModel(modelName: string): any {
+export function getTableForModel(modelName: string): SQLiteTable {
   const table = modelTableMap[modelName]
 
   if (!table) {
@@ -74,7 +75,7 @@ export function getTableForModel(modelName: string): any {
     })
   }
 
-  return table
+  return table as SQLiteTable
 }
 
 /**
@@ -149,6 +150,7 @@ export function getModelSingularName(modelName: string): string {
  * Gets the plural name for a model
  * @param modelName - The model name (singular or plural)
  * @returns The plural name
+ * @return The plural name
  */
 export function getModelPluralName(modelName: string): string {
   return pluralize.plural(modelName)
