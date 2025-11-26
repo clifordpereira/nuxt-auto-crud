@@ -30,7 +30,11 @@
         <h2>📋 Available Models</h2>
         <p>The following models are automatically detected from your schema:</p>
         <div class="models-grid">
-          <div v-for="model in models" :key="model" class="model-card">
+          <div
+            v-for="model in models"
+            :key="model"
+            class="model-card"
+          >
             <h3>{{ model }}</h3>
             <div class="endpoints">
               <div class="endpoint">
@@ -68,21 +72,27 @@
         <h2>🚀 Quick Start</h2>
         <div class="steps">
           <div class="step">
-            <div class="step-number">1</div>
+            <div class="step-number">
+              1
+            </div>
             <div class="step-content">
               <h3>Install Dependencies</h3>
               <pre><code>bun install</code></pre>
             </div>
           </div>
           <div class="step">
-            <div class="step-number">2</div>
+            <div class="step-number">
+              2
+            </div>
             <div class="step-content">
               <h3>Run the Playground</h3>
               <pre><code>bun run dev</code></pre>
             </div>
           </div>
           <div class="step">
-            <div class="step-number">3</div>
+            <div class="step-number">
+              3
+            </div>
             <div class="step-content">
               <h3>Test the APIs</h3>
               <p>Use the examples below or your favorite API client!</p>
@@ -145,24 +155,32 @@ await $fetch('/api/users/1', {
         <h2>✨ Features</h2>
         <div class="features-grid">
           <div class="feature">
-            <div class="feature-icon">🔄</div>
+            <div class="feature-icon">
+              🔄
+            </div>
             <h3>Auto-Detection</h3>
             <p>Automatically detects all tables from your Drizzle schema</p>
           </div>
           <div class="feature">
-            <div class="feature-icon">🛡️</div>
+            <div class="feature-icon">
+              🛡️
+            </div>
             <h3>Protected Fields</h3>
             <p>Automatically protects id and createdAt fields from updates</p>
           </div>
           <div class="feature">
-            <div class="feature-icon">📝</div>
+            <div class="feature-icon">
+              📝
+            </div>
             <h3>Full CRUD</h3>
             <p>
               Complete Create, Read, Update, Delete operations out of the box
             </p>
           </div>
           <div class="feature">
-            <div class="feature-icon">🎯</div>
+            <div class="feature-icon">
+              🎯
+            </div>
             <h3>Type-Safe</h3>
             <p>Fully typed with TypeScript support</p>
           </div>
@@ -184,8 +202,7 @@ await $fetch('/api/users/1', {
             <a
               href="https://github.com/clifordpereira/nuxt-auto-crud"
               target="_blank"
-              >GitHub repository</a
-            >
+            >GitHub repository</a>
             for more documentation
           </li>
           <li>
@@ -198,9 +215,10 @@ await $fetch('/api/users/1', {
     <footer class="footer">
       <p>
         Made with ❤️ by
-        <a href="https://github.com/clifordpereira" target="_blank"
-          >Cliford Pereira</a
-        >
+        <a
+          href="https://github.com/clifordpereira"
+          target="_blank"
+        >Cliford Pereira</a>
       </p>
     </footer>
   </div>
@@ -208,7 +226,7 @@ await $fetch('/api/users/1', {
 
 <script setup>
 // Sample models from the schema
-const models = ["users", "posts", "comments"];
+const models = ['users', 'posts', 'comments']
 </script>
 
 <style scoped>

@@ -1,5 +1,5 @@
 // runtime/server/utils/modelMapper.ts
-// @ts-ignore - #site/schema is an alias defined by the module
+// @ts-expect-error - #site/schema is an alias defined by the module
 import * as schema from '#site/schema'
 import pluralize from 'pluralize'
 import { pascalCase } from 'scule'
@@ -14,7 +14,7 @@ const PROTECTED_FIELDS = ['id', 'createdAt', 'created_at']
 /**
  * Custom updatable fields configuration (optional)
  * Only define here if you want to override the auto-detection
- * 
+ *
  * Example:
  * export const customUpdatableFields: Record<string, string[]> = {
  *   users: ['name', 'avatar'], // Only these fields can be updated
@@ -29,9 +29,9 @@ export const customUpdatableFields: Record<string, string[]> = {
  * Automatically builds a map of all exported tables from the schema
  * No manual configuration needed!
  */
-function buildModelTableMap(): Record<string, any> {
-  const tableMap: Record<string, any> = {}
-  
+function buildModelTableMap(): Record<string, unknown> {
+  const tableMap: Record<string, unknown> = {}
+
   // Iterate through all exports from schema
   for (const [key, value] of Object.entries(schema)) {
     // Check if it's a Drizzle table
@@ -41,13 +41,13 @@ function buildModelTableMap(): Record<string, any> {
       const hasTableSymbol = Symbol.for('drizzle:Name') in value
       const hasUnderscore = '_' in value
       const hasTableConfig = 'table' in value || '$inferSelect' in value
-      
+
       if (hasTableSymbol || hasUnderscore || hasTableConfig) {
         tableMap[key] = value
       }
     }
   }
-  
+
   return tableMap
 }
 
@@ -65,7 +65,7 @@ export const modelTableMap = buildModelTableMap()
  */
 export function getTableForModel(modelName: string) {
   const table = modelTableMap[modelName]
-  
+
   if (!table) {
     const availableModels = Object.keys(modelTableMap).join(', ')
     throw createError({
@@ -73,7 +73,7 @@ export function getTableForModel(modelName: string) {
       message: `Model '${modelName}' not found. Available models: ${availableModels}`,
     })
   }
-  
+
   return table
 }
 
@@ -81,11 +81,13 @@ export function getTableForModel(modelName: string) {
  * Auto-detects updatable fields for a table
  * Returns all fields except protected ones (id, createdAt, etc.)
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getTableColumns(table: any): string[] {
   try {
     const columns = getDrizzleTableColumns(table)
     return Object.keys(columns)
-  } catch (e) {
+  }
+  catch (e) {
     console.error('[getTableColumns] Error getting columns:', e)
     return []
   }
@@ -101,14 +103,14 @@ export function getUpdatableFields(modelName: string): string[] {
   if (customUpdatableFields[modelName]) {
     return customUpdatableFields[modelName]
   }
-  
+
   // Auto-detect from table schema
   const table = modelTableMap[modelName]
-  
+
   if (!table) return []
-  
+
   const allColumns = getTableColumns(table)
-  
+
   // Filter out protected fields
   return allColumns.filter(col => !PROTECTED_FIELDS.includes(col))
 }
@@ -119,16 +121,16 @@ export function getUpdatableFields(modelName: string): string[] {
  * @param data - The data object to filter
  * @returns Filtered object with only updatable fields
  */
-export function filterUpdatableFields(modelName: string, data: Record<string, any>): Record<string, any> {
+export function filterUpdatableFields(modelName: string, data: Record<string, unknown>): Record<string, unknown> {
   const allowedFields = getUpdatableFields(modelName)
-  const filtered: Record<string, any> = {}
-  
+  const filtered: Record<string, unknown> = {}
+
   for (const field of allowedFields) {
     if (data[field] !== undefined) {
       filtered[field] = data[field]
     }
   }
-  
+
   return filtered
 }
 

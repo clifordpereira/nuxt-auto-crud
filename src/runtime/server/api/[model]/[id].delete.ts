@@ -16,6 +16,6 @@ export default eventHandler(async (event) => {
       message: `${singularName} not found`,
     })
   }
-  
+
   return deletedRecord
 })
