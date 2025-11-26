@@ -3,10 +3,9 @@ import { eventHandler, getRouterParams, createError } from 'h3'
 import { eq } from 'drizzle-orm'
 import { getTableForModel, getModelSingularName } from '../../utils/modelMapper'
 
-import type { ModuleDatabase, TableWithId } from '../../types'
-
-// TODO: Better type for useDrizzle
-declare function useDrizzle(): ModuleDatabase
+import type { TableWithId } from '../../types'
+// @ts-expect-error - #site/drizzle is an alias defined by the module
+import { useDrizzle } from '#site/drizzle'
 
 export default eventHandler(async (event) => {
   const { model, id } = getRouterParams(event)

@@ -7,10 +7,17 @@ import {
 
 export interface ModuleOptions {
   /**
+  /**
    * Path to the database schema file
    * @default 'server/database/schema'
    */
   schemaPath?: string
+
+  /**
+   * Path to the drizzle instance file (must export useDrizzle)
+   * @default 'server/utils/drizzle'
+   */
+  drizzlePath?: string
 }
 
 export default defineNuxtModule<ModuleOptions>({
@@ -20,6 +27,7 @@ export default defineNuxtModule<ModuleOptions>({
   },
   defaults: {
     schemaPath: 'server/database/schema',
+    drizzlePath: 'server/utils/drizzle',
   },
   setup(options, nuxt) {
     const resolver = createResolver(import.meta.url)
@@ -31,6 +39,13 @@ export default defineNuxtModule<ModuleOptions>({
       options.schemaPath!,
     )
     nuxt.options.alias['#site/schema'] = schemaPath
+
+    // 2. Alias the drizzle instance
+    const drizzlePath = resolver.resolve(
+      nuxt.options.rootDir,
+      options.drizzlePath!,
+    )
+    nuxt.options.alias['#site/drizzle'] = drizzlePath
 
     // 2. Register the API routes
     // We scan the runtime/server/api directory and add handlers
