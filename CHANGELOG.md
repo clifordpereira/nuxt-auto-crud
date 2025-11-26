@@ -1,3 +1,19 @@
+## v1.1.1
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.1.0...v1.1.1)
+
+### 💅 Refactors
+
+- Remove `.ts` extension from server handler file paths. ([17328b5](https://github.com/clifordpereira/nuxt-auto-crud/commit/17328b5))
+
+### 🏡 Chore
+
+- **release:** V1.1.0 ([394f71d](https://github.com/clifordpereira/nuxt-auto-crud/commit/394f71d))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v1.1.0
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.0.0...v1.1.0)
