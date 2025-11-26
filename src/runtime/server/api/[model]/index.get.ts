@@ -2,8 +2,10 @@
 import { eventHandler, getRouterParams } from 'h3'
 import { getTableForModel } from '../../utils/modelMapper'
 
+import type { ModuleDatabase } from '../../types'
+
 // TODO: Better type for useDrizzle
-declare function useDrizzle(): any
+declare function useDrizzle(): ModuleDatabase
 
 export default eventHandler(async (event) => {
   const { model } = getRouterParams(event)

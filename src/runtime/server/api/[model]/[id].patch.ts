@@ -3,8 +3,10 @@ import { eventHandler, getRouterParams, readBody } from 'h3'
 import { eq } from 'drizzle-orm'
 import { getTableForModel, filterUpdatableFields } from '../../utils/modelMapper'
 
+import type { ModuleDatabase } from '../../types'
+
 // TODO: Better type for useDrizzle
-declare function useDrizzle(): any
+declare function useDrizzle(): ModuleDatabase
 
 export default eventHandler(async (event) => {
   const { model, id } = getRouterParams(event)
