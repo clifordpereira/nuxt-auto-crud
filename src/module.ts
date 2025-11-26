@@ -47,27 +47,27 @@ export default defineNuxtModule<ModuleOptions>({
     addServerHandler({
       route: '/api/:model',
       method: 'get',
-      handler: resolver.resolve(apiDir, '[model]/index.get.ts'),
+      handler: resolver.resolve(apiDir, '[model]/index.get'),
     })
     addServerHandler({
       route: '/api/:model',
       method: 'post',
-      handler: resolver.resolve(apiDir, '[model]/index.post.ts'),
+      handler: resolver.resolve(apiDir, '[model]/index.post'),
     })
     addServerHandler({
       route: '/api/:model/:id',
       method: 'get',
-      handler: resolver.resolve(apiDir, '[model]/[id].get.ts'),
+      handler: resolver.resolve(apiDir, '[model]/[id].get'),
     })
     addServerHandler({
       route: '/api/:model/:id',
       method: 'patch',
-      handler: resolver.resolve(apiDir, '[model]/[id].patch.ts'),
+      handler: resolver.resolve(apiDir, '[model]/[id].patch'),
     })
     addServerHandler({
       route: '/api/:model/:id',
       method: 'delete',
-      handler: resolver.resolve(apiDir, '[model]/[id].delete.ts'),
+      handler: resolver.resolve(apiDir, '[model]/[id].delete'),
     })
 
     // 3. Register Utils (modelMapper)
