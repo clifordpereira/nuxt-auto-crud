@@ -1,6 +1,10 @@
 // server/api/[model]/[id].delete.ts
 import { eventHandler, getRouterParams, createError } from 'h3'
 import { eq } from 'drizzle-orm'
+import { getTableForModel, getModelSingularName } from '../../utils/modelMapper'
+
+// TODO: Better type for useDrizzle
+declare function useDrizzle(): any
 
 export default eventHandler(async (event) => {
   const { model, id } = getRouterParams(event)

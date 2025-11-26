@@ -63,7 +63,7 @@ export const modelTableMap = buildModelTableMap()
  * @returns The corresponding database table
  * @throws Error if model is not found
  */
-export function getTableForModel(modelName: string) {
+export function getTableForModel(modelName: string): any {
   const table = modelTableMap[modelName]
 
   if (!table) {
