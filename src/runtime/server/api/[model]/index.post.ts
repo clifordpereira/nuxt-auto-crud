@@ -1,4 +1,6 @@
 // server/api/[model]/index.post.ts
+import { eventHandler, getRouterParams, readBody } from 'h3'
+
 export default eventHandler(async (event) => {
   const { model } = getRouterParams(event)
   const table = getTableForModel(model)

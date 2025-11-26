@@ -1,4 +1,7 @@
 // server/api/[model]/[id].patch.ts
+import { eventHandler, getRouterParams, readBody } from 'h3'
+import { eq } from 'drizzle-orm'
+
 export default eventHandler(async (event) => {
   const { model, id } = getRouterParams(event)
   const table = getTableForModel(model)

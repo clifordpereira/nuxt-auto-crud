@@ -1,4 +1,7 @@
 // server/api/[model]/[id].delete.ts
+import { eventHandler, getRouterParams, createError } from 'h3'
+import { eq } from 'drizzle-orm'
+
 export default eventHandler(async (event) => {
   const { model, id } = getRouterParams(event)
   const table = getTableForModel(model)
