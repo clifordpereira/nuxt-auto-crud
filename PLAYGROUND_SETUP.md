@@ -28,7 +28,6 @@ Created a comprehensive sample schema with three tables:
 Updated to include:
 
 - NuxtHub module for database support
-- Ghost API module configuration
 - Database enablement
 - Schema path configuration
 

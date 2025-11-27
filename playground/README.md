@@ -1,4 +1,4 @@
-# Nuxt Ghost API - Playground
+# Nuxt Auto CRUD - Playground
 
 This is the playground/demo application for the **nuxt-auto-crud** module.
 
@@ -165,7 +165,7 @@ For quick development iterations, use `bun run db:push` to sync schema changes d
 
 ## 📚 Learn More
 
-- [Nuxt Ghost API Documentation](https://github.com/clifordpereira/nuxt-auto-crud)
+- [Nuxt Auto CRUD Documentation](https://github.com/clifordpereira/nuxt-auto-crud)
 - [Drizzle ORM Documentation](https://orm.drizzle.team/)
 - [NuxtHub Documentation](https://hub.nuxt.com/)
 

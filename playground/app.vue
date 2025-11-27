@@ -2,7 +2,7 @@
   <div class="playground-container">
     <header class="header">
       <div class="header-content">
-        <h1>🚀 Nuxt Ghost API Playground</h1>
+        <h1>🚀 Nuxt Auto CRUD Playground</h1>
         <p class="subtitle">
           Auto-generated RESTful CRUD APIs from your database schema
         </p>

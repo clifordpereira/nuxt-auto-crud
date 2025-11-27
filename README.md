@@ -5,73 +5,141 @@
 [![License][license-src]][license-href]
 [![Nuxt][nuxt-src]][nuxt-href]
 
-Auto-generate RESTful CRUD APIs for your Nuxt app based solely on your database schema. No configuration needed!
+Auto-generate RESTful CRUD APIs for your **Nuxt** application based solely on your database schema. No configuration needed!
 
 - [✨ Release Notes](/CHANGELOG.md)
 - [🎮 Try the Playground](/playground)
 
-## ✨ Features
+## 🚀 CRUD APIs are ready to use without code
 
-- 🔄 **Auto-Detection** - Automatically detects all tables from your Drizzle schema
-- 🚀 **Zero Configuration** - Just define your schema, APIs are generated automatically
-- 🛡️ **Protected Fields** - Automatically protects `id` and `createdAt` fields from updates
-- 📝 **Full CRUD** - Complete Create, Read, Update, Delete operations out of the box
-- 🎯 **Type-Safe** - Fully typed with TypeScript support
-- 🔌 **Works with NuxtHub** - Seamlessly integrates with NuxtHub database
+- `GET /api/:model` - List all records
+- `POST /api/:model` - Create a new record
+- `GET /api/:model/:id` - Get record by ID
+- `PATCH /api/:model/:id` - Update record
+- `DELETE /api/:model/:id` - Delete record
 
-## 📦 Quick Setup
+## 📦 How to install
 
-### 1. Install the module
+### New Project (Recommended)
+
+Start a new project with everything pre-configured using our template:
 
 ```bash
-bun add nuxt-auto-crud
-# or
-npm install nuxt-auto-crud
+npx nuxi init -t gh:clifordpereira/nuxt-auto-crud_template <project-name>
+cd <project-name>
+bun db:generate
+bun run dev
 ```
 
-### 2. Add to your Nuxt config
+### Add User
+Open Nuxt DevTools (bottom-middle icon) > `...` menu > **Database** icon to add users.
+    > **Note:** If the users table doesn't appear, restart the server (`Ctrl + C` and `bun run dev`).
+
+That's it! You can now access the APIs:
+
+### Test API
+Visit [http://localhost:3000/api/users](http://localhost:3000/api/users).
+
+### Existing Project
+
+If you want to add `nuxt-auto-crud` to an existing project, follow these steps:
+
+### 1. Install dependencies
+
+```bash
+# Install module and required dependencies
+bun add nuxt-auto-crud @nuxthub/core@latest drizzle-orm
+bun add --dev wrangler drizzle-kit
+```
+
+### 2. Configure Nuxt
+
+Add the modules to your `nuxt.config.ts`:
 
 ```typescript
 // nuxt.config.ts
 export default defineNuxtConfig({
-  modules: ["@nuxthub/core", "nuxt-auto-crud"],
+  modules: ['@nuxthub/core', 'nuxt-auto-crud'],
 
   hub: {
     database: true,
   },
 
   autoCrud: {
-    schemaPath: "server/database/schema", // default value
+    schemaPath: 'server/database/schema', // default value
   },
-});
+})
 ```
 
-### 3. Define your database schema
+### 3. Configure Drizzle
+
+Add the generation script to your `package.json`:
+
+```json
+{
+  "scripts": {
+    "db:generate": "drizzle-kit generate"
+  }
+}
+```
+
+Create `drizzle.config.ts` in your project root:
+
+```typescript
+// drizzle.config.ts
+import { defineConfig } from 'drizzle-kit'
+
+export default defineConfig({
+  dialect: 'sqlite',
+  schema: './server/database/schema.ts',
+  out: './server/database/migrations'
+})
+```
+
+### 4. Setup Database Connection
+
+Create `server/utils/drizzle.ts` to export the database instance:
+
+```typescript
+// server/utils/drizzle.ts
+import { drizzle } from 'drizzle-orm/d1'
+export { sql, eq, and, or } from 'drizzle-orm'
+
+import * as schema from '../database/schema'
+
+export const tables = schema
+
+export function useDrizzle() {
+  return drizzle(hubDatabase(), { schema })
+}
+
+export type User = typeof schema.users.$inferSelect
+```
+
+### 5. Define your database schema
+
+Create `server/database/schema.ts`:
 
 ```typescript
 // server/database/schema.ts
-import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
 
-export const users = sqliteTable("users", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  name: text("name").notNull(),
-  email: text("email").notNull().unique(),
-  bio: text("bio"),
-  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(
-    () => new Date()
-  ),
-});
+export const users = sqliteTable('users', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  name: text('name').notNull(),
+  email: text('email').notNull().unique(),
+  password: text('password').notNull(),
+  avatar: text('avatar').notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+})
+```
 
-export const posts = sqliteTable("posts", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  title: text("title").notNull(),
-  content: text("content").notNull(),
-  published: integer("published", { mode: "boolean" }).default(false),
-  authorId: integer("author_id").references(() => users.id),
-  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(
-    () => new Date()
-  ),
-});
+### 6. Run the project
+
+```bash
+cd <project-name>
+bun db:generate
+bun run dev
 ```
 
 That's it! 🎉 Your CRUD APIs are now available:
@@ -99,6 +167,7 @@ bun install
 # Run the playground
 cd playground
 bun install
+bun db:generate
 bun run dev
 ```
 
@@ -112,9 +181,9 @@ The playground includes a sample schema with users, posts, and comments tables, 
 const user = await $fetch("/api/users", {
   method: "POST",
   body: {
-    name: "John Doe",
-    email: "john@example.com",
-    bio: "Software developer",
+    name: "Cliford Pereira",
+    email: "clifordpereira@gmail.com",
+    bio: "Full-Stack Developer",
   },
 });
 ```
@@ -183,35 +252,6 @@ You can customize updatable fields in your schema by modifying the `modelMapper.
 
 Contributions are welcome! Please check out the [contribution guide](/CONTRIBUTING.md).
 
-<details>
-  <summary>Local development</summary>
-  
-  ```bash
-  # Install dependencies
-  bun install
-  
-  # Generate type stubs
-  bun run dev:prepare
-  
-  # Develop with the playground
-  bun run dev
-  
-  # Build the playground
-  bun run dev:build
-  
-  # Run ESLint
-  bun run lint
-  
-  # Run Vitest
-  bun run test
-  bun run test:watch
-  
-  # Release new version
-  bun run release
-  ```
-
-</details>
-
 ## 📝 License
 
 [MIT License](./LICENSE)
@@ -220,13 +260,4 @@ Contributions are welcome! Please check out the [contribution guide](/CONTRIBUTI
 
 Made with ❤️ by [Cliford Pereira](https://github.com/clifordpereira)
 
-<!-- Badges -->
 
-[npm-version-src]: https://img.shields.io/npm/v/nuxt-auto-crud/latest.svg?style=flat&colorA=020420&colorB=00DC82
-[npm-version-href]: https://npmjs.com/package/nuxt-auto-crud
-[npm-downloads-src]: https://img.shields.io/npm/dm/nuxt-auto-crud.svg?style=flat&colorA=020420&colorB=00DC82
-[npm-downloads-href]: https://npm.chart.dev/nuxt-auto-crud
-[license-src]: https://img.shields.io/npm/l/nuxt-auto-crud.svg?style=flat&colorA=020420&colorB=00DC82
-[license-href]: https://npmjs.com/package/nuxt-auto-crud
-[nuxt-src]: https://img.shields.io/badge/Nuxt-020420?logo=nuxt.js
-[nuxt-href]: https://nuxt.com

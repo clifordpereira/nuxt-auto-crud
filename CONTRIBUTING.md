@@ -1,6 +1,6 @@
-# Contributing to Nuxt Ghost API
+# Contributing to Nuxt Auto CRUD
 
-Thank you for your interest in contributing to Nuxt Ghost API! 🎉
+Thank you for your interest in contributing to Nuxt Auto CRUD! 🎉
 
 ## Getting Started
 
