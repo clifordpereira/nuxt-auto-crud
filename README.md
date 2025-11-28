@@ -44,6 +44,8 @@ Visit [http://localhost:3000/api/users](http://localhost:3000/api/users).
 
 If you want to add `nuxt-auto-crud` to an existing project, follow these steps:
 
+> **Note:** These instructions assume you are using NuxtHub. If you are using a custom SQLite setup (e.g. better-sqlite3, Turso), please see [Custom Setup](./custom-setup.md).
+
 ### 1. Install dependencies
 
 ```bash
@@ -245,8 +247,8 @@ You can customize updatable fields in your schema by modifying the `modelMapper.
 ## 🔧 Requirements
 
 - Nuxt 3 or 4
-- NuxtHub (for database functionality)
-- Drizzle ORM
+- Drizzle ORM (SQLite)
+- NuxtHub (Recommended) or [Custom SQLite Setup](./custom-setup.md)
 
 ## 🤝 Contributing
 
