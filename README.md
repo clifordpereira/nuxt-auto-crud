@@ -244,6 +244,16 @@ By default, the following fields are protected from updates:
 
 You can customize updatable fields in your schema by modifying the `modelMapper.ts` utility.
 
+### Hidden Fields
+
+By default, the following fields are hidden from API responses for security:
+
+- `password`
+- `secret`
+- `token`
+
+You can customize hidden fields by modifying the `modelMapper.ts` utility.
+
 ## 🔧 Requirements
 
 - Nuxt 3 or 4

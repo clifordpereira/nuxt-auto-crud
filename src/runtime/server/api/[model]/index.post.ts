@@ -1,6 +1,6 @@
 // server/api/[model]/index.post.ts
 import { eventHandler, getRouterParams, readBody } from 'h3'
-import { getTableForModel } from '../../utils/modelMapper'
+import { getTableForModel, filterHiddenFields } from '../../utils/modelMapper'
 
 // @ts-expect-error - #site/drizzle is an alias defined by the module
 import { useDrizzle } from '#site/drizzle'
@@ -22,5 +22,5 @@ export default eventHandler(async (event) => {
     .returning()
     .get()
 
-  return record
+  return filterHiddenFields(model, record as Record<string, unknown>)
 })

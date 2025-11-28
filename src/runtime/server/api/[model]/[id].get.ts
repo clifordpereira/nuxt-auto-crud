@@ -1,7 +1,7 @@
 // server/api/[model]/[id].get.ts
 import { eventHandler, getRouterParams, createError } from 'h3'
 import { eq } from 'drizzle-orm'
-import { getTableForModel, getModelSingularName } from '../../utils/modelMapper'
+import { getTableForModel, getModelSingularName, filterHiddenFields } from '../../utils/modelMapper'
 
 import type { TableWithId } from '../../types'
 // @ts-expect-error - #site/drizzle is an alias defined by the module
@@ -25,5 +25,5 @@ export default eventHandler(async (event) => {
     })
   }
 
-  return record
+  return filterHiddenFields(model, record as Record<string, unknown>)
 })

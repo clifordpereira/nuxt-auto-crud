@@ -13,6 +13,11 @@ import { createError } from 'h3'
 const PROTECTED_FIELDS = ['id', 'createdAt', 'created_at']
 
 /**
+ * Fields that should never be returned in API responses
+ */
+const HIDDEN_FIELDS = ['password', 'secret', 'token']
+
+/**
  * Custom updatable fields configuration (optional)
  * Only define here if you want to override the auto-detection
  *
@@ -24,6 +29,14 @@ const PROTECTED_FIELDS = ['id', 'createdAt', 'created_at']
 export const customUpdatableFields: Record<string, string[]> = {
   // Add custom field restrictions here if needed
   // By default, all fields except PROTECTED_FIELDS are updatable
+}
+
+/**
+ * Custom hidden fields configuration (optional)
+ * Only define here if you want to override the default hidden fields
+ */
+export const customHiddenFields: Record<string, string[]> = {
+  // Add custom hidden fields here if needed
 }
 
 /**
@@ -162,4 +175,37 @@ export function getModelPluralName(modelName: string): string {
  */
 export function getAvailableModels(): string[] {
   return Object.keys(modelTableMap)
+}
+
+/**
+ * Gets the hidden fields for a model
+ * @param modelName - The name of the model
+ * @returns Array of field names that should be hidden
+ */
+export function getHiddenFields(modelName: string): string[] {
+  // Check if custom hidden fields are defined for this model
+  if (customHiddenFields[modelName]) {
+    return customHiddenFields[modelName]
+  }
+
+  return HIDDEN_FIELDS
+}
+
+/**
+ * Filters an object to exclude hidden fields
+ * @param modelName - The name of the model
+ * @param data - The data object to filter
+ * @returns Filtered object without hidden fields
+ */
+export function filterHiddenFields(modelName: string, data: Record<string, unknown>): Record<string, unknown> {
+  const hiddenFields = getHiddenFields(modelName)
+  const filtered: Record<string, unknown> = {}
+
+  for (const [key, value] of Object.entries(data)) {
+    if (!hiddenFields.includes(key)) {
+      filtered[key] = value
+    }
+  }
+
+  return filtered
 }

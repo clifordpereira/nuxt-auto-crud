@@ -1,7 +1,7 @@
 // server/api/[model]/[id].patch.ts
 import { eventHandler, getRouterParams, readBody } from 'h3'
 import { eq } from 'drizzle-orm'
-import { getTableForModel, filterUpdatableFields } from '../../utils/modelMapper'
+import { getTableForModel, filterUpdatableFields, filterHiddenFields } from '../../utils/modelMapper'
 
 import type { TableWithId } from '../../types'
 // @ts-expect-error - #site/drizzle is an alias defined by the module
@@ -22,5 +22,5 @@ export default eventHandler(async (event) => {
     .returning()
     .get()
 
-  return record
+  return filterHiddenFields(model, record as Record<string, unknown>)
 })
