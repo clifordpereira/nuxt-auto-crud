@@ -221,7 +221,57 @@ await $fetch("/api/users/1", {
 });
 ```
 
-## ⚙️ Configuration
+## Use Cases
+
+### 1. Full-stack App (with Auth)
+
+If you are building a full-stack Nuxt application, you can easily integrate `nuxt-auth-utils` and `nuxt-authorization` to secure your auto-generated APIs.
+
+First, install the modules:
+
+```bash
+npx nuxi@latest module add auth-utils
+npm install nuxt-authorization
+```
+
+Then, configure `nuxt-auto-crud` in your `nuxt.config.ts`:
+
+```ts
+export default defineNuxtConfig({
+  modules: [
+    'nuxt-auto-crud',
+    'nuxt-auth-utils'
+  ],
+  autoCrud: {
+    auth: {
+      enabled: true, // Enables requireUserSession() check
+      authorization: true // Enables authorize(model, action) check
+    }
+  }
+})
+```
+
+When `authorization` is enabled, the module will call `authorize(model, action)` where action is one of: `create`, `read`, `update`, `delete`.
+
+### 2. Backend-only App (API Mode)
+
+If you are using Nuxt as a backend for a separate client application (e.g., mobile app, SPA), you can use this module to quickly generate REST APIs.
+
+In this case, you might handle authentication differently (e.g., validating tokens in middleware) or disable the built-in auth checks if you have a global auth middleware.
+
+```ts
+export default defineNuxtConfig({
+  modules: ['nuxt-auto-crud'],
+  autoCrud: {
+    auth: {
+      enabled: false, // Default
+      authorization: false // Default
+    }
+  }
+})
+```
+
+## Configuration
 
 ### Module Options
 

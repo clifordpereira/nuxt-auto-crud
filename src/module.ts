@@ -18,6 +18,22 @@ export interface ModuleOptions {
    * @default 'server/utils/drizzle'
    */
   drizzlePath?: string
+
+  /**
+   * Authentication configuration
+   */
+  auth?: {
+    /**
+     * Enable authentication checks (requires nuxt-auth-utils)
+     * @default false
+     */
+    enabled: boolean
+    /**
+     * Enable authorization checks (requires nuxt-authorization)
+     * @default false
+     */
+    authorization?: boolean
+  }
 }
 
 export default defineNuxtModule<ModuleOptions>({
@@ -40,12 +56,16 @@ export default defineNuxtModule<ModuleOptions>({
     )
     nuxt.options.alias['#site/schema'] = schemaPath
 
-    // 2. Alias the drizzle instance
     const drizzlePath = resolver.resolve(
       nuxt.options.rootDir,
       options.drizzlePath!,
     )
     nuxt.options.alias['#site/drizzle'] = drizzlePath
+
+    // 3. Pass options to runtimeConfig
+    nuxt.options.runtimeConfig.autoCrud = {
+      auth: options.auth || { enabled: false, authorization: false },
+    }
 
     // 2. Register the API routes
     // We scan the runtime/server/api directory and add handlers
