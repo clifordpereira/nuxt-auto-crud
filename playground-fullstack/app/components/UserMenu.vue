@@ -112,7 +112,8 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
   icon: 'i-lucide-log-out',
   onSelect: async () => {
     await $fetch('/api/auth/logout', { method: 'POST' })
-    await navigateTo('/login')
+    // Force a reload to ensure layout changes (admin -> guest) are applied
+    window.location.href = '/login'
   }
 }]]))
 </script>
