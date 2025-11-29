@@ -6,6 +6,7 @@ export const users = sqliteTable('users', {
   password: text('password').notNull(),
   name: text('name'),
   avatar: text('avatar'),
+  role: text('role').default('user'),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull()
 })
@@ -26,20 +27,4 @@ export const products = sqliteTable('products', {
   status: text('status').notNull(), // 'active' | 'archived'
   inventory: integer('inventory').notNull().default(0),
   image: text('image')
-})
-
-export const sales = sqliteTable('sales', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
-  date: integer('date', { mode: 'timestamp' }).notNull(),
-  status: text('status').notNull(), // 'paid' | 'failed' | 'refunded'
-  email: text('email').notNull(),
-  amount: real('amount').notNull()
-})
-
-export const notifications = sqliteTable('notifications', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
-  unread: integer('unread', { mode: 'boolean' }).default(true),
-  senderId: integer('sender_id').references(() => users.id),
-  body: text('body').notNull(),
-  date: integer('date', { mode: 'timestamp' }).notNull()
 })

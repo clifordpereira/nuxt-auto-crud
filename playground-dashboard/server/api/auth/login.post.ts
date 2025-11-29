@@ -26,7 +26,7 @@ export default eventHandler(async (event) => {
       email: user.email,
       name: user.name,
       avatar: user.avatar,
-      role: 'admin' // Hardcoded for now as we only have admin users in this table
+      role: user.role || 'user'
     }
   })
 

@@ -29,13 +29,15 @@ useSeoMeta({
   twitterImage: 'https://ui.nuxt.com/assets/templates/nuxt/dashboard-light.png',
   twitterCard: 'summary_large_image'
 })
+
+const { user } = useUserSession()
 </script>
 
 <template>
   <UApp>
     <NuxtLoadingIndicator />
 
-    <NuxtLayout>
+    <NuxtLayout :name="user?.role === 'admin' ? 'dashboard' : 'default'">
       <NuxtPage />
     </NuxtLayout>
   </UApp>

@@ -8,6 +8,13 @@
       "when": 1764393664908,
       "tag": "0000_mixed_thena",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1764395523431,
+      "tag": "0001_loud_warlock",
+      "breakpoints": true
     }
   ]
 }
