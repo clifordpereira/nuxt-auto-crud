@@ -1,9 +1,8 @@
 # Nuxt Auto CRUD
 
-[![npm version][npm-version-src]][npm-version-href]
-[![npm downloads][npm-downloads-src]][npm-downloads-href]
-[![License][license-src]][license-href]
-[![Nuxt][nuxt-src]][nuxt-href]
+
+
+> **Note:** This module is currently in its alpha stage. However, you can use it to accelerate MVP development. It has not been tested thoroughly enough for production use; only happy-path testing is performed for each release.
 
 Auto-generate RESTful CRUD APIs for your **Nuxt** application based solely on your database schema. No configuration needed!
 

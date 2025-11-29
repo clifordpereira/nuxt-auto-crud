@@ -49,10 +49,11 @@ async function onSubmit() {
           <UIcon name="i-heroicons-command-line" class="w-12 h-12 text-primary-400" />
           <h1 class="text-4xl font-bold text-black">Nuxt Auto CRUD</h1>
         </div>
-        <p class="text-xl text-black max-w-md leading-relaxed">
-          A powerful, automated CRUD module for Nuxt.js. Manage your data with ease and efficiency.
+        <p class="text-xl text-black max-w-md leading-relaxed text-justify italic">
+          This template demonstrates securing your application by implementing Authentication and Authorization alongside nuxt-auto-crud. Remember that the module provides the backend CRUD APIs, but the frontend user interface must be developed by you.
         </p>
-      </div>
+
+        </div>
     </div>
 
     <!-- Right Side: Login Form -->
