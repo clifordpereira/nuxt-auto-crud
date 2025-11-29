@@ -15,7 +15,8 @@ async function waitServer(port) {
     try {
       await fetch(`http://localhost:${port}/api/users`)
       return true
-    } catch (e) {
+    }
+    catch {
       await new Promise(r => setTimeout(r, 1000))
     }
   }
@@ -29,16 +30,16 @@ async function main() {
   const fullstack = spawn('nuxi', ['dev', 'playground-fullstack', '--port', FULLSTACK_PORT], {
     cwd: rootDir,
     stdio: 'pipe',
-    env: { ...process.env, NUXT_SESSION_PASSWORD: 'password-must-be-at-least-32-characters-long' }
+    env: { ...process.env, NUXT_SESSION_PASSWORD: 'password-must-be-at-least-32-characters-long' },
   })
-  
+
   fullstack.stdout.pipe(logStream)
   fullstack.stderr.pipe(logStream)
 
   const backend = spawn('nuxi', ['dev', 'playground-backend', '--port', BACKEND_PORT], {
     cwd: rootDir,
     stdio: 'pipe',
-    env: { ...process.env }
+    env: { ...process.env },
   })
 
   backend.stdout.pipe(logStream)
@@ -54,15 +55,15 @@ async function main() {
     }
 
     console.log('Servers ready. Running tests...')
-    
+
     const test = spawn('npx', ['vitest', 'run'], {
       cwd: rootDir,
       stdio: 'inherit',
-      env: { 
-        ...process.env, 
+      env: {
+        ...process.env,
         TEST_PORT: FULLSTACK_PORT,
-        TEST_BACKEND_PORT: BACKEND_PORT 
-      }
+        TEST_BACKEND_PORT: BACKEND_PORT,
+      },
     })
 
     test.on('close', (code) => {
@@ -70,9 +71,9 @@ async function main() {
       backend.kill()
       process.exit(code)
     })
-
-  } catch (e) {
-    console.error(e)
+  }
+  catch {
+    console.error('Error starting servers')
     fullstack.kill()
     backend.kill()
     process.exit(1)

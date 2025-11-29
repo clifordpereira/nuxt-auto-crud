@@ -210,7 +210,7 @@ export function getPublicColumns(modelName: string): string[] | undefined {
  */
 export function filterPublicColumns(modelName: string, data: Record<string, unknown>): Record<string, unknown> {
   const publicColumns = getPublicColumns(modelName)
-  
+
   // If no public columns configured, return all (except hidden)
   if (!publicColumns) {
     return filterHiddenFields(modelName, data)

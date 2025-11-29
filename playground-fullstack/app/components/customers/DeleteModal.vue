@@ -2,7 +2,7 @@
 withDefaults(defineProps<{
   count?: number
 }>(), {
-  count: 0
+  count: 0,
 })
 
 const open = ref(false)

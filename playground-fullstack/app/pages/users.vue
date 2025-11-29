@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
 import { upperFirst } from 'scule'
@@ -16,20 +17,20 @@ const table = useTemplateRef('table')
 
 const columnFilters = ref([{
   id: 'email',
-  value: ''
+  value: '',
 }])
 const columnVisibility = ref()
 const rowSelection = ref({})
 
 const { data, status } = await useFetch<User[]>('/api/users', {
-  lazy: true
+  lazy: true,
 })
 
 function getRowItems(row: Row<User>) {
   return [
     {
       type: 'label',
-      label: 'Actions'
+      label: 'Actions',
     },
     {
       label: 'Copy user ID',
@@ -38,12 +39,12 @@ function getRowItems(row: Row<User>) {
         navigator.clipboard.writeText(row.original.id.toString())
         toast.add({
           title: 'Copied to clipboard',
-          description: 'User ID copied to clipboard'
+          description: 'User ID copied to clipboard',
         })
-      }
+      },
     },
     {
-      type: 'separator'
+      type: 'separator',
     },
     {
       label: 'Delete user',
@@ -52,10 +53,10 @@ function getRowItems(row: Row<User>) {
       onSelect() {
         toast.add({
           title: 'User deleted',
-          description: 'The user has been deleted.'
+          description: 'The user has been deleted.',
         })
-      }
-    }
+      },
+    },
   ]
 }
 
@@ -69,18 +70,18 @@ const columns: TableColumn<User>[] = [
           : table.getIsAllPageRowsSelected(),
         'onUpdate:modelValue': (value: boolean | 'indeterminate') =>
           table.toggleAllPageRowsSelected(!!value),
-        'ariaLabel': 'Select all'
+        'ariaLabel': 'Select all',
       }),
     cell: ({ row }) =>
       h(UCheckbox, {
         'modelValue': row.getIsSelected(),
         'onUpdate:modelValue': (value: boolean | 'indeterminate') => row.toggleSelected(!!value),
-        'ariaLabel': 'Select row'
-      })
+        'ariaLabel': 'Select row',
+      }),
   },
   {
     accessorKey: 'id',
-    header: 'ID'
+    header: 'ID',
   },
   {
     accessorKey: 'name',
@@ -90,23 +91,23 @@ const columns: TableColumn<User>[] = [
         h(UAvatar, {
           src: row.original.avatar,
           alt: row.original.name,
-          size: 'lg'
+          size: 'lg',
         }),
         h('div', undefined, [
           h('p', { class: 'font-medium text-highlighted' }, row.original.name || 'Unknown'),
-          h('p', { class: '' }, row.original.email)
-        ])
+          h('p', { class: '' }, row.original.email),
+        ]),
       ])
-    }
+    },
   },
   {
     accessorKey: 'role',
     header: 'Role',
     cell: ({ row }) => {
       return h(UBadge, { class: 'capitalize', variant: 'subtle' }, () =>
-        row.original.role || 'user'
+        row.original.role || 'user',
       )
-    }
+    },
   },
   {
     id: 'actions',
@@ -118,21 +119,21 @@ const columns: TableColumn<User>[] = [
           UDropdownMenu,
           {
             content: {
-              align: 'end'
+              align: 'end',
             },
-            items: getRowItems(row)
+            items: getRowItems(row),
           },
           () =>
             h(UButton, {
               icon: 'i-lucide-ellipsis-vertical',
               color: 'neutral',
               variant: 'ghost',
-              class: 'ml-auto'
-            })
-        )
+              class: 'ml-auto',
+            }),
+        ),
       )
-    }
-  }
+    },
+  },
 ]
 
 const email = computed({
@@ -141,12 +142,12 @@ const email = computed({
   },
   set: (value: string) => {
     table.value?.tableApi?.getColumn('email')?.setFilterValue(value || undefined)
-  }
+  },
 })
 
 const pagination = ref({
   pageIndex: 0,
-  pageSize: 10
+  pageSize: 10,
 })
 </script>
 
@@ -184,7 +185,7 @@ const pagination = ref({
                   },
                   onSelect(e?: Event) {
                     e?.preventDefault()
-                  }
+                  },
                 }))
             "
             :content="{ align: 'end' }"
@@ -206,7 +207,7 @@ const pagination = ref({
         v-model:row-selection="rowSelection"
         v-model:pagination="pagination"
         :pagination-options="{
-          getPaginationRowModel: getPaginationRowModel()
+          getPaginationRowModel: getPaginationRowModel(),
         }"
         class="shrink-0"
         :data="data"
@@ -218,7 +219,7 @@ const pagination = ref({
           tbody: '[&>tr]:last:[&>td]:border-b-0',
           th: 'py-2 first:rounded-l-lg last:rounded-r-lg border-y border-default first:border-l last:border-r',
           td: 'border-b border-default',
-          separator: 'h-0'
+          separator: 'h-0',
         }"
       />
 

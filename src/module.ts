@@ -52,18 +52,18 @@ export default defineNuxtModule<ModuleOptions>({
       cwd: nuxt.options.rootDir,
     })
 
-    // Merge options: Inline options take precedence over external config? 
+    // Merge options: Inline options take precedence over external config?
     // Usually external config is base, inline overrides.
     // But here, resources might be merged deeply.
-    // For simplicity, we'll do a shallow merge of top-level keys, 
+    // For simplicity, we'll do a shallow merge of top-level keys,
     // but for 'resources', we might want to merge them if both exist.
     // Let's use defu or simple spread for now.
-    
+
     const mergedAuth = {
       ...externalConfig?.auth,
       ...options.auth,
     }
-    
+
     const mergedResources = {
       ...externalConfig?.resources,
       ...options.resources,

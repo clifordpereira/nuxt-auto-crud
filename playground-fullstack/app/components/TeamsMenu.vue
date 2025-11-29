@@ -9,8 +9,8 @@ const teams = ref([{
   label: 'Auto Crud',
   avatar: {
     src: '/favicon.ico', // Placeholder or use a generic one
-    alt: 'Auto Crud'
-  }
+    alt: 'Auto Crud',
+  },
 }])
 const selectedTeam = ref(teams.value[0])
 
@@ -19,13 +19,13 @@ const items = computed<DropdownMenuItem[][]>(() => {
     ...team,
     onSelect() {
       selectedTeam.value = team
-    }
+    },
   })), [{
     label: 'Create team',
-    icon: 'i-lucide-circle-plus'
+    icon: 'i-lucide-circle-plus',
   }, {
     label: 'Manage teams',
-    icon: 'i-lucide-cog'
+    icon: 'i-lucide-cog',
   }]]
 })
 </script>
@@ -40,7 +40,7 @@ const items = computed<DropdownMenuItem[][]>(() => {
       v-bind="{
         ...selectedTeam,
         label: collapsed ? undefined : selectedTeam?.label,
-        trailingIcon: collapsed ? undefined : 'i-lucide-chevrons-up-down'
+        trailingIcon: collapsed ? undefined : 'i-lucide-chevrons-up-down',
       }"
       color="neutral"
       variant="ghost"
@@ -49,7 +49,7 @@ const items = computed<DropdownMenuItem[][]>(() => {
       class="data-[state=open]:bg-elevated"
       :class="[!collapsed && 'py-2']"
       :ui="{
-        trailingIcon: 'text-dimmed'
+        trailingIcon: 'text-dimmed',
       }"
     />
   </UDropdownMenu>

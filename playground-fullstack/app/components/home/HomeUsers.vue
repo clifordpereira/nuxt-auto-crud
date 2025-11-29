@@ -7,11 +7,12 @@ const UAvatar = resolveComponent('UAvatar')
 
 const { data: users } = await useFetch('/api/users')
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const columns: TableColumn<any>[] = [
   {
     accessorKey: 'id',
     header: 'ID',
-    cell: ({ row }) => `#${row.getValue('id')}`
+    cell: ({ row }) => `#${row.getValue('id')}`,
   },
   {
     accessorKey: 'name',
@@ -21,15 +22,15 @@ const columns: TableColumn<any>[] = [
         h(UAvatar, {
           src: row.original.avatar,
           alt: row.getValue('name'),
-          size: 'sm'
+          size: 'sm',
         }),
-        h('span', { class: 'font-medium text-gray-900 dark:text-white' }, row.getValue('name'))
+        h('span', { class: 'font-medium text-gray-900 dark:text-white' }, row.getValue('name')),
       ])
-    }
+    },
   },
   {
     accessorKey: 'email',
-    header: 'Email'
+    header: 'Email',
   },
   {
     accessorKey: 'role',
@@ -39,9 +40,9 @@ const columns: TableColumn<any>[] = [
       return h(UBadge, {
         color: role === 'admin' ? 'primary' : 'neutral',
         variant: 'subtle',
-        class: 'capitalize'
+        class: 'capitalize',
       }, () => role)
-    }
+    },
   },
   {
     accessorKey: 'createdAt',
@@ -50,21 +51,30 @@ const columns: TableColumn<any>[] = [
       return new Date(row.getValue('createdAt')).toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
-        day: 'numeric'
+        day: 'numeric',
       })
-    }
-  }
+    },
+  },
 ]
 </script>
 
 <template>
-  <UCard class="mt-8" :ui="{ header: 'px-4 sm:px-6', body: 'p-0 sm:p-0' }">
+  <UCard
+    class="mt-8"
+    :ui="{ header: 'px-4 sm:px-6', body: 'p-0 sm:p-0' }"
+  >
     <template #header>
       <div class="flex items-center justify-between">
         <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
           Recent Users
         </h3>
-        <UButton to="/users" color="neutral" variant="ghost" icon="i-lucide-arrow-right" trailing>
+        <UButton
+          to="/users"
+          color="neutral"
+          variant="ghost"
+          icon="i-lucide-arrow-right"
+          trailing
+        >
           View all
         </UButton>
       </div>
@@ -78,7 +88,7 @@ const columns: TableColumn<any>[] = [
         base: 'min-w-full table-fixed',
         thead: 'bg-gray-50 dark:bg-gray-800/50',
         th: 'text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider px-4 py-3 sm:px-6',
-        td: 'whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 px-4 py-4 sm:px-6'
+        td: 'whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 px-4 py-4 sm:px-6',
       }"
     />
   </UCard>

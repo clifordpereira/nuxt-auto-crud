@@ -1,14 +1,24 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
     <header class="bg-white dark:bg-gray-800 shadow">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
         <div class="flex items-center gap-1.5 font-bold text-xl text-gray-900 dark:text-white">
-        <UIcon name="i-heroicons-command-line" class="w-8 h-8 text-primary-500" />
-        Nuxt Auto CRUD (Full Stack Example)
-      </div>
+          <UIcon
+            name="i-heroicons-command-line"
+            class="w-8 h-8 text-primary-500"
+          />
+          Nuxt Auto CRUD (Full Stack Example)
+        </div>
         <nav>
-          <NuxtLink to="/products" class="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white px-3 py-2">Products</NuxtLink>
-          <NuxtLink to="/login" class="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white px-3 py-2">Admin Login</NuxtLink>
+          <NuxtLink
+            to="/products"
+            class="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white px-3 py-2"
+          >Products</NuxtLink>
+          <NuxtLink
+            to="/login"
+            class="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white px-3 py-2"
+          >Admin Login</NuxtLink>
         </nav>
       </div>
     </header>

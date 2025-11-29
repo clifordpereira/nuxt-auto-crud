@@ -9,7 +9,7 @@ export default defineNuxtConfig({
     'nuxt-auth-utils',
     '@vueuse/nuxt',
     'nuxt-authorization',
-    '../src/module'
+    '../src/module',
   ],
 
   devtools: { enabled: true },
@@ -17,29 +17,29 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
 
   future: {
-    compatibilityVersion: 4
+    compatibilityVersion: 4,
   },
 
   compatibilityDate: '2024-11-27',
 
   hub: {
-    database: true
-  },
-
-  eslint: {
-    config: {
-      stylistic: {
-        commaDangle: 'never',
-        braceStyle: '1tbs'
-      }
-    }
+    database: true,
   },
 
   autoCrud: {
     schemaPath: 'server/database/schema',
     auth: {
       enabled: true,
-      authorization: true
-    }
-  }
+      authorization: true,
+    },
+  },
+
+  eslint: {
+    config: {
+      stylistic: {
+        commaDangle: 'never',
+        braceStyle: '1tbs',
+      },
+    },
+  },
 })

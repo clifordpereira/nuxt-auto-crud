@@ -12,14 +12,14 @@ export default eventHandler(async (event) => {
   console.log('[GET] Request received', event.path)
   const { resources } = useAutoCrudConfig()
   const { model } = getRouterParams(event) as { model: string }
-  
+
   const isAdmin = await checkAdminAccess(event, model, 'list')
-  
+
   // Check public access if not admin
   if (!isAdmin) {
     const resourceConfig = resources?.[model]
     const isPublic = resourceConfig?.public === true || (Array.isArray(resourceConfig?.public) && resourceConfig.public.includes('list'))
-    
+
     if (!isPublic) {
       throw createError({
         statusCode: 401,
@@ -30,13 +30,13 @@ export default eventHandler(async (event) => {
 
   const table = getTableForModel(model)
 
-
   const results = await useDrizzle().select().from(table).all()
 
   return results.map((item: Record<string, unknown>) => {
     if (isAdmin) {
       return filterHiddenFields(model, item as Record<string, unknown>)
-    } else {
+    }
+    else {
       return filterPublicColumns(model, item as Record<string, unknown>)
     }
   })

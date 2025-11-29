@@ -19,20 +19,18 @@ export async function checkAdminAccess(event: H3Event, model: string, action: st
   }
 
   // Session based (default)
-  // @ts-ignore
+  // @ts-expect-error - requireUserSession is auto-imported
   if (typeof requireUserSession !== 'function') {
-    throw new Error('requireUserSession is not available')
+    throw new TypeError('requireUserSession is not available')
   }
 
   try {
-    // @ts-ignore
+    // @ts-expect-error - requireUserSession is auto-imported
     await requireUserSession(event)
-    
+
     // Check authorization if enabled
     if (auth.authorization) {
-      // @ts-ignore
       if (event.context.ability) {
-        // @ts-ignore
         const can = event.context.ability.can(action, model)
         if (!can) {
           throw createError({
@@ -42,11 +40,13 @@ export async function checkAdminAccess(event: H3Event, model: string, action: st
         }
       }
     }
-    
+
     return true
-  } catch (e: any) {
+  }
+  catch (e: unknown) {
     // If it's a 403 (Forbidden) from our ability check, rethrow it
-    if (e.statusCode === 403) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((e as any).statusCode === 403) {
       throw e
     }
     // Otherwise (401 from requireUserSession), return false (treat as guest)

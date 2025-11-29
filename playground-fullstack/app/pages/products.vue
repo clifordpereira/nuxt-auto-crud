@@ -1,22 +1,24 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
 definePageMeta({
-  layout: 'default'
+  layout: 'default',
 })
 
 const { data: products } = await useFetch('/api/products')
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const columns = [{
   key: 'image',
-  label: 'Image'
+  label: 'Image',
 }, {
   key: 'name',
-  label: 'Name'
+  label: 'Name',
 }, {
   key: 'price',
-  label: 'Price'
+  label: 'Price',
 }, {
   key: 'status',
-  label: 'Status'
+  label: 'Status',
 }]
 </script>
 
@@ -31,12 +33,19 @@ const columns = [{
       </p>
     </div>
 
-    <div v-if="products?.length" class="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
-      <div v-for="product in products" :key="product.id" class="group relative">
+    <div
+      v-if="products?.length"
+      class="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8"
+    >
+      <div
+        v-for="product in products"
+        :key="product.id"
+        class="group relative"
+      >
         <div class="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
-          <img 
-            :src="product.image || 'https://placehold.co/300x300?text=No+Image'" 
-            :alt="product.name" 
+          <img
+            :src="product.image || 'https://placehold.co/300x300?text=No+Image'"
+            :alt="product.name"
             class="h-full w-full object-cover object-center group-hover:opacity-75"
           >
         </div>
@@ -46,14 +55,23 @@ const columns = [{
         <p class="mt-1 text-lg font-medium text-gray-900 dark:text-white">
           ${{ product.price }}
         </p>
-        <UBadge :color="product.status === 'active' ? 'green' : 'gray'" variant="subtle" class="mt-2">
+        <UBadge
+          :color="product.status === 'active' ? 'green' : 'gray'"
+          variant="subtle"
+          class="mt-2"
+        >
           {{ product.status }}
         </UBadge>
       </div>
     </div>
 
-    <div v-else class="text-center py-12">
-      <p class="text-gray-500 dark:text-gray-400">No products found.</p>
+    <div
+      v-else
+      class="text-center py-12"
+    >
+      <p class="text-gray-500 dark:text-gray-400">
+        No products found.
+      </p>
     </div>
   </div>
 </template>

@@ -13,14 +13,14 @@ import { checkAdminAccess } from '../../utils/auth'
 export default eventHandler(async (event) => {
   const { resources } = useAutoCrudConfig()
   const { model, id } = getRouterParams(event) as { model: string, id: string }
-  
+
   const isAdmin = await checkAdminAccess(event, model, 'delete')
 
   // Check public access if not admin
   if (!isAdmin) {
     const resourceConfig = resources?.[model]
     const isPublic = resourceConfig?.public === true || (Array.isArray(resourceConfig?.public) && resourceConfig.public.includes('delete'))
-    
+
     if (!isPublic) {
       throw createError({
         statusCode: 401,
@@ -48,7 +48,8 @@ export default eventHandler(async (event) => {
 
   if (isAdmin) {
     return filterHiddenFields(model, deletedRecord as Record<string, unknown>)
-  } else {
+  }
+  else {
     return filterPublicColumns(model, deletedRecord as Record<string, unknown>)
   }
 })

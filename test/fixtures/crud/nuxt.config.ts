@@ -8,13 +8,13 @@ export default defineNuxtConfig({
     'nuxt-authorization',
     MyModule,
   ],
+  alias: {
+    '#authorization': fileURLToPath(new URL('./auth-mock.ts', import.meta.url)),
+  },
   hub: {
     database: true,
   },
   autoCrud: {
     schemaPath: 'server/database/schema',
-  },
-  alias: {
-    '#authorization': fileURLToPath(new URL('./auth-mock.ts', import.meta.url)),
   },
 })

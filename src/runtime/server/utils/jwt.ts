@@ -13,7 +13,8 @@ export async function verifyJwtToken(event: H3Event, secret: string): Promise<bo
     const secretKey = new TextEncoder().encode(secret)
     await jwtVerify(token, secretKey)
     return true
-  } catch (e) {
+  }
+  catch {
     return false
   }
 }

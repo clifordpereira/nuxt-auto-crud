@@ -11,14 +11,14 @@ import { checkAdminAccess } from '../../utils/auth'
 export default eventHandler(async (event) => {
   const { resources } = useAutoCrudConfig()
   const { model } = getRouterParams(event) as { model: string }
-  
+
   const isAdmin = await checkAdminAccess(event, model, 'create')
 
   // Check public access if not admin
   if (!isAdmin) {
     const resourceConfig = resources?.[model]
     const isPublic = resourceConfig?.public === true || (Array.isArray(resourceConfig?.public) && resourceConfig.public.includes('create'))
-    
+
     if (!isPublic) {
       throw createError({
         statusCode: 401,
@@ -29,7 +29,6 @@ export default eventHandler(async (event) => {
 
   const table = getTableForModel(model)
 
-
   const body = await readBody(event)
   const payload = filterUpdatableFields(model, body)
 
@@ -37,7 +36,8 @@ export default eventHandler(async (event) => {
 
   if (isAdmin) {
     return filterHiddenFields(model, newRecord as Record<string, unknown>)
-  } else {
+  }
+  else {
     return filterPublicColumns(model, newRecord as Record<string, unknown>)
   }
 })

@@ -1,5 +1,5 @@
 import type { InferSelectModel } from 'drizzle-orm'
-import * as schema from '../server/database/schema'
+import type * as schema from '../server/database/schema'
 
 export type Customer = InferSelectModel<typeof schema.customers>
 export type Product = InferSelectModel<typeof schema.products>

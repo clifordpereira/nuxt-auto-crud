@@ -8,7 +8,7 @@ export const users = sqliteTable('users', {
   avatar: text('avatar'),
   role: text('role').default('user'),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull()
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
 })
 
 export const customers = sqliteTable('customers', {
@@ -17,7 +17,7 @@ export const customers = sqliteTable('customers', {
   email: text('email').notNull().unique(),
   avatar: text('avatar'),
   status: text('status').notNull(), // 'subscribed' | 'unsubscribed' | 'bounced'
-  location: text('location')
+  location: text('location'),
 })
 
 export const products = sqliteTable('products', {
@@ -26,7 +26,7 @@ export const products = sqliteTable('products', {
   price: real('price').notNull(),
   status: text('status').notNull(), // 'active' | 'archived'
   inventory: integer('inventory').notNull().default(0),
-  image: text('image')
+  image: text('image'),
 })
 
 export const orders = sqliteTable('orders', {

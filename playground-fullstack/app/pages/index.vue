@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
 import type { DropdownMenuItem } from '@nuxt/ui'
 
@@ -5,21 +6,21 @@ const { isNotificationsSlideoverOpen } = useDashboard()
 
 definePageMeta({
   layout: 'dashboard',
-  middleware: 'auth'
+  middleware: 'auth',
 })
 
 const items = [[{
   label: 'New user',
   icon: 'i-lucide-user-plus',
-  to: '/users'
+  to: '/users',
 }, {
   label: 'New customer',
   icon: 'i-lucide-users',
-  to: '/customers'
+  to: '/customers',
 }, {
   label: 'New product',
   icon: 'i-lucide-package',
-  to: '/products'
+  to: '/products',
 }]] satisfies DropdownMenuItem[][]
 
 const { data: users } = await useFetch('/api/users')
@@ -34,27 +35,43 @@ const productsCount = computed(() => products.value?.length || 0)
 <template>
   <UDashboardPanel id="home">
     <template #header>
-      <UDashboardNavbar title="Home" :ui="{ right: 'gap-3' }">
+      <UDashboardNavbar
+        title="Home"
+        :ui="{ right: 'gap-3' }"
+      >
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
 
         <template #right>
-          <UTooltip text="Notifications" :shortcuts="['N']">
+          <UTooltip
+            text="Notifications"
+            :shortcuts="['N']"
+          >
             <UButton
               color="neutral"
               variant="ghost"
               square
               @click="isNotificationsSlideoverOpen = true"
             >
-              <UChip color="error" inset>
-                <UIcon name="i-lucide-bell" class="size-5 shrink-0" />
+              <UChip
+                color="error"
+                inset
+              >
+                <UIcon
+                  name="i-lucide-bell"
+                  class="size-5 shrink-0"
+                />
               </UChip>
             </UButton>
           </UTooltip>
 
           <UDropdownMenu :items="items">
-            <UButton icon="i-lucide-plus" size="md" class="rounded-full" />
+            <UButton
+              icon="i-lucide-plus"
+              size="md"
+              class="rounded-full"
+            />
           </UDropdownMenu>
         </template>
       </UDashboardNavbar>

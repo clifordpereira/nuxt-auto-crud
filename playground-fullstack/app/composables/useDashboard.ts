@@ -10,7 +10,7 @@ const _useDashboard = () => {
     'g-i': () => router.push('/inbox'),
     'g-c': () => router.push('/customers'),
     'g-s': () => router.push('/settings'),
-    'n': () => isNotificationsSlideoverOpen.value = !isNotificationsSlideoverOpen.value
+    'n': () => isNotificationsSlideoverOpen.value = !isNotificationsSlideoverOpen.value,
   })
 
   watch(() => route.fullPath, () => {
@@ -18,7 +18,7 @@ const _useDashboard = () => {
   })
 
   return {
-    isNotificationsSlideoverOpen
+    isNotificationsSlideoverOpen,
   }
 }
 

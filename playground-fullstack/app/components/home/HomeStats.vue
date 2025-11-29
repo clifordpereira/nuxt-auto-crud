@@ -9,17 +9,17 @@ const stats = computed(() => [{
   title: 'Users',
   icon: 'i-lucide-user',
   value: props.usersCount,
-  to: '/users'
+  to: '/users',
 }, {
   title: 'Customers',
   icon: 'i-lucide-users',
   value: props.customersCount,
-  to: '/customers'
+  to: '/customers',
 }, {
   title: 'Products',
   icon: 'i-lucide-package',
   value: props.productsCount,
-  to: '/products'
+  to: '/products',
 }])
 </script>
 
@@ -36,7 +36,7 @@ const stats = computed(() => [{
         container: 'gap-y-1.5',
         wrapper: 'items-start',
         leading: 'p-2.5 rounded-full bg-primary/10 ring ring-inset ring-primary/25 flex-col',
-        title: 'font-normal text-muted text-xs uppercase'
+        title: 'font-normal text-muted text-xs uppercase',
       }"
       class="lg:rounded-none first:rounded-l-lg last:rounded-r-lg hover:z-1"
     >
