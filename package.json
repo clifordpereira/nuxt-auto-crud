@@ -50,7 +50,9 @@
     "@nuxt/kit": "^4.2.1",
     "@types/pluralize": "^0.0.33",
     "pluralize": "^8.0.0",
-    "scule": "^1.0.0"
+    "scule": "^1.0.0",
+    "c12": "^2.0.1",
+    "jose": "^5.9.6"
   },
   "peerDependencies": {
     "drizzle-orm": "^0.30.0"

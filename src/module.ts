@@ -5,54 +5,13 @@ import {
   addServerImportsDir,
 } from '@nuxt/kit'
 
-export interface ModuleOptions {
-  /**
-  /**
-   * Path to the database schema file
-   * @default 'server/database/schema'
-   */
-  schemaPath?: string
+import type { ModuleOptions } from './types'
 
-  /**
-   * Path to the drizzle instance file (must export useDrizzle)
-   * @default 'server/utils/drizzle'
-   */
-  drizzlePath?: string
+export type { ModuleOptions }
 
-  /**
-   * Authentication configuration
-   */
-  auth?: {
-    /**
-     * Enable authentication checks (requires nuxt-auth-utils)
-     * @default false
-     */
-    enabled: boolean
-    /**
-     * Enable authorization checks (requires nuxt-authorization)
-     * @default false
-     */
-    authorization?: boolean
-  }
-
-  /**
-   * Resource-specific configuration
-   * Define public access and column visibility
-   */
-  resources?: {
-    [modelName: string]: {
-      /**
-       * Actions allowed without authentication
-       * true = all actions
-       * array = specific actions ('list', 'create', 'read', 'update', 'delete')
-       */
-      public?: boolean | ('list' | 'create' | 'read' | 'update' | 'delete')[]
-      /**
-       * Columns to return for unauthenticated requests
-       * If not specified, all columns (except hidden ones) are returned
-       */
-      publicColumns?: string[]
-    }
+declare module '@nuxt/schema' {
+  interface RuntimeConfig {
+    autoCrud: ModuleOptions
   }
 }
 
@@ -65,7 +24,7 @@ export default defineNuxtModule<ModuleOptions>({
     schemaPath: 'server/database/schema',
     drizzlePath: 'server/utils/drizzle',
   },
-  setup(options, nuxt) {
+  async setup(options, nuxt) {
     const resolver = createResolver(import.meta.url)
 
     // 1. Alias the schema so the runtime code can import it
@@ -82,13 +41,39 @@ export default defineNuxtModule<ModuleOptions>({
     )
     nuxt.options.alias['#site/drizzle'] = drizzlePath
 
-    // 3. Pass options to runtimeConfig
+    // 3. Load dedicated config (autocrud.config.ts)
+    const { loadConfig } = await import('c12')
+    const { config: externalConfig } = await loadConfig<ModuleOptions>({
+      name: 'autocrud',
+      cwd: nuxt.options.rootDir,
+    })
+
+    // Merge options: Inline options take precedence over external config? 
+    // Usually external config is base, inline overrides.
+    // But here, resources might be merged deeply.
+    // For simplicity, we'll do a shallow merge of top-level keys, 
+    // but for 'resources', we might want to merge them if both exist.
+    // Let's use defu or simple spread for now.
+    
+    const mergedAuth = {
+      ...externalConfig?.auth,
+      ...options.auth,
+    }
+    
+    const mergedResources = {
+      ...externalConfig?.resources,
+      ...options.resources,
+    }
+
+    // Pass options to runtimeConfig
     nuxt.options.runtimeConfig.autoCrud = {
       auth: {
-        enabled: options.auth?.enabled ?? false,
-        authorization: options.auth?.authorization ?? false,
+        enabled: mergedAuth.enabled ?? false,
+        authorization: mergedAuth.authorization ?? false,
+        type: mergedAuth.type ?? 'session',
+        jwtSecret: mergedAuth.jwtSecret,
       },
-      resources: options.resources || {},
+      resources: mergedResources || {},
     }
 
     // 2. Register the API routes

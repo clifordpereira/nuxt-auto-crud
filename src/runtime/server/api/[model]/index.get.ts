@@ -6,29 +6,39 @@ import { useRuntimeConfig } from '#imports'
 // @ts-expect-error - #site/drizzle is an alias defined by the module
 import { useDrizzle } from '#site/drizzle'
 
+import { verifyJwtToken } from '../../utils/jwt'
+import { useAutoCrudConfig } from '../../utils/config'
+
 export default eventHandler(async (event) => {
   console.log('[GET] Request received', event.path)
-  const { auth, resources } = useRuntimeConfig().autoCrud
+  const { auth, resources } = useAutoCrudConfig()
   let isAdmin = false
 
   if (auth?.enabled) {
-    // Try using global auto-import
-    // @ts-ignore
-    if (typeof requireUserSession === 'function') {
-      try {
-        // @ts-ignore
-        await requireUserSession(event)
-        isAdmin = true
-      } catch (e) {
-        // Not authenticated
+    if (auth.type === 'jwt') {
+      if (!auth.jwtSecret) {
+        console.warn('JWT Secret is not configured but auth type is jwt')
         isAdmin = false
+      } else {
+        isAdmin = await verifyJwtToken(event, auth.jwtSecret)
       }
     } else {
-       console.warn('requireUserSession is not available globally')
-       // Fallback or error?
-       // If auth is enabled, we expect it to be available.
-       // But if it's not, we might want to throw to fail the test.
-       throw new Error('requireUserSession is not available')
+      // Session based (default)
+      // Try using global auto-import
+      // @ts-ignore
+      if (typeof requireUserSession === 'function') {
+        try {
+          // @ts-ignore
+          await requireUserSession(event)
+          isAdmin = true
+        } catch (e) {
+          // Not authenticated
+          isAdmin = false
+        }
+      } else {
+         console.warn('requireUserSession is not available globally')
+         throw new Error('requireUserSession is not available')
+      }
     }
   } else {
     // Auth disabled = everyone is admin (or public with full access)

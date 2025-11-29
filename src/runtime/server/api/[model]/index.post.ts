@@ -6,24 +6,36 @@ import { useRuntimeConfig } from '#imports'
 // @ts-expect-error - #site/drizzle is an alias defined by the module
 import { useDrizzle } from '#site/drizzle'
 
+import { verifyJwtToken } from '../../utils/jwt'
+import { useAutoCrudConfig } from '../../utils/config'
+
 export default eventHandler(async (event) => {
-  const { auth, resources } = useRuntimeConfig().autoCrud
+  const { auth, resources } = useAutoCrudConfig()
   let isAdmin = false
 
   if (auth?.enabled) {
-    // Try using global auto-import
-    // @ts-ignore
-    if (typeof requireUserSession === 'function') {
-      try {
-        // @ts-ignore
-        await requireUserSession(event)
-        isAdmin = true
-      } catch (e) {
+    if (auth.type === 'jwt') {
+      if (!auth.jwtSecret) {
+        console.warn('JWT Secret is not configured but auth type is jwt')
         isAdmin = false
+      } else {
+        isAdmin = await verifyJwtToken(event, auth.jwtSecret)
       }
     } else {
-       // Fallback or error?
-       throw new Error('requireUserSession is not available')
+      // Try using global auto-import
+      // @ts-ignore
+      if (typeof requireUserSession === 'function') {
+        try {
+          // @ts-ignore
+          await requireUserSession(event)
+          isAdmin = true
+        } catch (e) {
+          isAdmin = false
+        }
+      } else {
+         // Fallback or error?
+         throw new Error('requireUserSession is not available')
+      }
     }
   } else {
     isAdmin = true
