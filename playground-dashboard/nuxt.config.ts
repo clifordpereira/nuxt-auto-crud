@@ -7,6 +7,8 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     '@nuxthub/core',
     'nuxt-auth-utils',
+    '@vueuse/nuxt',
+    'nuxt-authorization',
     '../src/module'
   ],
 

@@ -41,14 +41,9 @@ export default defineNuxtModule<ModuleOptions>({
     )
     nuxt.options.alias['#site/drizzle'] = drizzlePath
 
-    // Alias #authorization to nuxt-authorization/utils if available, or mock it?
-    // The module seems to rely on nuxt-authorization being present.
-    // Let's alias it to the user's project or node_modules.
-    // Since nuxt-authorization exports utils, we can alias #authorization to it.
-    // However, the user might not have it installed if they disabled auth.
-    // But the error says it's imported by the API handlers.
-    // We should alias it to 'nuxt-authorization/utils'
-    nuxt.options.alias['#authorization'] = 'nuxt-authorization/utils'
+    // Ensure #authorization alias exists for the runtime
+    // This resolves warnings when building the module files
+    nuxt.options.alias['#authorization'] = nuxt.options.alias['#authorization'] || 'nuxt-authorization/utils'
 
     // 3. Load dedicated config (autocrud.config.ts)
     const { loadConfig } = await import('c12')
