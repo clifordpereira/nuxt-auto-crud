@@ -15,5 +15,11 @@ export default defineNuxtConfig({
       enabled: true,
       authorization: true,
     },
+    resources: {
+      users: {
+        public: ['list', 'read'],
+        publicColumns: ['id', 'name', 'avatar'],
+      },
+    },
   },
 })
