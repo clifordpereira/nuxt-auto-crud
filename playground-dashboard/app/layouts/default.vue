@@ -1,0 +1,16 @@
+<template>
+  <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
+    <header class="bg-white dark:bg-gray-800 shadow">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+        <h1 class="text-xl font-bold text-gray-900 dark:text-white">Public Store</h1>
+        <nav>
+          <NuxtLink to="/products" class="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white px-3 py-2">Products</NuxtLink>
+          <NuxtLink to="/login" class="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white px-3 py-2">Admin Login</NuxtLink>
+        </nav>
+      </div>
+    </header>
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <slot />
+    </main>
+  </div>
+</template>
