@@ -28,3 +28,13 @@ export const products = sqliteTable('products', {
   inventory: integer('inventory').notNull().default(0),
   image: text('image')
 })
+
+export const orders = sqliteTable('orders', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  customerId: integer('customer_id').notNull().references(() => customers.id),
+  productId: integer('product_id').notNull().references(() => products.id),
+  quantity: integer('quantity').notNull().default(1),
+  total: real('total').notNull(),
+  status: text('status').notNull().default('pending'), // 'pending' | 'completed' | 'cancelled'
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+})
