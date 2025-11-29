@@ -14,61 +14,42 @@ const links = [[{
     open.value = false
   }
 }, {
-  label: 'Inbox',
-  icon: 'i-lucide-inbox',
-  to: '/inbox',
-  badge: '4',
-  onSelect: () => {
-    open.value = false
-  }
-}, {
-  label: 'Customers',
-  icon: 'i-lucide-users',
-  to: '/customers',
-  onSelect: () => {
-    open.value = false
-  }
-}, {
-  label: 'Settings',
-  to: '/settings',
-  icon: 'i-lucide-settings',
+  label: 'Resources',
+  icon: 'i-lucide-database',
   defaultOpen: true,
-  type: 'trigger',
   children: [{
-    label: 'General',
-    to: '/settings',
-    exact: true,
+    label: 'Users',
+    to: '/users',
     onSelect: () => {
       open.value = false
     }
   }, {
-    label: 'Members',
-    to: '/settings/members',
+    label: 'Customers',
+    to: '/customers',
     onSelect: () => {
       open.value = false
     }
   }, {
-    label: 'Notifications',
-    to: '/settings/notifications',
-    onSelect: () => {
-      open.value = false
-    }
-  }, {
-    label: 'Security',
-    to: '/settings/security',
+    label: 'Products',
+    to: '/products',
     onSelect: () => {
       open.value = false
     }
   }]
 }], [{
+  label: 'Documentation',
+  icon: 'i-lucide-book-open',
+  to: 'https://auto-crud.clifland.in/',
+  target: '_blank'
+}, {
   label: 'Feedback',
   icon: 'i-lucide-message-circle',
-  to: 'https://github.com/nuxt-ui-templates/dashboard',
+  to: 'https://discord.gg/YFTEvMtX',
   target: '_blank'
 }, {
   label: 'Help & Support',
   icon: 'i-lucide-info',
-  to: 'https://github.com/nuxt-ui-templates/dashboard',
+  to: 'https://github.com/clifordpereira/nuxt-auto-crud',
   target: '_blank'
 }]] satisfies NavigationMenuItem[][]
 

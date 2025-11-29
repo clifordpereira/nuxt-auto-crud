@@ -1,6 +1,6 @@
 import { defineAbility } from 'nuxt-authorization/utils'
 
-export default defineAbility(async (user, { can }) => {
+export default defineAbility((user, { can }) => {
   if (user?.role === 'admin') {
     can('manage', 'all')
   } else {
