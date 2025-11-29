@@ -2,47 +2,19 @@
 import { eventHandler, getRouterParams, createError } from 'h3'
 import { eq } from 'drizzle-orm'
 import { getTableForModel, getModelSingularName, filterHiddenFields, filterPublicColumns } from '../../utils/modelMapper'
-import { useRuntimeConfig } from '#imports'
 
 import type { TableWithId } from '../../types'
 // @ts-expect-error - #site/drizzle is an alias defined by the module
 import { useDrizzle } from '#site/drizzle'
 
-import { verifyJwtToken } from '../../utils/jwt'
 import { useAutoCrudConfig } from '../../utils/config'
+import { checkAdminAccess } from '../../utils/auth'
 
 export default eventHandler(async (event) => {
-  const { auth, resources } = useAutoCrudConfig()
-  let isAdmin = false
-
-  if (auth?.enabled) {
-    if (auth.type === 'jwt') {
-      if (!auth.jwtSecret) {
-        console.warn('JWT Secret is not configured but auth type is jwt')
-        isAdmin = false
-      } else {
-        isAdmin = await verifyJwtToken(event, auth.jwtSecret)
-      }
-    } else {
-      // Try using global auto-import
-      // @ts-ignore
-      if (typeof requireUserSession === 'function') {
-        try {
-          // @ts-ignore
-          await requireUserSession(event)
-          isAdmin = true
-        } catch (e) {
-          isAdmin = false
-        }
-      } else {
-         throw new Error('requireUserSession is not available')
-      }
-    }
-  } else {
-    isAdmin = true
-  }
-
-  const { model, id } = getRouterParams(event)
+  const { resources } = useAutoCrudConfig()
+  const { model, id } = getRouterParams(event) as { model: string, id: string }
+  
+  const isAdmin = await checkAdminAccess(event, model, 'delete')
 
   // Check public access if not admin
   if (!isAdmin) {
@@ -59,12 +31,6 @@ export default eventHandler(async (event) => {
 
   const table = getTableForModel(model) as TableWithId
 
-  if (isAdmin && auth?.authorization) {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore - #authorization is an optional module
-    const { authorize } = await import('#authorization')
-    await authorize(model, 'delete')
-  }
   const singularName = getModelSingularName(model)
 
   const deletedRecord = await useDrizzle()
