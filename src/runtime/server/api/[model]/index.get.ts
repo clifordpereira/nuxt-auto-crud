@@ -9,9 +9,18 @@ import { useDrizzle } from '#site/drizzle'
 export default eventHandler(async (event) => {
   const { auth } = useRuntimeConfig().autoCrud
   if (auth?.enabled) {
-    // @ts-expect-error - #auth-utils is an optional module
-    const { requireUserSession } = await import('#auth-utils')
-    await requireUserSession(event)
+    // Try using global auto-import
+    // @ts-ignore
+    if (typeof requireUserSession === 'function') {
+      // @ts-ignore
+      await requireUserSession(event)
+    } else {
+       console.warn('requireUserSession is not available globally')
+       // Fallback or error?
+       // If auth is enabled, we expect it to be available.
+       // But if it's not, we might want to throw to fail the test.
+       throw new Error('requireUserSession is not available')
+    }
   }
 
   const { model } = getRouterParams(event)

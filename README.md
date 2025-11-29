@@ -27,9 +27,12 @@ Start a new project with everything pre-configured using our template:
 ```bash
 npx nuxi init -t gh:clifordpereira/nuxt-auto-crud_template <project-name>
 cd <project-name>
+bun install
 bun db:generate
 bun run dev
 ```
+
+Detailed instructions can be found in [https://auto-crud.clifland.in/](https://auto-crud.clifland.in/)
 
 ### Add User
 Open Nuxt DevTools (bottom-middle icon) > `...` menu > **Database** icon to add users.
@@ -163,11 +166,11 @@ Want to see it in action? Clone this repo and try the playground:
 git clone https://github.com/clifordpereira/nuxt-auto-crud.git
 cd nuxt-auto-crud
 
-# Install dependencies
+# Install dependencies (parent folder)
 bun install
 
-# Run the playground
-cd playground
+# Run the playground (fullstack with auth)
+cd playground-fullstack
 bun install
 bun db:generate
 bun run dev

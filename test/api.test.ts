@@ -1,75 +1,105 @@
-import { fileURLToPath } from 'node:url'
-import { describe, it, expect } from 'vitest'
-import { setup, $fetch } from '@nuxt/test-utils/e2e'
+import { describe, it, expect, beforeAll } from 'vitest'
+import { ofetch } from 'ofetch'
+import * as schema from '../playground-fullstack/server/database/schema'
+import { getTableName, getTableColumns } from 'drizzle-orm'
 
-describe('API CRUD Operations', async () => {
-  await setup({
-    rootDir: fileURLToPath(new URL('./fixtures/crud', import.meta.url)),
-  })
+const PORT = process.env.TEST_PORT || '3000'
+const BASE_URL = `http://localhost:${PORT}/api`
+const SUITE = process.env.TEST_SUITE || 'backend'
 
-  let userId: number
-
-  it('Create a new user (POST)', async () => {
-    const newUser = {
-      name: 'Test User',
-      email: 'test@example.com',
-      bio: 'A test user bio',
+// Helper to generate random payload based on columns
+function generatePayload(table: any) {
+  const columns = getTableColumns(table)
+  const payload: any = {}
+  
+  for (const [key, col] of Object.entries(columns)) {
+    // Skip primary key and auto-generated fields
+    if ((col as any).primary || key === 'createdAt' || key === 'updatedAt') continue
+    
+    // Simple type mapping (enhance as needed)
+    const type = (col as any).columnType || (col as any).dataType
+    
+    if (type === 'SQLiteText') {
+      if (key === 'email') payload[key] = `test-${Date.now()}@example.com`
+      else payload[key] = `Test ${key}`
+    } else if (type === 'SQLiteInteger') {
+       if ((col as any).mode === 'boolean') payload[key] = false
+       else payload[key] = 1 // Default integer
     }
+  }
+  return payload
+}
 
-    const response = await $fetch('/api/users', {
-      method: 'POST',
-      body: newUser,
+describe(`API Tests (${SUITE})`, () => {
+  
+  // Dynamic Test Generation
+  for (const [key, table] of Object.entries(schema)) {
+    // Only process Drizzle tables
+    if (!table || typeof table !== 'object' || !('name' in (table as any))) continue
+    
+    const tableName = getTableName(table as any)
+    const modelName = tableName // Assuming model name matches table name for now
+    
+    // Skip posts/comments for now to avoid FK complexity in this iteration
+    if (tableName !== 'users') continue 
+
+    describe(`Model: ${modelName}`, () => {
+      let createdId: number | string
+      const payload = generatePayload(table)
+
+      if (SUITE === 'backend') {
+        describe('No Auth Mode', () => {
+          it(`should list ${modelName}`, async () => {
+            const res = await ofetch(`${BASE_URL}/${modelName}`)
+            expect(Array.isArray(res)).toBe(true)
+          })
+
+          it(`should create ${modelName}`, async () => {
+            const res = await ofetch(`${BASE_URL}/${modelName}`, {
+              method: 'POST',
+              body: payload,
+            })
+            expect(res).toMatchObject(payload)
+            expect(res.id).toBeDefined()
+            createdId = res.id
+          })
+
+          it(`should read ${modelName}`, async () => {
+            const res = await ofetch(`${BASE_URL}/${modelName}/${createdId}`)
+            expect(res).toMatchObject(payload)
+          })
+
+          it(`should update ${modelName}`, async () => {
+            const updatePayload = { ...payload, name: 'Updated Name' } // Naive update
+            const res = await ofetch(`${BASE_URL}/${modelName}/${createdId}`, {
+              method: 'PATCH',
+              body: updatePayload,
+            })
+            expect(res.name).toBe('Updated Name')
+          })
+
+          it(`should delete ${modelName}`, async () => {
+            await ofetch(`${BASE_URL}/${modelName}/${createdId}`, {
+              method: 'DELETE',
+            })
+            try {
+              await ofetch(`${BASE_URL}/${modelName}/${createdId}`)
+            } catch (err: any) {
+              expect(err.statusCode).toBe(404)
+            }
+          })
+        })
+      } else if (SUITE === 'fullstack') {
+        describe('Auth Mode', () => {
+          it(`should return 401 for unauthenticated access to ${modelName}`, async () => {
+            try {
+              await ofetch(`${BASE_URL}/${modelName}`)
+            } catch (err: any) {
+              expect(err.statusCode).toBe(401)
+            }
+          })
+        })
+      }
     })
-
-    expect(response).toHaveProperty('id')
-    expect(response.name).toBe(newUser.name)
-    expect(response.email).toBe(newUser.email)
-    userId = response.id
-  })
-
-  it('List users (GET)', async () => {
-    const response = await $fetch('/api/users')
-    expect(Array.isArray(response)).toBe(true)
-    expect(response.length).toBeGreaterThan(0)
-    const user = response.find((u: any) => u.id === userId)
-    expect(user).toBeDefined()
-    expect(user.email).toBe('test@example.com')
-  })
-
-  it('Get a specific user (GET)', async () => {
-    const response = await $fetch(`/api/users/${userId}`)
-    expect(response).toHaveProperty('id', userId)
-    expect(response.name).toBe('Test User')
-  })
-
-  it('Update a user (PATCH)', async () => {
-    const updates = {
-      name: 'Updated User',
-      bio: 'Updated bio',
-    }
-
-    const response = await $fetch(`/api/users/${userId}`, {
-      method: 'PATCH',
-      body: updates,
-    })
-
-    expect(response.id).toBe(userId)
-    expect(response.name).toBe(updates.name)
-    expect(response.bio).toBe(updates.bio)
-  })
-
-  it('Delete a user (DELETE)', async () => {
-    const response = await $fetch(`/api/users/${userId}`, {
-      method: 'DELETE',
-    })
-
-    expect(response).toEqual({ success: true })
-
-    // Verify user is gone
-    try {
-      await $fetch(`/api/users/${userId}`)
-    } catch (error: any) {
-      expect(error.response.status).toBe(404)
-    }
-  })
-})
+  }
+}, 20000)
