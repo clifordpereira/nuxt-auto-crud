@@ -9,6 +9,9 @@ export async function verifyJwtToken(event: H3Event, secret: string): Promise<bo
   }
 
   const token = authHeader.split(' ')[1]
+  if (!token) {
+    return false
+  }
   try {
     const secretKey = new TextEncoder().encode(secret)
     await jwtVerify(token, secretKey)

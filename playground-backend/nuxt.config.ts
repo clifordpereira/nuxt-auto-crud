@@ -11,5 +11,8 @@ export default defineNuxtConfig({
   // Auto CRUD configuration
   autoCrud: {
     schemaPath: 'server/database/schema',
+    auth: {
+      enabled: false,
+    },
   },
 })

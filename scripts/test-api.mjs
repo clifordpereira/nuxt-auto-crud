@@ -56,12 +56,12 @@ async function main() {
 
     console.log('Servers ready. Running tests...')
 
-    const test = spawn('npx', ['vitest', 'run'], {
+    const test = spawn('npx', ['vitest', 'run', 'test/api.test.ts', '--config', 'vitest.api.config.ts'], {
       cwd: rootDir,
       stdio: 'inherit',
       env: {
         ...process.env,
-        TEST_PORT: FULLSTACK_PORT,
+        TEST_PORT: BACKEND_PORT,
         TEST_BACKEND_PORT: BACKEND_PORT,
       },
     })

@@ -56,7 +56,7 @@ const columns = [{
           ${{ product.price }}
         </p>
         <UBadge
-          :color="product.status === 'active' ? 'green' : 'gray'"
+          :color="product.status === 'active' ? 'success' : 'neutral'"
           variant="subtle"
           class="mt-2"
         >
