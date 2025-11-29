@@ -1,5 +1,5 @@
 export default defineNuxtConfig({
-  modules: ['@nuxthub/core', '../src/module'],
+  modules: ['@nuxthub/core', 'nuxt-auth-utils', 'nuxt-authorization', '../src/module'],
 
   devtools: { enabled: true },
 
@@ -11,5 +11,9 @@ export default defineNuxtConfig({
   // Auto CRUD configuration
   autoCrud: {
     schemaPath: 'server/database/schema',
+    auth: {
+      enabled: true,
+      authorization: true,
+    },
   },
 })

@@ -1,0 +1,27 @@
+{
+  "private": true,
+  "name": "my-module-playground",
+  "type": "module",
+  "scripts": {
+    "dev": "nuxi dev",
+    "build": "nuxi build",
+    "generate": "nuxi generate",
+    "db:generate": "drizzle-kit generate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "@nuxthub/core": "^0.9.0",
+    "drizzle-orm": "^0.38.3",
+    "nuxt": "^4.2.1",
+    "nuxt-auth-utils": "^0.5.25",
+    "nuxt-authorization": "^0.3.5",
+    "pluralize": "^8.0.0",
+    "scule": "^1.3.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "better-sqlite3": "^11.8.1",
+    "drizzle-kit": "^0.31.7"
+  }
+}
