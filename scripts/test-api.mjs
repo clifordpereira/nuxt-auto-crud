@@ -17,7 +17,7 @@ async function startServer(playgroundDir, port) {
   })
 
   // Wait for server to be ready (naive wait, better to check output or poll)
-  await new Promise((resolve) => setTimeout(resolve, 5000))
+  await new Promise((resolve) => setTimeout(resolve, 10000))
   return server
 }
 

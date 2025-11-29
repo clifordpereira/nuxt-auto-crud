@@ -6,6 +6,7 @@ import { getTableName, getTableColumns } from 'drizzle-orm'
 const PORT = process.env.TEST_PORT || '3000'
 const BASE_URL = `http://localhost:${PORT}/api`
 const SUITE = process.env.TEST_SUITE || 'backend'
+const api = ofetch.create({ baseURL: `http://localhost:${PORT}` })
 
 // Helper to generate random payload based on columns
 function generatePayload(table: any) {
@@ -102,4 +103,64 @@ describe(`API Tests (${SUITE})`, () => {
       }
     })
   }
+  describe('Controlled API Exposure', () => {
+    // Only run these tests if we are testing the fullstack playground (which has auth enabled)
+    if (process.env.TEST_SUITE !== 'fullstack') return
+
+    const publicColumns = ['id', 'name', 'avatar']
+    const privateColumns = ['email', 'password', 'createdAt']
+
+    it('Public: List users (Allowed & Filtered)', async () => {
+      try {
+        const response = await api('/users')
+        expect(response).toBeDefined()
+        expect(Array.isArray(response)).toBe(true)
+        
+        if (response.length > 0) {
+          const user = response[0]
+          // Check public columns exist
+          publicColumns.forEach(col => expect(user).toHaveProperty(col))
+          // Check private columns are hidden
+          privateColumns.forEach(col => expect(user).not.toHaveProperty(col))
+        }
+      } catch (e) {
+        throw e
+      }
+    })
+
+    it('Public: Read user (Allowed & Filtered)', async () => {
+      // Assuming user with ID 1 exists from previous tests
+      const response = await api('/users/1')
+      expect(response).toBeDefined()
+      
+      // Check public columns exist
+      publicColumns.forEach(col => expect(response).toHaveProperty(col))
+      // Check private columns are hidden
+      privateColumns.forEach(col => expect(response).not.toHaveProperty(col))
+    })
+
+    it('Public: Create user (Unauthorized)', async () => {
+      try {
+        await api('/users', {
+          method: 'POST',
+          body: {
+            name: 'Hacker',
+            email: 'hacker@example.com',
+            password: 'password',
+            avatar: 'hacker.png'
+          }
+        })
+        expect.fail('Should have thrown 401')
+      } catch (e: any) {
+        console.log('Create user error (full):', e)
+        if (e.response) {
+            console.log('Response status:', e.response.status)
+            console.log('Response body:', e.response._data)
+        } else {
+            console.log('No response object on error')
+        }
+        expect(e.response?.status).toBe(401)
+      }
+    })
+  })
 }, 20000)

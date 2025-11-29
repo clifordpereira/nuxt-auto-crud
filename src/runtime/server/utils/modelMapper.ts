@@ -6,6 +6,7 @@ import { pascalCase } from 'scule'
 import { getTableColumns as getDrizzleTableColumns } from 'drizzle-orm'
 import type { SQLiteTable } from 'drizzle-orm/sqlite-core'
 import { createError } from 'h3'
+import { useRuntimeConfig } from '#imports'
 
 /**
  * Fields that should never be updatable via PATCH requests
@@ -189,6 +190,42 @@ export function getHiddenFields(modelName: string): string[] {
   }
 
   return HIDDEN_FIELDS
+}
+
+/**
+ * Gets the public columns for a model
+ * @param modelName - The name of the model
+ * @returns Array of field names that are public (or undefined if all are public)
+ */
+export function getPublicColumns(modelName: string): string[] | undefined {
+  const { resources } = useRuntimeConfig().autoCrud
+  return resources?.[modelName]?.publicColumns
+}
+
+/**
+ * Filters an object to only include public columns (if configured)
+ * @param modelName - The name of the model
+ * @param data - The data object to filter
+ * @returns Filtered object
+ */
+export function filterPublicColumns(modelName: string, data: Record<string, unknown>): Record<string, unknown> {
+  const publicColumns = getPublicColumns(modelName)
+  
+  // If no public columns configured, return all (except hidden)
+  if (!publicColumns) {
+    return filterHiddenFields(modelName, data)
+  }
+
+  const filtered: Record<string, unknown> = {}
+
+  for (const [key, value] of Object.entries(data)) {
+    // Must be in publicColumns AND not in hidden fields (double safety)
+    if (publicColumns.includes(key) && !getHiddenFields(modelName).includes(key)) {
+      filtered[key] = value
+    }
+  }
+
+  return filtered
 }
 
 /**

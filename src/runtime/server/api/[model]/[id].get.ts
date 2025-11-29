@@ -1,7 +1,7 @@
 // server/api/[model]/[id].get.ts
 import { eventHandler, getRouterParams, createError } from 'h3'
 import { eq } from 'drizzle-orm'
-import { getTableForModel, getModelSingularName, filterHiddenFields } from '../../utils/modelMapper'
+import { getTableForModel, getModelSingularName, filterHiddenFields, filterPublicColumns } from '../../utils/modelMapper'
 import { useRuntimeConfig } from '#imports'
 
 import type { TableWithId } from '../../types'
@@ -9,22 +9,45 @@ import type { TableWithId } from '../../types'
 import { useDrizzle } from '#site/drizzle'
 
 export default eventHandler(async (event) => {
-  const { auth } = useRuntimeConfig().autoCrud
+  const { auth, resources } = useRuntimeConfig().autoCrud
+  let isAdmin = false
+
   if (auth?.enabled) {
     // Try using global auto-import
     // @ts-ignore
     if (typeof requireUserSession === 'function') {
-      // @ts-ignore
-      await requireUserSession(event)
+      try {
+        // @ts-ignore
+        await requireUserSession(event)
+        isAdmin = true
+      } catch (e) {
+        isAdmin = false
+      }
     } else {
        throw new Error('requireUserSession is not available')
     }
+  } else {
+    isAdmin = true
   }
 
   const { model, id } = getRouterParams(event)
+
+  // Check public access if not admin
+  if (!isAdmin) {
+    const resourceConfig = resources?.[model]
+    const isPublic = resourceConfig?.public === true || (Array.isArray(resourceConfig?.public) && resourceConfig.public.includes('read'))
+    
+    if (!isPublic) {
+      throw createError({
+        statusCode: 401,
+        message: 'Unauthorized',
+      })
+    }
+  }
+
   const table = getTableForModel(model) as TableWithId
 
-  if (auth?.authorization) {
+  if (isAdmin && auth?.authorization) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore - #authorization is an optional module
     const { authorize } = await import('#authorization')
@@ -41,9 +64,13 @@ export default eventHandler(async (event) => {
   if (!record) {
     throw createError({
       statusCode: 404,
-      message: `${singularName} not found`,
+      message: 'Record not found',
     })
   }
 
-  return filterHiddenFields(model, record as Record<string, unknown>)
+  if (isAdmin) {
+    return filterHiddenFields(model, record as Record<string, unknown>)
+  } else {
+    return filterPublicColumns(model, record as Record<string, unknown>)
+  }
 })
