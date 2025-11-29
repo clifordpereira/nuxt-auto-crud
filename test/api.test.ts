@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest'
 import { ofetch } from 'ofetch'
+import { getTableName, getTableColumns } from 'drizzle-orm'
 import * as fullstackSchema from '../playground-fullstack/server/database/schema'
 import * as backendSchema from '../playground-backend/server/database/schema'
 
 const schema = (process.env.TEST_SUITE || 'backend') === 'backend' ? backendSchema : fullstackSchema
-import { getTableName, getTableColumns } from 'drizzle-orm'
 
 const PORT = process.env.TEST_PORT || '3000'
 const BASE_URL = `http://localhost:${PORT}/api`
@@ -119,7 +119,6 @@ describe(`API Tests (${SUITE})`, () => {
     })
   }
   describe.runIf(process.env.TEST_SUITE === 'fullstack')('Controlled API Exposure', () => {
-
     const publicColumns = ['id', 'name', 'avatar']
     const privateColumns = ['email', 'password', 'createdAt']
 
