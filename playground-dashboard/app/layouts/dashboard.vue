@@ -37,19 +37,14 @@ const links = [[{
     }
   }]
 }], [{
-  label: 'Documentation',
-  icon: 'i-lucide-book-open',
-  to: 'https://auto-crud.clifland.in/',
-  target: '_blank'
-}, {
-  label: 'Feedback',
-  icon: 'i-lucide-message-circle',
+  label: 'Help & Support',
+  icon: 'i-lucide-info',
   to: 'https://discord.gg/YFTEvMtX',
   target: '_blank'
 }, {
-  label: 'Help & Support',
-  icon: 'i-lucide-info',
-  to: 'https://github.com/clifordpereira/nuxt-auto-crud',
+  label: 'Report a bug',
+  icon: 'i-lucide-bug',
+  to: 'https://github.com/clifordpereira/nuxt-auto-crud/issues',
   target: '_blank'
 }]] satisfies NavigationMenuItem[][]
 
