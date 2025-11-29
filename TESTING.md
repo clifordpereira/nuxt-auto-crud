@@ -12,19 +12,23 @@ We use `vitest` for automated API testing. The tests are dynamically generated b
     *   Ensures APIs work without authentication.
 
 2.  **Full-stack (With Auth)**:
-    *   Starts `playground-fullstack` on port 3002.
+    *   Starts `playground-fullstack` on port 3000.
     *   Verifies that APIs return `401 Unauthorized` when accessed without a session.
     *   (Future) Verify authenticated access with mocked sessions.
 
 ### Running Tests
 
-To run the automated tests:
+To run the API integration tests:
 
 ```bash
 npm run test:api
 ```
 
-This script orchestrates the server startup and test execution for both scenarios.
+To run unit tests:
+
+```bash
+npm run test
+```
 
 ### Dynamic Test Generation
 

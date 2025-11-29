@@ -4,7 +4,7 @@
 
 > **Note:** This module is currently in its alpha stage. However, you can use it to accelerate MVP development. It has not been tested thoroughly enough for production use; only happy-path testing is performed for each release.
 
-Auto-generate RESTful CRUD APIs for your **Nuxt** application based solely on your database schema. No configuration needed!
+Auto-generate RESTful CRUD APIs for your **Nuxt** application based solely on your database schema. Minimal configuration required.
 
 - [✨ Release Notes](/CHANGELOG.md)
 - [🎮 Try the Playground](/playground)
@@ -52,6 +52,10 @@ If you want to add `nuxt-auto-crud` to an existing project, follow these steps:
 
 ```bash
 # Install module and required dependencies
+npm install nuxt-auto-crud @nuxthub/core@latest drizzle-orm
+npm install --save-dev wrangler drizzle-kit
+
+# Or using bun
 bun add nuxt-auto-crud @nuxthub/core@latest drizzle-orm
 bun add --dev wrangler drizzle-kit
 ```

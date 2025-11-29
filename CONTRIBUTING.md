@@ -93,8 +93,9 @@ nuxt-auto-crud/
 
 ### Testing
 
-- **Unit Tests**: Run `bun run test`
-- **Type Tests**: Run `bun run test:types`
+- **Unit Tests**: Run `npm run test`
+- **API Tests**: Run `npm run test:api`
+- **Type Tests**: Run `npm run test:types`
 - **Manual Testing**: Use the playground
 
 ### Code Style
