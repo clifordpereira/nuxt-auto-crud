@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
 const modelValue = defineModel<string>()
 const show = ref(false)
@@ -7,12 +8,12 @@ function checkStrength(str: string) {
     { regex: /.{8,}/, text: 'At least 8 characters' },
     { regex: /\d/, text: 'At least 1 number' },
     { regex: /[a-z]/, text: 'At least 1 lowercase letter' },
-    { regex: /[A-Z]/, text: 'At least 1 uppercase letter' }
+    { regex: /[A-Z]/, text: 'At least 1 uppercase letter' },
   ]
 
   return requirements.map(req => ({
     met: req.regex.test(str),
-    text: req.text
+    text: req.text,
   }))
 }
 
@@ -70,11 +71,17 @@ const text = computed(() => {
       size="sm"
     />
 
-    <p id="password-strength" class="text-sm font-medium">
+    <p
+      id="password-strength"
+      class="text-sm font-medium"
+    >
       {{ text }}. Must contain:
     </p>
 
-    <ul class="space-y-1" aria-label="Password requirements">
+    <ul
+      class="space-y-1"
+      aria-label="Password requirements"
+    >
       <li
         v-for="(req, index) in strength"
         :key="index"

@@ -7,58 +7,45 @@ const toast = useToast()
 
 const open = ref(false)
 
+// Get available resources from schemas
+const { schemas } = useResourceSchemas()
+const resourceNames = Object.keys(schemas)
+
+// Dynamically create navigation links based on available resources
 const links = [[{
   label: 'Home',
   icon: 'i-lucide-house',
-  to: '/',
+  to: '/dashboard',
   onSelect: () => {
     open.value = false
-  }
+  },
 }, {
   label: 'Resources',
   icon: 'i-lucide-database',
   defaultOpen: true,
-  children: [{
-    label: 'Users',
-    to: '/resource/users',
+  children: resourceNames.map(resource => ({
+    label: resource.charAt(0).toUpperCase() + resource.slice(1),
+    to: `/resource/${resource}`,
     onSelect: () => {
       open.value = false
-    }
-  }, {
-    label: 'Customers',
-    to: '/resource/customers',
-    onSelect: () => {
-      open.value = false
-    }
-  }, {
-    label: 'Products',
-    to: '/resource/products',
-    onSelect: () => {
-      open.value = false
-    }
-  }, {
-    label: 'Orders',
-    to: '/resource/orders',
-    onSelect: () => {
-      open.value = false
-    }
-  }]
+    },
+  })),
 }], [{
   label: 'Help & Support',
   icon: 'i-lucide-info',
   to: 'https://discord.gg/YFTEvMtX',
-  target: '_blank'
+  target: '_blank',
 }, {
   label: 'Report a bug',
   icon: 'i-lucide-bug',
   to: 'https://github.com/clifordpereira/nuxt-auto-crud/issues',
-  target: '_blank'
+  target: '_blank',
 }]] satisfies NavigationMenuItem[][]
 
 const groups = computed(() => [{
   id: 'links',
   label: 'Go to',
-  items: links.flat()
+  items: links.flat(),
 }, {
   id: 'code',
   label: 'Code',
@@ -67,8 +54,8 @@ const groups = computed(() => [{
     label: 'View page source',
     icon: 'i-simple-icons-github',
     to: `https://github.com/nuxt-ui-templates/dashboard/blob/main/app/pages${route.path === '/' ? '/index' : route.path}.vue`,
-    target: '_blank'
-  }]
+    target: '_blank',
+  }],
 }])
 
 onMounted(async () => {
@@ -87,12 +74,12 @@ onMounted(async () => {
       variant: 'outline',
       onClick: () => {
         cookie.value = 'accepted'
-      }
+      },
     }, {
       label: 'Opt out',
       color: 'neutral',
-      variant: 'ghost'
-    }]
+      variant: 'ghost',
+    }],
   })
 })
 </script>
@@ -107,10 +94,6 @@ onMounted(async () => {
       class="bg-elevated/25"
       :ui="{ footer: 'lg:border-t lg:border-default' }"
     >
-      <template #header="{ collapsed }">
-        <TeamsMenu :collapsed="collapsed" />
-      </template>
-
       <template #default="{ collapsed }">
         <UDashboardSearchButton
           :collapsed="collapsed"

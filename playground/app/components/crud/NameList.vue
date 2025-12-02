@@ -12,7 +12,8 @@ const emit = defineEmits(['update:modelValue'])
 let urlPath = ''
 if (props.tableName) {
   urlPath = props.tableName
-} else if (props.fieldName) {
+}
+else if (props.fieldName) {
   const baseName = props.fieldName.replace(/_id$/, '')
   urlPath = pluralize(baseName) // e.g., user_id → users
 }
@@ -22,14 +23,17 @@ const crudBaseUrl = config.crudBaseUrl || '/api'
 
 const { data: options } = await useFetch(() => `${crudBaseUrl}/${urlPath}`, {
   key: `crud-${urlPath}`,
-  transform: (rows: any[]) =>
-    rows?.map(row => ({
-      label: row.name || row.title || `#${row.id}`,
-      value: row.id,
-      extra: row.email
-    })),
+  transform: (rows: Record<string, unknown>[]) =>
+    rows?.map((row) => {
+      const r = row as { id: string | number, name?: string, title?: string, email?: string }
+      return {
+        label: r.name || r.title || `#${r.id}`,
+        value: r.id,
+        extra: r.email,
+      }
+    }),
   lazy: true,
-  headers: crudHeaders()
+  headers: crudHeaders(),
 })
 </script>
 
@@ -37,7 +41,7 @@ const { data: options } = await useFetch(() => `${crudBaseUrl}/${urlPath}`, {
   <USelectMenu
     :items="options"
     :model-value="modelValue"
-    value-key="value"
+    value-attribute="value"
     placeholder="Select"
     class="w-full"
     @update:model-value="emit('update:modelValue', $event)"

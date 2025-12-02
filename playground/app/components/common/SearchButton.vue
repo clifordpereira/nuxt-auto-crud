@@ -3,8 +3,15 @@ const value = defineModel<string>()
 </script>
 
 <template>
-  <UInput v-model="value" placeholder="Search ..." :ui="{ trailing: 'pe-1' }">
-    <template v-if="value?.length" #trailing>
+  <UInput
+    v-model="value"
+    placeholder="Search ..."
+    :ui="{ trailing: 'pe-1' }"
+  >
+    <template
+      v-if="value?.length"
+      #trailing
+    >
       <UButton
         color="neutral"
         variant="link"

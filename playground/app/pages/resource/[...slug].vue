@@ -1,7 +1,8 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
 definePageMeta({
   middleware: ['auth'],
-  layout: 'dashboard'
+  layout: 'dashboard',
 })
 
 const route = useRoute()
@@ -16,8 +17,15 @@ const schema = computed(() => (resource.value ? getSchema(resource.value) : unde
 
 <template>
   <div>
-    <CrudTable v-if="schema && resource" :resource="resource" :schema="schema" />
-    <div v-else class="p-4 text-red-500">
+    <CrudTable
+      v-if="schema && resource"
+      :resource="resource"
+      :schema="schema"
+    />
+    <div
+      v-else
+      class="p-4 text-red-500"
+    >
       Schema not found for resource: {{ resource }}
     </div>
   </div>

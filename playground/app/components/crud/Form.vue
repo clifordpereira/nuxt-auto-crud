@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
 import type { FormSubmitEvent } from '@nuxt/ui'
 import { useChangeCase } from '@vueuse/integrations/useChangeCase'
@@ -12,7 +13,7 @@ const props = defineProps<{
       selectOptions?: string[]
     }[]
   }
-  initialState?: Record<string, any>
+  initialState?: Record<string, unknown>
 }>()
 
 // We can pass relations via props if needed, or derive them.
@@ -21,20 +22,20 @@ const props = defineProps<{
 // However, the NameList component handles fetching the related data.
 
 const emit = defineEmits<{
-  (e: 'submit', event: FormSubmitEvent<any>): void
+  (e: 'submit', event: Record<string, unknown>): void
   (e: 'close'): void
 }>()
 
 // filter out system fields
 const filteredFields = props.schema.fields.filter(
-  field => field.name !== 'created_at' && field.name !== 'id'
+  field => field.name !== 'created_at' && field.name !== 'updated_at' && field.name !== 'id',
 )
 
 // dynamically build zod schema
 const formSchema = useDynamicZodSchema(filteredFields, !!props.initialState)
 
 // reactive state for form data
-const state = reactive<Record<string, any>>(
+const state = reactive<Record<string, unknown>>(
   filteredFields.reduce(
     (acc, field) => {
       acc[field.name]
@@ -42,8 +43,8 @@ const state = reactive<Record<string, any>>(
           ?? (field.type === 'boolean' ? false : '')
       return acc
     },
-    {} as Record<string, any>
-  )
+    {} as Record<string, unknown>,
+  ),
 )
 
 // processedFields with capitalized label for display
@@ -56,12 +57,12 @@ const processedFields = computed(() =>
     label = useChangeCase(label, 'capitalCase').value
     return {
       ...field,
-      label
+      label,
     }
-  })
+  }),
 )
 
-function handleSubmit(event: FormSubmitEvent<any>) {
+function handleSubmit(event: FormSubmitEvent<Record<string, unknown>>) {
   emit('submit', event.data)
   emit('close')
 }
@@ -75,7 +76,10 @@ function handleSubmit(event: FormSubmitEvent<any>) {
       class="space-y-4"
       @submit="handleSubmit"
     >
-      <template v-for="field in processedFields" :key="field.name">
+      <template
+        v-for="field in processedFields"
+        :key="field.name"
+      >
         <UFormField
           v-if="!props.initialState || field.name !== 'password'"
           :label="field.label"
@@ -83,30 +87,30 @@ function handleSubmit(event: FormSubmitEvent<any>) {
         >
           <UCheckbox
             v-if="field.type === 'boolean'"
-            v-model="state[field.name]"
+            v-model="state[field.name] as boolean"
           />
 
           <CrudNameList
             v-else-if="field.name.endsWith('_id')"
-            v-model="state[field.name]"
+            v-model="state[field.name] as string | number | null"
             :field-name="field.name"
           />
 
           <UInput
             v-else-if="field.type === 'date'"
-            v-model="state[field.name]"
+            v-model="state[field.name] as string"
             type="datetime-local"
           />
 
           <CommonPassword
             v-else-if="field.name === 'password'"
-            v-model="state[field.name]"
+            v-model="state[field.name] as string"
             type="password"
           />
 
           <USelect
             v-else-if="field.type === 'enum'"
-            v-model="state[field.name]"
+            v-model="state[field.name] as string"
             :items="field.selectOptions"
             placeholder="Select "
             class="w-full"
@@ -114,7 +118,7 @@ function handleSubmit(event: FormSubmitEvent<any>) {
 
           <UInput
             v-else
-            v-model="state[field.name]"
+            v-model="state[field.name] as string"
             :type="field.type"
             :required="field.required"
           />

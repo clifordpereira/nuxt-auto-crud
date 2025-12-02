@@ -7,7 +7,7 @@ const props = defineProps<{
   }
 }>()
 
-async function onSubmit(data: any) {
+async function onSubmit(data: Record<string, unknown>) {
   await useCrudFetch('POST', props.resource, null, data)
 }
 
@@ -18,7 +18,11 @@ const isModalOpen = ref(false)
   <div>
     <UModal v-model:open="isModalOpen">
       <!-- Trigger button -->
-      <UButton label="Add New" color="neutral" variant="subtle" />
+      <UButton
+        label="Add New"
+        color="neutral"
+        variant="subtle"
+      />
 
       <template #content>
         <div class="p-6 w-[400px] rounded-lg shadow-lg">
@@ -39,7 +43,10 @@ const isModalOpen = ref(false)
             </div>
 
             <!-- Fallback -->
-            <p v-else class="text-gray-500">
+            <p
+              v-else
+              class="text-gray-500"
+            >
               No schema provided for {{ props.resource }}
             </p>
           </div>

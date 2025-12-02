@@ -1,89 +1,216 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
-import type { DropdownMenuItem } from '@nuxt/ui'
-
-const { isNotificationsSlideoverOpen } = useDashboard()
-
 definePageMeta({
-  layout: 'dashboard',
-  middleware: 'auth'
+  layout: false,
 })
 
-const items = [[{
-  label: 'New user',
-  icon: 'i-lucide-user-plus',
-  to: '/resource/users'
-}, {
-  label: 'New customer',
-  icon: 'i-lucide-users',
-  to: '/resource/customers'
-}, {
-  label: 'New product',
-  icon: 'i-lucide-package',
-  to: '/resource/products'
-}]] satisfies DropdownMenuItem[][]
+const { loggedIn, user } = useUserSession()
 
-const { data: users } = await useFetch('/api/users')
-const { data: customers } = await useFetch('/api/customers')
-const { data: products } = await useFetch('/api/products')
-
-const usersCount = computed(() => users.value?.length || 0)
-const customersCount = computed(() => customers.value?.length || 0)
-const productsCount = computed(() => products.value?.length || 0)
+// Redirect to dashboard if already logged in
+if (loggedIn.value) {
+  await navigateTo('/dashboard')
+}
 </script>
 
 <template>
-  <UDashboardPanel id="home">
-    <template #header>
-      <UDashboardNavbar
-        title="Home"
-        :ui="{ right: 'gap-3' }"
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 px-4 sm:px-6 lg:px-8">
+    <div class="w-full max-w-4xl space-y-8 py-12">
+      <!-- Header -->
+      <div class="text-center">
+        <UIcon
+          name="i-heroicons-command-line"
+          class="mx-auto h-16 w-16 text-primary-500"
+        />
+        <h1 class="mt-6 text-4xl font-bold tracking-tight text-gray-900 dark:text-white">
+          Nuxt Auto CRUD
+        </h1>
+        <p class="mt-2 text-lg text-gray-600 dark:text-gray-400">
+          Automatic CRUD API & UI generation for Nuxt applications
+        </p>
+      </div>
+
+      <!-- Login Status -->
+      <div
+        v-if="loggedIn"
+        class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 text-center"
       >
-        <template #leading>
-          <UDashboardSidebarCollapse />
-        </template>
+        <p class="text-green-800 dark:text-green-200">
+          ✓ Logged in as <strong>{{ user?.email }}</strong>
+        </p>
+        <UButton
+          to="/dashboard"
+          color="primary"
+          size="lg"
+          class="mt-3"
+          icon="i-heroicons-arrow-right"
+        >
+          Go to Dashboard
+        </UButton>
+      </div>
 
-        <template #right>
-          <UTooltip
-            text="Notifications"
-            :shortcuts="['N']"
-          >
+      <!-- Main Content -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Getting Started -->
+        <UCard class="shadow-lg">
+          <template #header>
+            <h2 class="text-xl font-semibold flex items-center gap-2">
+              <UIcon
+                name="i-heroicons-rocket-launch"
+                class="text-primary-500"
+              />
+              Getting Started
+            </h2>
+          </template>
+          <div class="space-y-4">
+            <p class="text-gray-600 dark:text-gray-400">
+              Welcome to the Nuxt Auto CRUD playground! This demo showcases automatic CRUD API and UI generation.
+            </p>
+            <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+              <h3 class="font-semibold mb-3 text-gray-900 dark:text-white">
+                Demo Credentials
+              </h3>
+              <div class="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p class="font-semibold text-primary-600 dark:text-primary-400">
+                    Admin
+                  </p>
+                  <p class="text-gray-600 dark:text-gray-400">
+                    admin@example.com
+                  </p>
+                  <p class="text-gray-600 dark:text-gray-400">
+                    $1Password
+                  </p>
+                </div>
+                <div>
+                  <p class="font-semibold text-primary-600 dark:text-primary-400">
+                    User
+                  </p>
+                  <p class="text-gray-600 dark:text-gray-400">
+                    user@example.com
+                  </p>
+                  <p class="text-gray-600 dark:text-gray-400">
+                    $1Password
+                  </p>
+                </div>
+              </div>
+            </div>
             <UButton
-              color="neutral"
-              variant="ghost"
-              square
-              @click="isNotificationsSlideoverOpen = true"
+              v-if="!loggedIn"
+              to="/login"
+              color="primary"
+              size="lg"
+              block
+              icon="i-heroicons-arrow-right-on-rectangle"
             >
-              <UChip
-                color="error"
-                inset
-              >
-                <UIcon
-                  name="i-lucide-bell"
-                  class="size-5 shrink-0"
-                />
-              </UChip>
+              Sign In
             </UButton>
-          </UTooltip>
+          </div>
+        </UCard>
 
-          <UDropdownMenu :items="items">
-            <UButton
-              icon="i-lucide-plus"
-              size="md"
-              class="rounded-full"
+        <!-- Features -->
+        <UCard class="shadow-lg">
+          <template #header>
+            <h2 class="text-xl font-semibold flex items-center gap-2">
+              <UIcon
+                name="i-heroicons-sparkles"
+                class="text-primary-500"
+              />
+              Features
+            </h2>
+          </template>
+          <ul class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+            <li class="flex items-start gap-2">
+              <UIcon
+                name="i-heroicons-check-circle"
+                class="text-green-500 mt-0.5 shrink-0"
+              />
+              <span><strong>Auto-generated APIs:</strong> CRUD endpoints created automatically from Drizzle schema</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <UIcon
+                name="i-heroicons-check-circle"
+                class="text-green-500 mt-0.5 shrink-0"
+              />
+              <span><strong>Authentication:</strong> Built-in session management and role-based access control</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <UIcon
+                name="i-heroicons-check-circle"
+                class="text-green-500 mt-0.5 shrink-0"
+              />
+              <span><strong>Dynamic UI:</strong> Tables and forms generated on-the-fly based on data types</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <UIcon
+                name="i-heroicons-check-circle"
+                class="text-green-500 mt-0.5 shrink-0"
+              />
+              <span><strong>Relations:</strong> Automatic handling of relationships between resources</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <UIcon
+                name="i-heroicons-check-circle"
+                class="text-green-500 mt-0.5 shrink-0"
+              />
+              <span><strong>Permissions:</strong> Fine-grained access control per resource and action</span>
+            </li>
+          </ul>
+        </UCard>
+      </div>
+
+      <!-- Quick Links -->
+      <UCard class="shadow-lg">
+        <template #header>
+          <h2 class="text-xl font-semibold flex items-center gap-2">
+            <UIcon
+              name="i-heroicons-link"
+              class="text-primary-500"
             />
-          </UDropdownMenu>
+            Quick Links
+          </h2>
         </template>
-      </UDashboardNavbar>
-    </template>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <UButton
+            to="/login"
+            variant="outline"
+            block
+            icon="i-heroicons-arrow-right-on-rectangle"
+          >
+            Login
+          </UButton>
+          <UButton
+            to="/dashboard"
+            variant="outline"
+            block
+            icon="i-heroicons-home"
+          >
+            Dashboard
+          </UButton>
+          <UButton
+            href="https://github.com/clifordpereira/nuxt-auto-crud"
+            target="_blank"
+            variant="outline"
+            block
+            icon="i-simple-icons-github"
+          >
+            GitHub
+          </UButton>
+          <UButton
+            href="https://nuxt.com"
+            target="_blank"
+            variant="outline"
+            block
+            icon="i-simple-icons-nuxtdotjs"
+          >
+            Nuxt Docs
+          </UButton>
+        </div>
+      </UCard>
 
-    <template #body>
-      <HomeStats
-        :users-count="usersCount"
-        :customers-count="customersCount"
-        :products-count="productsCount"
-      />
-      <HomeUsers />
-    </template>
-  </UDashboardPanel>
+      <!-- Footer -->
+      <div class="text-center text-sm text-gray-500 dark:text-gray-400">
+        <p>Built with Nuxt, Drizzle ORM, and NuxtHub</p>
+      </div>
+    </div>
+  </div>
 </template>

@@ -69,7 +69,7 @@ describe(`API Tests (${SUITE})`, () => {
             method: 'POST',
             body: payload,
           })
-          
+
           const { password, ...expectedPayload } = payload
           expect(res).toMatchObject(expectedPayload)
           expect(res.password).toBeUndefined()

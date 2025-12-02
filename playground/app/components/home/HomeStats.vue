@@ -1,26 +1,23 @@
 <script setup lang="ts">
 const props = defineProps<{
-  usersCount: number
-  customersCount: number
-  productsCount: number
+  resourceCounts: Record<string, number>
 }>()
 
-const stats = computed(() => [{
-  title: 'Users',
-  icon: 'i-lucide-user',
-  value: props.usersCount,
-  to: '/resource/users'
-}, {
-  title: 'Customers',
-  icon: 'i-lucide-users',
-  value: props.customersCount,
-  to: '/resource/customers'
-}, {
-  title: 'Products',
-  icon: 'i-lucide-package',
-  value: props.productsCount,
-  to: '/resource/products'
-}])
+const iconMap: Record<string, string> = {
+  users: 'i-lucide-user',
+  customers: 'i-lucide-users',
+  products: 'i-lucide-package',
+  orders: 'i-lucide-shopping-cart',
+}
+
+const stats = computed(() =>
+  Object.entries(props.resourceCounts).map(([resource, count]) => ({
+    title: resource.charAt(0).toUpperCase() + resource.slice(1),
+    icon: iconMap[resource] || 'i-lucide-database',
+    value: count,
+    to: `/resource/${resource}`,
+  })),
+)
 </script>
 
 <template>
@@ -36,7 +33,7 @@ const stats = computed(() => [{
         container: 'gap-y-1.5',
         wrapper: 'items-start',
         leading: 'p-2.5 rounded-full bg-primary/10 ring ring-inset ring-primary/25 flex-col',
-        title: 'font-normal text-muted text-xs uppercase'
+        title: 'font-normal text-muted text-xs uppercase',
       }"
       class="lg:rounded-none first:rounded-l-lg last:rounded-r-lg hover:z-1"
     >

@@ -1,15 +1,15 @@
 // composables/useFormState.ts
 export function useFormState(
   fields: { name: string, type: string, required?: boolean }[],
-  initialState?: Record<string, any>
+  initialState?: Record<string, unknown>,
 ) {
-  const state = reactive<Record<string, any>>({})
+  const state = reactive<Record<string, unknown>>({})
 
   fields.forEach((field) => {
     let value = initialState?.[field.name] ?? ''
 
     if (field.type === 'date' && value) {
-      const date = new Date(value)
+      const date = new Date(value as string | number | Date)
 
       // Convert to local datetime format suitable for <input type="datetime-local">
       const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000)

@@ -1,13 +1,17 @@
 <script setup lang="ts">
 const props = defineProps<{
-  row: Record<string, any>
+  row: Record<string, unknown>
 }>()
 </script>
 
 <template>
   <div class="flex items-center gap-2">
     <UModal>
-      <UButton label="View" color="primary" variant="outline" />
+      <UButton
+        label="View"
+        color="primary"
+        variant="outline"
+      />
 
       <template #content>
         <div class="p-4 max-w-md bg-white rounded-lg shadow-md">

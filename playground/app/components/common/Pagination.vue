@@ -1,11 +1,12 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
 const props = defineProps<{
-  data: any[] // full dataset passed from parent
+  data: Record<string, unknown>[] // full dataset passed from parent
   itemsPerPage?: number
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:paginated', value: any[]): void
+  (e: 'update:paginated', value: Record<string, unknown>[]): void
 }>()
 
 // defaults
@@ -20,7 +21,7 @@ const searchedItems = computed(() => {
     Object.values(row)
       .join(' ')
       .toLowerCase()
-      .includes(search.value.toLowerCase())
+      .includes(search.value.toLowerCase()),
   )
 })
 
@@ -36,7 +37,7 @@ watch(
   () => {
     emit('update:paginated', paginatedItems.value)
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 watch([search], () => {

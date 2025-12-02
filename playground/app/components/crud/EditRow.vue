@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const props = defineProps<{
   resource: string
-  row: Record<string, any> // data of the row being edited
+  row: Record<string, unknown> // data of the row being edited
   schema: {
     resource: string
     fields: { name: string, type: string, required?: boolean }[]
@@ -12,14 +12,14 @@ const state = computed(() => {
   if (!props.schema) return {}
   // exclude system fields
   const filteredFields = props.schema.fields.filter(
-    field => field.name !== 'created_at' && field.name !== 'id'
+    field => field.name !== 'created_at' && field.name !== 'updated_at' && field.name !== 'id',
   )
 
   return useFormState(filteredFields, props.row)
 })
 
-async function onSubmit(data: any) {
-  await useCrudFetch('PUT', props.resource, props.row.id, data)
+async function onSubmit(data: Record<string, unknown>) {
+  await useCrudFetch('PATCH', props.resource, props.row.id as number, data)
 }
 
 const isModalOpen = ref(false)
@@ -53,7 +53,10 @@ const isModalOpen = ref(false)
         />
 
         <!-- Fallback -->
-        <p v-else class="text-sm text-red-500">
+        <p
+          v-else
+          class="text-sm text-red-500"
+        >
           No schema provided for {{ resource }}
         </p>
       </div>

@@ -1,5 +1,5 @@
 export const useResourceSchemas = () => {
-  const schemas: Record<string, { resource: string; fields: { name: string; type: string; required?: boolean; selectOptions?: string[] }[] }> = {
+  const schemas: Record<string, { resource: string, fields: { name: string, type: string, required?: boolean, selectOptions?: string[] }[] }> = {
     users: {
       resource: 'users',
       fields: [
@@ -10,8 +10,8 @@ export const useResourceSchemas = () => {
         { name: 'avatar', type: 'string' },
         { name: 'role', type: 'string' },
         { name: 'created_at', type: 'date' },
-        { name: 'updated_at', type: 'date' }
-      ]
+        { name: 'updated_at', type: 'date' },
+      ],
     },
     customers: {
       resource: 'customers',
@@ -21,8 +21,8 @@ export const useResourceSchemas = () => {
         { name: 'email', type: 'string', required: true },
         { name: 'avatar', type: 'string' },
         { name: 'status', type: 'string', required: true },
-        { name: 'location', type: 'string' }
-      ]
+        { name: 'location', type: 'string' },
+      ],
     },
     products: {
       resource: 'products',
@@ -32,8 +32,8 @@ export const useResourceSchemas = () => {
         { name: 'price', type: 'number', required: true },
         { name: 'status', type: 'string', required: true },
         { name: 'inventory', type: 'number', required: true },
-        { name: 'image', type: 'string' }
-      ]
+        { name: 'image', type: 'string' },
+      ],
     },
     orders: {
       resource: 'orders',
@@ -47,17 +47,17 @@ export const useResourceSchemas = () => {
           name: 'status',
           type: 'enum',
           required: true,
-          selectOptions: ['pending', 'completed', 'cancelled']
+          selectOptions: ['pending', 'completed', 'cancelled'],
         },
-        { name: 'created_at', type: 'date' }
-      ]
-    }
+        { name: 'created_at', type: 'date' },
+      ],
+    },
   }
 
   const getSchema = (resource: string) => schemas[resource]
 
   return {
     schemas,
-    getSchema
+    getSchema,
   }
 }
