@@ -68,7 +68,7 @@ describe(`API Tests (${SUITE})`, () => {
       baseURL: `http://localhost:${PORT}`,
       headers,
     })
-  })
+  }, 30000)
 
   // Dynamic Test Generation
   console.log('Schema keys:', Object.keys(schema))

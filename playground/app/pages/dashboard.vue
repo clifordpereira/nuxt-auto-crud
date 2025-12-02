@@ -126,7 +126,6 @@ const resourceCounts = computed(() => {
           </ul>
         </UCard>
       </div>
-      <HomeUsers />
     </template>
   </UDashboardPanel>
 </template>

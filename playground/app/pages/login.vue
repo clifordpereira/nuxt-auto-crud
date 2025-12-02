@@ -58,7 +58,7 @@ async function onSubmit() {
           class="space-y-6"
           @submit.prevent="onSubmit"
         >
-          <UFormGroup
+          <UFormField
             label="Email address"
             name="email"
           >
@@ -70,9 +70,9 @@ async function onSubmit() {
               icon="i-heroicons-envelope"
               size="lg"
             />
-          </UFormGroup>
+          </UFormField>
 
-          <UFormGroup
+          <UFormField
             label="Password"
             name="password"
           >
@@ -84,7 +84,7 @@ async function onSubmit() {
               icon="i-heroicons-lock-closed"
               size="lg"
             />
-          </UFormGroup>
+          </UFormField>
 
           <div>
             <UButton
