@@ -19,6 +19,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       apiAppUrl: '',
+      crudBaseUrl: '/api',
     },
   },
 

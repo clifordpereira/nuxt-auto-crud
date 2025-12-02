@@ -12,15 +12,15 @@ definePageMeta({
 const items = [[{
   label: 'New user',
   icon: 'i-lucide-user-plus',
-  to: '/users',
+  to: '/resource/users',
 }, {
   label: 'New customer',
   icon: 'i-lucide-users',
-  to: '/customers',
+  to: '/resource/customers',
 }, {
   label: 'New product',
   icon: 'i-lucide-package',
-  to: '/products',
+  to: '/resource/products',
 }]] satisfies DropdownMenuItem[][]
 
 const { data: users } = await useFetch('/api/users')

@@ -12,7 +12,7 @@
         </div>
         <nav>
           <NuxtLink
-            to="/products"
+            to="/resource/products"
             class="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white px-3 py-2"
           >Products</NuxtLink>
           <NuxtLink

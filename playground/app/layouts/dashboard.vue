@@ -20,19 +20,19 @@ const links = [[{
   defaultOpen: true,
   children: [{
     label: 'Users',
-    to: '/users',
+    to: '/resource/users',
     onSelect: () => {
       open.value = false
     },
   }, {
     label: 'Customers',
-    to: '/customers',
+    to: '/resource/customers',
     onSelect: () => {
       open.value = false
     },
   }, {
     label: 'Products',
-    to: '/products',
+    to: '/resource/products',
     onSelect: () => {
       open.value = false
     },

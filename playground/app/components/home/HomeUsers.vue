@@ -69,7 +69,7 @@ const columns: TableColumn<any>[] = [
           Recent Users
         </h3>
         <UButton
-          to="/users"
+          to="/resource/users"
           color="neutral"
           variant="ghost"
           icon="i-lucide-arrow-right"

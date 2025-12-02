@@ -9,17 +9,17 @@ const stats = computed(() => [{
   title: 'Users',
   icon: 'i-lucide-user',
   value: props.usersCount,
-  to: '/users',
+  to: '/resource/users',
 }, {
   title: 'Customers',
   icon: 'i-lucide-users',
   value: props.customersCount,
-  to: '/customers',
+  to: '/resource/customers',
 }, {
   title: 'Products',
   icon: 'i-lucide-package',
   value: props.productsCount,
-  to: '/products',
+  to: '/resource/products',
 }])
 </script>
 
