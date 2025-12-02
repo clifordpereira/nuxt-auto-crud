@@ -8,8 +8,8 @@ const toast = useToast()
 const open = ref(false)
 
 // Get available resources from schemas
-const { schemas } = useResourceSchemas()
-const resourceNames = Object.keys(schemas)
+const { schemas } = await useResourceSchemas()
+const resourceNames = Object.keys(schemas.value || {})
 
 // Dynamically create navigation links based on available resources
 const links = [[{

@@ -11,18 +11,15 @@ const appConfig = useAppConfig()
 const colors = ['red', 'orange', 'amber', 'yellow', 'lime', 'green', 'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose']
 const neutrals = ['slate', 'gray', 'zinc', 'neutral', 'stone']
 
-const user = ref({
-  name: 'Admin User',
-  avatar: {
-    src: 'https://github.com/clifordpereira.png',
-    alt: 'Admin User',
-  },
-})
+const { user } = useUserSession()
 
 const items = computed<DropdownMenuItem[][]>(() => ([[{
   type: 'label',
-  label: user.value.name,
-  avatar: user.value.avatar,
+  label: user.value?.name,
+  avatar: {
+    src: user.value?.avatar || '',
+    alt: user.value?.name || '',
+  },
 }], [{
   label: 'Profile',
   icon: 'i-lucide-user',

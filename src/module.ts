@@ -3,6 +3,8 @@ import {
   createResolver,
   addServerHandler,
   addServerImportsDir,
+  addImportsDir,
+  addServerPlugin,
 } from '@nuxt/kit'
 
 import type { ModuleOptions, AuthOptions, RuntimeModuleOptions } from './types'
@@ -124,6 +126,23 @@ export default defineNuxtModule<ModuleOptions>({
     // For API routes (server/api), we need to register them as event handlers
     const apiDir = resolver.resolve('./runtime/server/api')
 
+    // Register system APIs
+    addServerHandler({
+      route: '/api/_schema',
+      method: 'get',
+      handler: resolver.resolve(apiDir, '_schema/index.get'),
+    })
+    addServerHandler({
+      route: '/api/_schema/:table',
+      method: 'get',
+      handler: resolver.resolve(apiDir, '_schema/[table].get'),
+    })
+    addServerHandler({
+      route: '/api/_relations',
+      method: 'get',
+      handler: resolver.resolve(apiDir, '_relations.get'),
+    })
+
     // We register the dynamic model handler
     // Since it's a dynamic route [model], we register it carefully
     addServerHandler({
@@ -155,6 +174,12 @@ export default defineNuxtModule<ModuleOptions>({
     // 3. Register Utils (modelMapper)
     // This allows the API handlers to use getTableForModel, etc.
     addServerImportsDir(resolver.resolve('./runtime/server/utils'))
+
+    // 4. Register Composables
+    addImportsDir(resolver.resolve('./runtime/composables'))
+
+    // 5. Register Plugins
+    addServerPlugin(resolver.resolve('./runtime/server/plugins/seed'))
 
     console.log('🚀 Auto CRUD module loaded!')
     console.log(`   - Schema: ${options.schemaPath}`)

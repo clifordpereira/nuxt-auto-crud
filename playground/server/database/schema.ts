@@ -1,4 +1,5 @@
 import { sqliteTable, text, integer, real } from 'drizzle-orm/sqlite-core'
+import { relations } from 'drizzle-orm'
 
 export const users = sqliteTable('users', {
   id: integer('id').primaryKey({ autoIncrement: true }),
@@ -38,3 +39,22 @@ export const orders = sqliteTable('orders', {
   status: text('status').notNull().default('pending'), // 'pending' | 'completed' | 'cancelled'
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
 })
+
+export const customersRelations = relations(customers, ({ many }) => ({
+  orders: many(orders),
+}))
+
+export const productsRelations = relations(products, ({ many }) => ({
+  orders: many(orders),
+}))
+
+export const ordersRelations = relations(orders, ({ one }) => ({
+  customer: one(customers, {
+    fields: [orders.customerId],
+    references: [customers.id],
+  }),
+  product: one(products, {
+    fields: [orders.productId],
+    references: [products.id],
+  }),
+}))

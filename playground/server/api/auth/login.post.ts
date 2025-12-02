@@ -1,4 +1,3 @@
-import { compare } from 'bcryptjs'
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 
@@ -13,7 +12,7 @@ export default eventHandler(async (event) => {
 
   const user = await db.select().from(tables.users).where(eq(tables.users.email, body.email)).get()
 
-  if (!user || !await compare(body.password, user.password)) {
+  if (!user || !await verifyPassword(user.password, body.password)) {
     throw createError({
       statusCode: 401,
       message: 'Invalid credentials',

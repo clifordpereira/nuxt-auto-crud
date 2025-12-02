@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, beforeAll } from 'vitest'
 import { ofetch } from 'ofetch'
 import { getTableName, getTableColumns } from 'drizzle-orm'
 import * as fullstackSchema from '../playground/server/database/schema'
@@ -7,9 +7,7 @@ import * as backendSchema from '../playground-backendonly/server/database/schema
 const schema = (process.env.TEST_SUITE || 'backend') === 'backend' ? backendSchema : fullstackSchema
 
 const PORT = process.env.TEST_PORT || '3000'
-const BASE_URL = `http://localhost:${PORT}/api`
 const SUITE = process.env.TEST_SUITE || 'backend'
-const api = ofetch.create({ baseURL: `http://localhost:${PORT}` })
 
 // Helper to generate random payload based on columns
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -41,6 +39,37 @@ function generatePayload(table: any) {
 }
 
 describe(`API Tests (${SUITE})`, () => {
+  let api: typeof ofetch
+
+  beforeAll(async () => {
+    const headers: Record<string, string> = {}
+
+    if (SUITE === 'fullstack') {
+      try {
+        const response = await ofetch.raw(`http://localhost:${PORT}/api/auth/login`, {
+          method: 'POST',
+          body: {
+            email: 'admin@example.com',
+            password: '$1Password',
+          },
+        })
+        const setCookie = response.headers.get('set-cookie')
+        if (setCookie) {
+          headers.cookie = setCookie
+        }
+      }
+      catch (e) {
+        console.error('Login failed', e)
+        throw e
+      }
+    }
+
+    api = ofetch.create({
+      baseURL: `http://localhost:${PORT}`,
+      headers,
+    })
+  })
+
   // Dynamic Test Generation
   for (const [_key, table] of Object.entries(schema)) {
     // Only process Drizzle tables
@@ -60,12 +89,12 @@ describe(`API Tests (${SUITE})`, () => {
 
       describe('LCRUD Operations', () => {
         it(`should list ${modelName}`, async () => {
-          const res = await ofetch(`${BASE_URL}/${modelName}`)
+          const res = await api(`/api/${modelName}`)
           expect(Array.isArray(res)).toBe(true)
         })
 
         it(`should create ${modelName}`, async () => {
-          const res = await ofetch(`${BASE_URL}/${modelName}`, {
+          const res = await api(`/api/${modelName}`, {
             method: 'POST',
             body: payload,
           })
@@ -78,14 +107,14 @@ describe(`API Tests (${SUITE})`, () => {
         })
 
         it(`should read ${modelName}`, async () => {
-          const res = await ofetch(`${BASE_URL}/${modelName}/${createdId}`)
+          const res = await api(`/api/${modelName}/${createdId}`)
           const { password, ...expectedPayload } = payload
           expect(res).toMatchObject(expectedPayload)
         })
 
         it(`should update ${modelName}`, async () => {
           const updatePayload = { ...payload, name: 'Updated Name' } // Naive update
-          const res = await ofetch(`${BASE_URL}/${modelName}/${createdId}`, {
+          const res = await api(`/api/${modelName}/${createdId}`, {
             method: 'PATCH',
             body: updatePayload,
           })
@@ -93,11 +122,11 @@ describe(`API Tests (${SUITE})`, () => {
         })
 
         it(`should delete ${modelName}`, async () => {
-          await ofetch(`${BASE_URL}/${modelName}/${createdId}`, {
+          await api(`/api/${modelName}/${createdId}`, {
             method: 'DELETE',
           })
           try {
-            await ofetch(`${BASE_URL}/${modelName}/${createdId}`)
+            await api(`/api/${modelName}/${createdId}`)
           }
           catch (err: unknown) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -127,7 +156,19 @@ describe(`API Tests (${SUITE})`, () => {
 
     it('Public: Read user (Allowed & Filtered)', async () => {
       // Assuming user with ID 1 exists from previous tests
-      const response = await api('/api/users/1')
+      // We need to find a valid ID. Since we just ran LCRUD, the created user was deleted.
+      // But the admin user (ID 1 probably) should exist if seeded.
+      // Or we can list users and pick one.
+      
+      const users = await api('/api/users')
+      if (users.length === 0) {
+          // Should not happen if seeding works or LCRUD created something (but LCRUD deleted it)
+          // Admin user should be there.
+          throw new Error('No users found to test read')
+      }
+      const userId = users[0].id
+
+      const response = await api(`/api/users/${userId}`)
       expect(response).toBeDefined()
 
       // Check public columns exist

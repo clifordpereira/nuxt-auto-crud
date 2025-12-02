@@ -10,8 +10,8 @@ definePageMeta({
 })
 
 // Get available resources from schemas
-const { schemas } = useResourceSchemas()
-const resourceNames = Object.keys(schemas)
+const { schemas } = await useResourceSchemas()
+const resourceNames = Object.keys(schemas.value || {})
 
 // Dynamically create dropdown items based on available resources
 const iconMap: Record<string, string> = {
