@@ -6,7 +6,7 @@ import { verifyJwtToken } from './jwt'
 export async function checkAdminAccess(event: H3Event, model: string, action: string): Promise<boolean> {
   const { auth } = useAutoCrudConfig()
 
-  if (!auth?.enabled) {
+  if (!auth?.authentication) {
     return true
   }
 

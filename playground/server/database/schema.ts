@@ -7,8 +7,8 @@ export const users = sqliteTable('users', {
   name: text('name'),
   avatar: text('avatar'),
   role: text('role').default('user'),
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
 })
 
 export const customers = sqliteTable('customers', {

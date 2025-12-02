@@ -11,8 +11,14 @@ export default defineNuxtConfig({
   // Auto CRUD configuration
   autoCrud: {
     schemaPath: 'server/database/schema',
+    auth: false,
+    /*
     auth: {
-      enabled: false,
+      type: 'jwt',
+      authentication: true,
+      authorization: true,
+      jwtSecret: 'test-secret-key-123',
     },
+    */
   },
 })

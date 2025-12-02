@@ -5,13 +5,13 @@ import {
   addServerImportsDir,
 } from '@nuxt/kit'
 
-import type { ModuleOptions } from './types'
+import type { ModuleOptions, AuthOptions, RuntimeModuleOptions } from './types'
 
 export type { ModuleOptions }
 
 declare module '@nuxt/schema' {
   interface RuntimeConfig {
-    autoCrud: ModuleOptions
+    autoCrud: RuntimeModuleOptions
   }
 }
 
@@ -23,6 +23,7 @@ export default defineNuxtModule<ModuleOptions>({
   defaults: {
     schemaPath: 'server/database/schema',
     drizzlePath: 'server/utils/drizzle',
+    auth: false,
   },
   async setup(options, nuxt) {
     const resolver = createResolver(import.meta.url)
@@ -59,9 +60,42 @@ export default defineNuxtModule<ModuleOptions>({
     // but for 'resources', we might want to merge them if both exist.
     // Let's use defu or simple spread for now.
 
-    const mergedAuth = {
-      ...externalConfig?.auth,
-      ...options.auth,
+    let mergedAuth: AuthOptions = {
+      authentication: false,
+      authorization: false,
+      type: 'session',
+    }
+
+    if (options.auth === true) {
+      mergedAuth = {
+        authentication: true,
+        authorization: true,
+        type: 'session',
+        ...(typeof externalConfig?.auth === 'object' ? externalConfig.auth : {}),
+      }
+    }
+    else if (options.auth === false) {
+      mergedAuth = {
+        authentication: false,
+        authorization: false,
+        type: 'session',
+      }
+    }
+    else {
+      // It's an object or undefined
+      mergedAuth = {
+        authentication: true, // Default to true if object provided? Or undefined?
+        // If options.auth is undefined, we might want defaults.
+        // But if defaults say auth: false, then options.auth might be undefined.
+        // Let's stick to the plan: default is false.
+        ...(typeof externalConfig?.auth === 'object' ? externalConfig.auth : {}),
+        ...(typeof options.auth === 'object' ? options.auth : {}),
+      }
+      // If authentication is missing, default to false?
+      // The user wants "auth: false or AuthOption, default: false"
+      if (mergedAuth.authentication === undefined) {
+        mergedAuth.authentication = false
+      }
     }
 
     const mergedResources = {
@@ -72,7 +106,7 @@ export default defineNuxtModule<ModuleOptions>({
     // Pass options to runtimeConfig
     nuxt.options.runtimeConfig.autoCrud = {
       auth: {
-        enabled: mergedAuth.enabled ?? false,
+        authentication: mergedAuth.authentication ?? false,
         authorization: mergedAuth.authorization ?? false,
         type: mergedAuth.type ?? 'session',
         jwtSecret: mergedAuth.jwtSecret,

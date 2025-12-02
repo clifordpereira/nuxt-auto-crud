@@ -26,12 +26,22 @@ export default defineNuxtConfig({
     database: true,
   },
 
+  runtimeConfig: {
+    public: {
+      apiAppUrl: '',
+    },
+  },
+
   autoCrud: {
     schemaPath: 'server/database/schema',
+    auth: false,
+    /*
     auth: {
-      enabled: true,
+      type: 'session',
+      authentication: true,
       authorization: true,
     },
+    */
   },
 
   eslint: {

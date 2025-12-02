@@ -1,6 +1,6 @@
 import { useRuntimeConfig } from '#imports'
-import type { ModuleOptions } from '../../../types'
+import type { RuntimeModuleOptions } from '../../../types'
 
-export const useAutoCrudConfig = (): ModuleOptions => {
-  return useRuntimeConfig().autoCrud as ModuleOptions
+export const useAutoCrudConfig = (): RuntimeModuleOptions => {
+  return useRuntimeConfig().autoCrud as RuntimeModuleOptions
 }

@@ -2,17 +2,17 @@
 
 ## Automated Tests
 
-We use `vitest` for automated API testing. The tests are dynamically generated based on the Drizzle schema defined in `playground-fullstack/server/database/schema.ts`.
+We use `vitest` for automated API testing. The tests are dynamically generated based on the Drizzle schema defined in `playground/server/database/schema.ts`.
 
 ### Test Scenarios
 
 1.  **Backend-only (No Auth)**:
-    *   Starts `playground-backend` on port 3001.
+    *   Starts `playground-backendonly` on port 3001.
     *   Verifies LCRUD (List, Create, Read, Update, Delete) operations for the `users` model.
     *   Ensures APIs work without authentication.
 
 2.  **Full-stack (With Auth)**:
-    *   Starts `playground-fullstack` on port 3000.
+    *   Starts `playground` on port 3000.
     *   Verifies that APIs return `401 Unauthorized` when accessed without a session.
     *   (Future) Verify authenticated access with mocked sessions.
 
@@ -52,10 +52,10 @@ npm run test:api
 ```
 
 This script will:
-1.  Start the `playground-backend` server.
+1.  Start the `playground-backendonly` server.
 2.  Run the "No Auth" test suite.
 3.  Stop the server.
-4.  Start the `playground-fullstack` server.
+4.  Start the `playground` server.
 5.  Run the "Auth" test suite.
 6.  Stop the server.
 

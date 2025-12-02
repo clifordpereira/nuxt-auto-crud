@@ -1,7 +1,5 @@
 # Nuxt Auto CRUD
 
-
-
 > **Note:** This module is currently in its alpha stage. However, you can use it to accelerate MVP development. It has not been tested thoroughly enough for production use; only happy-path testing is performed for each release.
 
 Auto-generate RESTful CRUD APIs for your **Nuxt** application based solely on your database schema. Minimal configuration required.
@@ -19,7 +17,7 @@ Auto-generate RESTful CRUD APIs for your **Nuxt** application based solely on yo
 
 ## 📦 How to install
 
-### New Project (Recommended)
+### 1. Fullstack Template (Recommended)
 
 Start a new project with everything pre-configured using our template:
 
@@ -33,22 +31,13 @@ bun run dev
 
 Detailed instructions can be found in [https://auto-crud.clifland.in/](https://auto-crud.clifland.in/)
 
-### Add User
-Open Nuxt DevTools (bottom-middle icon) > `...` menu > **Database** icon to add users.
-    > **Note:** If the users table doesn't appear, restart the server (`Ctrl + C` and `bun run dev`).
-
-That's it! You can now access the APIs:
-
-### Test API
-Visit [http://localhost:3000/api/users](http://localhost:3000/api/users).
-
-### Existing Project
+### 2. Manual Setup (Existing Project)
 
 If you want to add `nuxt-auto-crud` to an existing project, follow these steps:
 
 > **Note:** These instructions assume you are using NuxtHub. If you are using a custom SQLite setup (e.g. better-sqlite3, Turso), please see [Custom Setup](./custom-setup.md).
 
-### 1. Install dependencies
+#### Install dependencies
 
 ```bash
 # Install module and required dependencies
@@ -60,7 +49,7 @@ bun add nuxt-auto-crud @nuxthub/core@latest drizzle-orm
 bun add --dev wrangler drizzle-kit
 ```
 
-### 2. Configure Nuxt
+#### Configure Nuxt
 
 Add the modules to your `nuxt.config.ts`:
 
@@ -75,11 +64,12 @@ export default defineNuxtConfig({
 
   autoCrud: {
     schemaPath: 'server/database/schema', // default value
+    auth: false, // Disable auth by default for easy testing
   },
 })
 ```
 
-### 3. Configure Drizzle
+#### Configure Drizzle
 
 Add the generation script to your `package.json`:
 
@@ -104,7 +94,7 @@ export default defineConfig({
 })
 ```
 
-### 4. Setup Database Connection
+#### Setup Database Connection
 
 Create `server/utils/drizzle.ts` to export the database instance:
 
@@ -124,7 +114,7 @@ export function useDrizzle() {
 export type User = typeof schema.users.$inferSelect
 ```
 
-### 5. Define your database schema
+#### Define your database schema
 
 Create `server/database/schema.ts`:
 
@@ -142,7 +132,7 @@ export const users = sqliteTable('users', {
 })
 ```
 
-### 6. Run the project
+#### Run the project
 
 ```bash
 cd <project-name>
@@ -150,15 +140,82 @@ bun db:generate
 bun run dev
 ```
 
-That's it! 🎉 Your CRUD APIs are now available:
+That's it! 🎉 Your CRUD APIs are now available at `/api/users`.
 
-- `GET /api/users` - List all users
-- `POST /api/users` - Create a new user
-- `GET /api/users/:id` - Get user by ID
-- `PATCH /api/users/:id` - Update user
-- `DELETE /api/users/:id` - Delete user
+### 3. Backend-only App (API Mode)
 
-_(Same endpoints for all your tables!)_
+If you are using Nuxt as a backend for a separate client application (e.g., mobile app, SPA), you can use this module to quickly generate REST APIs.
+
+In this case, you might handle authentication differently (e.g., validating tokens in middleware) or disable the built-in auth checks if you have a global auth middleware.
+
+```ts
+export default defineNuxtConfig({
+  modules: ['nuxt-auto-crud'],
+  autoCrud: {
+    auth: false // APIs are public (or handled by your own middleware)
+  }
+})
+```
+
+## 🔐 Authentication Configuration
+
+The module supports `auth: false` by default, which exposes all LCRUD APIs. You can enable authentication and authorization as needed.
+
+### Session Auth (Default)
+
+Requires `nuxt-auth-utils` and `nuxt-authorization`.
+
+```typescript
+export default defineNuxtConfig({
+  autoCrud: {
+    auth: {
+      type: 'session',
+      authentication: true, // Enables requireUserSession() check
+      authorization: true // Enables authorize(model, action) check
+    }
+  }
+})
+```
+
+### JWT Auth
+
+Useful for backend-only apps.
+
+```typescript
+export default defineNuxtConfig({
+  autoCrud: {
+    auth: {
+      type: 'jwt',
+      authentication: true,
+      jwtSecret: process.env.JWT_SECRET,
+      authorization: true
+    }
+  }
+})
+```
+
+## 🛡️ Resource Configuration (RBAC)
+
+You can define fine-grained access control and resource policies using `autocrud.config.ts` in your project root. This file is optional and useful when you need specific rules per resource.
+
+```typescript
+// autocrud.config.ts
+export default {
+  resources: {
+    users: {
+      // Access Control
+      auth: {
+        // Admin has full access
+        admin: true,
+        // Public (unauthenticated) users can only list and read
+        public: ['list', 'read'],
+      },
+      // Field Visibility
+      publicColumns: ['id', 'name', 'avatar'], // Only these columns are returned to public users
+    },
+  }
+}
+```
 
 ## 🎮 Try the Playground
 
@@ -172,14 +229,18 @@ cd nuxt-auto-crud
 # Install dependencies (parent folder)
 bun install
 
-# Run the playground (fullstack with auth)
-cd playground-fullstack
+# Run the playground (Fullstack)
+cd playground
+bun install
+bun db:generate
+bun run dev
+
+# Run the playground (Backend Only)
+cd playground-backendonly
 bun install
 bun db:generate
 bun run dev
 ```
-
-The playground includes a sample schema with users, posts, and comments tables, plus an interactive UI to explore all the features.
 
 ## 📖 Usage Examples
 
@@ -225,56 +286,6 @@ const updated = await $fetch("/api/users/1", {
 await $fetch("/api/users/1", {
   method: "DELETE",
 });
-```
-
-## Use Cases
-
-### 1. Full-stack App (with Auth)
-
-If you are building a full-stack Nuxt application, you can easily integrate `nuxt-auth-utils` and `nuxt-authorization` to secure your auto-generated APIs.
-
-First, install the modules:
-
-```bash
-npx nuxi@latest module add auth-utils
-npm install nuxt-authorization
-```
-
-Then, configure `nuxt-auto-crud` in your `nuxt.config.ts`:
-
-```ts
-export default defineNuxtConfig({
-  modules: [
-    'nuxt-auto-crud',
-    'nuxt-auth-utils'
-  ],
-  autoCrud: {
-    auth: {
-      enabled: true, // Enables requireUserSession() check
-      authorization: true // Enables authorize(model, action) check
-    }
-  }
-})
-```
-
-When `authorization` is enabled, the module will call `authorize(model, action)` where action is one of: `create`, `read`, `update`, `delete`.
-
-### 2. Backend-only App (API Mode)
-
-If you are using Nuxt as a backend for a separate client application (e.g., mobile app, SPA), you can use this module to quickly generate REST APIs.
-
-In this case, you might handle authentication differently (e.g., validating tokens in middleware) or disable the built-in auth checks if you have a global auth middleware.
-
-```ts
-export default defineNuxtConfig({
-  modules: ['nuxt-auto-crud'],
-  autoCrud: {
-    auth: {
-      enabled: false, // Default
-      authorization: false // Default
-    }
-  }
-})
 ```
 
 ## Configuration
@@ -327,5 +338,3 @@ Contributions are welcome! Please check out the [contribution guide](/CONTRIBUTI
 ## 👨‍💻 Author
 
 Made with ❤️ by [Cliford Pereira](https://github.com/clifordpereira)
-
-

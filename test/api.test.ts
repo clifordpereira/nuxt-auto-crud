@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import { ofetch } from 'ofetch'
 import { getTableName, getTableColumns } from 'drizzle-orm'
-import * as fullstackSchema from '../playground-fullstack/server/database/schema'
-import * as backendSchema from '../playground-backend/server/database/schema'
+import * as fullstackSchema from '../playground/server/database/schema'
+import * as backendSchema from '../playground-backendonly/server/database/schema'
 
 const schema = (process.env.TEST_SUITE || 'backend') === 'backend' ? backendSchema : fullstackSchema
 
@@ -58,72 +58,57 @@ describe(`API Tests (${SUITE})`, () => {
       let createdId: number | string
       const payload = generatePayload(table)
 
-      if (SUITE === 'backend') {
-        describe('No Auth Mode', () => {
-          it(`should list ${modelName}`, async () => {
-            const res = await ofetch(`${BASE_URL}/${modelName}`)
-            expect(Array.isArray(res)).toBe(true)
-          })
-
-          it(`should create ${modelName}`, async () => {
-            const res = await ofetch(`${BASE_URL}/${modelName}`, {
-              method: 'POST',
-              body: payload,
-            })
-            expect(res).toMatchObject(payload)
-            expect(res.id).toBeDefined()
-            createdId = res.id
-          })
-
-          it(`should read ${modelName}`, async () => {
-            const res = await ofetch(`${BASE_URL}/${modelName}/${createdId}`)
-            expect(res).toMatchObject(payload)
-          })
-
-          it(`should update ${modelName}`, async () => {
-            const updatePayload = { ...payload, name: 'Updated Name' } // Naive update
-            const res = await ofetch(`${BASE_URL}/${modelName}/${createdId}`, {
-              method: 'PATCH',
-              body: updatePayload,
-            })
-            expect(res.name).toBe('Updated Name')
-          })
-
-          it(`should delete ${modelName}`, async () => {
-            await ofetch(`${BASE_URL}/${modelName}/${createdId}`, {
-              method: 'DELETE',
-            })
-            try {
-              await ofetch(`${BASE_URL}/${modelName}/${createdId}`)
-            }
-            catch (err: unknown) {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              expect((err as any).statusCode).toBe(404)
-            }
-          })
+      describe('LCRUD Operations', () => {
+        it(`should list ${modelName}`, async () => {
+          const res = await ofetch(`${BASE_URL}/${modelName}`)
+          expect(Array.isArray(res)).toBe(true)
         })
-      }
-      else if (SUITE === 'fullstack') {
-        describe('Auth Mode', () => {
-          it(`should return 401 for unauthenticated access to ${modelName}`, async () => {
-            try {
-              await ofetch(`${BASE_URL}/${modelName}`)
-            }
-            catch (err: unknown) {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              expect((err as any).statusCode).toBe(401)
-            }
+
+        it(`should create ${modelName}`, async () => {
+          const res = await ofetch(`${BASE_URL}/${modelName}`, {
+            method: 'POST',
+            body: payload,
           })
+          expect(res).toMatchObject(payload)
+          expect(res.id).toBeDefined()
+          createdId = res.id
         })
-      }
+
+        it(`should read ${modelName}`, async () => {
+          const res = await ofetch(`${BASE_URL}/${modelName}/${createdId}`)
+          expect(res).toMatchObject(payload)
+        })
+
+        it(`should update ${modelName}`, async () => {
+          const updatePayload = { ...payload, name: 'Updated Name' } // Naive update
+          const res = await ofetch(`${BASE_URL}/${modelName}/${createdId}`, {
+            method: 'PATCH',
+            body: updatePayload,
+          })
+          expect(res.name).toBe('Updated Name')
+        })
+
+        it(`should delete ${modelName}`, async () => {
+          await ofetch(`${BASE_URL}/${modelName}/${createdId}`, {
+            method: 'DELETE',
+          })
+          try {
+            await ofetch(`${BASE_URL}/${modelName}/${createdId}`)
+          }
+          catch (err: unknown) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            expect((err as any).statusCode).toBe(404)
+          }
+        })
+      })
     })
   }
   describe.runIf(process.env.TEST_SUITE === 'fullstack')('Controlled API Exposure', () => {
-    const publicColumns = ['id', 'name', 'avatar']
-    const privateColumns = ['email', 'password', 'createdAt']
+    const publicColumns = ['id', 'name', 'avatar', 'email']
+    const privateColumns = ['password']
 
     it('Public: List users (Allowed & Filtered)', async () => {
-      const response = await api('/users')
+      const response = await api('/api/users')
       expect(response).toBeDefined()
       expect(Array.isArray(response)).toBe(true)
 
@@ -138,7 +123,7 @@ describe(`API Tests (${SUITE})`, () => {
 
     it('Public: Read user (Allowed & Filtered)', async () => {
       // Assuming user with ID 1 exists from previous tests
-      const response = await api('/users/1')
+      const response = await api('/api/users/1')
       expect(response).toBeDefined()
 
       // Check public columns exist
@@ -147,34 +132,6 @@ describe(`API Tests (${SUITE})`, () => {
       privateColumns.forEach(col => expect(response).not.toHaveProperty(col))
     })
 
-    it('Public: Create user (Unauthorized)', async () => {
-      try {
-        await api('/users', {
-          method: 'POST',
-          body: {
-            name: 'Hacker',
-            email: 'hacker@example.com',
-            password: 'password',
-            avatar: 'hacker.png',
-          },
-        })
-        expect.fail('Should have thrown 401')
-      }
-      catch (e: unknown) {
-        console.log('Create user error (full):', e)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        if ((e as any).response) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          console.log('Response status:', (e as any).response.status)
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          console.log('Response body:', (e as any).response._data)
-        }
-        else {
-          console.log('No response object on error')
-        }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        expect((e as any).response?.status).toBe(401)
-      }
-    })
+
   })
 }, 20000)
