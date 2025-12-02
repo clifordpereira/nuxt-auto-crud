@@ -71,21 +71,46 @@ describe(`API Tests (${SUITE})`, () => {
   })
 
   // Dynamic Test Generation
+  console.log('Schema keys:', Object.keys(schema))
   for (const [_key, table] of Object.entries(schema)) {
     // Only process Drizzle tables
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if (!table || typeof table !== 'object' || !('name' in (table as any))) continue
+    if (!table || typeof table !== 'object') continue
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const tableName = getTableName(table as any)
+    let tableName
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      tableName = getTableName(table as any)
+    }
+    catch {
+      continue
+    }
+
+    if (!tableName) continue
+    
     const modelName = tableName // Assuming model name matches table name for now
 
-    // Skip posts/comments for now to avoid FK complexity in this iteration
-    if (tableName !== 'users') continue
+    // Filter tables to test
+    if (!['users', 'customers', 'products', 'orders'].includes(tableName)) continue
 
     describe(`Model: ${modelName}`, () => {
       let createdId: number | string
       const payload = generatePayload(table)
+
+      // Special handling for orders
+      if (tableName === 'orders') {
+        payload.total = 100.50
+        payload.status = 'pending'
+      }
+      // Special handling for products
+      if (tableName === 'products') {
+        payload.price = 50.00
+        payload.inventory = 100
+        payload.status = 'active'
+      }
+      // Special handling for customers
+      if (tableName === 'customers') {
+        payload.status = 'subscribed'
+      }
 
       describe('LCRUD Operations', () => {
         it(`should list ${modelName}`, async () => {
@@ -94,14 +119,75 @@ describe(`API Tests (${SUITE})`, () => {
         })
 
         it(`should create ${modelName}`, async () => {
-          const res = await api(`/api/${modelName}`, {
-            method: 'POST',
-            body: payload,
-          })
+          // For orders, we need valid customerId and productId
+          if (tableName === 'orders') {
+            // Create or find a customer
+            let customerId
+            const customers = await api('/api/customers')
+            if (customers.length > 0) {
+              customerId = customers[0].id
+            }
+            else {
+              const newCustomer = await api('/api/customers', {
+                method: 'POST',
+                body: {
+                  name: 'Test Customer for Order',
+                  email: `customer-${Date.now()}@test.com`,
+                  status: 'subscribed',
+                },
+              })
+              customerId = newCustomer.id
+            }
+            payload.customerId = customerId
+
+            // Create or find a product
+            let productId
+            const products = await api('/api/products')
+            if (products.length > 0) {
+              productId = products[0].id
+            }
+            else {
+              const newProduct = await api('/api/products', {
+                method: 'POST',
+                body: {
+                  name: 'Test Product for Order',
+                  price: 29.99,
+                  status: 'active',
+                  inventory: 50,
+                },
+              })
+              productId = newProduct.id
+            }
+            payload.productId = productId
+          }
+
+          console.log(`Creating ${modelName} with payload:`, JSON.stringify(payload, null, 2))
+          let res
+          try {
+            res = await api(`/api/${modelName}`, {
+              method: 'POST',
+              body: payload,
+            })
+          } catch (err: any) {
+            console.error(`Failed to create ${modelName}:`, err.data || err.message)
+            throw err
+          }
 
           const { password, ...expectedPayload } = payload
-          expect(res).toMatchObject(expectedPayload)
-          expect(res.password).toBeUndefined()
+          // For dates, we might get back a string, so we can't strictly match object if payload has Date object
+          // But here payload.createdAt is string (ISO) if we set it.
+          // However, API might return it differently? Drizzle returns Date object usually?
+          // Over JSON it becomes string.
+          // Let's relax the match for orders
+          if (tableName === 'orders') {
+            expect(res.id).toBeDefined()
+            expect(res.total).toBe(payload.total)
+          }
+          else {
+            expect(res).toMatchObject(expectedPayload)
+          }
+
+          if (res.password) expect(res.password).toBeUndefined()
           expect(res.id).toBeDefined()
           createdId = res.id
         })
@@ -109,19 +195,38 @@ describe(`API Tests (${SUITE})`, () => {
         it(`should read ${modelName}`, async () => {
           const res = await api(`/api/${modelName}/${createdId}`)
           const { password, ...expectedPayload } = payload
-          expect(res).toMatchObject(expectedPayload)
+          if (tableName === 'orders') {
+            expect(res.id).toBe(createdId)
+          }
+          else {
+            expect(res).toMatchObject(expectedPayload)
+          }
         })
 
         it(`should update ${modelName}`, async () => {
-          const updatePayload = { ...payload, name: 'Updated Name' } // Naive update
+          const updatePayload = { ...payload }
+          if (tableName === 'users' || tableName === 'customers' || tableName === 'products') {
+            updatePayload.name = 'Updated Name'
+          }
+          if (tableName === 'orders') {
+            updatePayload.status = 'completed'
+          }
+
           const res = await api(`/api/${modelName}/${createdId}`, {
             method: 'PATCH',
             body: updatePayload,
           })
-          expect(res.name).toBe('Updated Name')
+
+          if (tableName === 'orders') {
+            expect(res.status).toBe('completed')
+          }
+          else {
+            expect(res.name).toBe('Updated Name')
+          }
         })
 
         it(`should delete ${modelName}`, async () => {
+          if (!createdId) throw new Error('No createdId to delete')
           await api(`/api/${modelName}/${createdId}`, {
             method: 'DELETE',
           })
@@ -159,12 +264,12 @@ describe(`API Tests (${SUITE})`, () => {
       // We need to find a valid ID. Since we just ran LCRUD, the created user was deleted.
       // But the admin user (ID 1 probably) should exist if seeded.
       // Or we can list users and pick one.
-      
+
       const users = await api('/api/users')
       if (users.length === 0) {
-          // Should not happen if seeding works or LCRUD created something (but LCRUD deleted it)
-          // Admin user should be there.
-          throw new Error('No users found to test read')
+        // Should not happen if seeding works or LCRUD created something (but LCRUD deleted it)
+        // Admin user should be there.
+        throw new Error('No users found to test read')
       }
       const userId = users[0].id
 

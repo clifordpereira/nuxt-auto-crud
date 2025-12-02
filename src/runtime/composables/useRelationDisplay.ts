@@ -1,4 +1,4 @@
-import { ref, useFetch } from '#imports'
+import { ref, useFetch, useRequestHeaders } from '#imports'
 
 export const useRelationDisplay = (
   schema: {
@@ -9,6 +9,7 @@ export const useRelationDisplay = (
   const resourceName = schema.resource
   const relationsMap = ref<Record<string, Record<string, string>>>({})
   const displayValues = ref<Record<string, Record<string, string>>>({})
+  const headers = useRequestHeaders(['cookie'])
 
   const fetchRelations = async () => {
     // 1. Fetch relations metadata
@@ -28,19 +29,24 @@ export const useRelationDisplay = (
       relationFields.map(async (fieldName) => {
         const targetTable = resourceRelations[fieldName]
         // We assume the API for targetTable is /api/[targetTable]
-        const { data: relatedData } = await useFetch<Record<string, unknown>[]>(`/api/${targetTable}`)
-        
-        if (relatedData.value) {
-          displayValues.value[fieldName] = relatedData.value.reduce<Record<string, string>>(
-            (acc, item) => {
-              const id = item.id as number
-              // Try to find a good display name
-              const label = (item.name || item.title || item.email || item.username || `#${item.id}`) as string
-              acc[id] = label
-              return acc
-            },
-            {},
-          )
+        try {
+          const relatedData = await $fetch<Record<string, unknown>[]>(`/api/${targetTable}`, { headers })
+
+          if (relatedData) {
+            displayValues.value[fieldName] = relatedData.reduce<Record<string, string>>(
+              (acc, item) => {
+                const id = item.id as number
+                // Try to find a good display name
+                const label = (item.name || item.title || item.email || item.username || `#${item.id}`) as string
+                acc[id] = label
+                return acc
+              },
+              {},
+            )
+          }
+        }
+        catch (error) {
+          console.error(`Failed to fetch relation data for ${targetTable}:`, error)
         }
       }),
     )
@@ -56,6 +62,6 @@ export const useRelationDisplay = (
   return {
     fetchRelations,
     getDisplayValue,
-    relationsMap
+    relationsMap,
   }
 }

@@ -3,7 +3,7 @@
 import * as schema from '#site/schema'
 import pluralize from 'pluralize'
 import { pascalCase } from 'scule'
-import { getTableColumns as getDrizzleTableColumns } from 'drizzle-orm'
+import { getTableColumns as getDrizzleTableColumns, getTableName } from 'drizzle-orm'
 import type { SQLiteTable } from 'drizzle-orm/sqlite-core'
 import { createError } from 'h3'
 import { useRuntimeConfig } from '#imports'
@@ -50,15 +50,16 @@ function buildModelTableMap(): Record<string, unknown> {
   // Iterate through all exports from schema
   for (const [key, value] of Object.entries(schema)) {
     // Check if it's a Drizzle table
-    // Drizzle tables have specific properties we can check
     if (value && typeof value === 'object') {
-      // Check for common Drizzle table properties
-      const hasTableSymbol = Symbol.for('drizzle:Name') in value
-      const hasUnderscore = '_' in value
-      const hasTableConfig = 'table' in value || '$inferSelect' in value
-
-      if (hasTableSymbol || hasUnderscore || hasTableConfig) {
-        tableMap[key] = value
+      try {
+        // getTableName returns the table name for valid tables, and undefined/null for others (like relations)
+        // This is a more robust check than checking for properties
+        const tableName = getTableName(value as any)
+        if (tableName) {
+          tableMap[key] = value
+        }
+      } catch (e) {
+        // Ignore if it throws (not a table)
       }
     }
   }

@@ -41,8 +41,8 @@ export function useDynamicZodSchema(
     }
     else if (field.type === 'number') {
       validators[field.name] = field.required
-        ? z.number()
-        : z.number().optional()
+        ? z.coerce.number()
+        : z.coerce.number().optional()
     }
     else if (field.type === 'date') {
       validators[field.name] = field.required

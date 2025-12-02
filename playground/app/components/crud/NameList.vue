@@ -14,7 +14,7 @@ if (props.tableName) {
   urlPath = props.tableName
 }
 else if (props.fieldName) {
-  const baseName = props.fieldName.replace(/_id$/, '')
+  const baseName = props.fieldName.replace(/(_id|Id)$/, '')
   urlPath = pluralize(baseName) // e.g., user_id → users
 }
 
@@ -35,20 +35,36 @@ const { data: options } = await useFetch(() => `${crudBaseUrl}/${urlPath}`, {
   lazy: true,
   headers: crudHeaders(),
 })
+
+function handleUpdate(value: unknown) {
+  if (value && typeof value === 'object') {
+    // If USelectMenu returns the full object despite value-attribute, extract the ID
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const id = (value as any).value || (value as any).id
+    emit('update:modelValue', id)
+  }
+  else {
+    emit('update:modelValue', value)
+  }
+}
 </script>
 
 <template>
   <USelectMenu
-    :items="options"
-    :model-value="modelValue"
+    :items="options || []"
+    :model-value="modelValue as any"
     value-attribute="value"
+    option-attribute="label"
     placeholder="Select"
     class="w-full"
-    @update:model-value="emit('update:modelValue', $event)"
+    @update:model-value="handleUpdate"
   >
     <template #item-label="{ item }">
-      {{ item.label }}
-      <span class="text-muted">{{ item.extra }}</span>
+      <span>{{ item.label }}</span>
+      <span
+        v-if="item.extra"
+        class="text-gray-400 text-xs ml-2"
+      >({{ item.extra }})</span>
     </template>
   </USelectMenu>
 </template>

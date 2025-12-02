@@ -38,9 +38,23 @@ const formSchema = useDynamicZodSchema(filteredFields, !!props.initialState)
 const state = reactive<Record<string, unknown>>(
   filteredFields.reduce(
     (acc, field) => {
-      acc[field.name]
-        = props.initialState?.[field.name]
-          ?? (field.type === 'boolean' ? false : '')
+      let value = props.initialState?.[field.name]
+
+      // Handle relation fields that might be objects
+      // Case 1: value is an object with id (e.g. customer_id: { id: 1, ... })
+      if ((field.name.endsWith('_id') || field.name.endsWith('Id')) && value && typeof value === 'object' && 'id' in value) {
+        value = (value as { id: unknown }).id
+      }
+      // Case 2: value is undefined, but there might be a relation object (e.g. field is customer_id, but props has customer: { id: 1 })
+      else if ((field.name.endsWith('_id') || field.name.endsWith('Id')) && value === undefined) {
+        const relationName = field.name.endsWith('_id') ? field.name.replace('_id', '') : field.name.replace('Id', '')
+        const relationValue = props.initialState?.[relationName]
+        if (relationValue && typeof relationValue === 'object' && 'id' in relationValue) {
+          value = (relationValue as { id: unknown }).id
+        }
+      }
+
+      acc[field.name] = value ?? (field.type === 'boolean' ? false : undefined)
       return acc
     },
     {} as Record<string, unknown>,
@@ -53,6 +67,9 @@ const processedFields = computed(() =>
     let label = field.name
     if (label.endsWith('_id')) {
       label = label.replace('_id', '')
+    }
+    else if (label.endsWith('Id')) {
+      label = label.replace('Id', '')
     }
     label = useChangeCase(label, 'capitalCase').value
     return {
@@ -81,7 +98,6 @@ function handleSubmit(event: FormSubmitEvent<Record<string, unknown>>) {
         :key="field.name"
       >
         <UFormField
-          v-if="!props.initialState || field.name !== 'password'"
           :label="field.label"
           :name="field.name"
         >
@@ -91,21 +107,28 @@ function handleSubmit(event: FormSubmitEvent<Record<string, unknown>>) {
           />
 
           <CrudNameList
-            v-else-if="field.name.endsWith('_id')"
+            v-else-if="field.name.endsWith('_id') || field.name.endsWith('Id')"
             v-model="state[field.name] as string | number | null"
             :field-name="field.name"
           />
 
+          <template v-else-if="field.name === 'password'">
+            <CommonPassword
+              v-if="!props.initialState"
+              v-model="state[field.name] as string"
+              type="password"
+            />
+            <span
+              v-else
+              class="text-gray-500 italic text-sm"
+            >
+              Password can only be set on creation.
+            </span>
+          </template>
           <UInput
             v-else-if="field.type === 'date'"
             v-model="state[field.name] as string"
             type="datetime-local"
-          />
-
-          <CommonPassword
-            v-else-if="field.name === 'password'"
-            v-model="state[field.name] as string"
-            type="password"
           />
 
           <USelect
@@ -124,6 +147,7 @@ function handleSubmit(event: FormSubmitEvent<Record<string, unknown>>) {
           />
         </UFormField>
       </template>
+
       <UButton type="submit">
         Submit
       </UButton>

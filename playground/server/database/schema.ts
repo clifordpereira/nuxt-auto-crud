@@ -37,7 +37,7 @@ export const orders = sqliteTable('orders', {
   quantity: integer('quantity').notNull().default(1),
   total: real('total').notNull(),
   status: text('status').notNull().default('pending'), // 'pending' | 'completed' | 'cancelled'
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
 })
 
 export const customersRelations = relations(customers, ({ many }) => ({
