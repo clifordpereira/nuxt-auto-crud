@@ -18,11 +18,10 @@ export default defineNitroPlugin(async () => {
         avatar: 'https://i.pravatar.cc/150?u=admin',
         role: 'admin',
         createdAt: new Date(),
-        updatedAt: new Date(),
+        updatedAt: new Date()
       })
       console.log('Admin user seeded.')
-    }
-    else if (existingAdmin.role !== 'admin') {
+    } else if (existingAdmin.role !== 'admin') {
       await db.update(tables.users).set({ role: 'admin' }).where(eq(tables.users.email, 'admin@example.com'))
       console.log('Admin user role updated.')
     }

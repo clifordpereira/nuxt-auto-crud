@@ -4,7 +4,7 @@ import { z } from 'zod'
 
 const loginSchema = z.object({
   email: z.string().email(),
-  password: z.string(),
+  password: z.string()
 })
 
 export default eventHandler(async (event) => {
@@ -16,7 +16,7 @@ export default eventHandler(async (event) => {
   if (!user || !await compare(body.password, user.password)) {
     throw createError({
       statusCode: 401,
-      message: 'Invalid credentials',
+      message: 'Invalid credentials'
     })
   }
 
@@ -26,8 +26,8 @@ export default eventHandler(async (event) => {
       email: user.email,
       name: user.name,
       avatar: user.avatar,
-      role: user.role || 'user',
-    },
+      role: user.role || 'user'
+    }
   })
 
   return { user }

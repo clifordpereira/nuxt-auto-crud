@@ -1,17 +1,17 @@
 <script setup lang="ts">
 const props = defineProps<{
-  resource: string;
+  resource: string
   schema: {
-    resource: string;
-    fields: { name: string; type: string; required?: boolean }[];
-  };
-}>();
+    resource: string
+    fields: { name: string, type: string, required?: boolean }[]
+  }
+}>()
 
 async function onSubmit(data: any) {
-  await useCrudFetch("POST", props.resource, null, data);
+  await useCrudFetch('POST', props.resource, null, data)
 }
 
-const isModalOpen = ref(false);
+const isModalOpen = ref(false)
 </script>
 
 <template>
@@ -26,7 +26,7 @@ const isModalOpen = ref(false);
           <h2 class="text-lg font-semibold mb-4">
             Add New {{ props.resource }}
           </h2>
-          <hr />
+          <hr>
 
           <div class="mt-4">
             <!-- Dynamic form -->

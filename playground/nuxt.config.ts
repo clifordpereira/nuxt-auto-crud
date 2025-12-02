@@ -9,7 +9,7 @@ export default defineNuxtConfig({
     'nuxt-auth-utils',
     '@vueuse/nuxt',
     'nuxt-authorization',
-    '../src/module',
+    '../src/module'
   ],
 
   devtools: { enabled: true },
@@ -19,23 +19,23 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       apiAppUrl: '',
-      crudBaseUrl: '/api',
-    },
+      crudBaseUrl: '/api'
+    }
   },
 
   future: {
-    compatibilityVersion: 4,
+    compatibilityVersion: 4
   },
 
   compatibilityDate: '2024-11-27',
 
   hub: {
-    database: true,
+    database: true
   },
 
   autoCrud: {
     schemaPath: 'server/database/schema',
-    auth: false,
+    auth: false
     /*
     auth: {
       type: 'session',
@@ -49,8 +49,8 @@ export default defineNuxtConfig({
     config: {
       stylistic: {
         commaDangle: 'never',
-        braceStyle: '1tbs',
-      },
-    },
-  },
+        braceStyle: '1tbs'
+      }
+    }
+  }
 })

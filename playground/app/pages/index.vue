@@ -6,21 +6,21 @@ const { isNotificationsSlideoverOpen } = useDashboard()
 
 definePageMeta({
   layout: 'dashboard',
-  middleware: 'auth',
+  middleware: 'auth'
 })
 
 const items = [[{
   label: 'New user',
   icon: 'i-lucide-user-plus',
-  to: '/resource/users',
+  to: '/resource/users'
 }, {
   label: 'New customer',
   icon: 'i-lucide-users',
-  to: '/resource/customers',
+  to: '/resource/customers'
 }, {
   label: 'New product',
   icon: 'i-lucide-package',
-  to: '/resource/products',
+  to: '/resource/products'
 }]] satisfies DropdownMenuItem[][]
 
 const { data: users } = await useFetch('/api/users')

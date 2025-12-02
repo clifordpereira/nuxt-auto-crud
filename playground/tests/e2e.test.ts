@@ -3,7 +3,7 @@ import { setup, createPage } from '@nuxt/test-utils/e2e'
 
 describe('Dashboard E2E', async () => {
   await setup({
-    server: true,
+    server: true
   })
 
   it('Public: can view products page', async () => {

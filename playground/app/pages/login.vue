@@ -1,7 +1,7 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
 definePageMeta({
-  layout: false,
+  layout: false
 })
 
 const toast = useToast()
@@ -9,7 +9,7 @@ const { fetch: refreshSession } = useUserSession()
 
 const state = reactive({
   email: '',
-  password: '',
+  password: ''
 })
 
 const loading = ref(false)
@@ -19,18 +19,17 @@ async function onSubmit() {
   try {
     await $fetch('/api/auth/login', {
       method: 'POST',
-      body: state,
+      body: state
     })
     await refreshSession()
     // Force a reload to ensure layout changes (guest -> admin) are applied
     window.location.href = '/'
-  }
-  catch (err: unknown) {
+  } catch (err: unknown) {
     toast.add({
       title: 'Error',
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       description: (err as any).data?.message || 'Invalid credentials',
-      color: 'error',
+      color: 'error'
     })
     loading.value = false
   }

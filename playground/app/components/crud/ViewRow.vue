@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const props = defineProps<{
-  row: Record<string, any>;
-}>();
+  row: Record<string, any>
+}>()
 </script>
 
 <template>
@@ -11,7 +11,9 @@ const props = defineProps<{
 
       <template #content>
         <div class="p-4 max-w-md bg-white rounded-lg shadow-md">
-          <h3 class="text-lg font-semibold mb-3 text-gray-950">Details</h3>
+          <h3 class="text-lg font-semibold mb-3 text-gray-950">
+            Details
+          </h3>
           <ul class="space-y-2 text-sm">
             <li
               v-for="(value, key) in props.row"

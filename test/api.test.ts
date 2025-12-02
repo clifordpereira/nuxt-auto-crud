@@ -28,7 +28,7 @@ function generatePayload(table: any) {
     const type = (col as any).columnType || (col as any).dataType
 
     if (type === 'SQLiteText') {
-      if (key === 'email') payload[key] = `test-${Date.now()}@example.com`
+      if (key === 'email') payload[key] = `test-${Date.now()}-${Math.floor(Math.random() * 10000)}@example.com`
       else payload[key] = `Test ${key}`
     }
     else if (type === 'SQLiteInteger') {
@@ -69,14 +69,18 @@ describe(`API Tests (${SUITE})`, () => {
             method: 'POST',
             body: payload,
           })
-          expect(res).toMatchObject(payload)
+          
+          const { password, ...expectedPayload } = payload
+          expect(res).toMatchObject(expectedPayload)
+          expect(res.password).toBeUndefined()
           expect(res.id).toBeDefined()
           createdId = res.id
         })
 
         it(`should read ${modelName}`, async () => {
           const res = await ofetch(`${BASE_URL}/${modelName}/${createdId}`)
-          expect(res).toMatchObject(payload)
+          const { password, ...expectedPayload } = payload
+          expect(res).toMatchObject(expectedPayload)
         })
 
         it(`should update ${modelName}`, async () => {

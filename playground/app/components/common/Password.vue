@@ -1,38 +1,38 @@
 <script setup lang="ts">
-const modelValue = defineModel<string>();
-const show = ref(false);
+const modelValue = defineModel<string>()
+const show = ref(false)
 
 function checkStrength(str: string) {
   const requirements = [
-    { regex: /.{8,}/, text: "At least 8 characters" },
-    { regex: /\d/, text: "At least 1 number" },
-    { regex: /[a-z]/, text: "At least 1 lowercase letter" },
-    { regex: /[A-Z]/, text: "At least 1 uppercase letter" },
-  ];
+    { regex: /.{8,}/, text: 'At least 8 characters' },
+    { regex: /\d/, text: 'At least 1 number' },
+    { regex: /[a-z]/, text: 'At least 1 lowercase letter' },
+    { regex: /[A-Z]/, text: 'At least 1 uppercase letter' }
+  ]
 
-  return requirements.map((req) => ({
+  return requirements.map(req => ({
     met: req.regex.test(str),
-    text: req.text,
-  }));
+    text: req.text
+  }))
 }
 
-const strength = computed(() => checkStrength(modelValue.value || ""));
-const score = computed(() => strength.value.filter((req) => req.met).length);
+const strength = computed(() => checkStrength(modelValue.value || ''))
+const score = computed(() => strength.value.filter(req => req.met).length)
 
 const color = computed(() => {
-  if (score.value === 0) return "neutral";
-  if (score.value <= 1) return "error";
-  if (score.value <= 2) return "warning";
-  if (score.value === 3) return "warning";
-  return "success";
-});
+  if (score.value === 0) return 'neutral'
+  if (score.value <= 1) return 'error'
+  if (score.value <= 2) return 'warning'
+  if (score.value === 3) return 'warning'
+  return 'success'
+})
 
 const text = computed(() => {
-  if (score.value === 0) return "Enter a password";
-  if (score.value <= 2) return "Weak password";
-  if (score.value === 3) return "Medium password";
-  return "Strong password";
-});
+  if (score.value === 0) return 'Enter a password'
+  if (score.value <= 2) return 'Weak password'
+  if (score.value === 3) return 'Medium password'
+  return 'Strong password'
+})
 </script>
 
 <template>

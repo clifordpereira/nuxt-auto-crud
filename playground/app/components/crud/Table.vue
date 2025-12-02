@@ -1,31 +1,39 @@
 <script setup lang="ts">
-const props = defineProps<{
-  resource: string;
-  schema: {
-    resource: string;
-    fields: { name: string; type: string; required?: boolean }[];
-  };
-}>();
+import pluralize from 'pluralize'
 
-const config = useRuntimeConfig().public;
-const crudBaseUrl = config.crudBaseUrl || '/api';
+const props = defineProps<{
+  resource: string
+  schema: {
+    resource: string
+    fields: { name: string, type: string, required?: boolean }[]
+  }
+}>()
+
+const config = useRuntimeConfig().public
+const crudBaseUrl = config.crudBaseUrl || '/api'
 
 const { data } = await useFetch(`${crudBaseUrl}/${props.resource}`, {
-  headers: crudHeaders(),
-});
+  headers: crudHeaders()
+})
+
+// Fetch relations
+const { fetchRelations, getDisplayValue } = useRelationDisplay(props.schema)
+await fetchRelations()
 
 async function onDelete(id: number) {
-  if (!confirm("Are you sure you want to delete this row?")) return;
+  if (!confirm('Are you sure you want to delete this row?')) return
 
-  await useCrudFetch("DELETE", props.resource, id);
+  await useCrudFetch('DELETE', props.resource, id)
 }
 
-const paginatedItems = ref<any[]>([]);
+const paginatedItems = ref<any[]>([])
 </script>
 
 <template>
   <div class="overflow-x-auto">
-    <h1 class="text-2xl font-bold text-center mt-3">List {{ resource }}</h1>
+    <h1 class="text-2xl font-bold text-center mt-3">
+      List {{ resource }}
+    </h1>
     <CrudCreateRow :resource="resource" :schema="schema" />
 
     <CommonPagination
@@ -66,7 +74,7 @@ const paginatedItems = ref<any[]>([]);
             :key="key"
             class="border border-gray-300 px-4 py-2"
           >
-            {{ isDate(value) ? formatDateForDisplay(value) : value }}
+            {{ getDisplayValue(key as string, value) }}
           </td>
           <td class="border border-gray-300 px-4 py-2">
             <UPopover
