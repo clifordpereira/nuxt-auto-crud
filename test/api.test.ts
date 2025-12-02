@@ -131,7 +131,5 @@ describe(`API Tests (${SUITE})`, () => {
       // Check private columns are hidden
       privateColumns.forEach(col => expect(response).not.toHaveProperty(col))
     })
-
-
   })
 }, 20000)

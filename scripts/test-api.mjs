@@ -39,7 +39,8 @@ function runTest(suite, port) {
     test.on('close', (code) => {
       if (code === 0) {
         resolve()
-      } else {
+      }
+      else {
         reject(new Error(`Tests failed for ${suite} with code ${code}`))
       }
     })
