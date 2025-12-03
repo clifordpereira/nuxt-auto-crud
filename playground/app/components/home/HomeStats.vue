@@ -5,9 +5,6 @@ const props = defineProps<{
 
 const iconMap: Record<string, string> = {
   users: 'i-lucide-user',
-  customers: 'i-lucide-users',
-  products: 'i-lucide-package',
-  orders: 'i-lucide-shopping-cart',
 }
 
 const stats = computed(() =>

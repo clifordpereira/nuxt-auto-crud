@@ -15,7 +15,7 @@ const { user } = useUserSession()
 
 const items = computed<DropdownMenuItem[][]>(() => ([[{
   type: 'label',
-  label: user.value?.name,
+  label: user.value?.name || undefined,
   avatar: {
     src: user.value?.avatar || '',
     alt: user.value?.name || '',
@@ -121,8 +121,9 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
     <UButton
       v-bind="{
         ...user,
-        avatar: user?.avatar ? { src: user.avatar, alt: user?.name } : undefined,
-        label: collapsed ? undefined : user?.name,
+        name: user?.name || undefined,
+        avatar: user?.avatar ? { src: user.avatar, alt: user?.name || undefined } : undefined,
+        label: collapsed ? undefined : (user?.name || undefined),
         trailingIcon: collapsed ? undefined : 'i-lucide-chevrons-up-down',
       }"
       color="neutral"

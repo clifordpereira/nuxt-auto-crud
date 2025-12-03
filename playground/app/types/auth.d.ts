@@ -1,9 +1,5 @@
+import type { User as DbUser } from '../../server/utils/drizzle'
+
 declare module '#auth-utils' {
-  interface User {
-    id: number
-    email: string
-    name: string
-    avatar: string
-    role: string
-  }
+  interface User extends Omit<DbUser, 'password' | 'createdAt' | 'updatedAt'> {}
 }

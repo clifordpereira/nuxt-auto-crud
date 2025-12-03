@@ -16,9 +16,6 @@ const resourceNames = Object.keys(schemas.value || {})
 // Dynamically create dropdown items based on available resources
 const iconMap: Record<string, string> = {
   users: 'i-lucide-user-plus',
-  customers: 'i-lucide-users',
-  products: 'i-lucide-package',
-  orders: 'i-lucide-shopping-cart',
 }
 
 const items = [[
