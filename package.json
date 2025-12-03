@@ -58,6 +58,7 @@
     "drizzle-orm": "^0.30.0"
   },
   "devDependencies": {
+    "@iconify-json/lucide": "^1.2.77",
     "@nuxt/devtools": "^3.1.0",
     "@nuxt/eslint-config": "^1.10.0",
     "@nuxt/module-builder": "^1.0.2",
