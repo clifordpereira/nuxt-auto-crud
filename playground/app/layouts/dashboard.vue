@@ -60,7 +60,7 @@ const groups = computed(() => [{
 
 onMounted(async () => {
   const cookie = useCookie('cookie-consent')
-  if (cookie.value === 'accepted') {
+  if (cookie.value === 'accepted' || import.meta.dev) {
     return
   }
 

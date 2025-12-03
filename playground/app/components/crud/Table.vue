@@ -1,6 +1,7 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
 import pluralize from 'pluralize'
+import { useChangeCase } from '@vueuse/integrations/useChangeCase'
 
 const props = defineProps<{
   resource: string
@@ -75,7 +76,7 @@ const paginatedItems = ref<Record<string, unknown>[]>([])
               scope="col"
               class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white"
             >
-              {{ key }}
+              {{ useChangeCase(String(key), 'capitalCase').value }}
             </th>
             <th
               scope="col"

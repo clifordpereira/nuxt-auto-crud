@@ -30,21 +30,25 @@ const items = [[
 ]] satisfies DropdownMenuItem[][]
 
 // Dynamically fetch data for all resources
-const resourceData = await Promise.all(
-  resourceNames.map(async (resource) => {
-    const { data } = await useFetch<Record<string, unknown>[]>(`/api/${resource}`, {
-      headers: crudHeaders(),
-    })
-    return { resource, data }
-  }),
-)
+const { data: resourceData } = await useAsyncData('dashboard-resources', async () => {
+  return await Promise.all(
+    resourceNames.map(async (resource) => {
+      const data = await $fetch<Record<string, unknown>[]>(`/api/${resource}`, {
+        headers: crudHeaders(),
+      })
+      return { resource, data }
+    }),
+  )
+})
 
 // Create a map of resource counts
 const resourceCounts = computed(() => {
   const counts: Record<string, number> = {}
-  resourceData.forEach(({ resource, data }) => {
-    counts[resource] = data.value?.length || 0
-  })
+  if (resourceData.value) {
+    resourceData.value.forEach(({ resource, data }) => {
+      counts[resource] = data?.length || 0
+    })
+  }
   return counts
 })
 </script>
@@ -107,7 +111,7 @@ const resourceCounts = computed(() => {
             Welcome to the Nuxt Auto CRUD playground. This application demonstrates how to automatically generate CRUD APIs and interfaces from your database schema.
           </p>
           <ul class="list-disc list-inside space-y-2 text-sm text-gray-600 dark:text-gray-400">
-            <li><strong>Manage Resources:</strong> Use the sidebar to navigate to Users, Customers, Products, or Orders.</li>
+            <li><strong>Manage Resources:</strong> Use the sidebar to navigate to your resources.</li>
             <li><strong>Create Data:</strong> Click the "New" button in the top right or on any resource page to add data.</li>
             <li><strong>Permissions:</strong> Log in as 'admin' for full access, or 'user' for restricted access.</li>
           </ul>
