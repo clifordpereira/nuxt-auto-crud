@@ -1,6 +1,6 @@
 {
   "name": "nuxt-auto-crud",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Exposes RESTful CRUD APIs for your Nuxt app based solely on your database migrations.",
   "author": "Cliford Pereira",
   "license": "MIT",
