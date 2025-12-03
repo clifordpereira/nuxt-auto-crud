@@ -94,16 +94,7 @@ if (loggedIn.value) {
                 </div>
               </div>
             </div>
-            <UButton
-              v-if="!loggedIn"
-              to="/login"
-              color="primary"
-              size="lg"
-              block
-              icon="i-heroicons-arrow-right-on-rectangle"
-            >
-              Sign In
-            </UButton>
+            <LoginModal v-if="!loggedIn" />
           </div>
         </UCard>
 
@@ -218,6 +209,7 @@ if (loggedIn.value) {
           </UButton>
         </div>
       </UCard>
+
 
       <!-- Footer -->
       <div class="text-center text-sm text-gray-500 dark:text-gray-400">

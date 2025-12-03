@@ -1,9 +1,5 @@
-<!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
-definePageMeta({
-  layout: false,
-})
-
+const isOpen = ref(false)
 const toast = useToast()
 const { fetch: refreshSession } = useUserSession()
 
@@ -22,13 +18,13 @@ async function onSubmit() {
       body: state,
     })
     await refreshSession()
-    // Force a reload to ensure layout changes (guest -> admin) are applied
-    window.location.href = '/'
+    isOpen.value = false
+    // Redirect to dashboard after successful login
+    await navigateTo('/dashboard')
   }
   catch (err: unknown) {
     toast.add({
       title: 'Error',
-
       description: (err as { data?: { message?: string } }).data?.message || 'Invalid credentials',
       color: 'error',
     })
@@ -38,22 +34,31 @@ async function onSubmit() {
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950 px-4 sm:px-6 lg:px-8">
-    <div class="w-full max-w-md space-y-8">
-      <div class="text-center">
-        <UIcon
-          name="i-heroicons-command-line"
-          class="mx-auto h-12 w-12 text-primary-500"
-        />
-        <h2 class="mt-6 text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
-          Nuxt Auto CRUD
-        </h2>
-        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-          Sign in to access the dashboard
-        </p>
-      </div>
+  <UModal v-model:open="isOpen">
+    <UButton
+      color="primary"
+      size="lg"
+      block
+      icon="i-heroicons-arrow-right-on-rectangle"
+    >
+      Sign In
+    </UButton>
 
-      <div class="bg-white dark:bg-gray-900 py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-gray-200 dark:border-gray-800">
+    <template #content>
+      <div class="p-6">
+        <div class="text-center mb-6">
+          <UIcon
+            name="i-heroicons-command-line"
+            class="mx-auto h-12 w-12 text-primary-500"
+          />
+          <h2 class="mt-4 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+            Sign In
+          </h2>
+          <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            Access the Nuxt Auto CRUD dashboard
+          </p>
+        </div>
+
         <form
           class="space-y-6"
           @submit.prevent="onSubmit"
@@ -69,6 +74,7 @@ async function onSubmit() {
               required
               icon="i-heroicons-envelope"
               size="lg"
+              class="w-full"
             />
           </UFormField>
 
@@ -83,6 +89,7 @@ async function onSubmit() {
               required
               icon="i-heroicons-lock-closed"
               size="lg"
+              class="w-full"
             />
           </UFormField>
 
@@ -129,6 +136,6 @@ async function onSubmit() {
           </div>
         </div>
       </div>
-    </div>
-  </div>
+    </template>
+  </UModal>
 </template>
