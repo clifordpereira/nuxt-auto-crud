@@ -122,7 +122,7 @@ const paginatedItems = ref<Record<string, unknown>[]>([])
 
                 <template #content>
                   <div class="p-1 flex flex-col gap-1 min-w-[120px]">
-                    <CrudViewRow :row="row" />
+                    <CrudViewRow :row="row" :schema="schema" />
                     <CrudEditRow
                       :resource="resource"
                       :row="row"

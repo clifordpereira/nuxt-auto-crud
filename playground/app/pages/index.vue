@@ -29,24 +29,7 @@ if (loggedIn.value) {
         </p>
       </div>
 
-      <!-- Login Status -->
-      <div
-        v-if="loggedIn"
-        class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 text-center"
-      >
-        <p class="text-green-800 dark:text-green-200">
-          ✓ Logged in as <strong>{{ user?.email }}</strong>
-        </p>
-        <UButton
-          to="/dashboard"
-          color="primary"
-          size="lg"
-          class="mt-3"
-          icon="i-heroicons-arrow-right"
-        >
-          Go to Dashboard
-        </UButton>
-      </div>
+
 
       <!-- Main Content -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

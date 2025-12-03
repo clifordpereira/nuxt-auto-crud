@@ -181,8 +181,6 @@ export default defineNuxtModule<ModuleOptions>({
     // 5. Register Plugins
     addServerPlugin(resolver.resolve('./runtime/server/plugins/seed'))
 
-    console.log('🚀 Auto CRUD module loaded!')
-    console.log(`   - Schema: ${options.schemaPath}`)
-    console.log(`   - API: /api/[model]`)
+
   },
 })
