@@ -17,16 +17,19 @@ describe('Dashboard E2E', async () => {
     expect(content).toBeTruthy()
   })
 
-  it('Admin: redirects to login when unauthenticated', async () => {
-    const page = await createPage('/')
-    // Should be redirected to /login
-    expect(page.url()).toContain('/login')
-    const text = await page.textContent('h2')
-    expect(text).toContain('Sign in to your account')
+  it('Admin: redirects to home when unauthenticated', async () => {
+    const page = await createPage('/dashboard')
+    // Should be redirected to /
+    await page.waitForURL(url => url.pathname === '/')
+    const text = await page.textContent('h1')
+    expect(text).toContain('Nuxt Auto CRUD')
   })
 
   it('Admin: can login and view dashboard', async () => {
-    const page = await createPage('/login')
+    const page = await createPage('/')
+
+    // Open login modal
+    await page.click('button:has-text("Sign In")')
 
     // Fill login form
     await page.fill('input[type="email"]', 'admin@example.com')
@@ -34,7 +37,7 @@ describe('Dashboard E2E', async () => {
     await page.click('button[type="submit"]')
 
     // Wait for navigation to dashboard
-    await page.waitForURL(url => url.pathname === '/')
+    await page.waitForURL(url => url.pathname === '/dashboard')
 
     // Check for dashboard specific element
     const text = await page.textContent('header')
