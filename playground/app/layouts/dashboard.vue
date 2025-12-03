@@ -6,6 +6,7 @@ const route = useRoute()
 const toast = useToast()
 
 const open = ref(false)
+const collapsed = ref(false)
 
 // Get available resources from schemas
 const { schemas } = await useResourceSchemas()
@@ -89,6 +90,7 @@ onMounted(async () => {
     <UDashboardSidebar
       id="default"
       v-model:open="open"
+      v-model:collapsed="collapsed"
       collapsible
       resizable
       class="bg-elevated/25"
@@ -117,8 +119,18 @@ onMounted(async () => {
         />
       </template>
 
-      <template #footer="{ collapsed }">
-        <UserMenu :collapsed="collapsed" />
+      <template #footer="{ collapsed: isCollapsed }">
+        <div class="flex flex-col gap-2 w-full">
+          <UButton
+            color="neutral"
+            variant="ghost"
+            :icon="isCollapsed ? 'i-lucide-chevrons-right' : 'i-lucide-chevrons-left'"
+            :aria-label="isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+            block
+            @click="collapsed = !collapsed"
+          />
+          <UserMenu :collapsed="isCollapsed" />
+        </div>
       </template>
     </UDashboardSidebar>
 

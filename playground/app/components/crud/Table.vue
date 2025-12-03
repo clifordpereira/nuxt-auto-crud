@@ -1,6 +1,5 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
-import pluralize from 'pluralize'
 import { useChangeCase } from '@vueuse/integrations/useChangeCase'
 
 const props = defineProps<{
@@ -41,17 +40,7 @@ const paginatedItems = ref<Record<string, unknown>[]>([])
       footer: 'p-4',
     }"
   >
-    <template #header>
-      <div class="flex items-center justify-between">
-        <h2 class="font-semibold leading-7 text-gray-900 dark:text-white text-xl capitalize">
-          {{ pluralize(resource) }}
-        </h2>
-        <CrudCreateRow
-          :resource="resource"
-          :schema="schema"
-        />
-      </div>
-    </template>
+
 
     <!-- Filters / Pagination Area -->
     <div class="flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">

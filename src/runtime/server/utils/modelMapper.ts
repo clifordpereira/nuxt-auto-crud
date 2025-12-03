@@ -140,10 +140,20 @@ export function getUpdatableFields(modelName: string): string[] {
 export function filterUpdatableFields(modelName: string, data: Record<string, unknown>): Record<string, unknown> {
   const allowedFields = getUpdatableFields(modelName)
   const filtered: Record<string, unknown> = {}
+  const table = modelTableMap[modelName]
+  const columns = table ? getDrizzleTableColumns(table as any) : {}
 
   for (const field of allowedFields) {
     if (data[field] !== undefined) {
-      filtered[field] = data[field]
+      let value = data[field]
+      const column = columns[field]
+
+      // Coerce timestamp fields to Date objects if they are strings
+      if (column && column.mode === 'timestamp' && typeof value === 'string') {
+        value = new Date(value)
+      }
+
+      filtered[field] = value
     }
   }
 
