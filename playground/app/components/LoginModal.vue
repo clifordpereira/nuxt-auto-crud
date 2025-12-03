@@ -1,4 +1,18 @@
 <script setup lang="ts">
+const props = withDefaults(defineProps<{
+  label?: string
+  color?: string
+  variant?: string
+  size?: string
+  class?: string
+}>(), {
+  label: 'Sign In',
+  color: 'primary',
+  variant: 'solid',
+  size: 'lg',
+  class: '',
+})
+
 const isOpen = ref(false)
 const toast = useToast()
 const { fetch: refreshSession } = useUserSession()
@@ -36,12 +50,13 @@ async function onSubmit() {
 <template>
   <UModal v-model:open="isOpen">
     <UButton
-      color="primary"
-      size="lg"
-      block
+      :color="props.color as any"
+      :variant="props.variant as any"
+      :size="props.size as any"
+      :class="props.class"
       icon="i-heroicons-arrow-right-on-rectangle"
     >
-      Sign In
+      {{ props.label }}
     </UButton>
 
     <template #content>

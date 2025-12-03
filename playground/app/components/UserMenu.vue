@@ -21,9 +21,6 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
     alt: user.value?.name || '',
   },
 }], [{
-  label: 'Profile',
-  icon: 'i-lucide-user',
-}], [{
   label: 'Theme',
   icon: 'i-lucide-palette',
   children: [{
@@ -110,7 +107,7 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
   onSelect: async () => {
     await $fetch('/api/auth/logout', { method: 'POST' })
     // Force a reload to ensure layout changes (admin -> guest) are applied
-    window.location.href = '/login'
+    window.location.href = '/'
   },
 }]]))
 </script>

@@ -15,10 +15,13 @@
             to="/resource/products"
             class="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white px-3 py-2"
           >Products</NuxtLink>
-          <NuxtLink
-            to="/login"
+          <LoginModal
+            label="Admin Login"
+            color="neutral"
+            variant="ghost"
+            size="md"
             class="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white px-3 py-2"
-          >Admin Login</NuxtLink>
+          />
         </nav>
       </div>
     </header>
