@@ -4,10 +4,20 @@
 
 Auto-generate RESTful CRUD APIs for your **Nuxt** application based solely on your database schema. Minimal configuration required.
 
+**Core Philosophy:**
+The main objective of this module is to **expose CRUD APIs without the need for writing code**. You define your database schema, and `nuxt-auto-crud` handles the rest.
+
+You don't need to setup an extra server or database to create an MVP of an application. The Nuxt (Nitro) server and SQLite can save you time and money.
+And you don't need a separate Strapi or Supabase setup to automate your CRUD process. `nuxt-auto-crud` will help you with that and accelerate your development exponentially.
+
+While we provide a playground with a CMS-like interface, this is primarily to demonstrate the capabilities. You are expected to build your own frontend application to consume these APIs.
+
 - [✨ Release Notes](/CHANGELOG.md)
 - [🎮 Try the Playground](/playground)
 
 ## 🚀 CRUD APIs are ready to use without code
+
+Once installed, your database tables automatically become API endpoints:
 
 - `GET /api/:model` - List all records
 - `POST /api/:model` - Create a new record
@@ -28,6 +38,11 @@ bun install
 bun db:generate
 bun run dev
 ```
+
+**Template Usage Modes:**
+
+1.  **Fullstack App**: The template includes the `nuxt-auto-crud` module, providing both the backend APIs and the frontend UI.
+2.  **Frontend Only**: You can use the template just for the frontend. In this case, you don't need to install the module in the frontend app. Instead, you would install `nuxt-auto-crud` in a separate backend setup (e.g., another Nuxt project acting as the API).
 
 Detailed instructions can be found in [https://auto-crud.clifland.in/](https://auto-crud.clifland.in/)
 
@@ -78,6 +93,7 @@ Add the generation script to your `package.json`:
   "scripts": {
     "db:generate": "drizzle-kit generate"
   }
+  // ...
 }
 ```
 
@@ -89,7 +105,7 @@ import { defineConfig } from 'drizzle-kit'
 
 export default defineConfig({
   dialect: 'sqlite',
-  schema: './server/database/schema.ts',
+  schema: './server/database/schema/index.ts', // Point to your schema index file
   out: './server/database/migrations'
 })
 ```
@@ -116,10 +132,10 @@ export type User = typeof schema.users.$inferSelect
 
 #### Define your database schema
 
-Create `server/database/schema.ts`:
+Create your schema files in `server/database/schema/`. For example, `server/database/schema/users.ts`:
 
 ```typescript
-// server/database/schema.ts
+// server/database/schema/users.ts
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
 
 export const users = sqliteTable('users', {
@@ -131,6 +147,8 @@ export const users = sqliteTable('users', {
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
 })
 ```
+
+> **Note:** The `organization.ts` and `cms.ts` files you might see in the playground are just examples and are commented out by default. You should implement a robust schema tailored to your production needs.
 
 #### Run the project
 
@@ -217,6 +235,10 @@ export default {
 }
 ```
 
+## ⚠️ Known Issues
+
+- **Foreign Key Naming:** Currently, if you have multiple foreign keys referring to the same table (e.g., `customer_id` and `author_id` both referring to the `users` table), the automatic relation handling might assume `user_id` for both. This is a known limitation in the current alpha version.
+
 ## 🎮 Try the Playground
 
 Want to see it in action? Clone this repo and try the playground:
@@ -231,12 +253,6 @@ bun install
 
 # Run the playground (Fullstack)
 cd playground
-bun install
-bun db:generate
-bun run dev
-
-# Run the playground (Backend Only)
-cd playground-backendonly
 bun install
 bun db:generate
 bun run dev
@@ -285,6 +301,10 @@ const updated = await $fetch("/api/users/1", {
 ```typescript
 await $fetch("/api/users/1", {
   method: "DELETE",
+  headers: {
+    // If auth is enabled
+    Authorization: 'Bearer ...' 
+  }
 });
 ```
 
