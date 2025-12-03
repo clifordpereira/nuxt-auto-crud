@@ -34,9 +34,9 @@ export default eventHandler(async (event) => {
   const body = await readBody(event)
   const payload = filterUpdatableFields(model, body)
 
-  // Automatically update updated_at if it exists
-  if ('updated_at' in table) {
-    payload.updated_at = new Date()
+  // Automatically update updatedAt if it exists
+  if ('updatedAt' in table) {
+    payload.updatedAt = new Date()
   }
 
   const updatedRecord = await useDrizzle()

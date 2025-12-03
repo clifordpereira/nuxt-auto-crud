@@ -8,8 +8,8 @@ export const users = sqliteTable('users', {
   name: text('name'),
   avatar: text('avatar'),
   role: text('role').default('user'),
-  created_at: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
-  updated_at: integer('updated_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
 })
 
 export const customers = sqliteTable('customers', {
@@ -37,7 +37,7 @@ export const orders = sqliteTable('orders', {
   quantity: integer('quantity').notNull().default(1),
   total: real('total').notNull(),
   status: text('status').notNull().default('pending'), // 'pending' | 'completed' | 'cancelled'
-  created_at: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
 })
 
 export const customersRelations = relations(customers, ({ many }) => ({

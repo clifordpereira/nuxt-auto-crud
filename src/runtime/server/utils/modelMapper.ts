@@ -11,7 +11,7 @@ import { useRuntimeConfig } from '#imports'
 /**
  * Fields that should never be updatable via PATCH requests
  */
-const PROTECTED_FIELDS = ['id', 'created_at', 'updated_at']
+const PROTECTED_FIELDS = ['id', 'created_at', 'updated_at', 'createdAt', 'updatedAt']
 
 /**
  * Fields that should never be returned in API responses
