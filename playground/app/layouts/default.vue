@@ -11,7 +11,6 @@
           Nuxt Auto CRUD (Full Stack Example)
         </div>
         <nav>
-
           <LoginModal
             label="Admin Login"
             color="neutral"

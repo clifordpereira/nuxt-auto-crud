@@ -180,7 +180,5 @@ export default defineNuxtModule<ModuleOptions>({
 
     // 5. Register Plugins
     addServerPlugin(resolver.resolve('./runtime/server/plugins/seed'))
-
-
   },
 })

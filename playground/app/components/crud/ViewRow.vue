@@ -26,7 +26,7 @@ function formatKey(key: string) {
 function formatValue(key: string, value: unknown) {
   if (value === null || value === undefined) return '-'
   if (typeof value === 'boolean') return value ? 'Yes' : 'No'
-  
+
   if (props.schema) {
     const display = getDisplayValue(key, value)
     if (display !== value) return display

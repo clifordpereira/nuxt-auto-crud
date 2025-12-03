@@ -12,43 +12,44 @@ export default defineNitroPlugin(async () => {
   if (typeof onHubReady === 'function') {
     // @ts-expect-error - onHubReady is auto-imported from @nuxthub/core
     onHubReady(async () => {
-    const { auth } = useAutoCrudConfig()
-    
-    // Only seed if auth is enabled and we have a users table
-    if (!auth?.authentication || !tables.users) {
-      return
-    }
+      const { auth } = useAutoCrudConfig()
 
-    const db = useDrizzle()
-
-    // Check if admin exists
-    const existingAdmin = await db.select().from(tables.users).where(eq(tables.users.email, 'admin@example.com')).get()
-
-    if (!existingAdmin) {
-      console.log('Seeding admin user...')
-      // Use hashPassword from nuxt-auth-utils if available, otherwise simple mock or error
-      // Since we can't guarantee nuxt-auth-utils is present in module context, we try to use it dynamically or assume it's there
-      // But wait, the module depends on nuxt-auth-utils being present in the user project for auth to work.
-      
-      let hashedPassword = '$1Password'
-      try {
-          // @ts-expect-error - hashPassword is auto-imported
-          hashedPassword = await hashPassword('$1Password')
-      } catch (e) {
-          console.warn('hashPassword not available, using plain text (insecure)')
+      // Only seed if auth is enabled and we have a users table
+      if (!auth?.authentication || !tables.users) {
+        return
       }
 
-      await db.insert(tables.users).values({
-        email: 'admin@example.com',
-        password: hashedPassword,
-        name: 'Admin User',
-        avatar: 'https://i.pravatar.cc/150?u=admin',
-        role: 'admin',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      })
-      console.log('Admin user seeded.')
-    }
-  })
+      const db = useDrizzle()
+
+      // Check if admin exists
+      const existingAdmin = await db.select().from(tables.users).where(eq(tables.users.email, 'admin@example.com')).get()
+
+      if (!existingAdmin) {
+        console.log('Seeding admin user...')
+        // Use hashPassword from nuxt-auth-utils if available, otherwise simple mock or error
+        // Since we can't guarantee nuxt-auth-utils is present in module context, we try to use it dynamically or assume it's there
+        // But wait, the module depends on nuxt-auth-utils being present in the user project for auth to work.
+
+        let hashedPassword = '$1Password'
+        try {
+          // @ts-expect-error - hashPassword is auto-imported
+          hashedPassword = await hashPassword('$1Password')
+        }
+        catch (e) {
+          console.warn('hashPassword not available, using plain text (insecure)')
+        }
+
+        await db.insert(tables.users).values({
+          email: 'admin@example.com',
+          password: hashedPassword,
+          name: 'Admin User',
+          avatar: 'https://i.pravatar.cc/150?u=admin',
+          role: 'admin',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        })
+        console.log('Admin user seeded.')
+      }
+    })
   }
 })

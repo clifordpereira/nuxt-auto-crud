@@ -86,7 +86,7 @@ describe(`API Tests (${SUITE})`, () => {
     }
 
     if (!tableName) continue
-    
+
     const modelName = tableName // Assuming model name matches table name for now
 
     // Filter tables to test
@@ -168,7 +168,8 @@ describe(`API Tests (${SUITE})`, () => {
               method: 'POST',
               body: payload,
             })
-          } catch (err: any) {
+          }
+          catch (err: any) {
             console.error(`Failed to create ${modelName}:`, err.data || err.message)
             throw err
           }

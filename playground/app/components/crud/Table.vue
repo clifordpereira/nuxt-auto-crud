@@ -40,8 +40,6 @@ const paginatedItems = ref<Record<string, unknown>[]>([])
       footer: 'p-4',
     }"
   >
-
-
     <!-- Filters / Pagination Area -->
     <div class="flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
       <CommonPagination
@@ -112,7 +110,10 @@ const paginatedItems = ref<Record<string, unknown>[]>([])
 
                 <template #content>
                   <div class="p-1 flex flex-col gap-1 min-w-[120px]">
-                    <CrudViewRow :row="row" :schema="schema" />
+                    <CrudViewRow
+                      :row="row"
+                      :schema="schema"
+                    />
                     <CrudEditRow
                       :resource="resource"
                       :row="row"

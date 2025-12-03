@@ -11,8 +11,6 @@ import { checkAdminAccess } from '../../utils/auth'
 import { desc } from 'drizzle-orm'
 import type { TableWithId } from '../../types'
 
-
-
 export default eventHandler(async (event) => {
   console.log('[GET] Request received', event.path)
   const { resources } = useAutoCrudConfig()

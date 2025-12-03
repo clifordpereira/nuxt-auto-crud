@@ -58,7 +58,8 @@ function buildModelTableMap(): Record<string, unknown> {
         if (tableName) {
           tableMap[key] = value
         }
-      } catch (e) {
+      }
+      catch (e) {
         // Ignore if it throws (not a table)
       }
     }

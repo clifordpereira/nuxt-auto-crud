@@ -1,6 +1,7 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
 import pluralize from 'pluralize'
+
 definePageMeta({
   middleware: ['auth'],
   layout: 'dashboard',
