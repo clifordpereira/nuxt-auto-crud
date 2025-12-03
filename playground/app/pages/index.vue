@@ -4,7 +4,7 @@ definePageMeta({
   layout: false,
 })
 
-const { loggedIn, user } = useUserSession()
+const { loggedIn } = useUserSession()
 
 // Redirect to dashboard if already logged in
 if (loggedIn.value) {

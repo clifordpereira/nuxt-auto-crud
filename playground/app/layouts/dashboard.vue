@@ -96,14 +96,14 @@ onMounted(async () => {
       class="bg-elevated/25"
       :ui="{ footer: 'lg:border-t lg:border-default' }"
     >
-      <template #default="{ collapsed }">
+      <template #default="{ collapsed: isSidebarCollapsed }">
         <UDashboardSearchButton
-          :collapsed="collapsed"
+          :collapsed="isSidebarCollapsed"
           class="bg-transparent ring-default"
         />
 
         <UNavigationMenu
-          :collapsed="collapsed"
+          :collapsed="isSidebarCollapsed"
           :items="links[0]"
           orientation="vertical"
           tooltip
@@ -111,7 +111,7 @@ onMounted(async () => {
         />
 
         <UNavigationMenu
-          :collapsed="collapsed"
+          :collapsed="isSidebarCollapsed"
           :items="links[1]"
           orientation="vertical"
           tooltip

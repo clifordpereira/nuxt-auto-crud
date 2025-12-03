@@ -17,7 +17,7 @@ export default eventHandler(async (event) => {
         await requireUserSession(event)
         isAuthenticated = true
       }
-      catch (e) {
+      catch {
         isAuthenticated = false
       }
     }

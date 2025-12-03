@@ -54,12 +54,13 @@ function buildModelTableMap(): Record<string, unknown> {
       try {
         // getTableName returns the table name for valid tables, and undefined/null for others (like relations)
         // This is a more robust check than checking for properties
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const tableName = getTableName(value as any)
         if (tableName) {
           tableMap[key] = value
         }
       }
-      catch (e) {
+      catch {
         // Ignore if it throws (not a table)
       }
     }
@@ -142,6 +143,7 @@ export function filterUpdatableFields(modelName: string, data: Record<string, un
   const allowedFields = getUpdatableFields(modelName)
   const filtered: Record<string, unknown> = {}
   const table = modelTableMap[modelName]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const columns = table ? getDrizzleTableColumns(table as any) : {}
 
   for (const field of allowedFields) {

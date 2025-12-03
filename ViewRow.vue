@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const props = defineProps<{
-  row: Record<string, any>
+  row: Record<string, unknown>
 }>()
 </script>
 

@@ -169,6 +169,7 @@ describe(`API Tests (${SUITE})`, () => {
               body: payload,
             })
           }
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           catch (err: any) {
             console.error(`Failed to create ${modelName}:`, err.data || err.message)
             throw err

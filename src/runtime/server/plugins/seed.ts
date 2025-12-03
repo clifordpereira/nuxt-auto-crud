@@ -35,7 +35,7 @@ export default defineNitroPlugin(async () => {
           // @ts-expect-error - hashPassword is auto-imported
           hashedPassword = await hashPassword('$1Password')
         }
-        catch (e) {
+        catch {
           console.warn('hashPassword not available, using plain text (insecure)')
         }
 
