@@ -55,7 +55,7 @@
     "jose": "^5.9.6"
   },
   "peerDependencies": {
-    "drizzle-orm": "^0.30.0"
+    "drizzle-orm": ">=0.30.0"
   },
   "devDependencies": {
     "@iconify-json/heroicons": "^1.2.3",
