@@ -159,6 +159,7 @@ if (loggedIn.value) {
       </div>
 
       <!-- Quick Links -->
+
       <UCard class="shadow-lg">
         <template #header>
           <h2 class="text-xl font-semibold flex items-center gap-2">
@@ -169,22 +170,15 @@ if (loggedIn.value) {
             Quick Links
           </h2>
         </template>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
           <UButton
-            to="/login"
+            href="https://auto-crud.clifland.in/"
+            target="_blank"
             variant="outline"
             block
-            icon="i-heroicons-arrow-right-on-rectangle"
+            icon="i-heroicons-book-open"
           >
-            Login
-          </UButton>
-          <UButton
-            to="/dashboard"
-            variant="outline"
-            block
-            icon="i-heroicons-home"
-          >
-            Dashboard
+            Documentation
           </UButton>
           <UButton
             href="https://github.com/clifordpereira/nuxt-auto-crud"
@@ -193,16 +187,34 @@ if (loggedIn.value) {
             block
             icon="i-simple-icons-github"
           >
-            GitHub
+            Repository
           </UButton>
           <UButton
-            href="https://nuxt.com"
+            href="https://github.com/clifordpereira/nuxt-auto-crud/issues"
             target="_blank"
             variant="outline"
             block
-            icon="i-simple-icons-nuxtdotjs"
+            icon="i-heroicons-bug-ant"
           >
-            Nuxt Docs
+            Report Issue
+          </UButton>
+          <UButton
+            href="https://github.com/clifordpereira/nuxt-auto-crud/blob/HEAD/CONTRIBUTING.md"
+            target="_blank"
+            variant="outline"
+            block
+            icon="i-heroicons-users"
+          >
+            Collaboration Guide
+          </UButton>
+          <UButton
+            href="https://www.clifland.in/"
+            target="_blank"
+            variant="outline"
+            block
+            icon="i-heroicons-globe-alt"
+          >
+            Creator Website
           </UButton>
         </div>
       </UCard>
