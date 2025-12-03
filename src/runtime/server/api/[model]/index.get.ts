@@ -8,6 +8,11 @@ import { useDrizzle } from '#site/drizzle'
 import { useAutoCrudConfig } from '../../utils/config'
 import { checkAdminAccess } from '../../utils/auth'
 
+import { desc } from 'drizzle-orm'
+import type { TableWithId } from '../../types'
+
+
+
 export default eventHandler(async (event) => {
   console.log('[GET] Request received', event.path)
   const { resources } = useAutoCrudConfig()
@@ -28,9 +33,9 @@ export default eventHandler(async (event) => {
     }
   }
 
-  const table = getTableForModel(model)
+  const table = getTableForModel(model) as TableWithId
 
-  const results = await useDrizzle().select().from(table).all()
+  const results = await useDrizzle().select().from(table).orderBy(desc(table.id)).all()
 
   return results.map((item: Record<string, unknown>) => {
     if (isAdmin) {
