@@ -36,28 +36,21 @@ const { data: options } = await useFetch(() => `${crudBaseUrl}/${urlPath}`, {
   headers: crudHeaders(),
 })
 
-function handleUpdate(value: unknown) {
-  if (value && typeof value === 'object') {
-    // If USelectMenu returns the full object despite value-attribute, extract the ID
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const id = (value as any).value || (value as any).id
-    emit('update:modelValue', id)
-  }
-  else {
-    emit('update:modelValue', value)
-  }
-}
+const selected = computed({
+  get: () => options.value?.find(opt => opt.value == props.modelValue),
+  set: (val: { value: string | number } | null) => {
+    emit('update:modelValue', val?.value)
+  },
+})
 </script>
 
 <template>
   <USelectMenu
+    v-model="selected"
     :items="options || []"
-    :model-value="modelValue as any"
-    value-attribute="value"
     option-attribute="label"
     placeholder="Select"
     class="w-full"
-    @update:model-value="handleUpdate"
   >
     <template #item-label="{ item }">
       <span>{{ item.label }}</span>
