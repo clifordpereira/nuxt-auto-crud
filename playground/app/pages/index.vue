@@ -124,21 +124,7 @@ if (loggedIn.value) {
                 name="i-heroicons-check-circle"
                 class="text-green-500 mt-0.5 shrink-0"
               />
-              <span><strong>Auto-generated APIs:</strong> CRUD endpoints created automatically from Drizzle schema</span>
-            </li>
-            <li class="flex items-start gap-2">
-              <UIcon
-                name="i-heroicons-check-circle"
-                class="text-green-500 mt-0.5 shrink-0"
-              />
-              <span><strong>Authentication:</strong> Built-in session management and role-based access control</span>
-            </li>
-            <li class="flex items-start gap-2">
-              <UIcon
-                name="i-heroicons-check-circle"
-                class="text-green-500 mt-0.5 shrink-0"
-              />
-              <span><strong>Dynamic UI:</strong> Tables and forms generated on-the-fly based on data types</span>
+              <span><strong>Auto-generated APIs:</strong> CRUD endpoints created automatically from Drizzle schema using <code>nuxt-auto-crud</code></span>
             </li>
             <li class="flex items-start gap-2">
               <UIcon
@@ -152,7 +138,21 @@ if (loggedIn.value) {
                 name="i-heroicons-check-circle"
                 class="text-green-500 mt-0.5 shrink-0"
               />
-              <span><strong>Permissions:</strong> Fine-grained access control per resource and action</span>
+              <span><strong>Dynamic UI:</strong> Tables and forms generated on-the-fly based on data types</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <UIcon
+                name="i-heroicons-check-circle"
+                class="text-green-500 mt-0.5 shrink-0"
+              />
+              <span><strong>Authentication:</strong> Built-in session management using <code>nuxt-auth-utils</code></span>
+            </li>
+            <li class="flex items-start gap-2">
+              <UIcon
+                name="i-heroicons-check-circle"
+                class="text-green-500 mt-0.5 shrink-0"
+              />
+              <span><strong>Permissions:</strong> Fine-grained access control per resource and action using <code>nuxt-authorization</code></span>
             </li>
           </ul>
         </UCard>
@@ -221,7 +221,7 @@ if (loggedIn.value) {
 
       <!-- Footer -->
       <div class="text-center text-sm text-gray-500 dark:text-gray-400">
-        <p>Built with Nuxt, Drizzle ORM, and NuxtHub</p>
+        <p>Built with Nuxt, Drizzle ORM, and nuxt-auto-crud</p>
       </div>
     </div>
   </div>
