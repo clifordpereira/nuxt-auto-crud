@@ -1,3 +1,19 @@
+## v1.9.0
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.8.0...v1.9.0)
+
+### 🚀 Enhancements
+
+- Enable autoCrud authentication and update `@vueuse/nuxt` and `@nuxt/eslint` dependencies. ([d7b3fa4](https://github.com/clifordpereira/nuxt-auto-crud/commit/d7b3fa4))
+
+### 🏡 Chore
+
+- Update `@ts-expect-error` comments for `requireUserSession` imports to clarify `#imports` availability. ([7d751ca](https://github.com/clifordpereira/nuxt-auto-crud/commit/7d751ca))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v1.8.0
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.7.0...v1.8.0)
