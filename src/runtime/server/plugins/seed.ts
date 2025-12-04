@@ -7,7 +7,6 @@ import { useAutoCrudConfig } from '../utils/config'
 // @ts-expect-error - #imports is available in runtime
 import { defineNitroPlugin, hashPassword, onHubReady } from '#imports'
 
-
 export default defineNitroPlugin(async () => {
   onHubReady(async () => {
     const { auth } = useAutoCrudConfig()
