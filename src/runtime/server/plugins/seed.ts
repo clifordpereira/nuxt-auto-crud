@@ -5,10 +5,10 @@ import { useDrizzle } from '#site/drizzle'
 import * as tables from '#site/schema'
 import { useAutoCrudConfig } from '../utils/config'
 // @ts-expect-error - #imports is available in runtime
-import { defineNitroPlugin, hashPassword } from '#imports'
+import { defineNitroPlugin, hashPassword, onHubReady } from '#imports'
+
 
 export default defineNitroPlugin(async () => {
-  // @ts-expect-error - onHubReady is auto-imported from @nuxthub/core
   onHubReady(async () => {
     const { auth } = useAutoCrudConfig()
 
