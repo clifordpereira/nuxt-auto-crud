@@ -3,12 +3,12 @@ import { defineNuxtConfig } from 'nuxt/config'
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   modules: [
-    '@nuxt/ui',
-    '@nuxt/eslint',
     '@nuxthub/core',
     'nuxt-auth-utils',
     '@vueuse/nuxt',
     'nuxt-authorization',
+    '@nuxt/ui',
+    '@nuxt/eslint',
     '../src/module',
   ],
 
@@ -34,14 +34,12 @@ export default defineNuxtConfig({
 
   autoCrud: {
     schemaPath: 'server/database/schema',
-    auth: true,
-    /*
+    // auth: true,
     auth: {
       type: 'session',
       authentication: true,
       authorization: true,
     },
-    */
   },
 
   eslint: {
