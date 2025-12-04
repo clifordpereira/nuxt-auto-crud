@@ -1,4 +1,6 @@
 import { eventHandler, createError } from 'h3'
+// @ts-expect-error - #imports is available in runtime
+import { requireUserSession } from '#imports'
 import { getRelations } from '../utils/schema'
 import { useAutoCrudConfig } from '../utils/config'
 import { verifyJwtToken } from '../utils/jwt'
@@ -13,7 +15,6 @@ export default eventHandler(async (event) => {
     }
     else {
       try {
-        // @ts-expect-error - requireUserSession is auto-imported
         await requireUserSession(event)
         isAuthenticated = true
       }
