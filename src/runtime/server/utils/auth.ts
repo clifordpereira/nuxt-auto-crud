@@ -1,7 +1,7 @@
 import type { H3Event } from 'h3'
 import { createError } from 'h3'
-// @ts-expect-error - nuxt-auth-utils is a peer dependency
-import { requireUserSession } from 'nuxt-auth-utils/server'
+// @ts-expect-error - #imports is available in runtime
+import { requireUserSession } from '#imports'
 import { useAutoCrudConfig } from './config'
 import { verifyJwtToken } from './jwt'
 

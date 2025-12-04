@@ -1,13 +1,11 @@
 import { eq } from 'drizzle-orm'
-// @ts-expect-error - nuxt-auth-utils is a peer dependency
-import { hashPassword } from 'nuxt-auth-utils/server'
 // @ts-expect-error - #site/drizzle is an alias defined by the module
 import { useDrizzle } from '#site/drizzle'
 // @ts-expect-error - #site/schema is an alias defined by the module
 import * as tables from '#site/schema'
 import { useAutoCrudConfig } from '../utils/config'
 // @ts-expect-error - #imports is available in runtime
-import { defineNitroPlugin } from '#imports'
+import { defineNitroPlugin, hashPassword } from '#imports'
 
 export default defineNitroPlugin(async () => {
   // @ts-expect-error - onHubReady is auto-imported from @nuxthub/core
