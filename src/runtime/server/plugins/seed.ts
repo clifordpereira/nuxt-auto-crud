@@ -26,7 +26,7 @@ export default defineNitroPlugin(async () => {
 
     if (!existingAdmin) {
       console.log('Seeding admin user...')
-      
+
       const hashedPassword = await hashPassword('$1Password')
 
       await db.insert(tables.users).values({
