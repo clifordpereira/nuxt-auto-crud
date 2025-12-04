@@ -1,5 +1,7 @@
 import type { H3Event } from 'h3'
 import { createError } from 'h3'
+// @ts-expect-error - nuxt-auth-utils is a peer dependency
+import { requireUserSession } from 'nuxt-auth-utils/server'
 import { useAutoCrudConfig } from './config'
 import { verifyJwtToken } from './jwt'
 
@@ -19,13 +21,7 @@ export async function checkAdminAccess(event: H3Event, model: string, action: st
   }
 
   // Session based (default)
-  // @ts-expect-error - requireUserSession is auto-imported
-  if (typeof requireUserSession !== 'function') {
-    throw new TypeError('requireUserSession is not available')
-  }
-
   try {
-    // @ts-expect-error - requireUserSession is auto-imported
     await requireUserSession(event)
 
     // Check authorization if enabled
@@ -49,7 +45,7 @@ export async function checkAdminAccess(event: H3Event, model: string, action: st
     if ((e as any).statusCode === 403) {
       throw e
     }
-    // Otherwise (401 from requireUserSession), return false (treat as guest)
+    // Otherwise (401 from requireUserSession or function not available), return false (treat as guest)
     return false
   }
 }
