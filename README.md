@@ -364,22 +364,28 @@ const updated = await $fetch("/api/users/1", {
 ```typescript
 await $fetch("/api/users/1", {
   method: "DELETE",
-  headers: {
-    // If auth is enabled
-    Authorization: 'Bearer ...' 
-  }
 });
 ```
+
+> **Note:** If authentication is enabled (default):
+> - **Fullstack App:** The module integrates with `nuxt-auth-utils`, so session cookies are handled automatically.
+> - **Backend-only App:** You must include the `Authorization: Bearer <token>` header in your requests.
 
 ## Configuration
 
 ### Module Options
 
 ```typescript
+
 export default defineNuxtConfig({
   autoCrud: {
     // Path to your database schema file (relative to project root)
     schemaPath: "server/database/schema", // default
+    
+    // Authentication configuration (see "Authentication Configuration" section)
+    auth: {
+        // ...
+    }
   },
 });
 ```
