@@ -3,10 +3,10 @@ export default {
     users: {
       auth: {
         admin: true,
-        public: false,
-      },
+        public: false
+      }
       // publicColumns: ['id', 'name'],
-    },
+    }
     // add more resources here...
-  },
+  }
 }

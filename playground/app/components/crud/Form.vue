@@ -28,7 +28,7 @@ const emit = defineEmits<{
 
 // filter out system fields
 const filteredFields = props.schema.fields.filter(
-  field => field.name !== 'created_at' && field.name !== 'updated_at' && field.name !== 'id',
+  field => field.name !== 'created_at' && field.name !== 'updated_at' && field.name !== 'id'
 )
 
 // dynamically build zod schema
@@ -44,9 +44,7 @@ const state = reactive<Record<string, unknown>>(
       // Case 1: value is an object with id (e.g. customer_id: { id: 1, ... })
       if ((field.name.endsWith('_id') || field.name.endsWith('Id')) && value && typeof value === 'object' && 'id' in value) {
         value = (value as { id: unknown }).id
-      }
-      // Case 2: value is undefined, but there might be a relation object (e.g. field is customer_id, but props has customer: { id: 1 })
-      else if ((field.name.endsWith('_id') || field.name.endsWith('Id')) && value === undefined) {
+      } else if ((field.name.endsWith('_id') || field.name.endsWith('Id')) && value === undefined) {
         const relationName = field.name.endsWith('_id') ? field.name.replace('_id', '') : field.name.replace('Id', '')
         const relationValue = props.initialState?.[relationName]
         if (relationValue && typeof relationValue === 'object' && 'id' in relationValue) {
@@ -57,8 +55,8 @@ const state = reactive<Record<string, unknown>>(
       acc[field.name] = value ?? (field.type === 'boolean' ? false : undefined)
       return acc
     },
-    {} as Record<string, unknown>,
-  ),
+    {} as Record<string, unknown>
+  )
 )
 
 // processedFields with capitalized label for display
@@ -67,16 +65,15 @@ const processedFields = computed(() =>
     let label = field.name
     if (label.endsWith('_id')) {
       label = label.replace('_id', '')
-    }
-    else if (label.endsWith('Id')) {
+    } else if (label.endsWith('Id')) {
       label = label.replace('Id', '')
     }
     label = useChangeCase(label, 'capitalCase').value
     return {
       ...field,
-      label,
+      label
     }
-  }),
+  })
 )
 
 function handleSubmit(event: FormSubmitEvent<Record<string, unknown>>) {

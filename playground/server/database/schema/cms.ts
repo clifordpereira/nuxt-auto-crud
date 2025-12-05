@@ -6,7 +6,7 @@ export const categories = sqliteTable('categories', {
   name: text('name').notNull(),
   slug: text('slug').notNull().unique(),
   description: text('description'),
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date())
 })
 
 export const posts = sqliteTable('posts', {
@@ -21,7 +21,7 @@ export const posts = sqliteTable('posts', {
   isPublished: integer('is_published', { mode: 'boolean' }).default(false),
   publishedAt: integer('published_at', { mode: 'timestamp' }),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date())
 })
 
 export const comments = sqliteTable('comments', {
@@ -32,5 +32,5 @@ export const comments = sqliteTable('comments', {
   authorName: text('author_name'), // For guest comments
   authorEmail: text('author_email'), // For guest comments
   isApproved: integer('is_approved', { mode: 'boolean' }).default(false),
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date())
 })

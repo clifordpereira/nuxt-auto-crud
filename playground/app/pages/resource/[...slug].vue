@@ -4,7 +4,7 @@ import pluralize from 'pluralize'
 
 definePageMeta({
   middleware: ['auth'],
-  layout: 'dashboard',
+  layout: 'dashboard'
 })
 
 const route = useRoute()
