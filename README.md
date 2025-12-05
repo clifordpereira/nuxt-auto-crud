@@ -10,14 +10,18 @@ The main objective of this module is to **expose CRUD APIs without the need for 
 You don't need to setup an extra server or database to create an MVP of an application. The Nuxt (Nitro) server and SQLite can save you time and money.
 And you don't need a separate Strapi or Supabase setup to automate your CRUD process. `nuxt-auto-crud` will help you with that and accelerate your development exponentially.
 
-While we provide a playground with a CMS-like interface, this is primarily to demonstrate the capabilities. You are expected to build your own frontend application to consume these APIs.
+While this module exposes CRUD APIs, you are expected to build your own frontend application to consume them.
+
+However, you can find an easy-to-use template here: [https://github.com/clifordpereira/nuxt-auto-crud_template](https://github.com/clifordpereira/nuxt-auto-crud_template).
+
+Detailed documentation can be found here: [https://auto-crud.clifland.in/](https://auto-crud.clifland.in/).
 
 - [✨ Release Notes](/CHANGELOG.md)
 - [🎮 Try the Playground](/playground)
 
 ## 🚀 CRUD APIs are ready to use without code
 
-Once installed, your database tables automatically become API endpoints:
+Once installed, your database tables' CRUD APIs are exposed in a controlled manner:
 
 - `GET /api/:model` - List all records
 - `POST /api/:model` - Create a new record
