@@ -197,7 +197,7 @@ bun db:generate
 bun run dev
 ```
 
-That's it! 🎉 Your CRUD APIs are now available at `/api/users`.
+That's it! 🎉 Your CRUD APIs are now available at `/api/users`. [Watch Demo](https://youtu.be/7gW0KW1KtN0)
 
 ### 3. Backend-only App (API Mode)
 
