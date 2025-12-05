@@ -97,6 +97,14 @@ onMounted(async () => {
       :ui="{ footer: 'lg:border-t lg:border-default' }"
     >
       <template #default="{ collapsed: isSidebarCollapsed }">
+        <UButton
+          color="neutral"
+          variant="ghost"
+          :icon="isSidebarCollapsed ? 'i-lucide-chevrons-right' : 'i-lucide-chevrons-left'"
+          :aria-label="isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+          block
+          @click="collapsed = !collapsed"
+        />
         <UDashboardSearchButton
           :collapsed="isSidebarCollapsed"
           class="bg-transparent ring-default"
@@ -120,17 +128,7 @@ onMounted(async () => {
       </template>
 
       <template #footer="{ collapsed: isCollapsed }">
-        <div class="flex flex-col gap-2 w-full">
-          <UButton
-            color="neutral"
-            variant="ghost"
-            :icon="isCollapsed ? 'i-lucide-chevrons-right' : 'i-lucide-chevrons-left'"
-            :aria-label="isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'"
-            block
-            @click="collapsed = !collapsed"
-          />
-          <UserMenu :collapsed="isCollapsed" />
-        </div>
+        <UserMenu :collapsed="isCollapsed" />
       </template>
     </UDashboardSidebar>
 
