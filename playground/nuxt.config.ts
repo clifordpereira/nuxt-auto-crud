@@ -34,9 +34,9 @@ export default defineNuxtConfig({
 
   autoCrud: {
     schemaPath: 'server/database/schema',
-    // auth: true,
+    // auth: false, // Uncomment this line for testing APIs without auth
     auth: {
-      type: 'session',
+      type: 'session', // for Normal Authentication with nuxt-auth-utils
       authentication: true,
       authorization: true,
     },

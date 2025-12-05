@@ -78,8 +78,13 @@ export default defineNuxtConfig({
   },
 
   autoCrud: {
-    schemaPath: 'server/database/schema', // default value
-    auth: false, // Disable auth by default for easy testing
+    schemaPath: 'server/database/schema',
+    // auth: false,
+    auth: {
+      type: 'session', // for Normal Authentication with nuxt-auth-utils
+      authentication: true,
+      authorization: true,
+    },
   },
 })
 ```
@@ -150,6 +155,40 @@ export const users = sqliteTable('users', {
 
 > **Note:** The `organization.ts` and `cms.ts` files you might see in the playground are just examples and are commented out by default. You should implement a robust schema tailored to your production needs.
 
+#### Adding New Schemas
+
+To add a new table (e.g., `posts`), simply create a new file in your schema directory:
+
+```typescript
+// server/database/schema/posts.ts
+import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
+import { users } from './users'
+
+export const posts = sqliteTable('posts', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  title: text('title').notNull(),
+  content: text('content').notNull(),
+  authorId: integer('author_id').references(() => users.id),
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
+})
+```
+
+Then, ensure it is exported in your `server/database/schema/index.ts` (if you are using an index file) or that your `drizzle.config.ts` is pointing to the correct location.
+
+```typescript
+// server/database/schema/index.ts
+export * from './users'
+export * from './posts'
+```
+
+After adding the file, run the generation script:
+
+```bash
+bun db:generate
+```
+
+The new API endpoints (e.g., `/api/posts`) will be automatically available.
+
 #### Run the project
 
 ```bash
@@ -166,18 +205,42 @@ If you are using Nuxt as a backend for a separate client application (e.g., mobi
 
 In this case, you might handle authentication differently (e.g., validating tokens in middleware) or disable the built-in auth checks if you have a global auth middleware.
 
-```ts
+```typescript
+// nuxt.config.ts
 export default defineNuxtConfig({
   modules: ['nuxt-auto-crud'],
   autoCrud: {
-    auth: false // APIs are public (or handled by your own middleware)
-  }
+    schemaPath: 'server/database/schema',
+    // auth: false, // Uncomment this line for testing APIs without auth   
+    auth: {
+      type: 'jwt', // for app providing backend apis only
+      authentication: true,
+      authorization: true,
+      jwtSecret: process.env.NUXT_JWT_SECRET || 'test-secret-key-123',
+    },
+  },
+})
+```
+
+**Note:** Remember to add your `NUXT_JWT_SECRET` in `.env`.
+
+You should also configure `drizzle.config.ts` correctly:
+
+```typescript
+// drizzle.config.ts
+import { defineConfig } from 'drizzle-kit'
+
+export default defineConfig({
+  dialect: 'sqlite',
+  schema: './server/database/schema/index.ts',
+  out: './server/database/migrations',
+  tablesFilter: ['!_hub_migrations'],
 })
 ```
 
 ## 🔐 Authentication Configuration
 
-The module supports `auth: false` by default, which exposes all LCRUD APIs. You can enable authentication and authorization as needed.
+The module enables authentication by default. To test APIs without authentication, you can set `auth: false`.
 
 ### Session Auth (Default)
 
@@ -328,6 +391,8 @@ By default, the following fields are protected from updates:
 - `id`
 - `createdAt`
 - `created_at`
+- `updatedAt`
+- `updated_at`
 
 You can customize updatable fields in your schema by modifying the `modelMapper.ts` utility.
 

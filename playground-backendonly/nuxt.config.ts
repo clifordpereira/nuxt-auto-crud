@@ -11,14 +11,12 @@ export default defineNuxtConfig({
   // Auto CRUD configuration
   autoCrud: {
     schemaPath: 'server/database/schema',
-    auth: false,
-    /*
+    // auth: false, // Uncomment this line for testing APIs without auth   
     auth: {
-      type: 'jwt',
+      type: 'jwt', // for app providing backend apis only
       authentication: true,
       authorization: true,
-      jwtSecret: 'test-secret-key-123',
+      jwtSecret: process.env.NUXT_JWT_SECRET || 'test-secret-key-123',
     },
-    */
   },
 })
