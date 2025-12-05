@@ -152,8 +152,16 @@ export const users = sqliteTable('users', {
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
 })
 ```
+#### Run the project
 
-> **Note:** The `organization.ts` and `cms.ts` files you might see in the playground are just examples and are commented out by default. You should implement a robust schema tailored to your production needs.
+```bash
+cd <project-name>
+bun db:generate
+bun run dev
+```
+
+That's it! 🎉 Your CRUD APIs are now available at `/api/users`. 
+
 
 #### Adding New Schemas
 
@@ -187,17 +195,10 @@ After adding the file, run the generation script:
 bun db:generate
 ```
 
-The new API endpoints (e.g., `/api/posts`) will be automatically available.
+The new API endpoints (e.g., `/api/posts`) will be automatically available. [Watch Demo](https://youtu.be/7gW0KW1KtN0)
 
-#### Run the project
 
-```bash
-cd <project-name>
-bun db:generate
-bun run dev
-```
-
-That's it! 🎉 Your CRUD APIs are now available at `/api/users`. [Watch Demo](https://youtu.be/7gW0KW1KtN0)
+> **Note:** The `organization.ts` and `cms.ts` files you might see in the playground are just examples and are commented out by default. You should implement a robust schema tailored to your production needs.
 
 ### 3. Backend-only App (API Mode)
 
