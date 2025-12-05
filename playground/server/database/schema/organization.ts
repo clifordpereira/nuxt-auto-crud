@@ -7,7 +7,7 @@ export const customers = sqliteTable('customers', {
   email: text('email').notNull().unique(),
   avatar: text('avatar'),
   status: text('status').notNull(), // 'subscribed' | 'unsubscribed' | 'bounced'
-  location: text('location')
+  location: text('location'),
 })
 
 export const products = sqliteTable('products', {
@@ -16,7 +16,7 @@ export const products = sqliteTable('products', {
   price: real('price').notNull(),
   status: text('status').notNull(), // 'active' | 'archived'
   inventory: integer('inventory').notNull().default(0),
-  image: text('image')
+  image: text('image'),
 })
 
 export const orders = sqliteTable('orders', {
@@ -26,24 +26,24 @@ export const orders = sqliteTable('orders', {
   quantity: integer('quantity').notNull().default(1),
   total: real('total').notNull(),
   status: text('status').notNull().default('pending'), // 'pending' | 'completed' | 'cancelled'
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date())
+  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
 })
 
 export const customersRelations = relations(customers, ({ many }) => ({
-  orders: many(orders)
+  orders: many(orders),
 }))
 
 export const productsRelations = relations(products, ({ many }) => ({
-  orders: many(orders)
+  orders: many(orders),
 }))
 
 export const ordersRelations = relations(orders, ({ one }) => ({
   customer: one(customers, {
     fields: [orders.customerId],
-    references: [customers.id]
+    references: [customers.id],
   }),
   product: one(products, {
     fields: [orders.productId],
-    references: [products.id]
-  })
+    references: [products.id],
+  }),
 }))

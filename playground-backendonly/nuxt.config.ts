@@ -11,7 +11,7 @@ export default defineNuxtConfig({
   // Auto CRUD configuration
   autoCrud: {
     schemaPath: 'server/database/schema',
-    // auth: false, // Uncomment this line for testing APIs without auth   
+    // auth: false, // Uncomment this line for testing APIs without auth
     auth: {
       type: 'jwt', // for app providing backend apis only
       authentication: true,

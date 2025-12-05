@@ -6,7 +6,7 @@ const { isNotificationsSlideoverOpen } = useDashboard()
 
 definePageMeta({
   layout: 'dashboard',
-  middleware: 'auth'
+  middleware: 'auth',
 })
 
 // Get available resources from schemas
@@ -15,15 +15,15 @@ const resourceNames = Object.keys(schemas.value || {})
 
 // Dynamically create dropdown items based on available resources
 const iconMap: Record<string, string> = {
-  users: 'i-lucide-user-plus'
+  users: 'i-lucide-user-plus',
 }
 
 const items = [[
   ...resourceNames.map(resource => ({
     label: `New ${resource.slice(0, -1)}`,
     icon: iconMap[resource] || 'i-lucide-plus',
-    to: `/resource/${resource}`
-  }))
+    to: `/resource/${resource}`,
+  })),
 ]] satisfies DropdownMenuItem[][]
 
 // Dynamically fetch data for all resources
@@ -31,10 +31,10 @@ const { data: resourceData } = await useAsyncData('dashboard-resources', async (
   return await Promise.all(
     resourceNames.map(async (resource) => {
       const data = await $fetch<Record<string, unknown>[]>(`/api/${resource}`, {
-        headers: crudHeaders()
+        headers: crudHeaders(),
       })
       return { resource, data }
-    })
+    }),
   )
 })
 

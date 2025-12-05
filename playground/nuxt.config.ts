@@ -9,7 +9,7 @@ export default defineNuxtConfig({
     'nuxt-authorization',
     '@nuxt/ui',
     '@nuxt/eslint',
-    '../src/module'
+    '../src/module',
   ],
 
   devtools: { enabled: true },
@@ -18,18 +18,18 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      crudBaseUrl: '/api'
-    }
+      crudBaseUrl: '/api',
+    },
   },
 
   future: {
-    compatibilityVersion: 4
+    compatibilityVersion: 4,
   },
 
   compatibilityDate: '2024-11-27',
 
   hub: {
-    database: true
+    database: true,
   },
 
   autoCrud: {
@@ -38,16 +38,16 @@ export default defineNuxtConfig({
     auth: {
       type: 'session', // for Normal Authentication with nuxt-auth-utils
       authentication: true,
-      authorization: true
-    }
+      authorization: true,
+    },
   },
 
   eslint: {
     config: {
       stylistic: {
         commaDangle: 'never',
-        braceStyle: '1tbs'
-      }
-    }
-  }
+        braceStyle: '1tbs',
+      },
+    },
+  },
 })
