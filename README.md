@@ -12,10 +12,6 @@ And you don't need a separate Strapi or Supabase setup to automate your CRUD pro
 
 While this module exposes CRUD APIs, you are expected to build your own frontend application to consume them.
 
-However, you can find an easy-to-use template here: [https://github.com/clifordpereira/nuxt-auto-crud_template](https://github.com/clifordpereira/nuxt-auto-crud_template).
-
-Detailed documentation can be found here: [https://auto-crud.clifland.in/](https://auto-crud.clifland.in/).
-
 - [✨ Release Notes](/CHANGELOG.md)
 - [🎮 Try the Playground](/playground)
 
@@ -421,6 +417,16 @@ You can customize hidden fields by modifying the `modelMapper.ts` utility.
 - Nuxt 3 or 4
 - Drizzle ORM (SQLite)
 - NuxtHub (Recommended) or [Custom SQLite Setup](./custom-setup.md)
+
+## 🔗 Other Helpful Links
+
+- **Template:** [https://github.com/clifordpereira/nuxt-auto-crud_template](https://github.com/clifordpereira/nuxt-auto-crud_template)
+- **Docs:** [https://auto-crud.clifland.in/](https://auto-crud.clifland.in/)
+- **Repo:** [https://github.com/clifordpereira/nuxt-auto-crud](https://github.com/clifordpereira/nuxt-auto-crud)
+- **YouTube:** [https://youtu.be/M9-koXmhB9k](https://youtu.be/M9-koXmhB9k)
+- **YouTube 2:** [https://youtu.be/7gW0KW1KtN0](https://youtu.be/7gW0KW1KtN0)
+- **npm:** [https://www.npmjs.com/package/nuxt-auto-crud](https://www.npmjs.com/package/nuxt-auto-crud)
+- **Discuss:** [https://discord.gg/hGgyEaGu](https://discord.gg/hGgyEaGu)
 
 ## 🤝 Contributing
 
