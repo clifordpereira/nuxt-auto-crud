@@ -25,8 +25,6 @@ const items = [[
     to: `/resource/${resource}`,
   })),
 ]] satisfies DropdownMenuItem[][]
-
-
 </script>
 
 <template>
@@ -75,7 +73,6 @@ const items = [[
     </template>
 
     <template #body>
-
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
         <UCard>
           <template #header>
