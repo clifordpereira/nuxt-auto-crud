@@ -26,28 +26,7 @@ const items = [[
   })),
 ]] satisfies DropdownMenuItem[][]
 
-// Dynamically fetch data for all resources
-const { data: resourceData } = await useAsyncData('dashboard-resources', async () => {
-  return await Promise.all(
-    resourceNames.map(async (resource) => {
-      const data = await $fetch<Record<string, unknown>[]>(`/api/${resource}`, {
-        headers: crudHeaders(),
-      })
-      return { resource, data }
-    }),
-  )
-})
 
-// Create a map of resource counts
-const resourceCounts = computed(() => {
-  const counts: Record<string, number> = {}
-  if (resourceData.value) {
-    resourceData.value.forEach(({ resource, data }) => {
-      counts[resource] = data?.length || 0
-    })
-  }
-  return counts
-})
 </script>
 
 <template>
@@ -96,7 +75,7 @@ const resourceCounts = computed(() => {
     </template>
 
     <template #body>
-      <HomeStats :resource-counts="resourceCounts" />
+
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
         <UCard>
           <template #header>
