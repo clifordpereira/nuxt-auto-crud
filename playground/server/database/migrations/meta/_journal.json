@@ -15,6 +15,13 @@
       "when": 1765039021436,
       "tag": "0001_last_wilson_fisk",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1765039909689,
+      "tag": "0002_conscious_selene",
+      "breakpoints": true
     }
   ]
 }
