@@ -12,10 +12,17 @@ export function drizzleTableToFields(table: any, resourceName: string) {
     const column = col as any
     const isRequired = column.notNull
     let type = 'string'
-    const selectOptions: string[] | undefined = undefined
+    let selectOptions: string[] | undefined = undefined
 
+    // Check for enum values (Drizzle stores them in enumValues or config.enumValues)
+    const enumValues = column.enumValues || column.config?.enumValues
+
+    if (enumValues) {
+      type = 'enum'
+      selectOptions = enumValues
+    }
     // Map Drizzle types to frontend types
-    if (column.dataType === 'number' || column.columnType === 'SQLiteInteger' || column.columnType === 'SQLiteReal') {
+    else if (column.dataType === 'number' || column.columnType === 'SQLiteInteger' || column.columnType === 'SQLiteReal') {
       type = 'number'
       // Check if it is a timestamp
       if (column.name.endsWith('_at') || column.name.endsWith('At')) {
