@@ -1,0 +1,10 @@
+{  
+  "users": {
+    "auth": {
+      "admin": true,
+      "manager": ["list", "read"],
+      "customer": false,
+      "public": false
+    }
+  }
+}
