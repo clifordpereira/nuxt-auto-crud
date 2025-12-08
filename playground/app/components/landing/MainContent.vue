@@ -9,7 +9,10 @@ const { loggedIn, clear } = useUserSession()
       <UCard class="shadow-lg">
         <template #header>
           <h2 class="text-xl font-semibold flex items-center gap-2">
-            <UIcon name="i-heroicons-user-circle" class="text-primary-500" />
+            <UIcon
+              name="i-heroicons-user-circle"
+              class="text-primary-500"
+            />
             Playground Login
           </h2>
         </template>

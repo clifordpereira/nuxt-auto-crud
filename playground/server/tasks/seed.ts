@@ -4,7 +4,7 @@ import * as tables from '../database/schema'
 export default defineTask({
   meta: {
     name: 'db:seed',
-    description: 'Run database seed task'
+    description: 'Run database seed task',
   },
   async run() {
     console.log('Running DB seed task...')
@@ -30,7 +30,7 @@ export default defineTask({
         avatar: 'https://i.pravatar.cc/150?u=admin',
         role: 'admin',
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       })
       console.log('Admin user seeded.')
       results.push('admin')
@@ -49,7 +49,7 @@ export default defineTask({
         avatar: 'https://i.pravatar.cc/150?u=moderator',
         role: 'moderator',
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       })
       console.log('Moderator user seeded.')
       results.push('moderator')
@@ -68,7 +68,7 @@ export default defineTask({
         avatar: 'https://i.pravatar.cc/150?u=manager',
         role: 'manager',
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       })
       console.log('Manager user seeded.')
       results.push('manager')
@@ -87,12 +87,12 @@ export default defineTask({
         avatar: 'https://i.pravatar.cc/150?u=customer',
         role: 'customer',
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       })
       console.log('Customer user seeded.')
       results.push('customer')
     }
 
     return { result: 'success', seeded: results }
-  }
+  },
 })

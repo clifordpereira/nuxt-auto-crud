@@ -11,7 +11,7 @@ export function drizzleTableToFields(table: any, resourceName: string) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const column = col as any
     const isRequired = column.notNull
-    
+
     const { type, selectOptions } = mapColumnType(column)
 
     fields.push({

@@ -8,5 +8,5 @@ export const users = sqliteTable('users', {
   email: text('email').notNull().unique(),
   password: text('password').notNull(),
   avatar: text('avatar'),
-  role: text('role').default('user')
+  role: text('role').default('user'),
 })

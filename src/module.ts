@@ -4,7 +4,6 @@ import {
   addServerHandler,
   addServerImportsDir,
   addImportsDir,
-  addServerPlugin,
 } from '@nuxt/kit'
 
 import type { ModuleOptions, AuthOptions, RuntimeModuleOptions } from './types'
@@ -47,7 +46,7 @@ export default defineNuxtModule<ModuleOptions>({
     // Alias the ability file
     const abilityPath = resolver.resolve(
       nuxt.options.rootDir,
-      'server/utils/ability'
+      'server/utils/ability',
     )
     nuxt.options.alias['#site/ability'] = abilityPath
 
@@ -184,7 +183,5 @@ export default defineNuxtModule<ModuleOptions>({
 
     // 4. Register Composables
     addImportsDir(resolver.resolve('./runtime/composables'))
-
-
   },
 })

@@ -12,14 +12,14 @@ const mainLinks = computed(() => mainMenu.map(item => ({
   ...item,
   onSelect: () => {
     open.value = false
-  }
+  },
 })))
 
 const footerLinks = computed(() => footerMenu.map(item => ({
   ...item,
   onSelect: () => {
     open.value = false
-  }
+  },
 })))
 </script>
 

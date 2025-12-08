@@ -1,4 +1,4 @@
-/// <reference path="../../auth.d.ts" />
+import '../../auth.d.ts'
 import type { H3Event } from 'h3'
 import { createError } from 'h3'
 import globalAbility from '#site/ability'

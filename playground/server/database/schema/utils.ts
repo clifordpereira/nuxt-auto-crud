@@ -5,16 +5,16 @@ export const systemFields = {
   id: integer('id').primaryKey({ autoIncrement: true }),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
-  deletedAt: integer('deleted_at', { mode: 'timestamp' }) // Soft delete
+  deletedAt: integer('deleted_at', { mode: 'timestamp' }), // Soft delete
 }
 
 // 2. Status Field (Optional)
 export const statusField = {
-  status: text('status', { enum: ['active', 'inactive'] }).default('active')
+  status: text('status', { enum: ['active', 'inactive'] }).default('active'),
 }
 
 // 3. Base Fields (Common descriptive fields for entities)
 export const baseFields = {
   name: text('name').notNull(),
-  description: text('description')
+  description: text('description'),
 }

@@ -5,12 +5,12 @@ const contentData = {
   steps: [
     {
       title: 'Test Auth',
-      description: 'Log in with different roles (Admin, Manager, Moderator) to see the effect. Permissions are controlled in \'app/config/auth/<table>.json\''
+      description: 'Log in with different roles (Admin, Manager, Moderator) to see the effect. Permissions are controlled in \'app/config/auth/<table>.json\'',
     },
     {
       title: 'Extend Schema',
-      description: 'Add new tables in server/database/schema and restart the server to use the new tables. If needed use \'npm db:generate\''
-    }
+      description: 'Add new tables in server/database/schema and restart the server to use the new tables. If needed use \'npm db:generate\'',
+    },
   ],
   config: `{
   "users": {
@@ -23,7 +23,7 @@ const contentData = {
       "public": false
     }
   }
-}`
+}`,
 }
 </script>
 
@@ -42,10 +42,16 @@ const contentData = {
       <div class="grid gap-8 lg:grid-cols-2 items-start">
         <!-- Left Column: Steps -->
         <div class="space-y-6">
-          <UCard v-for="(step, index) in contentData.steps" :key="index">
+          <UCard
+            v-for="(step, index) in contentData.steps"
+            :key="index"
+          >
             <template #header>
               <div class="flex items-center gap-2">
-                <UBadge color="primary" variant="solid">
+                <UBadge
+                  color="primary"
+                  variant="solid"
+                >
                   {{ index + 1 }}
                 </UBadge>
                 <h3 class="text-xl font-semibold">
