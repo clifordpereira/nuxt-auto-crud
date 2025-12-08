@@ -1,4 +1,5 @@
-import '../../auth.d.ts'
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="../../auth.d.ts" />
 import type { H3Event } from 'h3'
 import { createError } from 'h3'
 import globalAbility from '#site/ability'
