@@ -29,6 +29,13 @@ bun db:generate
 bun run dev
 ```
 
+4. Seed the database:
+
+   - Open **Nuxt DevTools** (`Shift + Alt + D`).
+   - Navigate to the **NuxtHub** tab.
+   - Click on **Tasks** in the sidebar.
+   - Run the `db:seed` task to populate the database with test data (Admin, Manager, Moderator, Customer).
+
 ## Authentication
 
 The playground is configured with **Session Authentication**.
@@ -46,6 +53,15 @@ The playground uses `nuxt-authorization` to manage permissions.
 - **Public**: Limited access.
 
 Check `autocrud.config.ts` and `app/config/auth/users.json` to see the permission rules.
+
+## Viewing the Database
+
+You can view and manage your database directly using **Nuxt DevTools**.
+
+1.  Start the development server (`bun run dev`).
+2.  Open the application in your browser (`http://localhost:3000`).
+3.  Open Nuxt DevTools (`Shift + Alt + D`).
+4.  Navigate to the **NuxtHub** tab to explore your tables and data.
 
 ## Testing
 
