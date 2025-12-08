@@ -1,3 +1,15 @@
+## v1.12.1
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.12.0...v1.12.1)
+
+### 💅 Refactors
+
+- Replace `import` with `/// <reference>` for `auth.d.ts` type declaration. ([b52f2e3](https://github.com/clifordpereira/nuxt-auto-crud/commit/b52f2e3))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v1.12.0
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.11.0...v1.12.0)
