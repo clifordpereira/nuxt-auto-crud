@@ -14,7 +14,7 @@ const { loggedIn } = useUserSession()
 
 // Redirect to dashboard if already logged in
 if (loggedIn.value) {
-  await navigateTo('/dashboard')
+  await navigateTo('/resource/users')
 }
 </script>
 

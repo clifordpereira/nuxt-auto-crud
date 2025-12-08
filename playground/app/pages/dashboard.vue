@@ -3,6 +3,8 @@ definePageMeta({
   layout: 'dashboard',
   middleware: 'auth',
 })
+
+await navigateTo('/resource/users')
 </script>
 
 <template>

@@ -39,7 +39,7 @@ async function onSubmit() {
     
     isOpen.value = false
     // Redirect to dashboard after successful login
-    await navigateTo('/dashboard')
+    await navigateTo('/resource/users')
   }
   catch (err: unknown) {
     toast.add({
