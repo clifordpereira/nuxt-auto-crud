@@ -1,0 +1,7 @@
+[
+  {
+    "label": "Home",
+    "icon": "i-lucide-house",
+    "to": "/dashboard"
+  }
+]

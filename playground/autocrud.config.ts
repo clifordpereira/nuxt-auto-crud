@@ -1,4 +1,4 @@
-import usersConfig from './app/config/autocrud/users.json'
+import usersConfig from './app/config/auth/users.json'
 
 export default {
   resources: {

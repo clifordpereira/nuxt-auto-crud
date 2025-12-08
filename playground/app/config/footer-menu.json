@@ -1,0 +1,14 @@
+[
+  {
+    "label": "Help & Support",
+    "icon": "i-lucide-info",
+    "to": "https://discord.gg/YFTEvMtX",
+    "target": "_blank"
+  },
+  {
+    "label": "Report a bug",
+    "icon": "i-lucide-bug",
+    "to": "https://github.com/clifordpereira/nuxt-auto-crud/issues",
+    "target": "_blank"
+  }
+]
