@@ -2,32 +2,10 @@ import { ofetch } from 'ofetch'
 
 const BASE_URL = 'http://localhost:3000'
 
-async function login(email: string) {
-  try {
-    const response = await ofetch(`${BASE_URL}/api/auth/login`, {
-      method: 'POST',
-      body: { email, password: '$1Password' },
-      ignoreResponseError: true,
-      onResponse({ response }) {
-        // Capture cookies
-      }
-    })
-    
-    // ofetch automatically handles cookies if we use a create instance, but here we are just grabbing headers?
-    // Actually, let's use a fetcher with cookie support or just manual header management.
-    return response
-  } catch (e) {
-    console.error('Login failed', e)
-    return null
-  }
-}
-
 async function testScenario(role: string, email: string) {
   console.log(`\nTesting as ${role} (${email})...`)
   
   // 1. Login
-  // We need to persist cookies.
-  // Let's use a custom fetcher wrapper that stores cookies.
   let cookies: string[] = []
   
   const client = ofetch.create({
@@ -42,7 +20,6 @@ async function testScenario(role: string, email: string) {
     onResponse({ response }) {
       const setCookie = response.headers.get('set-cookie')
       if (setCookie) {
-        // Simple split, might need better parsing for multiple cookies
         cookies = [setCookie.split(';')[0]] 
       }
     }
@@ -60,38 +37,75 @@ async function testScenario(role: string, email: string) {
   }
 
   // 2. List Users
+  let users: any[] = []
   try {
-    await client('/api/users')
-    console.log('✅ List Users: Allowed')
+    const response = await client('/api/users')
+    users = response.data || response
+    console.log(`✅ List Users: Allowed (${users.length} users found)`)
   } catch (e: any) {
     if (e.statusCode === 403 || e.statusCode === 401) {
-      console.log('🚫 List Users: Denied (Expected for Customer)')
+      console.log('🚫 List Users: Denied')
     } else {
       console.log(`❌ List Users: Failed with ${e.statusCode}`)
     }
   }
 
-  // 3. Create User (Should fail for Manager/Customer)
+  // 3. Create User
+  let createdUserId: number | null = null
   try {
-    await client('/api/users', {
+    const newUser = await client('/api/users', {
       method: 'POST',
       body: {
-        email: `test-${role}@example.com`,
+        email: `test-${role}-${Date.now()}@example.com`,
         password: 'password',
         name: 'Test User'
       }
     })
-    console.log('⚠️ Create User: Allowed (Unexpected for Manager/Customer)')
+    createdUserId = newUser.id
+    if (role === 'Admin') {
+        console.log('✅ Create User: Allowed (Expected for Admin)')
+    } else {
+        console.log('⚠️ Create User: Allowed (Unexpected for ' + role + ')')
+    }
   } catch (e: any) {
     if (e.statusCode === 403 || e.statusCode === 401) {
-      console.log('✅ Create User: Denied (Expected)')
+      if (role !== 'Admin') {
+          console.log(`✅ Create User: Denied (Expected for ${role})`)
+      } else {
+          console.log(`❌ Create User: Denied (Unexpected for Admin)`)
+      }
     } else {
       console.log(`❌ Create User: Failed with ${e.statusCode}`)
     }
   }
+
+  // 4. Delete User
+  // If we created a user, try to delete it. If not, try to delete the last user from the list (if not empty)
+  // Be careful not to delete the current user or important seed data if possible.
+  // For safety, let's only try to delete if we created one, or if we found a user that looks like a test user.
+  
+  const targetId = createdUserId
+  
+  if (targetId) {
+      try {
+        await client(`/api/users/${targetId}`, {
+          method: 'DELETE'
+        })
+        console.log(`⚠️ Delete User: Allowed (Unexpected for ${role} based on config)`)
+      } catch (e: any) {
+        if (e.statusCode === 403 || e.statusCode === 401) {
+          console.log(`✅ Delete User: Denied (Expected for ${role})`)
+        } else {
+          console.log(`❌ Delete User: Failed with ${e.statusCode}`)
+        }
+      }
+  } else {
+      console.log('ℹ️ Skipping Delete User test (no user created to delete)')
+  }
 }
 
 async function main() {
+  await testScenario('Admin', 'admin@example.com')
   await testScenario('Manager', 'manager@example.com')
   await testScenario('Customer', 'customer@example.com')
 }

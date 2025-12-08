@@ -4,11 +4,6 @@ import config from '../../autocrud.config'
 export default defineAbility((user, model: string, action: string) => {
   const role = user?.role || 'public'
 
-  // Admin super-user override
-  if (role === 'admin') {
-    return true
-  }
-
   // Get resource config
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const resourceConfig = (config.resources as any)[model]
