@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1764760206494,
-      "tag": "0000_sudden_green_goblin",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1765039021436,
-      "tag": "0001_last_wilson_fisk",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1765039909689,
-      "tag": "0002_conscious_selene",
+      "when": 1765164188686,
+      "tag": "0000_nebulous_thaddeus_ross",
       "breakpoints": true
     }
   ]
