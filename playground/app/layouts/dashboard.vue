@@ -6,8 +6,8 @@ const open = ref(false)
 const collapsed = ref(false)
 
 // Import menu configurations
-import mainMenu from '../config/main-menu.json'
-import footerMenu from '../config/footer-menu.json'
+import mainMenu from '../config/menus/main.json'
+import footerMenu from '../config/menus/footer.json'
 
 // Map menus to add onSelect handler
 const mainLinks = computed(() => mainMenu.map(item => ({

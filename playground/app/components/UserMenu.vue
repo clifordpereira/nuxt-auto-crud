@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from '@nuxt/ui'
+import userMenuLinks from '../config/menus/user-links.json'
 
 defineProps<{
   collapsed?: boolean
@@ -91,17 +92,9 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
       e.preventDefault()
     },
   }],
-}], [{
-  label: 'Documentation',
-  icon: 'i-lucide-book-open',
-  to: 'https://auto-crud.clifland.in/',
-  target: '_blank',
-}, {
-  label: 'GitHub repository',
-  icon: 'i-simple-icons-github',
-  to: 'https://github.com/clifordpereira/nuxt-auto-crud',
-  target: '_blank',
-}, {
+}], [
+  ...userMenuLinks,
+  {
   label: 'Log out',
   icon: 'i-lucide-log-out',
   onSelect: async () => {

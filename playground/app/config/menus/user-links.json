@@ -1,0 +1,14 @@
+[
+  {
+    "label": "Documentation",
+    "icon": "i-lucide-book-open",
+    "to": "https://auto-crud.clifland.in/",
+    "target": "_blank"
+  },
+  {
+    "label": "GitHub repository",
+    "icon": "i-simple-icons-github",
+    "to": "https://github.com/clifordpereira/nuxt-auto-crud",
+    "target": "_blank"
+  }
+]
