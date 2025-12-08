@@ -4,10 +4,10 @@ const BASE_URL = 'http://localhost:3000'
 
 async function testScenario(role: string, email: string) {
   console.log(`\nTesting as ${role} (${email})...`)
-  
+
   // 1. Login
   let cookies: string[] = []
-  
+
   const client = ofetch.create({
     baseURL: BASE_URL,
     onRequest({ options }) {
@@ -20,7 +20,7 @@ async function testScenario(role: string, email: string) {
     onResponse({ response }) {
       const setCookie = response.headers.get('set-cookie')
       if (setCookie) {
-        cookies = [setCookie.split(';')[0]] 
+        cookies = [setCookie.split(';')[0]]
       }
     }
   })
@@ -37,12 +37,13 @@ async function testScenario(role: string, email: string) {
   }
 
   // 2. List Users
-  let users: any[] = []
+  let users: Record<string, unknown>[] = []
   try {
     const response = await client('/api/users')
     users = response.data || response
     console.log(`✅ List Users: Allowed (${users.length} users found)`)
-  } catch (e: any) {
+  } catch (error: unknown) {
+    const e = error as { statusCode: number }
     if (e.statusCode === 403 || e.statusCode === 401) {
       console.log('🚫 List Users: Denied')
     } else {
@@ -63,16 +64,17 @@ async function testScenario(role: string, email: string) {
     })
     createdUserId = newUser.id
     if (role === 'Admin') {
-        console.log('✅ Create User: Allowed (Expected for Admin)')
+      console.log('✅ Create User: Allowed (Expected for Admin)')
     } else {
-        console.log('⚠️ Create User: Allowed (Unexpected for ' + role + ')')
+      console.log('⚠️ Create User: Allowed (Unexpected for ' + role + ')')
     }
-  } catch (e: any) {
+  } catch (error: unknown) {
+    const e = error as { statusCode: number }
     if (e.statusCode === 403 || e.statusCode === 401) {
       if (role !== 'Admin') {
-          console.log(`✅ Create User: Denied (Expected for ${role})`)
+        console.log(`✅ Create User: Denied (Expected for ${role})`)
       } else {
-          console.log(`❌ Create User: Denied (Unexpected for Admin)`)
+        console.log(`❌ Create User: Denied (Unexpected for Admin)`)
       }
     } else {
       console.log(`❌ Create User: Failed with ${e.statusCode}`)
@@ -83,24 +85,25 @@ async function testScenario(role: string, email: string) {
   // If we created a user, try to delete it. If not, try to delete the last user from the list (if not empty)
   // Be careful not to delete the current user or important seed data if possible.
   // For safety, let's only try to delete if we created one, or if we found a user that looks like a test user.
-  
+
   const targetId = createdUserId
-  
+
   if (targetId) {
-      try {
-        await client(`/api/users/${targetId}`, {
-          method: 'DELETE'
-        })
-        console.log(`⚠️ Delete User: Allowed (Unexpected for ${role} based on config)`)
-      } catch (e: any) {
-        if (e.statusCode === 403 || e.statusCode === 401) {
-          console.log(`✅ Delete User: Denied (Expected for ${role})`)
-        } else {
-          console.log(`❌ Delete User: Failed with ${e.statusCode}`)
-        }
+    try {
+      await client(`/api/users/${targetId}`, {
+        method: 'DELETE'
+      })
+      console.log(`⚠️ Delete User: Allowed (Unexpected for ${role} based on config)`)
+    } catch (error: unknown) {
+      const e = error as { statusCode: number }
+      if (e.statusCode === 403 || e.statusCode === 401) {
+        console.log(`✅ Delete User: Denied (Expected for ${role})`)
+      } else {
+        console.log(`❌ Delete User: Failed with ${e.statusCode}`)
       }
+    }
   } else {
-      console.log('ℹ️ Skipping Delete User test (no user created to delete)')
+    console.log('ℹ️ Skipping Delete User test (no user created to delete)')
   }
 }
 

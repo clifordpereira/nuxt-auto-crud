@@ -1,27 +1,25 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
-
-
-const open = ref(false)
-const collapsed = ref(false)
-
 // Import menu configurations
 import mainMenu from '../config/menus/main.json'
 import footerMenu from '../config/menus/footer.json'
+
+const open = ref(false)
+const collapsed = ref(false)
 
 // Map menus to add onSelect handler
 const mainLinks = computed(() => mainMenu.map(item => ({
   ...item,
   onSelect: () => {
     open.value = false
-  },
+  }
 })))
 
 const footerLinks = computed(() => footerMenu.map(item => ({
   ...item,
   onSelect: () => {
     open.value = false
-  },
+  }
 })))
 </script>
 

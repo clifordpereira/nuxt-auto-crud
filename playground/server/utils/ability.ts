@@ -17,7 +17,7 @@ export default defineAbility((user, model: string, action: string) => {
   if (permissions === true) {
     return true
   }
-  
+
   if (Array.isArray(permissions)) {
     return permissions.includes(action)
   }

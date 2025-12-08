@@ -8,7 +8,7 @@ export default defineTask({
   },
   async run() {
     console.log('Running DB seed task...')
-    
+
     // Only seed if we have a users table
     if (!tables.users) {
       return { result: 'skipped', reason: 'No users table found' }
@@ -30,7 +30,7 @@ export default defineTask({
         avatar: 'https://i.pravatar.cc/150?u=admin',
         role: 'admin',
         createdAt: new Date(),
-        updatedAt: new Date(),
+        updatedAt: new Date()
       })
       console.log('Admin user seeded.')
       results.push('admin')
@@ -49,7 +49,7 @@ export default defineTask({
         avatar: 'https://i.pravatar.cc/150?u=moderator',
         role: 'moderator',
         createdAt: new Date(),
-        updatedAt: new Date(),
+        updatedAt: new Date()
       })
       console.log('Moderator user seeded.')
       results.push('moderator')
@@ -68,7 +68,7 @@ export default defineTask({
         avatar: 'https://i.pravatar.cc/150?u=manager',
         role: 'manager',
         createdAt: new Date(),
-        updatedAt: new Date(),
+        updatedAt: new Date()
       })
       console.log('Manager user seeded.')
       results.push('manager')
@@ -87,7 +87,7 @@ export default defineTask({
         avatar: 'https://i.pravatar.cc/150?u=customer',
         role: 'customer',
         createdAt: new Date(),
-        updatedAt: new Date(),
+        updatedAt: new Date()
       })
       console.log('Customer user seeded.')
       results.push('customer')

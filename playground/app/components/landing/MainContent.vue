@@ -23,7 +23,9 @@ const { loggedIn, clear } = useUserSession()
                 <p class="font-semibold text-primary-600 dark:text-primary-400">
                   Admin
                 </p>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Full Access</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                  Full Access
+                </p>
                 <p class="text-gray-600 dark:text-gray-300 font-mono text-xs">
                   admin@example.com
                 </p>
@@ -32,7 +34,9 @@ const { loggedIn, clear } = useUserSession()
                 <p class="font-semibold text-primary-600 dark:text-primary-400">
                   Manager
                 </p>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">CRUD Access</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                  CRUD Access
+                </p>
                 <p class="text-gray-600 dark:text-gray-300 font-mono text-xs">
                   manager@example.com
                 </p>
@@ -41,7 +45,9 @@ const { loggedIn, clear } = useUserSession()
                 <p class="font-semibold text-primary-600 dark:text-primary-400">
                   Moderator
                 </p>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Read Only</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                  Read Only
+                </p>
                 <p class="text-gray-600 dark:text-gray-300 font-mono text-xs">
                   moderator@example.com
                 </p>
@@ -55,8 +61,8 @@ const { loggedIn, clear } = useUserSession()
             variant="solid"
             size="lg"
             icon="i-heroicons-arrow-right-on-rectangle"
-            @click="clear"
             block
+            @click="clear"
           >
             Logout
           </UButton>

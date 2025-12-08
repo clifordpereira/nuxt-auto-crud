@@ -16,8 +16,8 @@ const items = computed(() => [{
   children: resourceNames.value.map(resource => ({
     label: resource.charAt(0).toUpperCase() + resource.slice(1),
     to: `/resource/${resource}`,
-    onSelect: props.onSelect,
-  })),
+    onSelect: props.onSelect
+  }))
 }] satisfies NavigationMenuItem[])
 </script>
 

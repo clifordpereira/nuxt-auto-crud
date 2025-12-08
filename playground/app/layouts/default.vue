@@ -7,6 +7,7 @@ async function onLogout() {
   await navigateTo('/')
 }
 </script>
+
 <template>
   <div class="min-h-screen bg-gray-200 dark:bg-gray-950">
     <header class="bg-white dark:bg-gray-800 shadow">
