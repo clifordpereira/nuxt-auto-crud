@@ -10,10 +10,10 @@ const collapsed = ref(false)
 
 // Get available resources from schemas
 const { schemas } = await useResourceSchemas()
-const resourceNames = Object.keys(schemas.value || {})
+const resourceNames = computed(() => Object.keys(schemas.value || {}))
 
 // Dynamically create navigation links based on available resources
-const links = [[{
+const links = computed(() => [[{
   label: 'Home',
   icon: 'i-lucide-house',
   to: '/dashboard',
@@ -24,7 +24,7 @@ const links = [[{
   label: 'Resources',
   icon: 'i-lucide-database',
   defaultOpen: true,
-  children: resourceNames.map(resource => ({
+  children: resourceNames.value.map(resource => ({
     label: resource.charAt(0).toUpperCase() + resource.slice(1),
     to: `/resource/${resource}`,
     onSelect: () => {
@@ -41,12 +41,12 @@ const links = [[{
   icon: 'i-lucide-bug',
   to: 'https://github.com/clifordpereira/nuxt-auto-crud/issues',
   target: '_blank',
-}]] satisfies NavigationMenuItem[][]
+}]] satisfies NavigationMenuItem[][])
 
 const groups = computed(() => [{
   id: 'links',
   label: 'Go to',
-  items: links.flat(),
+  items: links.value.flat(),
 }, {
   id: 'code',
   label: 'Code',
@@ -132,10 +132,8 @@ onMounted(async () => {
       </template>
     </UDashboardSidebar>
 
-    <UDashboardSearch :groups="groups" />
-
-    <slot />
-
-    <NotificationsSlideover />
+    <UDashboardPanel>
+      <slot />
+    </UDashboardPanel>
   </UDashboardGroup>
 </template>
