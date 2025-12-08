@@ -6,6 +6,7 @@ export default defineNuxtConfig({
   modules: [
     MyModule,
     'nuxt-auth-utils',
+    'nuxt-authorization',
   ],
   runtimeConfig: {
     session: {
