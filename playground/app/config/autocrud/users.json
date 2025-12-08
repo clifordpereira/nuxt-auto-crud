@@ -1,9 +1,11 @@
-{  
+{
   "users": {
     "auth": {
       "admin": true,
-      "manager": ["list", "read"],
+      "manager": ["list", "read", "create", "update", "delete"],
+      "moderator": ["list", "read"],
       "customer": false,
+      "user": false,
       "public": false
     }
   }

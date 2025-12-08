@@ -107,6 +107,7 @@ async function testScenario(role: string, email: string) {
 async function main() {
   await testScenario('Admin', 'admin@example.com')
   await testScenario('Manager', 'manager@example.com')
+  await testScenario('Moderator', 'moderator@example.com')
   await testScenario('Customer', 'customer@example.com')
 }
 

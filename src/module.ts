@@ -185,7 +185,6 @@ export default defineNuxtModule<ModuleOptions>({
     // 4. Register Composables
     addImportsDir(resolver.resolve('./runtime/composables'))
 
-    // 5. Register Plugins
-    addServerPlugin(resolver.resolve('./runtime/server/plugins/seed'))
+
   },
 })
