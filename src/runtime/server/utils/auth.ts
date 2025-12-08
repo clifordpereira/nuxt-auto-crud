@@ -1,7 +1,9 @@
+/// <reference path="../../auth.d.ts" />
 import type { H3Event } from 'h3'
 import { createError } from 'h3'
+import globalAbility from '#site/ability'
 // @ts-expect-error - #imports is available in runtime
-import { requireUserSession } from '#imports'
+import { requireUserSession, allows } from '#imports'
 import { useAutoCrudConfig } from './config'
 import { verifyJwtToken } from './jwt'
 
@@ -26,14 +28,12 @@ export async function checkAdminAccess(event: H3Event, model: string, action: st
 
     // Check authorization if enabled
     if (auth.authorization) {
-      if (event.context.ability) {
-        const can = event.context.ability.can(action, model)
-        if (!can) {
-          throw createError({
-            statusCode: 403,
-            message: 'Forbidden',
-          })
-        }
+      const allowed = await allows(event, globalAbility, model, action)
+      if (!allowed) {
+        throw createError({
+          statusCode: 403,
+          message: 'Forbidden',
+        })
       }
     }
 

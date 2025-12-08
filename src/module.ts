@@ -44,6 +44,13 @@ export default defineNuxtModule<ModuleOptions>({
     )
     nuxt.options.alias['#site/drizzle'] = drizzlePath
 
+    // Alias the ability file
+    const abilityPath = resolver.resolve(
+      nuxt.options.rootDir,
+      'server/utils/ability'
+    )
+    nuxt.options.alias['#site/ability'] = abilityPath
+
     // Ensure #authorization alias exists for the runtime
     // This resolves warnings when building the module files
     nuxt.options.alias['#authorization'] = nuxt.options.alias['#authorization'] || 'nuxt-authorization/utils'
