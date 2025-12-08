@@ -19,6 +19,20 @@
           name="i-heroicons-check-circle"
           class="text-green-500 mt-0.5 shrink-0"
         />
+        <span><strong>Authentication:</strong> Built-in session management using <code>nuxt-auth-utils</code></span>
+      </li>
+      <li class="flex items-start gap-2">
+        <UIcon
+          name="i-heroicons-check-circle"
+          class="text-green-500 mt-0.5 shrink-0"
+        />
+        <span><strong>Authorization:</strong> Fine-grained access control per resource and action using <code>nuxt-authorization</code></span>
+      </li>
+      <li class="flex items-start gap-2">
+        <UIcon
+          name="i-heroicons-check-circle"
+          class="text-green-500 mt-0.5 shrink-0"
+        />
         <span><strong>Auto-generated APIs:</strong> CRUD endpoints created automatically from Drizzle schema using <code>nuxt-auto-crud</code></span>
       </li>
       <li class="flex items-start gap-2">
@@ -33,21 +47,7 @@
           name="i-heroicons-check-circle"
           class="text-green-500 mt-0.5 shrink-0"
         />
-        <span><strong>Dynamic UI:</strong> Tables and forms generated on-the-fly based on data types</span>
-      </li>
-      <li class="flex items-start gap-2">
-        <UIcon
-          name="i-heroicons-check-circle"
-          class="text-green-500 mt-0.5 shrink-0"
-        />
-        <span><strong>Authentication:</strong> Built-in session management using <code>nuxt-auth-utils</code></span>
-      </li>
-      <li class="flex items-start gap-2">
-        <UIcon
-          name="i-heroicons-check-circle"
-          class="text-green-500 mt-0.5 shrink-0"
-        />
-        <span><strong>Permissions:</strong> Fine-grained access control per resource and action using <code>nuxt-authorization</code></span>
+        <span><strong>Dynamic UI:</strong> Reusable Table and Form components that adapt dynamically to any resource or model</span>
       </li>
     </ul>
   </UCard>

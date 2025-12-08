@@ -47,6 +47,10 @@ const paginatedItems = ref<Record<string, unknown>[]>([])
         :items-per-page="10"
         @update:paginated="paginatedItems = $event"
       />
+      <CrudCreateRow
+        :resource="resource"
+        :schema="schema"
+      />
     </div>
 
     <!-- Table -->
