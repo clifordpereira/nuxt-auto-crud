@@ -57,10 +57,15 @@ If you want to add `nuxt-auto-crud` to an existing project, follow these steps:
 ```bash
 # Install module and required dependencies
 npm install nuxt-auto-crud @nuxthub/core@latest drizzle-orm
+
+# Optional: Install auth dependencies if using Session Auth (Recommended)
+npm install nuxt-auth-utils nuxt-authorization
+
 npm install --save-dev wrangler drizzle-kit
 
 # Or using bun
 bun add nuxt-auto-crud @nuxthub/core@latest drizzle-orm
+bun add nuxt-auth-utils nuxt-authorization
 bun add --dev wrangler drizzle-kit
 ```
 
@@ -245,10 +250,19 @@ The module enables authentication by default. To test APIs without authenticatio
 
 ### Session Auth (Default)
 
-Requires `nuxt-auth-utils` and `nuxt-authorization`.
+Requires `nuxt-auth-utils` and `nuxt-authorization` to be installed in your project.
+
+```bash
+npm install nuxt-auth-utils nuxt-authorization
+```
 
 ```typescript
 export default defineNuxtConfig({
+  modules: [
+    'nuxt-auth-utils',
+    'nuxt-authorization',
+    'nuxt-auto-crud'
+  ],
   autoCrud: {
     auth: {
       type: 'session',
@@ -261,7 +275,7 @@ export default defineNuxtConfig({
 
 ### JWT Auth
 
-Useful for backend-only apps.
+Useful for backend-only apps. Does **not** require `nuxt-auth-utils`.
 
 ```typescript
 export default defineNuxtConfig({
@@ -274,6 +288,36 @@ export default defineNuxtConfig({
     }
   }
 })
+```
+
+### Disabling Auth
+
+You can disable authentication entirely for testing or public APIs.
+
+```typescript
+export default defineNuxtConfig({
+  autoCrud: {
+    auth: {
+      authentication: false,
+      authorization: false
+    }
+    // OR simply:
+    // auth: false
+  }
+})
+```
+
+## 🧪 Testing
+
+This module is tested using **Vitest**.
+
+- **Unit Tests:** We cover utility functions and helpers.
+- **E2E Tests:** We verify the API endpoints using a real Nuxt server instance.
+
+To run the tests locally:
+
+```bash
+npm run test
 ```
 
 ## 🛡️ Resource Configuration (RBAC)
@@ -302,6 +346,7 @@ export default {
 ## ⚠️ Known Issues
 
 - **Foreign Key Naming:** Currently, if you have multiple foreign keys referring to the same table (e.g., `customer_id` and `author_id` both referring to the `users` table), the automatic relation handling might assume `user_id` for both. This is a known limitation in the current alpha version.
+- **Sidebar Visibility:** For non-admin users, the sidebar resource list might not be fully visible or populated in the current playground implementation. This is a known limitation.
 
 ## 🎮 Try the Playground
 
