@@ -4,7 +4,7 @@ definePageMeta({
   layout: false,
 })
 
-const { loggedIn } = useUserSession()
+const { loggedIn, clear } = useUserSession()
 
 // Redirect to dashboard if already logged in
 if (loggedIn.value) {
@@ -76,6 +76,16 @@ if (loggedIn.value) {
               </div>
             </div>
             <LoginModal v-if="!loggedIn" />
+            <UButton
+              v-else
+              color="neutral"
+              variant="solid"
+              size="lg"
+              icon="i-heroicons-arrow-right-on-rectangle"
+              @click="clear"
+            >
+              Logout
+            </UButton>
           </div>
         </UCard>
 
