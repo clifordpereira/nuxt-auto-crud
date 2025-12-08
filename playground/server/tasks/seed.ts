@@ -1,14 +1,21 @@
 import { eq } from 'drizzle-orm'
 import * as tables from '../database/schema'
 
-export default defineNitroPlugin(async () => {
-  onHubReady(async () => {
+export default defineTask({
+  meta: {
+    name: 'db:seed',
+    description: 'Run database seed task'
+  },
+  async run() {
+    console.log('Running DB seed task...')
+    
     // Only seed if we have a users table
     if (!tables.users) {
-      return
+      return { result: 'skipped', reason: 'No users table found' }
     }
 
     const db = useDrizzle()
+    const results = []
 
     // Seed Admin
     const existingAdmin = await db.select().from(tables.users).where(eq(tables.users.email, 'admin@example.com')).get()
@@ -26,6 +33,7 @@ export default defineNitroPlugin(async () => {
         updatedAt: new Date(),
       })
       console.log('Admin user seeded.')
+      results.push('admin')
     }
 
     // Seed Moderator
@@ -44,6 +52,7 @@ export default defineNitroPlugin(async () => {
         updatedAt: new Date(),
       })
       console.log('Moderator user seeded.')
+      results.push('moderator')
     }
 
     // Seed Manager
@@ -62,6 +71,7 @@ export default defineNitroPlugin(async () => {
         updatedAt: new Date(),
       })
       console.log('Manager user seeded.')
+      results.push('manager')
     }
 
     // Seed Customer
@@ -80,6 +90,9 @@ export default defineNitroPlugin(async () => {
         updatedAt: new Date(),
       })
       console.log('Customer user seeded.')
+      results.push('customer')
     }
-  })
+
+    return { result: 'success', seeded: results }
+  }
 })
