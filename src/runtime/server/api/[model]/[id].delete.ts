@@ -1,36 +1,17 @@
 // server/api/[model]/[id].delete.ts
 import { eventHandler, getRouterParams, createError } from 'h3'
 import { eq } from 'drizzle-orm'
-import { getTableForModel, getModelSingularName, filterHiddenFields, filterPublicColumns } from '../../utils/modelMapper'
-
+import { getTableForModel, getModelSingularName } from '../../utils/modelMapper'
 import type { TableWithId } from '../../types'
 // @ts-expect-error - #site/drizzle is an alias defined by the module
 import { useDrizzle } from '#site/drizzle'
-
-import { useAutoCrudConfig } from '../../utils/config'
-import { checkAdminAccess } from '../../utils/auth'
+import { ensureResourceAccess, formatResourceResult } from '../../utils/handler'
 
 export default eventHandler(async (event) => {
-  const { resources } = useAutoCrudConfig()
   const { model, id } = getRouterParams(event) as { model: string, id: string }
-
-  const isAdmin = await checkAdminAccess(event, model, 'delete')
-
-  // Check public access if not admin
-  if (!isAdmin) {
-    const resourceConfig = resources?.[model]
-    const isPublic = resourceConfig?.public === true || (Array.isArray(resourceConfig?.public) && resourceConfig.public.includes('delete'))
-
-    if (!isPublic) {
-      throw createError({
-        statusCode: 401,
-        message: 'Unauthorized',
-      })
-    }
-  }
+  const isAdmin = await ensureResourceAccess(event, model, 'delete')
 
   const table = getTableForModel(model) as TableWithId
-
   const singularName = getModelSingularName(model)
 
   const deletedRecord = await useDrizzle()
@@ -46,10 +27,5 @@ export default eventHandler(async (event) => {
     })
   }
 
-  if (isAdmin) {
-    return filterHiddenFields(model, deletedRecord as Record<string, unknown>)
-  }
-  else {
-    return filterPublicColumns(model, deletedRecord as Record<string, unknown>)
-  }
+  return formatResourceResult(model, deletedRecord as Record<string, unknown>, isAdmin)
 })

@@ -1,33 +1,11 @@
 import { eventHandler, createError, getRouterParam } from 'h3'
-// @ts-expect-error - #imports is available in runtime
-import { requireUserSession } from '#imports'
+
 import { getSchema } from '../../utils/schema'
-import { useAutoCrudConfig } from '../../utils/config'
-import { verifyJwtToken } from '../../utils/jwt'
+import { ensureAuthenticated } from '../../utils/auth'
 
 export default eventHandler(async (event) => {
-  const { auth } = useAutoCrudConfig()
+  await ensureAuthenticated(event)
   const tableName = getRouterParam(event, 'table')
-
-  if (auth?.authentication) {
-    let isAuthenticated = false
-    if (auth.type === 'jwt' && auth.jwtSecret) {
-      isAuthenticated = await verifyJwtToken(event, auth.jwtSecret)
-    }
-    else {
-      try {
-        await requireUserSession(event)
-        isAuthenticated = true
-      }
-      catch {
-        isAuthenticated = false
-      }
-    }
-
-    if (!isAuthenticated) {
-      throw createError({ statusCode: 401, message: 'Unauthorized' })
-    }
-  }
 
   if (!tableName) {
     throw createError({ statusCode: 400, message: 'Table name is required' })

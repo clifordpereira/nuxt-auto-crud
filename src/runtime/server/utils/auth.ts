@@ -49,3 +49,29 @@ export async function checkAdminAccess(event: H3Event, model: string, action: st
     return false
   }
 }
+
+export async function ensureAuthenticated(event: H3Event): Promise<void> {
+  const { auth } = useAutoCrudConfig()
+
+  if (!auth?.authentication) {
+    return
+  }
+
+  let isAuthenticated = false
+  if (auth.type === 'jwt' && auth.jwtSecret) {
+    isAuthenticated = await verifyJwtToken(event, auth.jwtSecret)
+  }
+  else {
+    try {
+      await requireUserSession(event)
+      isAuthenticated = true
+    }
+    catch {
+      isAuthenticated = false
+    }
+  }
+
+  if (!isAuthenticated) {
+    throw createError({ statusCode: 401, message: 'Unauthorized' })
+  }
+}

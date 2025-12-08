@@ -11,30 +11,8 @@ export function drizzleTableToFields(table: any, resourceName: string) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const column = col as any
     const isRequired = column.notNull
-    let type = 'string'
-    let selectOptions: string[] | undefined = undefined
-
-    // Check for enum values (Drizzle stores them in enumValues or config.enumValues)
-    const enumValues = column.enumValues || column.config?.enumValues
-
-    if (enumValues) {
-      type = 'enum'
-      selectOptions = enumValues
-    }
-    // Map Drizzle types to frontend types
-    else if (column.dataType === 'number' || column.columnType === 'SQLiteInteger' || column.columnType === 'SQLiteReal') {
-      type = 'number'
-      // Check if it is a timestamp
-      if (column.name.endsWith('_at') || column.name.endsWith('At')) {
-        type = 'date'
-      }
-    }
-    else if (column.dataType === 'boolean') {
-      type = 'boolean'
-    }
-    else if (column.dataType === 'date' || (column.dataType === 'string' && (column.name.endsWith('_at') || column.name.endsWith('At')))) {
-      type = 'date'
-    }
+    
+    const { type, selectOptions } = mapColumnType(column)
 
     fields.push({
       name: key,
@@ -48,6 +26,34 @@ export function drizzleTableToFields(table: any, resourceName: string) {
     resource: resourceName,
     fields,
   }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function mapColumnType(column: any): { type: string, selectOptions?: string[] } {
+  // Check for enum values (Drizzle stores them in enumValues or config.enumValues)
+  const enumValues = column.enumValues || column.config?.enumValues
+
+  if (enumValues) {
+    return { type: 'enum', selectOptions: enumValues }
+  }
+
+  if (column.dataType === 'boolean') {
+    return { type: 'boolean' }
+  }
+
+  if (column.dataType === 'date' || (column.dataType === 'string' && (column.name.endsWith('_at') || column.name.endsWith('At')))) {
+    return { type: 'date' }
+  }
+
+  if (column.dataType === 'number' || column.columnType === 'SQLiteInteger' || column.columnType === 'SQLiteReal') {
+    // Check if it is a timestamp
+    if (column.name.endsWith('_at') || column.name.endsWith('At')) {
+      return { type: 'date' }
+    }
+    return { type: 'number' }
+  }
+
+  return { type: 'string' }
 }
 
 export async function getRelations() {
