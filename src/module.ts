@@ -46,7 +46,7 @@ export default defineNuxtModule<ModuleOptions>({
     // Alias the ability file
     const abilityPath = resolver.resolve(
       nuxt.options.rootDir,
-      'server/utils/ability',
+      'shared/utils/abilities',
     )
     nuxt.options.alias['#site/ability'] = abilityPath
 

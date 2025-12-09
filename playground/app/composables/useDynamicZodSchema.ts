@@ -52,6 +52,11 @@ export function useDynamicZodSchema(
     else if (field.type === 'boolean') {
       validators[field.name] = z.boolean().optional()
     }
+    else if (field.type === 'enum') {
+      validators[field.name] = field.required
+        ? z.string().min(1, `${field.name} is required`)
+        : z.string().optional()
+    }
   })
 
   return z.object(validators)

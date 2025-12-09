@@ -2,6 +2,34 @@
   {
     "label": "Home",
     "icon": "i-lucide-house",
-    "to": "/resource/users"
+    "to": "/admin/dashboard"
+  },
+  {
+    "label": "Users",
+    "icon": "i-lucide-users",
+    "to": "/admin/users"
+  },
+  {
+    "label": "Roles & Permissions",
+    "icon": "i-lucide-shield",
+    "defaultOpen": false,
+    "children": [
+      {
+        "label": "Roles",
+        "to": "/admin/roles"
+      },
+      {
+        "label": "Permissions",
+        "to": "/admin/permissions"
+      },
+      {
+        "label": "Resources",
+        "to": "/admin/resources"
+      },
+      {
+        "label": "Resource Permissions",
+        "to": "/admin/roleResourcePermissions"
+      }
+    ]
   }
 ]

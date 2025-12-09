@@ -1,10 +1,19 @@
 import { defineAbility } from 'nuxt-authorization/utils'
-import { getPublicPermissions } from './permissions'
+
+let publicPermissionsPromise: Promise<Record<string, string[]>> | null = null
 
 export default defineAbility(async (user, model: string, action: string) => {
   // 1. Handle Public/Unauthenticated Access
   if (!user) {
-    const publicPermissions = await getPublicPermissions()
+    if (!publicPermissionsPromise) {
+      publicPermissionsPromise = $fetch<Record<string, string[]>>('/api/permissions/public')
+        .catch((e) => {
+          console.error('Failed to fetch public permissions', e)
+          publicPermissionsPromise = null
+          return {}
+        })
+    }
+    const publicPermissions = await publicPermissionsPromise
     const resourcePermissions = publicPermissions[model]
     
     if (Array.isArray(resourcePermissions)) {

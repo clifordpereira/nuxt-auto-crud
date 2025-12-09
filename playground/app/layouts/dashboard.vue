@@ -1,4 +1,3 @@
-<!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
 // Import menu configurations
 import mainMenu from '../config/menus/main.json'
@@ -8,12 +7,24 @@ const open = ref(false)
 const collapsed = ref(false)
 
 // Map menus to add onSelect handler
-const mainLinks = computed(() => mainMenu.map(item => ({
-  ...item,
-  onSelect: () => {
-    open.value = false
-  },
-})))
+const { user } = useUserSession()
+const mainLinks = computed(() => {
+  const links = mainMenu.map(item => ({
+    ...item,
+    onSelect: () => {
+      open.value = false
+    },
+  }))
+
+  // Filter out permissions menu for non-admins
+  // Assuming 'admin' is the role name for administrators
+  // You might need to adjust this logic based on your actual role implementation
+  if ((user.value as any)?.role !== 'admin') {
+    return links.filter(link => link.label !== 'Roles & Permissions')
+  }
+
+  return links
+})
 
 const footerLinks = computed(() => footerMenu.map(item => ({
   ...item,

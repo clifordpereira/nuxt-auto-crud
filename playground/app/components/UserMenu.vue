@@ -16,10 +16,10 @@ const { user } = useUserSession()
 
 const items = computed<DropdownMenuItem[][]>(() => ([[{
   type: 'label',
-  label: user.value?.name || undefined,
+  label: (user.value as any)?.name || undefined,
   avatar: {
-    src: user.value?.avatar || '',
-    alt: user.value?.name || '',
+    src: (user.value as any)?.avatar || '',
+    alt: (user.value as any)?.name || '',
   },
 }], [{
   label: 'Theme',
@@ -114,9 +114,9 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
     <UButton
       v-bind="{
         ...user,
-        name: user?.name || undefined,
-        avatar: user?.avatar ? { src: user.avatar, alt: user?.name || undefined } : undefined,
-        label: collapsed ? undefined : (user?.name || undefined),
+        name: (user as any)?.name || undefined,
+        avatar: (user as any)?.avatar ? { src: (user as any).avatar, alt: (user as any)?.name || undefined } : undefined,
+        label: collapsed ? undefined : ((user as any)?.name || undefined),
         trailingIcon: collapsed ? undefined : 'i-lucide-chevrons-up-down',
       }"
       color="neutral"
