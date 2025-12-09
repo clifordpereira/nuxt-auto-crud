@@ -2,7 +2,7 @@
 
 > **Note:** This module is currently in its alpha stage. However, you can use it to accelerate MVP development. It has not been tested thoroughly enough for production use; only happy-path testing is performed for each release.
 
-Auto-generate RESTful CRUD APIs for your **Nuxt** application based solely on your database schema. Minimal configuration required.
+Auto-expose RESTful CRUD APIs for your **Nuxt** application based solely on your database schema. Minimal configuration required.
 
 **Core Philosophy:**
 The main objective of this module is to **expose CRUD APIs without the need for writing code**. You define your database schema, and `nuxt-auto-crud` handles the rest.
@@ -44,7 +44,7 @@ bun run dev
 1.  **Fullstack App**: The template includes the `nuxt-auto-crud` module, providing both the backend APIs and the frontend UI. [Watch Demo](https://youtu.be/M9-koXmhB9k)
 2.  **Frontend Only**: You can use the template just for the frontend. In this case, you don't need to install the module in the frontend app. Instead, you would install `nuxt-auto-crud` in a separate backend setup (e.g., another Nuxt project acting as the API).
 
-Detailed instructions can be found in [https://auto-crud.clifland.in/](https://auto-crud.clifland.in/)
+Detailed instructions can be found in [https://auto-crud.clifland.in/docs](https://auto-crud.clifland.in/docs)
 
 ### 2. Manual Setup (Existing Project)
 
@@ -207,7 +207,7 @@ The new API endpoints (e.g., `/api/posts`) will be automatically available. [Wat
 
 ### 3. Backend-only App (API Mode)
 
-If you are using Nuxt as a backend for a separate client application (e.g., mobile app, SPA), you can use this module to quickly generate REST APIs.
+If you are using Nuxt as a backend for a separate client application (e.g., mobile app, SPA), you can use this module to quickly expose REST APIs.
 
 In this case, you might handle authentication differently (e.g., validating tokens in middleware) or disable the built-in auth checks if you have a global auth middleware.
 
@@ -467,12 +467,14 @@ You can customize hidden fields by modifying the `modelMapper.ts` utility.
 ## 🔗 Other Helpful Links
 
 - **Template:** [https://github.com/clifordpereira/nuxt-auto-crud_template](https://github.com/clifordpereira/nuxt-auto-crud_template)
-- **Docs:** [https://auto-crud.clifland.in/](https://auto-crud.clifland.in/)
+- **Docs:** [https://auto-crud.clifland.in/docs](https://auto-crud.clifland.in/docs)
 - **Repo:** [https://github.com/clifordpereira/nuxt-auto-crud](https://github.com/clifordpereira/nuxt-auto-crud)
-- **YouTube:** [https://youtu.be/M9-koXmhB9k](https://youtu.be/M9-koXmhB9k)
-- **YouTube 2:** [https://youtu.be/7gW0KW1KtN0](https://youtu.be/7gW0KW1KtN0)
+- **YouTube (Installation):** [https://youtu.be/M9-koXmhB9k](https://youtu.be/M9-koXmhB9k)
+- **YouTube (Add Schemas):** [https://youtu.be/7gW0KW1KtN0](https://youtu.be/7gW0KW1KtN0)
+- **YouTube (Various Permissions):** [https://www.youtube.com/watch?v=Yty3OCYbwOo](https://www.youtube.com/watch?v=Yty3OCYbwOo)
 - **npm:** [https://www.npmjs.com/package/nuxt-auto-crud](https://www.npmjs.com/package/nuxt-auto-crud)
-- **Discuss:** [https://discord.gg/hGgyEaGu](https://discord.gg/hGgyEaGu)
+- **Github Discussions:** [https://github.com/clifordpereira/nuxt-auto-crud/discussions/1](https://github.com/clifordpereira/nuxt-auto-crud/discussions/1)
+- **Discord:** [https://discord.gg/hGgyEaGu](https://discord.gg/hGgyEaGu)
 
 ## 🤝 Contributing
 

@@ -6,77 +6,81 @@ seo:
 navigation.icon: i-lucide-credit-card
 plans:
   - title: Basic
-    description: A basic plan for individuals.
+    description: Perfect for developers who want to explore and build on their own.
     price:
-      month: $9.9
-      year: $99.9
+      month: Free
+      year: Free
     button:
       label: Get Started
       color: neutral
       variant: subtle
+      to: https://github.com/clifordpereira/nuxt-auto-crud
+      target: _blank
     features:
-      - 1 GB Storage
-      - 1 Email Account
-      - 1 Domain
-      - 1 Website
-      - 1 Database
-      - 1 SSL Certificate
-      - 1 Support Ticket
+      - Automatic CRUD APIs
+      - Authentication
+      - Authorization
+      - Open Source Template
+      - Full Source Code Access
+      - Community Support
+      - Self-Hosted
+      - Unlimited Projects
   - title: Standard
-    description: A standard plan for small teams.
+    description: Professional setup and support to get your application running smoothly.
     price:
-      month: $19.9
-      year: $199.9
+      month: Contact
+      year: Contact
     highlight: true
     scale: true
     button:
-      label: Get Started
+      label: Contact Sales
+      to: mailto:clifordpereira@gmail.com
     features:
-      - 10 GB Storage
-      - 10 Email Accounts
-      - 10 Domains
-      - 10 Websites
-      - 10 Databases
-      - 10 SSL Certificates
-      - 10 Support Tickets
+      - Everything in Basic
+      - Template Setup & Configuration
+      - Deployment Assistance
+      - AI Chat Integration (Tawk.to)
+      - Custom Feature Development (Paid Add-on)
+      - Priority Email Support
   - title: Premium
-    description: A premium plan for large teams.
+    description: End-to-end managed solution for complete peace of mind.
     price:
-      month: $29.9
-      year: $299.9
+      month: Contact
+      year: Contact
     button:
-      label: Get Started
+      label: Contact Sales
       color: neutral
       variant: subtle
+      to: mailto:clifordpereira@gmail.com
     features:
-      - 100 GB Storage
-      - 100 Email Accounts
-      - 100 Domains
-      - 100 Websites
-      - 100 Databases
-      - 100 SSL Certificates
-      - 100 Support Tickets
+      - Everything in Standard
+      - Fully Managed Hosting
+      - Firebase / NuxtHub / Vercel
+      - Proactive Monitoring
+      - Security Updates
+      - Performance Optimization
+      - Dedicated Support Channel
 logos:
   title: Trusted by the world's best
   icons:
-    - i-simple-icons-amazonaws
-    - i-simple-icons-heroku
+    - i-simple-icons-firebase
+    - i-simple-icons-render
     - i-simple-icons-netlify
     - i-simple-icons-vercel
     - i-simple-icons-cloudflare
 faq:
   title: Frequently asked questions
-  description: Culpa consectetur dolor pariatur commodo aliqua amet tempor nisi enim deserunt elit cillum.
+  description: Everything you need to know about Nuxt Auto CRUD.
   items:
-    - label: Is this a secure service?
-      content: Qui sunt nostrud aliquip reprehenderit enim proident veniam magna aliquip velit occaecat eiusmod nisi deserunt sunt.
-    - label: How can I cancel my subscription?
-      content: Consectetur irure Lorem nostrud adipisicing aliqua mollit Lorem sit officia magna eiusmod cupidatat.
-    - label: How does the free trial work?
-      content: Quis officia commodo magna eu qui aliquip duis.
-    - label: Can I switch plans later?
-      content: Dolore irure ullamco dolore eu occaecat magna eiusmod dolor aliqua culpa labore.
-    - label: Do you offer refunds?
-      content: Duis mollit nostrud voluptate mollit Lorem dolore commodo veniam incididunt eiusmod.
+    - label: Which databases are supported?
+      content: Nuxt Auto CRUD works with any database supported by Drizzle ORM, including PostgreSQL, MySQL, SQLite, and Cloudflare D1.
+    - label: Can I customize the exposed APIs?
+      content: Yes! You can hook into lifecycle events to add custom logic before or after any CRUD operation, or completely override specific routes.
+    - label: How is authentication handled?
+      content: We provide built-in support for session-based and JWT authentication. You can easily integrate with your existing auth provider or use our default implementation.
+    - label: Is it suitable for production?
+      content: Absolutely. Nuxt Auto CRUD is built on top of battle-tested libraries like Drizzle ORM and H3, and includes features like validation and rate limiting out of the box.
+    - label: Can I use it with existing projects?
+      content: Yes, you can add Nuxt Auto CRUD to any existing Nuxt project. It's designed to work alongside your existing API routes and pages.
     - label: Do you offer support?
-      content: Aliqua sit nisi consequat pariatur Lorem minim irure qui.
+      content: Community support is available via GitHub Issues. For dedicated support and setup assistance, check out our Standard and Premium plans.

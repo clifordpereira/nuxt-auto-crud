@@ -2,7 +2,7 @@
   {
     "label": "Documentation",
     "icon": "i-lucide-book-open",
-    "to": "https://auto-crud.clifland.in/",
+    "to": "/docs",
     "target": "_blank"
   },
   {

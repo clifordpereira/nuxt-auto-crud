@@ -11,7 +11,6 @@ async function logout() {
 const items = computed(() => [{
   label: 'Docs',
   to: '/docs',
-  active: route.path.startsWith('/docs'),
 }, {
   label: 'Pricing',
   to: '/pricing',

@@ -22,6 +22,7 @@
         "zod": "^4.1.13",
       },
       "devDependencies": {
+        "@iconify-json/vscode-icons": "^1.2.37",
         "@nuxt/eslint": "^1.10.0",
         "@types/bcryptjs": "^3.0.0",
         "drizzle-kit": "^0.31.8",
@@ -232,6 +233,8 @@
     "@iconify-json/lucide": ["@iconify-json/lucide@1.2.76", "", { "dependencies": { "@iconify/types": "*" } }, "sha512-9eBMZ7baxGpPoEy5/PFk8udvxypWLsBvs32oGuQ9GPsibaE64Ey/5UL32zHDjUrK7lKcGgUdZhcfpHfPjaiKYw=="],
 
     "@iconify-json/simple-icons": ["@iconify-json/simple-icons@1.2.60", "", { "dependencies": { "@iconify/types": "*" } }, "sha512-KlwLBKCdMCqfySdkAA+jehdUx6VSjnj6lvzQKus7HjkPSQ6QP58d6xiptkIp0jd/Hw3PW2++nRuGvCvSYaF0Mg=="],
+
+    "@iconify-json/vscode-icons": ["@iconify-json/vscode-icons@1.2.37", "", { "dependencies": { "@iconify/types": "*" } }, "sha512-HLRdU6nZks4N8x3JYz6j+b3+hcUCvYvlTLwGzM3xyXfTJyDSA2cAdWcEXfoA4hQMJGA+zCDSPAWFelFptH5Kbw=="],
 
     "@iconify/collections": ["@iconify/collections@1.0.622", "", { "dependencies": { "@iconify/types": "*" } }, "sha512-HMTAEh/0GdZe3XoDeelIH6St5LxmPzaWIXCBVhOXUVC6XdWILOCafimpp2SkDqDmpoqZBk9CwDHR3IPf/fXyQQ=="],
 

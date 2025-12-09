@@ -2,35 +2,52 @@
 const columns = [{
   label: 'Resources',
   children: [{
-    label: 'Help center',
-  }, {
     label: 'Docs',
+    to: '/docs',
   }, {
-    label: 'Roadmap',
+    label: 'Template',
+    to: 'https://github.com/clifordpereira/nuxt-auto-crud_template',
+    target: '_blank'
   }, {
     label: 'Changelog',
-  }],
-}, {
-  label: 'Features',
-  children: [{
-    label: 'Affiliates',
-  }, {
-    label: 'Portal',
-  }, {
-    label: 'Jobs',
-  }, {
-    label: 'Sponsors',
-  }],
-}, {
-  label: 'Company',
-  children: [{
-    label: 'About',
-  }, {
-    label: 'Pricing',
-  }, {
-    label: 'Careers',
+    to: '/changelog'
   }, {
     label: 'Blog',
+    to: '/blog'
+  }],
+}, {
+  label: 'Community',
+  children: [{
+    label: 'GitHub Repo',
+    to: 'https://github.com/clifordpereira/nuxt-auto-crud',
+    target: '_blank'
+  }, {
+    label: 'NPM Package',
+    to: 'https://www.npmjs.com/package/nuxt-auto-crud',
+    target: '_blank'
+  }, {
+    label: 'Discuss on Discord',
+    to: 'https://discord.gg/hGgyEaGu',
+    target: '_blank'
+  }, {
+    label: 'GitHub Discussions',
+    to: 'https://github.com/clifordpereira/nuxt-auto-crud/discussions/1',
+    target: '_blank'
+  }],
+}, {
+  label: 'YouTube',
+  children: [{
+    label: 'Installation',
+    to: 'https://youtu.be/M9-koXmhB9k',
+    target: '_blank'
+  }, {
+    label: 'Add Schema',
+    to: 'https://youtu.be/7gW0KW1KtN0',
+    target: '_blank'
+  }, {
+    label: 'Permissions',
+    to: 'https://www.youtube.com/watch?v=Yty3OCYbwOo',
+    target: '_blank'
   }],
 }]
 
@@ -90,32 +107,24 @@ function onSubmit() {
 
     <template #left>
       <p class="text-muted text-sm">
-        Built with Nuxt UI • © {{ new Date().getFullYear() }}
+        © {{ new Date().getFullYear() }} Nuxt Auto CRUD
       </p>
     </template>
 
     <template #right>
       <UButton
-        to="https://go.nuxt.com/discord"
+        to="https://discord.gg/hGgyEaGu"
         target="_blank"
         icon="i-simple-icons-discord"
-        aria-label="Nuxt on Discord"
+        aria-label="Nuxt Auto CRUD on Discord"
         color="neutral"
         variant="ghost"
       />
       <UButton
-        to="https://go.nuxt.com/x"
-        target="_blank"
-        icon="i-simple-icons-x"
-        aria-label="Nuxt on X"
-        color="neutral"
-        variant="ghost"
-      />
-      <UButton
-        to="https://github.com/nuxt-ui-templates/saas"
+        to="https://github.com/clifordpereira/nuxt-auto-crud"
         target="_blank"
         icon="i-simple-icons-github"
-        aria-label="Nuxt UI on GitHub"
+        aria-label="Nuxt Auto CRUD on GitHub"
         color="neutral"
         variant="ghost"
       />
