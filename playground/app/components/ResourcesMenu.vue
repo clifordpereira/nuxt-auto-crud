@@ -7,8 +7,8 @@ const props = defineProps<{
 }>()
 
 const { schemas } = await useResourceSchemas()
-const resourceNames = computed(() => 
-  Object.keys(schemas.value || {}).filter(name => !['users', 'roles', 'permissions', 'resources', 'roleResourcePermissions'].includes(name))
+const resourceNames = computed(() =>
+  Object.keys(schemas.value || {}).filter(name => !['users', 'roles', 'permissions', 'resources', 'roleResourcePermissions'].includes(name)),
 )
 
 const items = computed(() => [{

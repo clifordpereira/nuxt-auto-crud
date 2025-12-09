@@ -3,12 +3,12 @@ import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
 
 definePageMeta({
-  layout: 'auth'
+  layout: 'auth',
 })
 
 useSeoMeta({
   title: 'Login',
-  description: 'Login to your account to continue'
+  description: 'Login to your account to continue',
 })
 
 const toast = useToast()
@@ -18,16 +18,16 @@ const fields = [{
   type: 'text' as const,
   label: 'Email',
   placeholder: 'Enter your email',
-  required: true
+  required: true,
 }, {
   name: 'password',
   label: 'Password',
   type: 'password' as const,
-  placeholder: 'Enter your password'
+  placeholder: 'Enter your password',
 }, {
   name: 'remember',
   label: 'Remember me',
-  type: 'checkbox' as const
+  type: 'checkbox' as const,
 }]
 
 const providers = [{
@@ -35,18 +35,18 @@ const providers = [{
   icon: 'i-simple-icons-google',
   onClick: () => {
     toast.add({ title: 'Google', description: 'Login with Google' })
-  }
+  },
 }, {
   label: 'GitHub',
   icon: 'i-simple-icons-github',
   onClick: () => {
     toast.add({ title: 'GitHub', description: 'Login with GitHub' })
-  }
+  },
 }]
 
 const schema = z.object({
   email: z.string().email('Invalid email'),
-  password: z.string().min(8, 'Must be at least 8 characters')
+  password: z.string().min(8, 'Must be at least 8 characters'),
 })
 
 type Schema = z.output<typeof schema>
@@ -55,13 +55,14 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
   try {
     await $fetch('/api/auth/login', {
       method: 'POST',
-      body: payload.data
+      body: payload.data,
     })
     const { fetch } = useUserSession()
     await fetch()
     toast.add({ title: 'Success', description: 'Logged in successfully' })
     await navigateTo('/admin/dashboard')
-  } catch (error: any) {
+  }
+  catch (error: any) {
     toast.add({ title: 'Error', description: error.data?.message || 'Login failed', color: 'error' })
   }
 }

@@ -14,7 +14,7 @@ export default defineNuxtConfig({
   ],
 
   devtools: {
-    enabled: true
+    enabled: true,
   },
 
   css: ['~/assets/css/main.css'],
@@ -26,7 +26,7 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
-    '/docs': { redirect: '/docs/auto-crud', prerender: false }
+    '/docs': { redirect: '/docs/auto-crud', prerender: false },
   },
 
   compatibilityDate: '2024-07-11',
@@ -34,18 +34,18 @@ export default defineNuxtConfig({
   nitro: {
     prerender: {
       routes: [
-        '/'
+        '/',
       ],
-      crawlLinks: true
+      crawlLinks: true,
     },
     experimental: {
       tasks: true,
-      openAPI: true
-    }
+      openAPI: true,
+    },
   },
 
   hub: {
-    database: true
+    database: true,
   },
 
   autoCrud: {
@@ -53,16 +53,16 @@ export default defineNuxtConfig({
     auth: {
       type: 'session',
       authentication: true,
-      authorization: true
-    }
+      authorization: true,
+    },
   },
 
   eslint: {
     config: {
       stylistic: {
         commaDangle: 'never',
-        braceStyle: '1tbs'
-      }
-    }
-  }
+        braceStyle: '1tbs',
+      },
+    },
+  },
 })

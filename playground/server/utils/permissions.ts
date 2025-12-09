@@ -21,13 +21,13 @@ export async function getPublicPermissions(): Promise<Record<string, string[]>> 
 
   const permissionsData = await db.select({
     resource: tables.resources.name,
-    action: tables.permissions.code
+    action: tables.permissions.code,
   })
-  .from(tables.roleResourcePermissions)
-  .innerJoin(tables.resources, eq(tables.roleResourcePermissions.resourceId, tables.resources.id))
-  .innerJoin(tables.permissions, eq(tables.roleResourcePermissions.permissionId, tables.permissions.id))
-  .where(eq(tables.roleResourcePermissions.roleId, publicRole.id))
-  .all()
+    .from(tables.roleResourcePermissions)
+    .innerJoin(tables.resources, eq(tables.roleResourcePermissions.resourceId, tables.resources.id))
+    .innerJoin(tables.permissions, eq(tables.roleResourcePermissions.permissionId, tables.permissions.id))
+    .where(eq(tables.roleResourcePermissions.roleId, publicRole.id))
+    .all()
 
   const permissions: Record<string, string[]> = {}
   for (const p of permissionsData) {

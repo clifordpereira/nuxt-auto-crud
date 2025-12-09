@@ -13,17 +13,17 @@ export const categories = sqliteTable('categories', {
 export const comments = sqliteTable('comments', {
   ...systemFields,
   content: text('content').notNull(),
-  
+
   // Polymorphic Fields (Generic for any resource: 'post', 'product', 'service', etc.)
-  resourceType: text('resource_type').notNull(), 
+  resourceType: text('resource_type').notNull(),
   resourceId: integer('resource_id').notNull(),
-  
+
   userId: integer('user_id').references(() => users.id), // Optional: for logged-in users
   authorName: text('author_name'), // For guest comments
   authorEmail: text('author_email'), // For guest comments
-  
+
   rating: integer('rating'), // Optional: 1-5 stars. If present, this acts as a "Review"
   isApproved: integer('is_approved', { mode: 'boolean' }).default(false),
-}, (t) => ({
+}, t => ({
   resourceIdx: index('resource_idx').on(t.resourceType, t.resourceId),
 }))
