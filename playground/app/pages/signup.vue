@@ -73,7 +73,6 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
   <UAuthForm
     :fields="fields"
     :schema="schema"
-    :providers="providers"
     title="Create an account"
     :submit="{ label: 'Create account' }"
     @submit="onSubmit"
