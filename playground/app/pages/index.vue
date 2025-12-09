@@ -42,8 +42,14 @@ useSeoMeta({
       :orientation="section.orientation"
       :reverse="section.reverse"
       :features="section.features"
+      :links="section.links"
     >
-      <ImagePlaceholder />
+      <MDC
+        v-if="section.code"
+        :value="'```typescript\n' + section.code + '\n```'"
+        class="prose prose-primary dark:prose-invert max-w-none"
+      />
+      <ImagePlaceholder v-else />
     </UPageSection>
 
     <UPageSection
