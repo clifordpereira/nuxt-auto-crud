@@ -1,3 +1,33 @@
+## v1.13.0
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.12.1...v1.13.0)
+
+### 🚀 Enhancements
+
+- Implement a comprehensive role-based access control (RBAC) system with new database schemas, migrations, and UI components. ([9fbe34b](https://github.com/clifordpereira/nuxt-auto-crud/commit/9fbe34b))
+- Regenerate database migration files and update metadata. ([d0e8303](https://github.com/clifordpereira/nuxt-auto-crud/commit/d0e8303))
+
+### 💅 Refactors
+
+- Update ability alias path to shared utilities ([64c27bd](https://github.com/clifordpereira/nuxt-auto-crud/commit/64c27bd))
+- Move `ability.ts` from `server/utils` to `shared/utils/abilities.ts`. ([ffc165f](https://github.com/clifordpereira/nuxt-auto-crud/commit/ffc165f))
+
+### 📖 Documentation
+
+- Remove permissions management documentation ([61826f8](https://github.com/clifordpereira/nuxt-auto-crud/commit/61826f8))
+
+### 🏡 Chore
+
+- Update `@vueuse/core` to version 14.1.0 and adjust related lock file entries. ([b467463](https://github.com/clifordpereira/nuxt-auto-crud/commit/b467463))
+
+### 🎨 Styles
+
+- Apply consistent formatting across various files. ([6fae3d8](https://github.com/clifordpereira/nuxt-auto-crud/commit/6fae3d8))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v1.12.1
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.12.0...v1.12.1)
