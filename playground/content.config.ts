@@ -138,8 +138,8 @@ export const collections = {
     schema: z.object({
       title: z.string().nonempty(),
       description: z.string(),
-      date: z.date(),
-      image: z.string(),
+      date: z.date().optional(),
+      image: z.string().optional(),
     }),
   }),
 }
