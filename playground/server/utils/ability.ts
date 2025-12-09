@@ -1,25 +1,29 @@
 import { defineAbility } from 'nuxt-authorization/utils'
-import config from '../../autocrud.config'
+import { getPublicPermissions } from './permissions'
 
-export default defineAbility((user, model: string, action: string) => {
-  const role = user?.role || 'public'
-
-  // Get resource config
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const resourceConfig = (config.resources as any)[model]
-  if (!resourceConfig) {
+export default defineAbility(async (user, model: string, action: string) => {
+  // 1. Handle Public/Unauthenticated Access
+  if (!user) {
+    const publicPermissions = await getPublicPermissions()
+    const resourcePermissions = publicPermissions[model]
+    
+    if (Array.isArray(resourcePermissions)) {
+      return resourcePermissions.includes(action)
+    }
     return false
   }
 
-  // Get permissions for the current role
-  const permissions = resourceConfig.auth?.[role]
-
-  if (permissions === true) {
+  // 2. Admin has full access
+  if (user.role === 'admin') {
     return true
   }
 
-  if (Array.isArray(permissions)) {
-    return permissions.includes(action)
+  // 3. Check permissions from session (DB-driven)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const resourcePermissions = (user as any)?.permissions?.[model]
+  
+  if (Array.isArray(resourcePermissions)) {
+    return resourcePermissions.includes(action)
   }
 
   return false

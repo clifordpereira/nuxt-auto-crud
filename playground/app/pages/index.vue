@@ -2,7 +2,7 @@
 <script setup lang="ts">
 const siteData = {
   title: 'Nuxt Auto CRUD',
-  description: 'Automatic CRUD API & UI generation for Nuxt applications',
+  description: 'Automatic CRUD API & UI for Nuxt applications',
   footer: 'Built with Nuxt, Drizzle ORM, and nuxt-auto-crud',
 }
 
@@ -23,10 +23,6 @@ if (loggedIn.value) {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
       <!-- Header -->
       <div class="text-center">
-        <UIcon
-          name="i-heroicons-command-line"
-          class="mx-auto h-16 w-16 text-primary-500"
-        />
         <h1 class="mt-6 text-4xl font-bold tracking-tight text-gray-900 dark:text-white">
           {{ siteData.title }}
         </h1>

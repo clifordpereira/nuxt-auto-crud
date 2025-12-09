@@ -36,7 +36,7 @@ defineOptions({
           name="i-heroicons-check-circle"
           class="text-green-500 mt-0.5 shrink-0"
         />
-        <span><strong>Auto-generated APIs:</strong> CRUD endpoints created automatically from Drizzle schema using <code>nuxt-auto-crud</code></span>
+        <span><strong>Automatic APIs:</strong> CRUD endpoints created automatically from Drizzle schema using <code>nuxt-auto-crud</code></span>
       </li>
       <li class="flex items-start gap-2">
         <UIcon

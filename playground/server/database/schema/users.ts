@@ -1,12 +1,21 @@
-import { sqliteTable, text } from 'drizzle-orm/sqlite-core'
+import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
+import { roles } from './permissions'
 import { systemFields, statusField } from './utils'
+import { relations } from 'drizzle-orm'
 
 export const users = sqliteTable('users', {
   ...systemFields,
   ...statusField,
-  name: text('name'),
+  name: text('name').notNull(),
   email: text('email').notNull().unique(),
   password: text('password').notNull(),
   avatar: text('avatar'),
-  role: text('role').default('user'),
+  roleId: integer('role_id').references(() => roles.id),
 })
+
+export const usersRelations = relations(users, ({ one }) => ({
+  assignedRole: one(roles, {
+    fields: [users.roleId],
+    references: [roles.id],
+  }),
+}))

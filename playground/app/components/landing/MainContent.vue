@@ -13,7 +13,7 @@ const { loggedIn, clear } = useUserSession()
               name="i-heroicons-user-circle"
               class="text-primary-500"
             />
-            Playground Login
+            Login
           </h2>
         </template>
         <div class="space-y-4">

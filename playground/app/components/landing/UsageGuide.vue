@@ -1,29 +1,17 @@
 <script setup lang="ts">
 const contentData = {
-  title: 'How to use this Playground',
+  title: 'How to use this Template',
   description: 'Explore the capabilities of Nuxt Auto CRUD with this interactive demo.',
   steps: [
     {
       title: 'Test Auth',
-      description: 'Log in with different roles (Admin, Manager, Moderator) to see the effect. Permissions are controlled in \'app/config/auth/<table>.json\'',
+      description: 'Log in with different roles (Admin, Manager, Moderator) to see the effect. Permissions are now fully Database-Driven!',
     },
     {
       title: 'Extend Schema',
       description: 'Add new tables in server/database/schema and restart the server to use the new tables. If needed use \'npm db:generate\'',
     },
-  ],
-  config: `{
-  "users": {
-    "auth": {
-      "admin": true,
-      "manager": ["list", "read", "create", "update", "delete"],
-      "moderator": ["list", "read"],
-      "customer": false,
-      "user": false,
-      "public": false
-    }
-  }
-}`,
+  ]
 }
 </script>
 
@@ -69,14 +57,33 @@ const contentData = {
         <div class="bg-gray-900 dark:bg-gray-950 rounded-xl p-6 shadow-lg border border-gray-800">
           <div class="mb-4">
             <h3 class="text-lg font-semibold text-white">
-              Example Auth Configuration
+              Database Schema Structure
             </h3>
             <p class="text-sm text-gray-400">
-              <code>// app/config/auth/users.json</code>
+              Permissions are now managed via DB tables
             </p>
           </div>
-          <div class="overflow-x-auto">
-            <pre class="text-sm text-gray-300 font-mono"><code>{{ contentData.config }}</code></pre>
+          <div class="space-y-4 text-gray-300 text-sm">
+            <p>
+              To manage permissions, you simply add or modify records in specific database tables:
+            </p>
+            <ul class="list-disc list-inside space-y-1 ml-2">
+              <li><span class="text-primary-400 font-mono">roles</span>: Define user roles (e.g., Admin, Editor)</li>
+              <li><span class="text-primary-400 font-mono">resources</span>: Define what to protect (e.g., Posts)</li>
+              <li><span class="text-primary-400 font-mono">permissions</span>: Define actions (e.g., Create, Read)</li>
+              <li><span class="text-primary-400 font-mono">role_resource_permissions</span>: Link them all together</li>
+            </ul>
+            <div class="pt-4">
+              <UButton
+                to="/permissions-guide"
+                color="primary"
+                variant="solid"
+                block
+                icon="i-heroicons-book-open"
+              >
+                Read the Full Guide
+              </UButton>
+            </div>
           </div>
         </div>
       </div>
