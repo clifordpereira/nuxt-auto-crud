@@ -6,7 +6,7 @@ export default defineAbility(async (user, model: string, action: string) => {
   // 1. Handle Public/Unauthenticated Access
   if (!user) {
     if (!publicPermissionsPromise) {
-      publicPermissionsPromise = $fetch<Record<string, string[]>>('/api/permissions/public')
+      publicPermissionsPromise = $fetch<Record<string, string[]>>('/api/public-permissions')
         .catch((e) => {
           console.error('Failed to fetch public permissions', e)
           publicPermissionsPromise = null
