@@ -7,15 +7,17 @@ const props = defineProps<{
 }>()
 
 const { schemas } = await useResourceSchemas()
-const resourceNames = computed(() => Object.keys(schemas.value || {}))
+const resourceNames = computed(() =>
+  Object.keys(schemas.value || {}).filter(name => !['users', 'roles', 'permissions', 'resources', 'roleResourcePermissions'].includes(name)),
+)
 
 const items = computed(() => [{
-  label: 'Resources',
+  label: 'Models',
   icon: 'i-lucide-database',
   defaultOpen: true,
   children: resourceNames.value.map(resource => ({
     label: resource.charAt(0).toUpperCase() + resource.slice(1),
-    to: `/resource/${resource}`,
+    to: `/admin/${resource}`,
     onSelect: props.onSelect,
   })),
 }] satisfies NavigationMenuItem[])

@@ -16,7 +16,7 @@
         </template>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
           <UButton
-            href="https://auto-crud.clifland.in/"
+            href="/docs"
             target="_blank"
             variant="outline"
             block

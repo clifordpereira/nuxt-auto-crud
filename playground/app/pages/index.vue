@@ -1,55 +1,103 @@
-<!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
-const siteData = {
-  title: 'Nuxt Auto CRUD',
-  description: 'Automatic CRUD API & UI for Nuxt applications',
-  footer: 'Built with Nuxt, Drizzle ORM, and nuxt-auto-crud',
-}
+const { data: page } = await useAsyncData('index', () => queryCollection('index').first())
 
-definePageMeta({
-  layout: false,
+const title = page.value?.seo?.title || page.value?.title
+const description = page.value?.seo?.description || page.value?.description
+
+useSeoMeta({
+  titleTemplate: '',
+  title,
+  ogTitle: title,
+  description,
+  ogDescription: description,
 })
-
-const { loggedIn } = useUserSession()
-
-// Redirect to dashboard if already logged in
-if (loggedIn.value) {
-  await navigateTo('/resource/users')
-}
 </script>
 
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
-      <!-- Header -->
-      <div class="text-center">
-        <h1 class="mt-6 text-4xl font-bold tracking-tight text-gray-900 dark:text-white">
-          {{ siteData.title }}
-        </h1>
-        <p class="mt-2 text-lg text-gray-600 dark:text-gray-400">
-          {{ siteData.description }}
-        </p>
-      </div>
+  <div v-if="page">
+    <UPageHero
+      :title="page.title"
+      :description="page.description"
+      :links="page.hero.links"
+    >
+      <template #top>
+        <HeroBackground />
+      </template>
 
-      <!-- Main Content & Features Grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-        <!-- Main Content (Left Column) -->
-        <LandingMainContent />
+      <template #title>
+        <MDC
+          :value="page.title"
+          unwrap="p"
+        />
+      </template>
 
-        <!-- Features (Right Column) -->
-        <LandingFeatures />
-      </div>
+      <PromotionalVideo />
+    </UPageHero>
 
-      <!-- Usage Guide -->
-      <LandingUsageGuide />
+    <UPageSection
+      v-for="(section, index) in page.sections"
+      :key="index"
+      :title="section.title"
+      :description="section.description"
+      :orientation="section.orientation"
+      :reverse="section.reverse"
+      :features="section.features"
+      :links="section.links"
+    >
+      <MDC
+        v-if="section.code"
+        :value="'```typescript\n' + section.code + '\n```'"
+        class="prose prose-primary dark:prose-invert max-w-none"
+      />
+      <ImagePlaceholder v-else />
+    </UPageSection>
 
-      <!-- Quick Links -->
-      <LandingQuickLinks />
+    <UPageSection
+      :title="page.features.title"
+      :description="page.features.description"
+    >
+      <UPageGrid>
+        <UPageCard
+          v-for="(item, index) in page.features.items"
+          :key="index"
+          v-bind="item"
+          spotlight
+        />
+      </UPageGrid>
+    </UPageSection>
 
-      <!-- Footer -->
-      <div class="text-center text-sm text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-800 pt-8">
-        <p>{{ siteData.footer }}</p>
-      </div>
-    </div>
+    <UPageSection
+      id="testimonials"
+      :headline="page.testimonials.headline"
+      :title="page.testimonials.title"
+      :description="page.testimonials.description"
+    >
+      <UPageColumns class="xl:columns-4">
+        <UPageCard
+          v-for="(testimonial, index) in page.testimonials.items"
+          :key="index"
+          variant="subtle"
+          :description="testimonial.quote"
+          :ui="{ description: 'before:content-[open-quote] after:content-[close-quote]' }"
+        >
+          <template #footer>
+            <UUser
+              v-bind="testimonial.user"
+              size="lg"
+            />
+          </template>
+        </UPageCard>
+      </UPageColumns>
+    </UPageSection>
+
+    <USeparator />
+
+    <UPageCTA
+      v-bind="page.cta"
+      variant="naked"
+      class="overflow-hidden"
+    >
+      <LazyStarsBg />
+    </UPageCTA>
   </div>
 </template>

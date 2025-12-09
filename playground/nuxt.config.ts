@@ -1,18 +1,21 @@
-import { defineNuxtConfig } from 'nuxt/config'
-
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   modules: [
+    '@nuxt/eslint',
+    '@nuxt/image',
+    '@nuxt/ui',
+    '@nuxt/content',
+    '@vueuse/nuxt',
+    'nuxt-og-image',
     '@nuxthub/core',
     'nuxt-auth-utils',
-    '@vueuse/nuxt',
     'nuxt-authorization',
-    '@nuxt/ui',
-    '@nuxt/eslint',
     '../src/module',
   ],
 
-  devtools: { enabled: true },
+  devtools: {
+    enabled: true,
+  },
 
   css: ['~/assets/css/main.css'],
 
@@ -22,15 +25,22 @@ export default defineNuxtConfig({
     },
   },
 
-  future: {
-    compatibilityVersion: 4,
+  routeRules: {
+    '/docs': { redirect: '/docs/auto-crud', prerender: false },
   },
 
-  compatibilityDate: '2024-11-27',
+  compatibilityDate: '2024-07-11',
 
   nitro: {
+    prerender: {
+      routes: [
+        '/',
+      ],
+      crawlLinks: true,
+    },
     experimental: {
       tasks: true,
+      openAPI: true,
     },
   },
 
@@ -40,9 +50,8 @@ export default defineNuxtConfig({
 
   autoCrud: {
     schemaPath: 'server/database/schema',
-    // auth: false, // Uncomment this line for testing APIs without auth
     auth: {
-      type: 'session', // for Normal Authentication with nuxt-auth-utils
+      type: 'session',
       authentication: true,
       authorization: true,
     },

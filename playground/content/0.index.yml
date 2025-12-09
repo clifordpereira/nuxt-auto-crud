@@ -1,0 +1,120 @@
+title: Instant CRUD APIs for [Nuxt]{class="text-primary"}
+description: Expose RESTful CRUD APIs from your Drizzle ORM schema automatically. Write schema files, configure permissions, and focus on your business logic.
+seo:
+  title: Nuxt Auto CRUD - Instant APIs from Drizzle Schema
+  description: Automatically expose RESTful CRUD APIs from your Drizzle ORM schema. Focus on your business logic, not boilerplate code.
+navigation: false
+hero:
+  links:
+    - label: Documentation
+      icon: i-lucide-book-open
+      trailing: true
+      to: /docs
+      size: xl
+    - label: Use Template
+      icon: i-simple-icons-github
+      size: xl
+      color: neutral
+      variant: subtle
+      to: https://github.com/clifordpereira/nuxt-auto-crud_template
+      target: _blank
+sections:
+  - title: Powered by Drizzle ORM
+    description: Define your database schema using Drizzle ORM and let Nuxt Auto CRUD handle the rest. No manual API routes, no repetitive controller code.
+    id: features
+    orientation: horizontal
+    code: |
+      import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
+
+      export const users = sqliteTable('users', {
+        id: integer('id').primaryKey(),
+        name: text('name').notNull(),
+        email: text('email').notNull().unique(),
+        role: text('role').default('user')
+      })
+    features:
+      - name: Schema Driven
+        description: Your database schema is the single source of truth. APIs are automatically exposed based on your table definitions.
+        icon: i-lucide-database
+      - name: Type Safe
+        description: Full TypeScript support with automatically generated types for your API responses and request bodies.
+        icon: i-lucide-file-code
+      - name: Relationship Handling
+        description: Automatically handles relationships between tables, allowing for deep fetching and complex queries out of the box.
+        icon: i-lucide-git-merge
+  - title: Test the Demo
+    description: Experience the power of role-based access control. Log in with these demo accounts to see how permissions change what you can see and do.
+    orientation: horizontal
+    reverse: true
+    links:
+      - label: Sign In
+        to: /login
+        icon: i-lucide-log-in
+        size: lg
+        color: primary
+        variant: solid
+    code: |
+      // Password for all accounts: $1Password
+
+      // 1. Admin (Full Access)
+      email: 'admin@example.com'
+
+      // 2. Manager (Manage Users)
+      email: 'manager@example.com'
+
+      // 3. Moderator (Read-Only Access)
+      email: 'moderator@example.com'
+    features:
+      - name: Admin Role
+        description: 'admin: Full access to all resources. Can create, read, update, and delete users, roles, and permissions.'
+        icon: i-lucide-shield-alert
+      - name: Manager Role
+        description: 'manager: Can manage users but has limited access to system configuration.'
+        icon: i-lucide-users
+      - name: Moderator Role
+        description: 'moderator: Read-only access to most resources. Perfect for auditing and monitoring.'
+        icon: i-lucide-eye
+features:
+  title: Stop Writing Boilerplate
+  description: Focus on building your product, not writing the same CRUD operations over and over again.
+  items:
+    - title: Automatic Routes
+      description: Exposes GET, POST, PATCH, and DELETE endpoints for every table in your schema.
+      icon: i-lucide-route
+    - title: Authentication
+      description: Built-in support for session-based and JWT authentication. Secure your APIs with ease.
+      icon: i-lucide-shield-check
+    - title: Role Based Access
+      description: Define roles and permissions to control who can access and modify your data.
+      icon: i-lucide-users
+    - title: Validation
+      description: Automatic request validation based on your Drizzle schema types.
+      icon: i-lucide-check-square
+    - title: Search & Pagination
+      description: Built-in query parameters for powerful search and pagination.
+      icon: i-lucide-search
+
+testimonials:
+  headline: Trusted by Developers
+  title: Join Developers Building with Nuxt Auto CRUD
+  description: See why developers choose Nuxt Auto CRUD to ship their SaaS applications faster and with more confidence.
+  items:
+    - quote: I built Nuxt Auto CRUD to make development efficient. If you find it useful, I'd love to hear your feedback and feature it here! Send your testimonials to clifordpereira@gmail.com.
+      user:
+        name: Cliford Pereira
+        description: Author of Nuxt Auto CRUD
+        avatar:
+          src: https://github.com/clifordpereira.png
+cta:
+  title: Ready to speed up your development?
+  description: Install Nuxt Auto CRUD today and stop writing boilerplate code.
+  links:
+    - label: Get Started
+      to: '/docs'
+      target: _self
+      trailingIcon: i-lucide-arrow-right
+    - label: View on GitHub
+      to: 'https://github.com/clifordpereira/nuxt-auto-crud'
+      target: _blank
+      variant: subtle
+      icon: i-simple-icons-github
