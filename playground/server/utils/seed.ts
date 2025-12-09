@@ -13,7 +13,7 @@ export const seedDatabase = async () => {
 
   for (const roleName of rolesToSeed) {
     let role = await db.select().from(tables.roles).where(eq(tables.roles.name, roleName)).get()
-    
+
     if (!role) {
       console.log(`Seeding role: ${roleName}...`)
       const [inserted] = await db.insert(tables.roles).values({
@@ -25,9 +25,9 @@ export const seedDatabase = async () => {
       role = inserted
       console.log(`Role ${roleName} seeded.`)
     }
-    
+
     if (role) {
-        roleIds[roleName] = role.id
+      roleIds[roleName] = role.id
     }
   }
 
@@ -37,7 +37,7 @@ export const seedDatabase = async () => {
 
   for (const resourceName of resourcesToSeed) {
     let resource = await db.select().from(tables.resources).where(eq(tables.resources.name, resourceName)).get()
-    
+
     if (!resource) {
       console.log(`Seeding resource: ${resourceName}...`)
       const [inserted] = await db.insert(tables.resources).values({
@@ -58,7 +58,7 @@ export const seedDatabase = async () => {
   for (const code of permissionsToSeed) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let permission = await db.select().from(tables.permissions).where(eq(tables.permissions.code, code as any)).get()
-    
+
     if (!permission) {
       console.log(`Seeding permission: ${code}...`)
       const [inserted] = await db.insert(tables.permissions).values({
@@ -76,41 +76,41 @@ export const seedDatabase = async () => {
 
   // 4. Assign Permissions to Roles (Example: Manager gets all on users, Moderator gets read/list on users)
   const rolePermissionsConfig = [
-      { role: 'manager', resource: 'users', perms: ['create', 'read', 'update', 'delete', 'list'] },
-      { role: 'moderator', resource: 'users', perms: ['read', 'list'] },
-      { role: 'public', resource: 'users', perms: [] }, // Explicitly no permissions for public on users by default
+    { role: 'manager', resource: 'users', perms: ['create', 'read', 'update', 'delete', 'list'] },
+    { role: 'moderator', resource: 'users', perms: ['read', 'list'] },
+    { role: 'public', resource: 'users', perms: [] }, // Explicitly no permissions for public on users by default
   ]
 
   for (const config of rolePermissionsConfig) {
-      const rId = roleIds[config.role]
-      const resId = resourceIds[config.resource]
-      
-      if (rId && resId) {
-          for (const permCode of config.perms) {
-              const pId = permissionIds[permCode]
-              if (pId) {
-                   // Check existence
-                   const existing = await db.select().from(tables.roleResourcePermissions)
-                      .where(and(
-                          eq(tables.roleResourcePermissions.roleId, rId),
-                          eq(tables.roleResourcePermissions.resourceId, resId),
-                          eq(tables.roleResourcePermissions.permissionId, pId)
-                      ))
-                      .get()
-                   
-                   if (!existing) {
-                       await db.insert(tables.roleResourcePermissions).values({
-                           roleId: rId,
-                           resourceId: resId,
-                           permissionId: pId,
-                           createdAt: new Date(),
-                           updatedAt: new Date(),
-                       })
-                       console.log(`Assigned ${permCode} on ${config.resource} to ${config.role}`)
-                   }
-              }
+    const rId = roleIds[config.role]
+    const resId = resourceIds[config.resource]
+
+    if (rId && resId) {
+      for (const permCode of config.perms) {
+        const pId = permissionIds[permCode]
+        if (pId) {
+          // Check existence
+          const existing = await db.select().from(tables.roleResourcePermissions)
+            .where(and(
+              eq(tables.roleResourcePermissions.roleId, rId),
+              eq(tables.roleResourcePermissions.resourceId, resId),
+              eq(tables.roleResourcePermissions.permissionId, pId),
+            ))
+            .get()
+
+          if (!existing) {
+            await db.insert(tables.roleResourcePermissions).values({
+              roleId: rId,
+              resourceId: resId,
+              permissionId: pId,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            })
+            console.log(`Assigned ${permCode} on ${config.resource} to ${config.role}`)
           }
+        }
       }
+    }
   }
 
   // 5. Seed Users
@@ -127,7 +127,7 @@ export const seedDatabase = async () => {
     if (!existingUser) {
       console.log(`Seeding user: ${userData.email}...`)
       const hashedPassword = await hashPassword('$1Password')
-      
+
       await db.insert(tables.users).values({
         email: userData.email,
         password: hashedPassword,

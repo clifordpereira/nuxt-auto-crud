@@ -12,13 +12,13 @@ export default eventHandler(async (event) => {
 
   let result = await db.select({
     user: tables.users,
-    role: tables.roles.name
+    role: tables.roles.name,
   })
-  .from(tables.users)
-  .leftJoin(tables.roles, eq(tables.users.roleId, tables.roles.id))
-  .where(eq(tables.users.email, body.email))
-  .get()
-  
+    .from(tables.users)
+    .leftJoin(tables.roles, eq(tables.users.roleId, tables.roles.id))
+    .where(eq(tables.users.email, body.email))
+    .get()
+
   if (!result && body.email === 'admin@example.com') {
     const userCount = await db.select({ count: sql`count(*)` }).from(tables.users).get()
     if (userCount && userCount.count === 0) {
@@ -26,12 +26,12 @@ export default eventHandler(async (event) => {
       // Fetch again
       result = await db.select({
         user: tables.users,
-        role: tables.roles.name
+        role: tables.roles.name,
       })
-      .from(tables.users)
-      .leftJoin(tables.roles, eq(tables.users.roleId, tables.roles.id))
-      .where(eq(tables.users.email, body.email))
-      .get()
+        .from(tables.users)
+        .leftJoin(tables.roles, eq(tables.users.roleId, tables.roles.id))
+        .where(eq(tables.users.email, body.email))
+        .get()
     }
   }
 
@@ -46,18 +46,18 @@ export default eventHandler(async (event) => {
   const role = result.role || 'user'
 
   // Fetch permissions
-  let permissions: Record<string, string[]> = {}
-  
+  const permissions: Record<string, string[]> = {}
+
   if (user.roleId) {
     const permissionsData = await db.select({
       resource: tables.resources.name,
-      action: tables.permissions.code
+      action: tables.permissions.code,
     })
-    .from(tables.roleResourcePermissions)
-    .innerJoin(tables.resources, eq(tables.roleResourcePermissions.resourceId, tables.resources.id))
-    .innerJoin(tables.permissions, eq(tables.roleResourcePermissions.permissionId, tables.permissions.id))
-    .where(eq(tables.roleResourcePermissions.roleId, user.roleId))
-    .all()
+      .from(tables.roleResourcePermissions)
+      .innerJoin(tables.resources, eq(tables.roleResourcePermissions.resourceId, tables.resources.id))
+      .innerJoin(tables.permissions, eq(tables.roleResourcePermissions.permissionId, tables.permissions.id))
+      .where(eq(tables.roleResourcePermissions.roleId, user.roleId))
+      .all()
 
     for (const p of permissionsData) {
       if (!permissions[p.resource]) {

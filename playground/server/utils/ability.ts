@@ -6,7 +6,7 @@ export default defineAbility(async (user, model: string, action: string) => {
   if (!user) {
     const publicPermissions = await getPublicPermissions()
     const resourcePermissions = publicPermissions[model]
-    
+
     if (Array.isArray(resourcePermissions)) {
       return resourcePermissions.includes(action)
     }
@@ -21,7 +21,7 @@ export default defineAbility(async (user, model: string, action: string) => {
   // 3. Check permissions from session (DB-driven)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const resourcePermissions = (user as any)?.permissions?.[model]
-  
+
   if (Array.isArray(resourcePermissions)) {
     return resourcePermissions.includes(action)
   }
