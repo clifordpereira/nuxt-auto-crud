@@ -33,7 +33,7 @@ export async function useCrudFetch(
     const url
       = method === 'PATCH' || method === 'DELETE'
         ? `${crudBaseUrl}/${resource}/${id}`
-        : `${crudBaseUrl}/${resource}`
+        : `${crudBaseUrl}/${resource}`.replace('//', '/')
 
     console.log(url)
 

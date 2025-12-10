@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useChangeCase } from '@vueuse/integrations/useChangeCase'
+
 const props = defineProps<{
   resource: string
   schema: {
@@ -19,7 +21,7 @@ const isModalOpen = ref(false)
     <UModal v-model:open="isModalOpen">
       <!-- Trigger button -->
       <UButton
-        label="Add New"
+        :label="`Add New ${useChangeCase(props.resource, 'capitalCase').value}`"
         color="neutral"
         variant="subtle"
       />

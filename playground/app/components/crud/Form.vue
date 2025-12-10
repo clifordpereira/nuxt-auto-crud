@@ -138,6 +138,13 @@ function handleSubmit(event: FormSubmitEvent<Record<string, unknown>>) {
             class="w-full"
           />
 
+          <UTextarea
+            v-else-if="field.type === 'textarea'"
+            v-model="state[field.name] as string"
+            :required="field.required"
+            autoresize
+          />
+
           <UInput
             v-else
             v-model="state[field.name] as string"

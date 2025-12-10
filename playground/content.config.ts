@@ -46,6 +46,7 @@ export const collections = {
           orientation: orientationEnum.optional(),
           reverse: z.boolean().optional(),
           code: z.string().optional(),
+          image: z.string().optional(),
           links: z.array(createLinkSchema()).optional(),
           features: z.array(createFeatureItemSchema()),
         }),

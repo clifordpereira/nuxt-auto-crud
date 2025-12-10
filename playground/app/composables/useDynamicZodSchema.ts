@@ -34,10 +34,17 @@ export function useDynamicZodSchema(
       return
     }
 
-    if (field.type === 'string') {
-      validators[field.name] = field.required
-        ? z.string().min(1, `${field.name} is required`)
-        : z.string().optional()
+    if (['string', 'text', 'textarea', 'email'].includes(field.type)) {
+      if (field.type === 'email') {
+        validators[field.name] = field.required
+          ? z.string().email()
+          : z.string().email().optional()
+      }
+      else {
+        validators[field.name] = field.required
+          ? z.string().min(1, `${field.name} is required`)
+          : z.string().optional()
+      }
     }
     else if (field.type === 'number') {
       validators[field.name] = field.required

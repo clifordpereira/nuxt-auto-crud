@@ -67,4 +67,16 @@ CREATE TABLE `subscribers` (
 	`email` text NOT NULL
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `subscribers_email_unique` ON `subscribers` (`email`);
+CREATE UNIQUE INDEX `subscribers_email_unique` ON `subscribers` (`email`);--> statement-breakpoint
+CREATE TABLE `testimonials` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`created_at` integer NOT NULL,
+	`updated_at` integer NOT NULL,
+	`deleted_at` integer,
+	`status` text DEFAULT 'inactive',
+	`name` text NOT NULL,
+	`role` text NOT NULL,
+	`content` text NOT NULL,
+	`avatar` text,
+	`company` text
+);
