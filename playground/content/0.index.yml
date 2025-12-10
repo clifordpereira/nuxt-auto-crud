@@ -23,6 +23,7 @@ sections:
     description: Define your database schema using Drizzle ORM and let Nuxt Auto CRUD handle the rest. No manual API routes, no repetitive controller code.
     id: features
     orientation: horizontal
+    reverse: false
     code: |
       // server/database/schema/users.ts
       import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
@@ -43,10 +44,25 @@ sections:
       - name: Relationship Handling
         description: Automatically handles relationships between tables, allowing for deep fetching and complex queries out of the box.
         icon: i-lucide-git-merge
+  - title: Manage Permissions with Ease
+    description: Manage permissions effortlessly with an intuitive interface. Grant or revoke access to resources for different roles with just a few clicks.
+    orientation: horizontal
+    reverse: true
+    image: /images/easy-permissions.png
+    features:
+      - name: Visual Matrix
+        description: View and edit permissions in a clear, grid-based layout.
+        icon: i-lucide-grid
+      - name: Granular Control
+        description: Fine-tune access levels (Create, Read, Update, Delete) for each resource and role.
+        icon: i-lucide-sliders
+      - name: Instant Updates
+        description: Changes are applied immediately, ensuring your application's security is always up to date.
+        icon: i-lucide-zap
   - title: Test the Demo
     description: Experience the power of role-based access control. Log in with these demo accounts to see how permissions change what you can see and do.
     orientation: horizontal
-    reverse: true
+    reverse: false
     links:
       - label: Sign In
         to: /login
@@ -91,7 +107,7 @@ features:
     - title: Validation
       description: Automatic request validation based on your Drizzle schema types.
       icon: i-lucide-check-square
-    - title: Search & Pagination
+    - title: Pagination and Search
       description: Built-in query parameters for powerful search and pagination.
       icon: i-lucide-search
 

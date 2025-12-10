@@ -49,6 +49,12 @@ useSeoMeta({
         :value="'```typescript\n' + section.code + '\n```'"
         class="prose prose-primary dark:prose-invert max-w-none"
       />
+      <img
+        v-else-if="section.image"
+        :src="section.image"
+        :alt="section.title"
+        class="w-full rounded-md shadow-xl ring-1 ring-gray-300 dark:ring-gray-700"
+      />
       <ImagePlaceholder v-else />
     </UPageSection>
 

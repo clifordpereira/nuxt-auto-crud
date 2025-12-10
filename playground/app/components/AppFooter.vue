@@ -134,7 +134,7 @@ function onSubmit() {
 
     <template #left>
       <p class="text-muted text-sm">
-        © {{ new Date().getFullYear() }} Nuxt Auto CRUD
+        Built by <NuxtLink to="https://clifland.in" target="_blank" class="hover:text-primary">Clifland</NuxtLink>
       </p>
     </template>
 
