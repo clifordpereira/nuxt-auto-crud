@@ -1,3 +1,39 @@
+## v1.14.0
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.13.0...v1.14.0)
+
+### 🚀 Enhancements
+
+- Implement comprehensive playground site with new content, pages, components, layouts, and database migrations. ([bec04a6](https://github.com/clifordpereira/nuxt-auto-crud/commit/bec04a6))
+- Implement admin dashboard with user count and remove old dashboard and generic resource pages ([5802f8c](https://github.com/clifordpereira/nuxt-auto-crud/commit/5802f8c))
+- Enhance Nuxt, Nitro, Hub, and AutoCRUD configurations, update content schemas, and apply minor formatting adjustments. ([0f166c3](https://github.com/clifordpereira/nuxt-auto-crud/commit/0f166c3))
+- Enhance homepage content with code examples, demo login details, and updated section features, supported by UI and content schema changes. ([704b167](https://github.com/clifordpereira/nuxt-auto-crud/commit/704b167))
+- Update blog content by replacing existing articles with new ones. ([db46474](https://github.com/clifordpereira/nuxt-auto-crud/commit/db46474))
+- Remove external authentication provider integration and signup link from authentication forms. ([3179951](https://github.com/clifordpereira/nuxt-auto-crud/commit/3179951))
+- Add resource-based permissions management with dedicated UI and ability checks for CRUD operations. ([5dc2f8e](https://github.com/clifordpereira/nuxt-auto-crud/commit/5dc2f8e))
+- Add 'Manage Permissions' section with image display support and update footer branding. ([5dacfda](https://github.com/clifordpereira/nuxt-auto-crud/commit/5dacfda))
+- Implement newsletter subscription with new schema, API endpoint, and refined guest authorization. ([f43011a](https://github.com/clifordpereira/nuxt-auto-crud/commit/f43011a))
+- Introduce testimonials feature with database schema, API endpoint, and UI component, and refine permission checks and form validation. ([f8f14a7](https://github.com/clifordpereira/nuxt-auto-crud/commit/f8f14a7))
+
+### 💅 Refactors
+
+- Update public permissions API endpoint path ([6aa594c](https://github.com/clifordpereira/nuxt-auto-crud/commit/6aa594c))
+- Reorganize changelog entries from descriptive names to version-based files and update content configuration. ([ae64643](https://github.com/clifordpereira/nuxt-auto-crud/commit/ae64643))
+- Remove unused `abilityLogic` import and simplify guest authorization check. ([60bf71c](https://github.com/clifordpereira/nuxt-auto-crud/commit/60bf71c))
+
+### 📖 Documentation
+
+- Add real-world recipes for newsletter subscription and testimonials system. ([b960207](https://github.com/clifordpereira/nuxt-auto-crud/commit/b960207))
+
+### 🏡 Chore
+
+- Update database migration metadata. ([f52baff](https://github.com/clifordpereira/nuxt-auto-crud/commit/f52baff))
+- Update dependencies, introduce Bun lockfile, and improve type safety and linting. ([76c0237](https://github.com/clifordpereira/nuxt-auto-crud/commit/76c0237))
+
+### ❤️ Contributors
+
+- Cliford Pereira <cliford.pereira@gmail.com>
+
 ## v1.13.0
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.12.1...v1.13.0)
