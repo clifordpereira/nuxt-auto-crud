@@ -1,6 +1,7 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
 import { useChangeCase } from '@vueuse/integrations/useChangeCase'
+import resourceAbility from '~~/shared/utils/abilities'
 
 const props = defineProps<{
   resource: string
@@ -47,10 +48,12 @@ const paginatedItems = ref<Record<string, unknown>[]>([])
         :items-per-page="10"
         @update:paginated="paginatedItems = $event"
       />
-      <CrudCreateRow
-        :resource="resource"
-        :schema="schema"
-      />
+      <Can :ability="resourceAbility" :args="[resource, 'create']">
+        <CrudCreateRow
+          :resource="resource"
+          :schema="schema"
+        />
+      </Can>
     </div>
 
     <!-- Table -->
@@ -114,24 +117,30 @@ const paginatedItems = ref<Record<string, unknown>[]>([])
 
                 <template #content>
                   <div class="p-1 flex flex-col gap-1 min-w-[120px]">
-                    <CrudViewRow
-                      :row="row"
-                      :schema="schema"
-                    />
-                    <CrudEditRow
-                      :resource="resource"
-                      :row="row"
-                      :schema="schema"
-                    />
-                    <UButton
-                      label="Delete"
-                      color="error"
-                      variant="ghost"
-                      size="xs"
-                      icon="i-lucide-trash"
-                      class="justify-start"
-                      @click="onDelete(row.id as number)"
-                    />
+                    <Can :ability="resourceAbility" :args="[resource, 'read']">
+                      <CrudViewRow
+                        :row="row"
+                        :schema="schema"
+                      />
+                    </Can>
+                    <Can :ability="resourceAbility" :args="[resource, 'update']">
+                      <CrudEditRow
+                        :resource="resource"
+                        :row="row"
+                        :schema="schema"
+                      />
+                    </Can>
+                    <Can :ability="resourceAbility" :args="[resource, 'delete']">
+                      <UButton
+                        label="Delete"
+                        color="error"
+                        variant="ghost"
+                        size="xs"
+                        icon="i-lucide-trash"
+                        class="justify-start"
+                        @click="onDelete(row.id as number)"
+                      />
+                    </Can>
                   </div>
                 </template>
               </UPopover>

@@ -9,7 +9,7 @@ hero:
     - label: Documentation
       icon: i-lucide-book-open
       trailing: true
-      to: /docs
+      to: /docs/auto-crud
       size: xl
     - label: Use Template
       icon: i-simple-icons-github
@@ -19,11 +19,12 @@ hero:
       to: https://github.com/clifordpereira/nuxt-auto-crud_template
       target: _blank
 sections:
-  - title: Powered by Drizzle ORM
+  - title: Build Apps by Just Writing Schemas
     description: Define your database schema using Drizzle ORM and let Nuxt Auto CRUD handle the rest. No manual API routes, no repetitive controller code.
     id: features
     orientation: horizontal
     code: |
+      // server/database/schema/users.ts
       import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
 
       export const users = sqliteTable('users', {
@@ -110,7 +111,7 @@ cta:
   description: Install Nuxt Auto CRUD today and stop writing boilerplate code.
   links:
     - label: Get Started
-      to: '/docs'
+      to: '/docs/auto-crud'
       target: _self
       trailingIcon: i-lucide-arrow-right
     - label: View on GitHub

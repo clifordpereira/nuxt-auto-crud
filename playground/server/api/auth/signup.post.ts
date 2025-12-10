@@ -23,12 +23,16 @@ export default eventHandler(async (event) => {
   // Hash password
   const hashedPassword = await hashPassword(body.password)
 
+  // Get default role (user)
+  const defaultRole = await db.select().from(tables.roles).where(eq(tables.roles.name, 'user')).get()
+
   // Insert user
   const user = await db.insert(tables.users).values({
     name: body.name,
     email: body.email,
     password: hashedPassword,
     status: 'active',
+    roleId: defaultRole?.id,
   }).returning().get()
 
   // Set session
@@ -38,7 +42,7 @@ export default eventHandler(async (event) => {
       email: user.email,
       name: user.name,
       avatar: user.avatar,
-      role: 'user',
+      role: defaultRole?.name || 'user',
       permissions: {},
     },
   })

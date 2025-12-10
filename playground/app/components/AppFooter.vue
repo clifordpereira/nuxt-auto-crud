@@ -3,7 +3,7 @@ const columns = [{
   label: 'Resources',
   children: [{
     label: 'Docs',
-    to: '/docs',
+    to: '/docs/auto-crud',
   }, {
     label: 'Template',
     to: 'https://github.com/clifordpereira/nuxt-auto-crud_template',
@@ -48,7 +48,34 @@ const columns = [{
     label: 'Permissions',
     to: 'https://www.youtube.com/watch?v=Yty3OCYbwOo',
     target: '_blank'
+  }, {
+    label: 'RBAC Demo',
+    to: 'https://www.youtube.com/watch?v=W0ju4grRC9M',
+    target: '_blank'
   }],
+}, {
+  label: 'Built with',
+  children: [{
+    label: 'Nuxt Auto Crud',
+    to: 'https://www.npmjs.com/package/nuxt-auto-crud',
+    target: '_blank'
+  }, {
+    label: 'Drizzle ORM',
+    to: 'https://orm.drizzle.team/docs/sql-schema-declaration',
+    target: '_blank'
+  }, {
+    label: 'Nuxt Authentication',
+    to: 'https://nuxt.com/docs/4.x/guide/recipes/sessions-and-authentication',
+    target: '_blank'
+  }, {
+    label: 'Nuxt Authorization',
+    to: 'https://nuxt.com/modules/authorization',
+    target: '_blank'
+  }, {
+    label: 'Nuxt UI SaaS',
+    to: 'https://saas-template.nuxt.dev/',
+    target: '_blank'
+  }]
 }]
 
 const toast = useToast()

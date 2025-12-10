@@ -12,7 +12,7 @@ const resourceNames = computed(() =>
 )
 
 const items = computed(() => [{
-  label: 'Models',
+  label: 'Custom Models',
   icon: 'i-lucide-database',
   defaultOpen: true,
   children: resourceNames.value.map(resource => ({

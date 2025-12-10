@@ -10,7 +10,7 @@ async function logout() {
 
 const items = computed(() => [{
   label: 'Docs',
-  to: '/docs',
+  to: '/docs/auto-crud',
 }, {
   label: 'Pricing',
   to: '/pricing',

@@ -28,7 +28,7 @@
       },
       {
         "label": "Resource Permissions",
-        "to": "/admin/roleResourcePermissions"
+        "to": "/admin/resource-permissions"
       }
     ]
   }

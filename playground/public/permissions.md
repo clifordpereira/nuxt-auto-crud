@@ -1,34 +1,29 @@
----
-title: Managing Permissions
-description: Learn how to manage permissions using the Role-Based Access Control (RBAC) system.
----
+# Managing Permissions in Nuxt Auto CRUD
 
 To manage permissions in your application, you don't need to touch the code structure. Instead, you simply add or modify records in specific database tables. The system uses a **Role-Based Access Control (RBAC)** model.
 
-<iframe width="100%" height="400" src="https://www.youtube.com/embed/W0ju4grRC9M" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen class="rounded-xl"></iframe>
-
-## Core Concepts
+## 1. The Core Concepts
 
 *   **Users**: The actual people logging in.
 *   **Roles**: Labels like "Admin", "Manager", or "Support" that group users together.
 *   **Resources**: The parts of your application you want to protect (e.g., "users", "tickets", "products").
 *   **Permissions**: The specific actions allowed (e.g., "create", "read", "update", "delete", "list").
 
-## How to Manage Access (Step-by-Step)
+## 2. How to Manage Access (Step-by-Step)
 
-### 1. Create a New Role
+### A. Create a New Role
 If you need a new type of user (e.g., "Editor"), you simply add a row to the **`roles`** table.
 *   **Table**: `roles`
 *   **Action**: Insert a new record.
 *   **Example**: Name = "Editor"
 
-### 2. Define a Resource
+### B. Define a Resource
 If you create a new feature (e.g., a "Blog"), you need to register it as a resource.
 *   **Table**: `resources`
 *   **Action**: Insert a new record.
 *   **Example**: Name = "blog_posts"
 
-### 3. Grant Permissions (The "Rule Book")
+### C. Grant Permissions (The "Rule Book")
 This is the most important part. To say "Editors can update blog posts", you link the three concepts together in the **`role_resource_permissions`** table.
 *   **Table**: `role_resource_permissions`
 *   **Action**: Insert a record linking the IDs of:
@@ -38,7 +33,7 @@ This is the most important part. To say "Editors can update blog posts", you lin
 
 *You repeat this for every action you want to allow (e.g., one row for "read", another for "create").*
 
-### 4. Assign a Role to a User
+### D. Assign a Role to a User
 Finally, to give a user these powers, you just assign them the role.
 *   **Table**: `users`
 *   **Action**: Select the Role for a specific user.
@@ -53,7 +48,3 @@ Finally, to give a user these powers, you just assign them the role.
 | **`permissions`** | Define *actions* (Create, Read, Update, Delete). |
 | **`role_resource_permissions`** | **The Master Switch**. Connects Role + Resource + Action. |
 | **`users`** | Assigns a Role to a specific person via the `Role` field. |
-
-## Public Access
-
-Public (unauthenticated) access is controlled by the `public` role in the database. Assign permissions to the `public` role to allow access to resources for non-logged-in users.
