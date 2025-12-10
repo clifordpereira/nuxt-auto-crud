@@ -11,7 +11,7 @@ definePageMeta({
 const config = useRuntimeConfig().public
 const crudBaseUrl = config.crudBaseUrl || '/api'
 
-const { data: users } = await useFetch<any[]>(`${crudBaseUrl}/users`, {
+const { data: users } = await useFetch<unknown[]>(`${crudBaseUrl}/users`, {
   headers: crudHeaders(),
 })
 

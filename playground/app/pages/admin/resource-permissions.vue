@@ -53,7 +53,7 @@ const { data: roleResourcePermissions, refresh } = await useFetch<RoleResourcePe
 // Tabs configuration - Exclude 'admin'
 const items = computed(() => roles.value?.filter(r => r.name !== 'admin').map(role => ({
   label: role.name,
-  roleId: role.id
+  roleId: role.id,
 })) || [])
 
 const selectedIndex = ref(0)
@@ -72,7 +72,7 @@ const initLocalState = () => {
 
   const currentRoleId = selectedRole.value.roleId
 
-  roleResourcePermissions.value.forEach(p => {
+  roleResourcePermissions.value.forEach((p) => {
     if (p.roleId === currentRoleId) {
       localPermissions.value.set(`${p.resourceId}-${p.permissionId}`, true)
     }
@@ -93,7 +93,8 @@ const togglePermission = (resourceId: number, permissionId: number, value: boole
   const key = `${resourceId}-${permissionId}`
   if (value) {
     localPermissions.value.set(key, true)
-  } else {
+  }
+  else {
     localPermissions.value.delete(key)
   }
   isDirty.value = true
@@ -108,7 +109,7 @@ const saveChanges = async () => {
   try {
     // 1. Get current permissions for this role from server (to know what to delete)
     const currentServerPerms = roleResourcePermissions.value?.filter(p => p.roleId === currentRoleId) || []
-    
+
     // 2. Calculate diffs
     const toCreate: { roleId: number, resourceId: number, permissionId: number }[] = []
     const toDelete: number[] = [] // IDs of role_resource_permissions to delete
@@ -127,7 +128,7 @@ const saveChanges = async () => {
     }
 
     // Find what to delete
-    currentServerPerms.forEach(p => {
+    currentServerPerms.forEach((p) => {
       const key = `${p.resourceId}-${p.permissionId}`
       if (!localPermissions.value.has(key)) {
         toDelete.push(p.id)
@@ -136,13 +137,13 @@ const saveChanges = async () => {
 
     // 3. Execute updates
     const promises = []
-    
+
     // Batch create
     for (const item of toCreate) {
       promises.push($fetch(`${crudBaseUrl}/roleResourcePermissions`, {
         method: 'POST',
         headers: crudHeaders(),
-        body: item
+        body: item,
       }))
     }
 
@@ -155,21 +156,23 @@ const saveChanges = async () => {
     }
 
     await Promise.all(promises)
-    
+
     await refresh()
     isDirty.value = false
     toast.add({ title: 'Success', description: 'Permissions updated successfully.' })
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Failed to save permissions:', error)
     toast.add({ title: 'Error', description: 'Failed to save permissions.', color: 'error' })
-  } finally {
+  }
+  finally {
     isSaving.value = false
   }
 }
 
 // Filter out system resources
-const displayResources = computed(() => resources.value?.filter(r => 
-  !['roles', 'permissions', 'resources', 'roleResourcePermissions'].includes(r.name)
+const displayResources = computed(() => resources.value?.filter(r =>
+  !['roles', 'permissions', 'resources', 'roleResourcePermissions'].includes(r.name),
 ) || [])
 
 const displayPermissions = computed(() => {
@@ -186,15 +189,16 @@ watch(items, (newItems) => {
     selectedIndex.value = 0
   }
 }, { immediate: true })
-
 </script>
 
 <template>
   <div class="flex flex-col h-full">
     <div class="border-b border-gray-200 dark:border-gray-700 px-4 py-4 flex items-center justify-between bg-white dark:bg-gray-900">
-      <h1 class="text-xl font-semibold text-gray-900 dark:text-white">Resource Permissions</h1>
+      <h1 class="text-xl font-semibold text-gray-900 dark:text-white">
+        Resource Permissions
+      </h1>
       <div class="flex gap-2">
-         <UButton
+        <UButton
           v-if="isDirty"
           label="Save Changes"
           color="primary"
@@ -205,23 +209,41 @@ watch(items, (newItems) => {
     </div>
 
     <div class="p-4 flex-1 overflow-auto">
-      <div v-if="!roles || !resources || !permissions" class="flex justify-center items-center h-64">
-        <UIcon name="i-lucide-loader-2" class="animate-spin w-8 h-8 text-primary-500" />
+      <div
+        v-if="!roles || !resources || !permissions"
+        class="flex justify-center items-center h-64"
+      >
+        <UIcon
+          name="i-lucide-loader-2"
+          class="animate-spin w-8 h-8 text-primary-500"
+        />
       </div>
-      
-      <template v-else>
-        <UTabs v-model="selectedIndex" :items="items" class="mb-6" />
 
-        <UCard v-if="selectedRole" :ui="{ body: 'p-0 sm:p-0' }">
+      <template v-else>
+        <UTabs
+          v-model="selectedIndex"
+          :items="items"
+          class="mb-6"
+        />
+
+        <UCard
+          v-if="selectedRole"
+          :ui="{ body: 'p-0 sm:p-0' }"
+        >
           <div class="overflow-x-auto">
             <table class="w-full text-sm text-left">
               <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
-                  <th scope="col" class="px-6 py-3 font-medium">Resource</th>
-                  <th 
-                    v-for="perm in displayPermissions" 
-                    :key="perm.id" 
-                    scope="col" 
+                  <th
+                    scope="col"
+                    class="px-6 py-3 font-medium"
+                  >
+                    Resource
+                  </th>
+                  <th
+                    v-for="perm in displayPermissions"
+                    :key="perm.id"
+                    scope="col"
                     class="px-6 py-3 font-medium text-center"
                   >
                     {{ perm.name }}
@@ -229,23 +251,23 @@ watch(items, (newItems) => {
                 </tr>
               </thead>
               <tbody>
-                <tr 
-                  v-for="res in displayResources" 
-                  :key="res.id" 
+                <tr
+                  v-for="res in displayResources"
+                  :key="res.id"
                   class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
                 >
                   <td class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
                     {{ res.name }}
                   </td>
-                  <td 
-                    v-for="perm in displayPermissions" 
-                    :key="perm.id" 
+                  <td
+                    v-for="perm in displayPermissions"
+                    :key="perm.id"
                     class="px-6 py-4 text-center"
                   >
-                    <UCheckbox 
+                    <UCheckbox
                       :model-value="hasPermission(res.id, perm.id)"
-                      @update:model-value="(val) => togglePermission(res.id, perm.id, Boolean(val))"
                       class="justify-center"
+                      @update:model-value="(val) => togglePermission(res.id, perm.id, Boolean(val))"
                     />
                   </td>
                 </tr>

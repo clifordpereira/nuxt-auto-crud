@@ -48,7 +48,10 @@ const paginatedItems = ref<Record<string, unknown>[]>([])
         :items-per-page="10"
         @update:paginated="paginatedItems = $event"
       />
-      <Can :ability="resourceAbility" :args="[resource, 'create']">
+      <Can
+        :ability="resourceAbility"
+        :args="[resource, 'create']"
+      >
         <CrudCreateRow
           :resource="resource"
           :schema="schema"
@@ -117,20 +120,29 @@ const paginatedItems = ref<Record<string, unknown>[]>([])
 
                 <template #content>
                   <div class="p-1 flex flex-col gap-1 min-w-[120px]">
-                    <Can :ability="resourceAbility" :args="[resource, 'read']">
+                    <Can
+                      :ability="resourceAbility"
+                      :args="[resource, 'read']"
+                    >
                       <CrudViewRow
                         :row="row"
                         :schema="schema"
                       />
                     </Can>
-                    <Can :ability="resourceAbility" :args="[resource, 'update']">
+                    <Can
+                      :ability="resourceAbility"
+                      :args="[resource, 'update']"
+                    >
                       <CrudEditRow
                         :resource="resource"
                         :row="row"
                         :schema="schema"
                       />
                     </Can>
-                    <Can :ability="resourceAbility" :args="[resource, 'delete']">
+                    <Can
+                      :ability="resourceAbility"
+                      :args="[resource, 'delete']"
+                    >
                       <UButton
                         label="Delete"
                         color="error"

@@ -54,7 +54,7 @@ useSeoMeta({
         :src="section.image"
         :alt="section.title"
         class="w-full rounded-md shadow-xl ring-1 ring-gray-300 dark:ring-gray-700"
-      />
+      >
       <ImagePlaceholder v-else />
     </UPageSection>
 

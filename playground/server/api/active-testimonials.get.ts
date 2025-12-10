@@ -4,7 +4,7 @@ import { useDrizzle } from '../utils/drizzle'
 
 export default defineEventHandler(async () => {
   const db = useDrizzle()
-  
+
   const activeTestimonials = await db.select()
     .from(testimonials)
     .where(eq(testimonials.status, 'active'))

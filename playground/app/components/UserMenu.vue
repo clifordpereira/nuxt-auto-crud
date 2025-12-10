@@ -14,12 +14,20 @@ const neutrals = ['slate', 'gray', 'zinc', 'neutral', 'stone']
 
 const { user } = useUserSession()
 
+interface User {
+  name: string
+  avatar: string
+  [key: string]: unknown
+}
+
+const safeUser = computed(() => user.value as User | null)
+
 const items = computed<DropdownMenuItem[][]>(() => ([[{
   type: 'label',
-  label: (user.value as any)?.name || undefined,
+  label: safeUser.value?.name || undefined,
   avatar: {
-    src: (user.value as any)?.avatar || '',
-    alt: (user.value as any)?.name || '',
+    src: safeUser.value?.avatar || '',
+    alt: safeUser.value?.name || '',
   },
 }], [{
   label: 'Theme',
@@ -114,9 +122,9 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
     <UButton
       v-bind="{
         ...user,
-        name: (user as any)?.name || undefined,
-        avatar: (user as any)?.avatar ? { src: (user as any).avatar, alt: (user as any)?.name || undefined } : undefined,
-        label: collapsed ? undefined : ((user as any)?.name || undefined),
+        name: safeUser?.name || undefined,
+        avatar: safeUser?.avatar ? { src: safeUser.avatar, alt: safeUser?.name || undefined } : undefined,
+        label: collapsed ? undefined : (safeUser?.name || undefined),
         trailingIcon: collapsed ? undefined : 'i-lucide-chevrons-up-down',
       }"
       color="neutral"

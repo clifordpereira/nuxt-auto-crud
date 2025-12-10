@@ -1,5 +1,5 @@
 import { sqliteTable, text } from 'drizzle-orm/sqlite-core'
-import { systemFields, statusField } from './utils'
+import { systemFields } from './utils'
 
 export const testimonials = sqliteTable('testimonials', {
   ...systemFields,

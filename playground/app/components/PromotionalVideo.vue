@@ -13,7 +13,7 @@
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         allowfullscreen
         class="rounded-xl"
-      ></iframe>
+      />
     </UPageCard>
   </div>
 </template>

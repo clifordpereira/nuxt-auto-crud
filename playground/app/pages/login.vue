@@ -30,8 +30,6 @@ const fields = [{
   type: 'checkbox' as const,
 }]
 
-
-
 const schema = z.object({
   email: z.string().email('Invalid email'),
   password: z.string().min(8, 'Must be at least 8 characters'),
@@ -50,8 +48,9 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
     toast.add({ title: 'Success', description: 'Logged in successfully' })
     await navigateTo('/admin/dashboard')
   }
-  catch (error: any) {
-    toast.add({ title: 'Error', description: error.data?.message || 'Login failed', color: 'error' })
+  catch (error) {
+    const message = (error as { data?: { message?: string } })?.data?.message || 'Login failed'
+    toast.add({ title: 'Error', description: message, color: 'error' })
   }
 }
 </script>

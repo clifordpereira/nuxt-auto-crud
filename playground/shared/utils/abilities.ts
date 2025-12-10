@@ -2,7 +2,7 @@ import { defineAbility } from 'nuxt-authorization/utils'
 
 let publicPermissionsPromise: Promise<Record<string, string[]>> | null = null
 
-export const abilityLogic = async (user: any, model: string, action: string) => {
+export const abilityLogic = async (user: unknown, model: string, action: string) => {
   // 1. Admin has full access
   if (user?.role === 'admin') {
     return true

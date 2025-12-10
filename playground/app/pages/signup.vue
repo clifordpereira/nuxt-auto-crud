@@ -30,20 +30,6 @@ const fields = [{
   placeholder: 'Enter your password',
 }]
 
-const providers = [{
-  label: 'Google',
-  icon: 'i-simple-icons-google',
-  onClick: () => {
-    toast.add({ title: 'Google', description: 'Login with Google' })
-  },
-}, {
-  label: 'GitHub',
-  icon: 'i-simple-icons-github',
-  onClick: () => {
-    toast.add({ title: 'GitHub', description: 'Login with GitHub' })
-  },
-}]
-
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),
   email: z.string().email('Invalid email'),
@@ -63,8 +49,9 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
     toast.add({ title: 'Success', description: 'Account created successfully' })
     await navigateTo('/admin/dashboard')
   }
-  catch (error: any) {
-    toast.add({ title: 'Error', description: error.data?.message || 'Signup failed', color: 'error' })
+  catch (error) {
+    const message = (error as { data?: { message?: string } })?.data?.message || 'Signup failed'
+    toast.add({ title: 'Error', description: message, color: 'error' })
   }
 }
 </script>

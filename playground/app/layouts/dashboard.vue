@@ -19,7 +19,7 @@ const mainLinks = computed(() => {
   // Filter out permissions menu for non-admins
   // Assuming 'admin' is the role name for administrators
   // You might need to adjust this logic based on your actual role implementation
-  if ((user.value as any)?.role !== 'admin') {
+  if ((user.value as { role?: string })?.role !== 'admin') {
     return links.filter(link => link.label !== 'Roles & Permissions')
   }
 

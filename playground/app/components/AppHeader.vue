@@ -1,6 +1,4 @@
 <script setup lang="ts">
-const route = useRoute()
-
 const { loggedIn, clear } = useUserSession()
 
 async function logout() {

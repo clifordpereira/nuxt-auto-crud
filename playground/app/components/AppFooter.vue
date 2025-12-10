@@ -7,75 +7,75 @@ const columns = [{
   }, {
     label: 'Template',
     to: 'https://github.com/clifordpereira/nuxt-auto-crud_template',
-    target: '_blank'
+    target: '_blank',
   }, {
     label: 'Changelog',
-    to: '/changelog'
+    to: '/changelog',
   }, {
     label: 'Blog',
-    to: '/blog'
+    to: '/blog',
   }],
 }, {
   label: 'Community',
   children: [{
     label: 'GitHub Repo',
     to: 'https://github.com/clifordpereira/nuxt-auto-crud',
-    target: '_blank'
+    target: '_blank',
   }, {
     label: 'NPM Package',
     to: 'https://www.npmjs.com/package/nuxt-auto-crud',
-    target: '_blank'
+    target: '_blank',
   }, {
     label: 'Discuss on Discord',
     to: 'https://discord.gg/hGgyEaGu',
-    target: '_blank'
+    target: '_blank',
   }, {
     label: 'GitHub Discussions',
     to: 'https://github.com/clifordpereira/nuxt-auto-crud/discussions/1',
-    target: '_blank'
+    target: '_blank',
   }],
 }, {
   label: 'YouTube',
   children: [{
     label: 'Installation',
     to: 'https://youtu.be/M9-koXmhB9k',
-    target: '_blank'
+    target: '_blank',
   }, {
     label: 'Add Schema',
     to: 'https://youtu.be/7gW0KW1KtN0',
-    target: '_blank'
+    target: '_blank',
   }, {
     label: 'Permissions',
     to: 'https://www.youtube.com/watch?v=Yty3OCYbwOo',
-    target: '_blank'
+    target: '_blank',
   }, {
     label: 'RBAC Demo',
     to: 'https://www.youtube.com/watch?v=W0ju4grRC9M',
-    target: '_blank'
+    target: '_blank',
   }],
 }, {
   label: 'Built with',
   children: [{
     label: 'Nuxt Auto Crud',
     to: 'https://www.npmjs.com/package/nuxt-auto-crud',
-    target: '_blank'
+    target: '_blank',
   }, {
     label: 'Drizzle ORM',
     to: 'https://orm.drizzle.team/docs/sql-schema-declaration',
-    target: '_blank'
+    target: '_blank',
   }, {
     label: 'Nuxt Authentication',
     to: 'https://nuxt.com/docs/4.x/guide/recipes/sessions-and-authentication',
-    target: '_blank'
+    target: '_blank',
   }, {
     label: 'Nuxt Authorization',
     to: 'https://nuxt.com/modules/authorization',
-    target: '_blank'
+    target: '_blank',
   }, {
     label: 'Nuxt UI SaaS',
     to: 'https://saas-template.nuxt.dev/',
-    target: '_blank'
-  }]
+    target: '_blank',
+  }],
 }]
 
 const toast = useToast()
@@ -98,13 +98,16 @@ async function onSubmit() {
       description: 'You\'ve been subscribed to our newsletter.',
     })
     email.value = ''
-  } catch (error: any) {
+  }
+  catch (error: unknown) {
+    const err = error as { data?: { message?: string } }
     toast.add({
       title: 'Error',
-      description: error.data?.message || 'Something went wrong. Please try again.',
+      description: err.data?.message || 'Something went wrong. Please try again.',
       color: 'error',
     })
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
@@ -152,7 +155,11 @@ async function onSubmit() {
 
     <template #left>
       <p class="text-muted text-sm">
-        Built by <NuxtLink to="https://clifland.in" target="_blank" class="hover:text-primary">Clifland</NuxtLink>
+        Built by <NuxtLink
+          to="https://clifland.in"
+          target="_blank"
+          class="hover:text-primary"
+        >Clifland</NuxtLink>
       </p>
     </template>
 
