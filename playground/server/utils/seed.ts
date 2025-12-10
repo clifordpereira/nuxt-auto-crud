@@ -32,7 +32,7 @@ export const seedDatabase = async () => {
   }
 
   // 2. Seed Resources
-  const resourcesToSeed = ['users']
+  const resourcesToSeed = ['users', 'subscribers']
   const resourceIds: Record<string, number> = {}
 
   for (const resourceName of resourcesToSeed) {
@@ -79,6 +79,7 @@ export const seedDatabase = async () => {
     { role: 'manager', resource: 'users', perms: ['create', 'read', 'update', 'delete', 'list'] },
     { role: 'moderator', resource: 'users', perms: ['read', 'list'] },
     { role: 'public', resource: 'users', perms: [] }, // Explicitly no permissions for public on users by default
+    { role: 'public', resource: 'subscribers', perms: ['create'] }, // Allow public to subscribe
   ]
 
   for (const config of rolePermissionsConfig) {

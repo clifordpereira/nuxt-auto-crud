@@ -2,7 +2,7 @@ import { defineAbility } from 'nuxt-authorization/utils'
 
 let publicPermissionsPromise: Promise<Record<string, string[]>> | null = null
 
-export default defineAbility(async (user, model: string, action: string) => {
+export const abilityLogic = async (user: any, model: string, action: string) => {
   // 1. Handle Public/Unauthenticated Access
   if (!user) {
     if (!publicPermissionsPromise) {
@@ -36,4 +36,6 @@ export default defineAbility(async (user, model: string, action: string) => {
   }
 
   return false
-})
+}
+
+export default defineAbility(abilityLogic)

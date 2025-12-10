@@ -83,13 +83,30 @@ const toast = useToast()
 const email = ref('')
 const loading = ref(false)
 
-function onSubmit() {
+async function onSubmit() {
   loading.value = true
+  try {
+    await $fetch('/api/subscribers', {
+      method: 'POST',
+      body: {
+        email: email.value,
+      },
+    })
 
-  toast.add({
-    title: 'Subscribed!',
-    description: 'You\'ve been subscribed to our newsletter.',
-  })
+    toast.add({
+      title: 'Subscribed!',
+      description: 'You\'ve been subscribed to our newsletter.',
+    })
+    email.value = ''
+  } catch (error: any) {
+    toast.add({
+      title: 'Error',
+      description: error.data?.message || 'Something went wrong. Please try again.',
+      color: 'error',
+    })
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 
@@ -122,6 +139,7 @@ function onSubmit() {
                       size="xs"
                       color="neutral"
                       label="Subscribe"
+                      :loading="loading"
                     />
                   </template>
                 </UInput>

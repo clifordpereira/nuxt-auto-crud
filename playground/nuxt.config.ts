@@ -20,6 +20,8 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
 
   runtimeConfig: {
+    adminEmail: 'admin@example.com',
+    adminPassword: '$1Password',
     public: {
       crudBaseUrl: '/api',
     },

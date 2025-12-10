@@ -58,4 +58,13 @@ CREATE TABLE `roles` (
 	`description` text
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `roles_name_unique` ON `roles` (`name`);
+CREATE UNIQUE INDEX `roles_name_unique` ON `roles` (`name`);--> statement-breakpoint
+CREATE TABLE `subscribers` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`created_at` integer NOT NULL,
+	`updated_at` integer NOT NULL,
+	`deleted_at` integer,
+	`email` text NOT NULL
+);
+--> statement-breakpoint
+CREATE UNIQUE INDEX `subscribers_email_unique` ON `subscribers` (`email`);
