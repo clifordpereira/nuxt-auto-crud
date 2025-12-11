@@ -13,6 +13,7 @@ And you don't need a separate Strapi or Supabase setup to automate your CRUD pro
 While this module exposes CRUD APIs, you are expected to build your own frontend application to consume them.
 
 - [✨ Release Notes](/CHANGELOG.md)
+- [🗺️ Roadmap](/ROADMAP.md)
 - [🎮 Try the Playground](/playground)
 
 ## 🚀 CRUD APIs are ready to use without code
@@ -322,25 +323,19 @@ npm run test
 
 ## 🛡️ Resource Configuration (RBAC)
 
-You can define fine-grained access control and resource policies using `autocrud.config.ts` in your project root. This file is optional and useful when you need specific rules per resource.
+You can define fine-grained access control and resource policies in your `nuxt.config.ts` under the `autoCrud` key.
 
 ```typescript
-// autocrud.config.ts
-export default {
-  resources: {
-    users: {
-      // Access Control
-      auth: {
-        // Admin has full access
-        admin: true,
-        // Public (unauthenticated) users can only list and read
-        public: ['list', 'read'],
-      },
-      // Field Visibility
-      publicColumns: ['id', 'name', 'avatar'], // Only these columns are returned to public users
+// nuxt.config.ts
+export default defineNuxtConfig({
+  autoCrud: {
+    resources: {
+      // Guest View: Only these columns are visible to unauthenticated users.
+      // Access control (who can list/read) is managed by your DB permissions.
+      users: ['id', 'name', 'avatar'], 
     },
-  }
-}
+  },
+})
 ```
 
 ## ⚠️ Known Issues

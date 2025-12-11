@@ -213,7 +213,8 @@ export function getHiddenFields(modelName: string): string[] {
  */
 export function getPublicColumns(modelName: string): string[] | undefined {
   const { resources } = useRuntimeConfig().autoCrud
-  return resources?.[modelName]?.publicColumns
+  // Runtime config structure now matches simple key-value
+  return resources?.[modelName]
 }
 
 /**

@@ -45,11 +45,7 @@ export default defineNuxtModule<ModuleOptions>({
 
     nuxt.options.alias['#authorization'] ||= 'nuxt-authorization/utils'
 
-    const { loadConfig } = await import('c12')
-    const { config: externalConfig } = await loadConfig<ModuleOptions>({
-      name: 'autocrud',
-      cwd: nuxt.options.rootDir,
-    })
+
 
     const mergedAuth: AuthOptions = options.auth === false
       ? { authentication: false, authorization: false, type: 'session' }
@@ -57,7 +53,7 @@ export default defineNuxtModule<ModuleOptions>({
           authentication: true,
           authorization: options.auth === true,
           type: 'session',
-          ...(typeof externalConfig?.auth === 'object' ? externalConfig.auth : {}),
+
           ...(typeof options.auth === 'object' ? options.auth : {}),
         }
 
@@ -69,7 +65,7 @@ export default defineNuxtModule<ModuleOptions>({
         jwtSecret: mergedAuth.jwtSecret,
       },
       resources: {
-        ...externalConfig?.resources,
+
         ...options.resources,
       },
     }
