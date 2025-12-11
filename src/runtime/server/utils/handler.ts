@@ -9,7 +9,7 @@ import { getUserSession } from '#imports'
 
 export async function ensureResourceAccess(event: H3Event, model: string, action: string): Promise<boolean> {
   const { auth } = useAutoCrudConfig()
-  
+
   // This throws 403 if not authorized
   const isAuthorized = await checkAdminAccess(event, model, action)
   if (!isAuthorized) {

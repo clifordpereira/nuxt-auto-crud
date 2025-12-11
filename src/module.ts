@@ -45,8 +45,6 @@ export default defineNuxtModule<ModuleOptions>({
 
     nuxt.options.alias['#authorization'] ||= 'nuxt-authorization/utils'
 
-
-
     const mergedAuth: AuthOptions = options.auth === false
       ? { authentication: false, authorization: false, type: 'session' }
       : {
