@@ -1,3 +1,26 @@
+## v1.15.0
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.14.1...v1.15.0)
+
+### 🚀 Enhancements
+
+- Implement status-based filtering and `list_all` permission for generic API endpoints, removing explicit `statusField` from schemas and dedicated active-item endpoints. ([fc97b04](https://github.com/clifordpereira/nuxt-auto-crud/commit/fc97b04))
+- Implement public permissions logic, add new quick start and public permissions blog posts, and refine type safety. ([75bad6a](https://github.com/clifordpereira/nuxt-auto-crud/commit/75bad6a))
+- Add testimonials table and refactor ability definition. ([595b0c5](https://github.com/clifordpereira/nuxt-auto-crud/commit/595b0c5))
+
+### 📖 Documentation
+
+- Add relationships and deployment guides, clarify `status` field behavior, and update pricing content. ([8d173f8](https://github.com/clifordpereira/nuxt-auto-crud/commit/8d173f8))
+- Update pricing FAQ content to refer to documentation, footer, and direct contact for links and information. ([d82aabe](https://github.com/clifordpereira/nuxt-auto-crud/commit/d82aabe))
+
+### 🏡 Chore
+
+- Suppress ESLint warnings for unused parameters and any types in `abilityLogic` test fixture. ([fe0635a](https://github.com/clifordpereira/nuxt-auto-crud/commit/fe0635a))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v1.14.1
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.14.0...v1.14.1)
