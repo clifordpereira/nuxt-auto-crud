@@ -1,3 +1,16 @@
+## v1.15.2
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.15.0...v1.15.2)
+
+### 🏡 Chore
+
+- **release:** V1.15.1 ([a2cfd52](https://github.com/clifordpereira/nuxt-auto-crud/commit/a2cfd52))
+- Remove redundant `no-unused-vars` eslint disable from ability logic. ([163ebe7](https://github.com/clifordpereira/nuxt-auto-crud/commit/163ebe7))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v1.15.1
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.15.0...v1.15.1)
