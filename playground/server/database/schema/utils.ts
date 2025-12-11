@@ -1,16 +1,13 @@
 import { integer, text } from 'drizzle-orm/sqlite-core'
 
 // 1. System Fields (Safe for almost every table)
+
 export const systemFields = {
   id: integer('id').primaryKey({ autoIncrement: true }),
+  status: text('status', { enum: ['active', 'inactive'] }).default('active'),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
   deletedAt: integer('deleted_at', { mode: 'timestamp' }), // Soft delete
-}
-
-// 2. Status Field (Optional)
-export const statusField = {
-  status: text('status', { enum: ['active', 'inactive'] }).default('active'),
 }
 
 // 3. Base Fields (Common descriptive fields for entities)

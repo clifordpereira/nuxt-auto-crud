@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "78cb81e0-45b3-49a4-b894-156130d5d4f2",
+  "id": "85464e1a-75ee-40e7-b4a1-a7423ff173da",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "users": {
@@ -13,6 +13,14 @@
           "primaryKey": true,
           "notNull": true,
           "autoincrement": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'active'"
         },
         "created_at": {
           "name": "created_at",
@@ -34,14 +42,6 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
-        },
-        "status": {
-          "name": "status",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": "'active'"
         },
         "name": {
           "name": "name",
@@ -117,6 +117,14 @@
           "notNull": true,
           "autoincrement": true
         },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'active'"
+        },
         "created_at": {
           "name": "created_at",
           "type": "integer",
@@ -137,14 +145,6 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
-        },
-        "status": {
-          "name": "status",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": "'active'"
         },
         "name": {
           "name": "name",
@@ -184,6 +184,14 @@
           "notNull": true,
           "autoincrement": true
         },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'active'"
+        },
         "created_at": {
           "name": "created_at",
           "type": "integer",
@@ -204,14 +212,6 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
-        },
-        "status": {
-          "name": "status",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": "'active'"
         },
         "name": {
           "name": "name",
@@ -251,6 +251,14 @@
           "primaryKey": true,
           "notNull": true,
           "autoincrement": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'active'"
         },
         "created_at": {
           "name": "created_at",
@@ -351,6 +359,14 @@
           "notNull": true,
           "autoincrement": true
         },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'active'"
+        },
         "created_at": {
           "name": "created_at",
           "type": "integer",
@@ -371,14 +387,6 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
-        },
-        "status": {
-          "name": "status",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": "'active'"
         },
         "name": {
           "name": "name",
@@ -418,6 +426,14 @@
           "primaryKey": true,
           "notNull": true,
           "autoincrement": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'active'"
         },
         "created_at": {
           "name": "created_at",
@@ -472,6 +488,14 @@
           "notNull": true,
           "autoincrement": true
         },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'inactive'"
+        },
         "created_at": {
           "name": "created_at",
           "type": "integer",
@@ -492,14 +516,6 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
-        },
-        "status": {
-          "name": "status",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": "'inactive'"
         },
         "name": {
           "name": "name",

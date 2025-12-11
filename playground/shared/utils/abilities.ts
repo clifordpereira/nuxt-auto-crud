@@ -4,7 +4,7 @@ let publicPermissionsPromise: Promise<Record<string, string[]>> | null = null
 
 export const abilityLogic = async (user: unknown, model: string, action: string) => {
   // 1. Admin has full access
-  if (user?.role === 'admin') {
+  if ((user as any)?.role === 'admin') {
     return true
   }
 

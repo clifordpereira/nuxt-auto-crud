@@ -3,7 +3,7 @@
 import type { H3Event } from 'h3'
 import { createError } from 'h3'
 // @ts-expect-error - #imports is available in runtime
-import { requireUserSession, allows, getUserSession, abilities as globalAbility } from '#imports'
+import { requireUserSession, allows, getUserSession, abilities as globalAbility, abilityLogic } from '#imports'
 import { useAutoCrudConfig } from './config'
 import { verifyJwtToken } from './jwt'
 
@@ -35,7 +35,8 @@ export async function checkAdminAccess(event: H3Event, model: string, action: st
   // Check authorization if enabled
   if (auth.authorization) {
     try {
-      const guestCheck = !user && (typeof globalAbility === 'function' ? globalAbility : null)
+      const guestCheck = !user && (typeof abilityLogic === 'function' ? abilityLogic : (typeof globalAbility === 'function' ? globalAbility : null))
+
       const allowed = guestCheck
         ? await guestCheck(null, model, action)
         : await allows(event, globalAbility, model, action)

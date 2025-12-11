@@ -9,7 +9,7 @@ interface Testimonial {
   status: string
 }
 
-const { data: testimonials } = await useFetch<Testimonial[]>('/api/active-testimonials', {
+const { data: testimonials } = await useFetch<Testimonial[]>('/api/testimonials', {
   default: () => [],
 })
 </script>

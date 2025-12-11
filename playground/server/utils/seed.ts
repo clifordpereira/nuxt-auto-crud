@@ -52,7 +52,7 @@ export const seedDatabase = async () => {
   }
 
   // 3. Seed Permissions
-  const permissionsToSeed = ['create', 'read', 'update', 'delete', 'list']
+  const permissionsToSeed = ['create', 'read', 'update', 'delete', 'list', 'list_all']
   const permissionIds: Record<string, number> = {}
 
   for (const code of permissionsToSeed) {
@@ -62,7 +62,7 @@ export const seedDatabase = async () => {
     if (!permission) {
       console.log(`Seeding permission: ${code}...`)
       const [inserted] = await db.insert(tables.permissions).values({
-        name: code.charAt(0).toUpperCase() + code.slice(1), // Capitalize for name
+        name: code === 'list_all' ? 'List All' : code.charAt(0).toUpperCase() + code.slice(1), // Capitalize for name
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         code: code as any,
         status: 'active',
@@ -76,12 +76,12 @@ export const seedDatabase = async () => {
 
   // 4. Assign Permissions to Roles (Example: Manager gets all on users, Moderator gets read/list on users)
   const rolePermissionsConfig = [
-    { role: 'manager', resource: 'users', perms: ['create', 'read', 'update', 'delete', 'list'] },
+    { role: 'manager', resource: 'users', perms: ['create', 'read', 'update', 'delete', 'list', 'list_all'] },
     { role: 'moderator', resource: 'users', perms: ['read', 'list'] },
     { role: 'public', resource: 'users', perms: [] }, // Explicitly no permissions for public on users by default
     { role: 'public', resource: 'subscribers', perms: ['create'] }, // Allow public to subscribe
-    { role: 'public', resource: 'testimonials', perms: ['create', 'read', 'list'] }, // Allow public to create and view testimonials
-    { role: 'manager', resource: 'testimonials', perms: ['create', 'read', 'update', 'delete', 'list'] },
+    { role: 'public', resource: 'testimonials', perms: ['create', 'read', 'list'] }, // Allow public to create and view testimonials (active only)
+    { role: 'manager', resource: 'testimonials', perms: ['create', 'read', 'update', 'delete', 'list', 'list_all'] },
   ]
 
   for (const config of rolePermissionsConfig) {

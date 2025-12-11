@@ -1,27 +1,27 @@
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
 import { relations } from 'drizzle-orm'
 import { users } from './users'
-import { systemFields, statusField, baseFields } from './utils'
+import { systemFields, baseFields } from './utils'
 
 export const roles = sqliteTable('roles', {
   ...systemFields,
-  ...statusField,
+
   ...baseFields,
   name: text('name').notNull().unique(), // Override baseFields name to be unique
 })
 
 export const resources = sqliteTable('resources', {
   ...systemFields,
-  ...statusField,
+
   ...baseFields,
   name: text('name').notNull().unique(), // Override baseFields name to be unique
 })
 
 export const permissions = sqliteTable('permissions', {
   ...systemFields,
-  ...statusField,
+
   ...baseFields,
-  code: text('code', { enum: ['list', 'create', 'read', 'update', 'delete'] }).notNull(),
+  code: text('code', { enum: ['list', 'list_all', 'create', 'read', 'update', 'delete'] }).notNull(),
 })
 
 export const roleResourcePermissions = sqliteTable('role_resource_permissions', {

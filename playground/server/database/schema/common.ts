@@ -1,10 +1,10 @@
 import { sqliteTable, text, index, integer } from 'drizzle-orm/sqlite-core'
-import { systemFields, statusField, baseFields } from './utils'
+import { systemFields, baseFields } from './utils'
 import { users } from './users'
 
 export const categories = sqliteTable('categories', {
   ...systemFields,
-  ...statusField,
+
   ...baseFields,
   slug: text('slug').notNull().unique(),
   type: text('type', { enum: ['post', 'product', 'service'] }).notNull().default('post'),
