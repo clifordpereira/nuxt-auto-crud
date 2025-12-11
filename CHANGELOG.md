@@ -1,3 +1,23 @@
+## v1.16.0
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.15.2...v1.16.0)
+
+### 🚀 Enhancements
+
+- Simplify resource configuration and access control by consolidating into nuxt.config.ts and removing external config files. ([cb06dac](https://github.com/clifordpereira/nuxt-auto-crud/commit/cb06dac))
+
+### 📖 Documentation
+
+- Update module status to Beta, clarify public view configuration, and update dev dependencies. ([7bdc4ae](https://github.com/clifordpereira/nuxt-auto-crud/commit/7bdc4ae))
+
+### 🏡 Chore
+
+- Remove unnecessary blank lines from module and handler files. ([03f1da2](https://github.com/clifordpereira/nuxt-auto-crud/commit/03f1da2))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v1.15.2
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.15.0...v1.15.2)
