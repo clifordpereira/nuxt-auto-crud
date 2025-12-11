@@ -1,5 +1,7 @@
 import { defineAbility } from 'nuxt-authorization/utils'
 
-export default defineAbility(() => {
+export const abilityLogic = (user: any, model: string, action: string) => {
   return true
-})
+}
+
+export default defineAbility(abilityLogic)
