@@ -49,10 +49,10 @@
   "dependencies": {
     "@nuxt/kit": "^4.2.1",
     "@types/pluralize": "^0.0.33",
-    "pluralize": "^8.0.0",
-    "scule": "^1.0.0",
     "c12": "^2.0.1",
-    "jose": "^5.9.6"
+    "jose": "^5.9.6",
+    "pluralize": "^8.0.0",
+    "scule": "^1.0.0"
   },
   "peerDependencies": {
     "drizzle-orm": ">=0.30.0"
@@ -68,8 +68,9 @@
     "@nuxt/schema": "^4.2.1",
     "@nuxt/test-utils": "^3.20.1",
     "@nuxthub/core": "^0.9.1",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "latest",
-    "better-sqlite3": "^12.4.6",
+    "better-sqlite3": "^12.5.0",
     "changelogen": "^0.6.2",
     "drizzle-kit": "^0.31.7",
     "drizzle-orm": "^0.38.3",

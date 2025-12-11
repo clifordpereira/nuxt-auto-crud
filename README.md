@@ -1,6 +1,6 @@
 # Nuxt Auto CRUD
 
-> **Note:** This module is currently in its alpha stage. However, you can use it to accelerate MVP development. It has not been tested thoroughly enough for production use; only happy-path testing is performed for each release.
+> **Note:** This module is widely used in MVP development and is rapidly maturing. While currently in **Beta**, the core API (CRUD) is stable. Breaking changes may still occur in configuration or advanced features. Production use is encouraged with version pinning.
 
 Auto-expose RESTful CRUD APIs for your **Nuxt** application based solely on your database schema. Minimal configuration required.
 
@@ -321,9 +321,10 @@ To run the tests locally:
 npm run test
 ```
 
-## 🛡️ Resource Configuration (RBAC)
+## 🛡️ Public View Configuration (Field Visibility)
 
-You can define fine-grained access control and resource policies in your `nuxt.config.ts` under the `autoCrud` key.
+You can define which fields are visible to unauthenticated (guest) users in your `nuxt.config.ts`.
+> **Note:** Access control (RBAC) - determining *who* can access *what* - is expected to be handled by your database/permissions system (using `nuxt-authorization`). This configuration only controls the *serialization* of the response for guests.
 
 ```typescript
 // nuxt.config.ts
@@ -340,8 +341,9 @@ export default defineNuxtConfig({
 
 ## ⚠️ Known Issues
 
-- **Foreign Key Naming:** Currently, if you have multiple foreign keys referring to the same table (e.g., `customer_id` and `author_id` both referring to the `users` table), the automatic relation handling might assume `user_id` for both. This is a known limitation in the current alpha version.
-- **Sidebar Visibility:** For non-admin users, the sidebar resource list might not be fully visible or populated in the current playground implementation. This is a known limitation.
+- **Automatic Relation Expansion:** The module tries to automatically expand foreign keys (e.g., `user_id` -> `user: { name: ... }`). However, this relies on the foreign key column name matching the target table name (e.g., `user_id` for `users`).
+  - **Limitation:** If you have custom FK names like `customer_id` or `author_id` pointing to `users`, the automatic expansion will not work yet.
+  - **Workaround:** Ensure your FK columns follow the `tablename_id` convention where possible for now.
 
 ## 🎮 Try the Playground
 
@@ -426,7 +428,12 @@ export default defineNuxtConfig({
     // Authentication configuration (see "Authentication Configuration" section)
     auth: {
         // ...
-    }
+    },
+
+    // Public Guest View Configuration (Field Visibility)
+    resources: {
+        users: ['id', 'name', 'avatar'],
+    },
   },
 });
 ```
@@ -467,6 +474,7 @@ You can customize hidden fields by modifying the `modelMapper.ts` utility.
 - **YouTube (Installation):** [https://youtu.be/M9-koXmhB9k](https://youtu.be/M9-koXmhB9k)
 - **YouTube (Add Schemas):** [https://youtu.be/7gW0KW1KtN0](https://youtu.be/7gW0KW1KtN0)
 - **YouTube (Various Permissions):** [https://www.youtube.com/watch?v=Yty3OCYbwOo](https://www.youtube.com/watch?v=Yty3OCYbwOo)
+- **YouTube (Dynamic RBAC):** [https://www.youtube.com/watch?v=W0ju4grRC9M](https://www.youtube.com/watch?v=W0ju4grRC9M)
 - **npm:** [https://www.npmjs.com/package/nuxt-auto-crud](https://www.npmjs.com/package/nuxt-auto-crud)
 - **Github Discussions:** [https://github.com/clifordpereira/nuxt-auto-crud/discussions/1](https://github.com/clifordpereira/nuxt-auto-crud/discussions/1)
 - **Discord:** [https://discord.gg/hGgyEaGu](https://discord.gg/hGgyEaGu)
