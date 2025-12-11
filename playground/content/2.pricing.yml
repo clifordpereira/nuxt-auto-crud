@@ -1,5 +1,5 @@
-title: A plan for every need
-description: Our plans are designed to meet the requirements of both beginners and players. Get the right plan that suits you.
+title: Flexible Plans for Hobbyists, Developers & Businesses
+description: Whether you're a non-techie or a seasoned developer, we have options to support your journey.
 seo:
   title: Pricing
   description: Choose the plan that's right for you.
@@ -73,7 +73,7 @@ faq:
   description: Everything you need to know about Nuxt Auto CRUD.
   items:
     - label: Which databases are supported?
-      content: We have currently tested 'Nuxt Auto CRUD' with SQLite only. Support for other Drizzle ORM compatible databases will be added in future updates.
+      content: We have currently tested Nuxt Auto CRUD with SQLite only. Support for other Drizzle ORM compatible databases will be added in future updates.
     - label: Can I create custom APIs?
       content: Yes! The exposed APIs are suitable for most tasks. You can leverage them for standard operations, and for things like reports or analytics dashboards, you can build custom APIs exactly as you would in any other project.
     - label: How is authentication handled?
@@ -83,6 +83,6 @@ faq:
     - label: Can I use it with existing projects?
       content: Yes, you can add Nuxt Auto CRUD to any existing Nuxt project. Check out the [installation guide](/docs/auto-crud/install-auto-crud) to get started.
     - label: Do you offer support?
-      content: We have channels for community discussion on [GitHub Discussions](https://github.com/clifordpereira/nuxt-auto-crud/discussions/1) or [Discord](https://discord.gg/hGgyEaGu). For dedicated support and setup assistance, please [contact me](mailto:clifordpereira@gmail.com).
+      content: We have channels for community discussion on [GitHub Discussions](https://github.com/clifordpereira/nuxt-auto-crud/discussions/1) or [Discord](https://discord.gg/hGgyEaGu). For paid support and setup assistance, please [contact me](mailto:clifordpereira@gmail.com).
     - label: Where can I report bugs?
       content: If you find a bug or have a feature request, please open an issue on [GitHub](https://github.com/clifordpereira/nuxt-auto-crud/issues).
