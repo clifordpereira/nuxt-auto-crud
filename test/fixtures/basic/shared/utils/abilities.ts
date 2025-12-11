@@ -1,6 +1,7 @@
 import { defineAbility } from 'nuxt-authorization/utils'
 
-export const abilityLogic = (user: any, model: string, action: string) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
+export const abilityLogic = (_user: any, _model: string, _action: string) => {
   return true
 }
 
