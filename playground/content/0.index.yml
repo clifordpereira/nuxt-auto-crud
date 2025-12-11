@@ -122,6 +122,8 @@ testimonials:
         description: Author of Nuxt Auto CRUD
         avatar:
           src: https://github.com/clifordpereira.png
+
+
 cta:
   title: Ready to speed up your development?
   description: Install Nuxt Auto CRUD today and stop writing boilerplate code.

@@ -28,7 +28,7 @@ export default eventHandler(async (event) => {
   let query = useDrizzle().select().from(table)
 
   // Filter active rows for non-admins (or those without list_all) if status field exists
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   if (!canListAll && 'status' in columns) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     query = query.where(eq((table as any).status, 'active')) as any

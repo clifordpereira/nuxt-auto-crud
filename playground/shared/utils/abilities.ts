@@ -2,16 +2,22 @@ import { defineAbility } from 'nuxt-authorization/utils'
 
 let publicPermissionsPromise: Promise<Record<string, string[]>> | null = null
 
+interface User {
+  role?: string
+  permissions?: Record<string, string[]>
+}
+
 export const abilityLogic = async (user: unknown, model: string, action: string) => {
+  const userRecord = user as User
+
   // 1. Admin has full access
-  if ((user as any)?.role === 'admin') {
+  if (userRecord?.role === 'admin') {
     return true
   }
 
   // 2. Check permissions from session (DB-driven) for logged-in users
   if (user) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const resourcePermissions = (user as any)?.permissions?.[model]
+    const resourcePermissions = userRecord?.permissions?.[model]
 
     if (Array.isArray(resourcePermissions) && resourcePermissions.includes(action)) {
       return true

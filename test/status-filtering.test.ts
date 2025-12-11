@@ -11,7 +11,7 @@ describe('Status Filtering Tests', () => {
 
   beforeAll(async () => {
     // 1. Setup Admin API Client with Login
-    let adminHeaders: Record<string, string> = {}
+    const adminHeaders: Record<string, string> = {}
     try {
       const response = await ofetch.raw(`http://localhost:${PORT}/api/auth/login`, {
         method: 'POST',
@@ -24,7 +24,8 @@ describe('Status Filtering Tests', () => {
       if (setCookie) {
         adminHeaders.cookie = setCookie
       }
-    } catch (e) {
+    }
+    catch (e) {
       console.error('Admin login failed', e)
       throw e
     }
@@ -77,7 +78,7 @@ describe('Status Filtering Tests', () => {
   describe('Admin Access (Has list_all permission)', () => {
     it('should list both active and inactive items', async () => {
       const list = await adminApi('/api/testimonials')
-      const ids = list.map((item: any) => item.id)
+      const ids = list.map((item: { id: number }) => item.id)
       expect(ids).toContain(activeId)
       expect(ids).toContain(inactiveId)
     })
@@ -102,7 +103,8 @@ describe('Status Filtering Tests', () => {
         console.log('Public Permissions:', JSON.stringify(perms, null, 2))
         expect(perms).toBeDefined()
         expect(perms.testimonials).toContain('read')
-      } catch (err) {
+      }
+      catch (err) {
         console.error('Failed to fetch public permissions in test:', err)
         throw err
       }
@@ -110,7 +112,7 @@ describe('Status Filtering Tests', () => {
 
     it('should list ONLY active items', async () => {
       const list = await publicApi('/api/testimonials')
-      const ids = list.map((item: any) => item.id)
+      const ids = list.map((item: { id: number }) => item.id)
       expect(ids).toContain(activeId)
       expect(ids).not.toContain(inactiveId)
     })
@@ -125,8 +127,10 @@ describe('Status Filtering Tests', () => {
         await publicApi(`/api/testimonials/${inactiveId}`)
         // Should fail if it succeeds
         expect(true).toBe(false)
-      } catch (err: any) {
-        expect(err.statusCode).toBe(404)
+      }
+      catch (err: unknown) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        expect((err as any).statusCode).toBe(404)
       }
     })
   })

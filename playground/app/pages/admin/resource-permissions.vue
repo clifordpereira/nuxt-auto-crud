@@ -185,7 +185,7 @@ const displayPermissions = computed(() => {
 
 // Ensure a role is selected
 watch(items, (newItems) => {
-  if (newItems.length > 0 && (selectedIndex.value < 0 || selectedIndex.value >= newItems.length)) {
+  if (newItems.length > 0) {
     selectedIndex.value = 0
   }
 }, { immediate: true })
