@@ -80,11 +80,11 @@ export default defineNuxtConfig({
   modules: ['@nuxthub/core', 'nuxt-auto-crud'],
 
   hub: {
-    database: true,
+    db: 'sqlite',
   },
 
   autoCrud: {
-    schemaPath: 'server/database/schema',
+    schemaPath: 'server/db/schema',
     // auth: false,
     auth: {
       type: 'session', // for Normal Authentication with nuxt-auth-utils
@@ -102,7 +102,7 @@ Add the generation script to your `package.json`:
 ```json
 {
   "scripts": {
-    "db:generate": "drizzle-kit generate"
+    "db:generate": "nuxt db generate"
   }
   // ...
 }
@@ -116,8 +116,8 @@ import { defineConfig } from 'drizzle-kit'
 
 export default defineConfig({
   dialect: 'sqlite',
-  schema: './server/database/schema/index.ts', // Point to your schema index file
-  out: './server/database/migrations'
+  schema: './server/db/schema/index.ts', // Point to your schema index file
+  out: './server/db/migrations'
 })
 ```
 
@@ -127,15 +127,13 @@ Create `server/utils/drizzle.ts` to export the database instance:
 
 ```typescript
 // server/utils/drizzle.ts
-import { drizzle } from 'drizzle-orm/d1'
+import { db, schema } from 'hub:db'
 export { sql, eq, and, or } from 'drizzle-orm'
-
-import * as schema from '../database/schema'
 
 export const tables = schema
 
 export function useDrizzle() {
-  return drizzle(hubDatabase(), { schema })
+  return db
 }
 
 export type User = typeof schema.users.$inferSelect
@@ -143,10 +141,10 @@ export type User = typeof schema.users.$inferSelect
 
 #### Define your database schema
 
-Create your schema files in `server/database/schema/`. For example, `server/database/schema/users.ts`:
+Create your schema files in `server/db/schema/`. For example, `server/db/schema/users.ts`:
 
 ```typescript
-// server/database/schema/users.ts
+// server/db/schema/users.ts
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
 
 export const users = sqliteTable('users', {
@@ -174,7 +172,7 @@ That's it! 🎉 Your CRUD APIs are now available at `/api/users`.
 To add a new table (e.g., `posts`), simply create a new file in your schema directory:
 
 ```typescript
-// server/database/schema/posts.ts
+// server/db/schema/posts.ts
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
 import { users } from './users'
 
@@ -187,10 +185,10 @@ export const posts = sqliteTable('posts', {
 })
 ```
 
-Then, ensure it is exported in your `server/database/schema/index.ts` (if you are using an index file) or that your `drizzle.config.ts` is pointing to the correct location.
+Then, ensure it is exported in your `server/db/schema/index.ts` (if you are using an index file) or that your `drizzle.config.ts` is pointing to the correct location.
 
 ```typescript
-// server/database/schema/index.ts
+// server/db/schema/index.ts
 export * from './users'
 export * from './posts'
 ```
@@ -217,7 +215,7 @@ In this case, you might handle authentication differently (e.g., validating toke
 export default defineNuxtConfig({
   modules: ['nuxt-auto-crud'],
   autoCrud: {
-    schemaPath: 'server/database/schema',
+    schemaPath: 'server/db/schema',
     // auth: false, // Uncomment this line for testing APIs without auth   
     auth: {
       type: 'jwt', // for app providing backend apis only
@@ -239,8 +237,8 @@ import { defineConfig } from 'drizzle-kit'
 
 export default defineConfig({
   dialect: 'sqlite',
-  schema: './server/database/schema/index.ts',
-  out: './server/database/migrations',
+  schema: './server/db/schema/index.ts',
+  out: './server/db/migrations',
   tablesFilter: ['!_hub_migrations'],
 })
 ```
@@ -423,7 +421,7 @@ await $fetch("/api/users/1", {
 export default defineNuxtConfig({
   autoCrud: {
     // Path to your database schema file (relative to project root)
-    schemaPath: "server/database/schema", // default
+    schemaPath: "server/db/schema", // default
     
     // Authentication configuration (see "Authentication Configuration" section)
     auth: {

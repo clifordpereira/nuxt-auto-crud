@@ -5,12 +5,12 @@ export default defineNuxtConfig({
 
   // NuxtHub configuration for local database
   hub: {
-    database: true,
+    db: 'sqlite',
   },
 
   // Auto CRUD configuration
   autoCrud: {
-    schemaPath: 'server/database/schema',
+    schemaPath: 'server/db/schema',
     // auth: false, // Uncomment this line for testing APIs without auth
     auth: {
       type: 'jwt', // for app providing backend apis only

@@ -1,0 +1,15 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"compatibility_date": "2025-12-11",
+
+	"observability": {
+		"enabled": true
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "nac-template-db",
+			"database_id": "7f9f32d0-68c5-44ac-8a13-4928caefd799"
+		}
+	]
+}

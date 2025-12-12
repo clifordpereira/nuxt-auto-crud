@@ -45,14 +45,18 @@ export default defineNuxtConfig({
       tasks: true,
       openAPI: true,
     },
+    // preset: 'cloudflare_module',
+    // cloudflare: {
+    //   nodeCompat: true
+    // }
   },
 
   hub: {
-    database: true,
+    db: 'sqlite',
   },
 
   autoCrud: {
-    schemaPath: 'server/database/schema',
+    schemaPath: 'server/db/schema',
     auth: {
       type: 'session',
       authentication: true,

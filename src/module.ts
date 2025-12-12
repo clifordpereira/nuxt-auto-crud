@@ -22,7 +22,7 @@ export default defineNuxtModule<ModuleOptions>({
     configKey: 'autoCrud',
   },
   defaults: {
-    schemaPath: 'server/database/schema',
+    schemaPath: 'server/db/schema',
     drizzlePath: 'server/utils/drizzle',
     auth: false,
   },

@@ -10,15 +10,16 @@
     "lint": "eslint .",
     "typecheck": "nuxt typecheck",
     "test": "vitest",
-    "db:generate": "drizzle-kit generate"
+    "db:generate": "nuxt db generate"
   },
   "dependencies": {
     "@iconify-json/lucide": "^1.2.75",
     "@iconify-json/simple-icons": "^1.2.60",
+    "@libsql/client": "^0.15.15",
     "@nuxt/content": "^3.8.2",
     "@nuxt/image": "^2.0.0",
     "@nuxt/ui": "^4.2.1",
-    "@nuxthub/core": "^0.9.1",
+    "@nuxthub/core": "^0.10.1",
     "@standard-schema/spec": "^1.0.0",
     "@vueuse/nuxt": "^13.9.0",
     "bcryptjs": "^3.0.3",

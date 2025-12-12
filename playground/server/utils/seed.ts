@@ -1,5 +1,5 @@
 import { eq, and } from 'drizzle-orm'
-import * as tables from '../database/schema'
+import * as tables from '../db/schema'
 
 export const seedDatabase = async () => {
   console.log('Running DB seed task...')

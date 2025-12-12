@@ -1,18 +1,34 @@
-CREATE TABLE `users` (
+CREATE TABLE `categories` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`status` text DEFAULT 'active',
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
 	`deleted_at` integer,
 	`name` text NOT NULL,
-	`email` text NOT NULL,
-	`password` text NOT NULL,
-	`avatar` text,
-	`role_id` integer,
-	FOREIGN KEY (`role_id`) REFERENCES `roles`(`id`) ON UPDATE no action ON DELETE no action
+	`description` text,
+	`slug` text NOT NULL,
+	`type` text DEFAULT 'post' NOT NULL
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `users_email_unique` ON `users` (`email`);--> statement-breakpoint
+CREATE UNIQUE INDEX `categories_slug_unique` ON `categories` (`slug`);--> statement-breakpoint
+CREATE TABLE `comments` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`status` text DEFAULT 'active',
+	`created_at` integer NOT NULL,
+	`updated_at` integer NOT NULL,
+	`deleted_at` integer,
+	`content` text NOT NULL,
+	`resource_type` text NOT NULL,
+	`resource_id` integer NOT NULL,
+	`user_id` integer,
+	`author_name` text,
+	`author_email` text,
+	`rating` integer,
+	`is_approved` integer DEFAULT false,
+	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
+);
+--> statement-breakpoint
+CREATE INDEX `resource_idx` ON `comments` (`resource_type`,`resource_id`);--> statement-breakpoint
 CREATE TABLE `permissions` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`status` text DEFAULT 'active',
@@ -82,3 +98,19 @@ CREATE TABLE `testimonials` (
 	`avatar` text,
 	`company` text
 );
+--> statement-breakpoint
+CREATE TABLE `users` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`status` text DEFAULT 'active',
+	`created_at` integer NOT NULL,
+	`updated_at` integer NOT NULL,
+	`deleted_at` integer,
+	`name` text NOT NULL,
+	`email` text NOT NULL,
+	`password` text NOT NULL,
+	`avatar` text,
+	`role_id` integer,
+	FOREIGN KEY (`role_id`) REFERENCES `roles`(`id`) ON UPDATE no action ON DELETE no action
+);
+--> statement-breakpoint
+CREATE UNIQUE INDEX `users_email_unique` ON `users` (`email`);

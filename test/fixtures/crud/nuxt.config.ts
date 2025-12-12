@@ -12,9 +12,9 @@ export default defineNuxtConfig({
     '#authorization': fileURLToPath(new URL('./auth-mock.ts', import.meta.url)),
   },
   hub: {
-    database: true,
+    db: 'sqlite',
   },
   autoCrud: {
-    schemaPath: 'server/database/schema',
+    schemaPath: 'server/db/schema',
   },
 })
