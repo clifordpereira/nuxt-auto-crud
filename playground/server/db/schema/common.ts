@@ -7,7 +7,7 @@ export const categories = sqliteTable('categories', {
 
   ...baseFields,
   slug: text('slug').notNull().unique(),
-  type: text('type', { enum: ['post', 'product', 'service'] }).notNull().default('post'),
+  type: text('type', { enum: ['post', 'product', 'service'] }).notNull().default('post')
 })
 
 export const comments = sqliteTable('comments', {
@@ -23,7 +23,7 @@ export const comments = sqliteTable('comments', {
   authorEmail: text('author_email'), // For guest comments
 
   rating: integer('rating'), // Optional: 1-5 stars. If present, this acts as a "Review"
-  isApproved: integer('is_approved', { mode: 'boolean' }).default(false),
+  isApproved: integer('is_approved', { mode: 'boolean' }).default(false)
 }, t => ({
-  resourceIdx: index('resource_idx').on(t.resourceType, t.resourceId),
+  resourceIdx: index('resource_idx').on(t.resourceType, t.resourceId)
 }))

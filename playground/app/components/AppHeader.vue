@@ -8,16 +8,16 @@ async function logout() {
 
 const items = computed(() => [{
   label: 'Docs',
-  to: '/docs/auto-crud',
+  to: '/docs/auto-crud'
 }, {
   label: 'Pricing',
-  to: '/pricing',
+  to: '/pricing'
 }, {
   label: 'Blog',
-  to: '/blog',
+  to: '/blog'
 }, {
   label: 'Changelog',
-  to: '/changelog',
+  to: '/changelog'
 }])
 </script>
 

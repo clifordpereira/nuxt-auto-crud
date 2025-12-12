@@ -1,18 +1,18 @@
 <script setup lang="ts">
 defineOptions({
-  name: 'DashboardPage',
+  name: 'DashboardPage'
 })
 
 definePageMeta({
   layout: 'dashboard',
-  middleware: 'auth',
+  middleware: 'auth'
 })
 
 const config = useRuntimeConfig().public
 const crudBaseUrl = config.crudBaseUrl || '/api'
 
 const { data: users } = await useFetch<unknown[]>(`${crudBaseUrl}/users`, {
-  headers: crudHeaders(),
+  headers: crudHeaders()
 })
 
 const userCount = computed(() => users.value?.length || 0)

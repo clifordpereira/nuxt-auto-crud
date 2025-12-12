@@ -3,7 +3,7 @@ import { z } from 'zod'
 
 const loginSchema = z.object({
   email: z.string().email(),
-  password: z.string(),
+  password: z.string()
 })
 
 export default eventHandler(async (event) => {
@@ -12,7 +12,7 @@ export default eventHandler(async (event) => {
 
   let result = await db.select({
     user: tables.users,
-    role: tables.roles.name,
+    role: tables.roles.name
   })
     .from(tables.users)
     .leftJoin(tables.roles, eq(tables.users.roleId, tables.roles.id))
@@ -26,7 +26,7 @@ export default eventHandler(async (event) => {
       // Fetch again
       result = await db.select({
         user: tables.users,
-        role: tables.roles.name,
+        role: tables.roles.name
       })
         .from(tables.users)
         .leftJoin(tables.roles, eq(tables.users.roleId, tables.roles.id))
@@ -38,7 +38,7 @@ export default eventHandler(async (event) => {
   if (!result || !result.user || !await verifyPassword(result.user.password, body.password)) {
     throw createError({
       statusCode: 401,
-      message: 'Invalid credentials',
+      message: 'Invalid credentials'
     })
   }
 
@@ -51,7 +51,7 @@ export default eventHandler(async (event) => {
   if (user.roleId) {
     const permissionsData = await db.select({
       resource: tables.resources.name,
-      action: tables.permissions.code,
+      action: tables.permissions.code
     })
       .from(tables.roleResourcePermissions)
       .innerJoin(tables.resources, eq(tables.roleResourcePermissions.resourceId, tables.resources.id))
@@ -74,8 +74,8 @@ export default eventHandler(async (event) => {
       name: user.name,
       avatar: user.avatar,
       role: role,
-      permissions: permissions,
-    },
+      permissions: permissions
+    }
   })
 
   return { user }

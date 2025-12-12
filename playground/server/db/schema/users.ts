@@ -10,12 +10,12 @@ export const users = sqliteTable('users', {
   email: text('email').notNull().unique(),
   password: text('password').notNull(),
   avatar: text('avatar'),
-  roleId: integer('role_id').references(() => roles.id),
+  roleId: integer('role_id').references(() => roles.id)
 })
 
 export const usersRelations = relations(users, ({ one }) => ({
   assignedRole: one(roles, {
     fields: [users.roleId],
-    references: [roles.id],
-  }),
+    references: [roles.id]
+  })
 }))
