@@ -77,7 +77,7 @@ export default defineNuxtConfig({
   scripts: {
     registry: {
       googleAnalytics: {
-        id: 'G-2Q3XHYBQC6',
+        id: process.env.NUXT_PUBLIC_GA_ID || '',
       },
     },
   },
