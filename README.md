@@ -45,7 +45,7 @@ bun run dev
 1.  **Fullstack App**: The template includes the `nuxt-auto-crud` module, providing both the backend APIs and the frontend UI. [Watch Demo](https://youtu.be/M9-koXmhB9k)
 2.  **Frontend Only**: You can use the template just for the frontend. In this case, you don't need to install the module in the frontend app. Instead, you would install `nuxt-auto-crud` in a separate backend setup (e.g., another Nuxt project acting as the API).
 
-Detailed instructions can be found in [https://auto-crud.clifland.in/docs](https://auto-crud.clifland.in/docs)
+Detailed instructions can be found in [https://auto-crud.clifland.in/docs/auto-crud](https://auto-crud.clifland.in/docs/auto-crud)
 
 ### 2. Manual Setup (Existing Project)
 
@@ -469,7 +469,7 @@ You can customize hidden fields by modifying the `modelMapper.ts` utility.
 ## 🔗 Other Helpful Links
 
 - **Template:** [https://github.com/clifordpereira/nuxt-auto-crud_template](https://github.com/clifordpereira/nuxt-auto-crud_template)
-- **Docs:** [https://auto-crud.clifland.in/docs](https://auto-crud.clifland.in/docs/auto-crud)
+- **Docs:** [https://auto-crud.clifland.in/docs/auto-crud](https://auto-crud.clifland.in/docs/auto-crud)
 - **Repo:** [https://github.com/clifordpereira/nuxt-auto-crud](https://github.com/clifordpereira/nuxt-auto-crud)
 - **YouTube (Installation):** [https://youtu.be/M9-koXmhB9k](https://youtu.be/M9-koXmhB9k)
 - **YouTube (Add Schemas):** [https://youtu.be/7gW0KW1KtN0](https://youtu.be/7gW0KW1KtN0)
