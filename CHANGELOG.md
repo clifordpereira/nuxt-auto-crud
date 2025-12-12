@@ -1,3 +1,24 @@
+## v1.17.0
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.16.0...v1.17.0)
+
+### 🚀 Enhancements
+
+- Add `@nuxt/scripts` module with Google Analytics ID and update various dependencies. ([11c1e44](https://github.com/clifordpereira/nuxt-auto-crud/commit/11c1e44))
+
+### 📖 Documentation
+
+- Update documentation links to the correct path ([e2c9097](https://github.com/clifordpereira/nuxt-auto-crud/commit/e2c9097))
+
+### 🏡 Chore
+
+- **release:** V1.16.1 ([7f74e59](https://github.com/clifordpereira/nuxt-auto-crud/commit/7f74e59))
+- Relocate Google Analytics script configuration. ([b41f40d](https://github.com/clifordpereira/nuxt-auto-crud/commit/b41f40d))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v1.16.1
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.16.0...v1.16.1)
