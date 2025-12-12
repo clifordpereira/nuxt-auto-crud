@@ -44,7 +44,7 @@ export default defineNuxtModule<ModuleOptions>({
     nuxt.options.alias['#site/drizzle'] = drizzlePath
 
     addImportsDir(resolver.resolve(nuxt.options.rootDir, 'shared/utils'))
-    
+
     // Add stubs for optional modules
     const stubsPath = resolver.resolve('./runtime/server/stubs/auth')
     if (!hasNuxtModule('nuxt-auth-utils')) {

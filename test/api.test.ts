@@ -52,7 +52,7 @@ describe(`API Tests (${SUITE})`, () => {
         .setIssuedAt()
         .setExpirationTime('2h')
         .sign(secret)
-      
+
       headers.Authorization = `Bearer ${token}`
     }
 

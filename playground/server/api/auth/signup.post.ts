@@ -4,7 +4,7 @@ import { z } from 'zod'
 const signupSchema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
-  password: z.string().min(8)
+  password: z.string().min(8),
 })
 
 export default eventHandler(async (event) => {
@@ -16,7 +16,7 @@ export default eventHandler(async (event) => {
   if (existingUser) {
     throw createError({
       statusCode: 400,
-      message: 'User already exists'
+      message: 'User already exists',
     })
   }
 
@@ -32,7 +32,7 @@ export default eventHandler(async (event) => {
     email: body.email,
     password: hashedPassword,
     status: 'active',
-    roleId: defaultRole?.id
+    roleId: defaultRole?.id,
   }).returning().get()
 
   // Set session
@@ -43,8 +43,8 @@ export default eventHandler(async (event) => {
       name: user.name,
       avatar: user.avatar,
       role: defaultRole?.name || 'user',
-      permissions: {}
-    }
+      permissions: {},
+    },
   })
 
   return { user }

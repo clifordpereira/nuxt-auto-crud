@@ -10,7 +10,7 @@ const props = withDefaults(defineProps<{
   color: 'primary',
   variant: 'solid',
   size: 'lg',
-  class: ''
+  class: '',
 })
 
 const isOpen = ref(false)
@@ -19,7 +19,7 @@ const { fetch: refreshSession } = useUserSession()
 
 const state = reactive({
   email: 'admin@example.com',
-  password: '$1Password'
+  password: '$1Password',
 })
 
 const loading = ref(false)
@@ -29,7 +29,7 @@ async function onSubmit() {
   try {
     await $fetch('/api/auth/login', {
       method: 'POST',
-      body: state
+      body: state,
     })
     await refreshSession()
 
@@ -40,11 +40,12 @@ async function onSubmit() {
     isOpen.value = false
     // Redirect to dashboard after successful login
     await navigateTo('/resource/users')
-  } catch (err: unknown) {
+  }
+  catch (err: unknown) {
     toast.add({
       title: 'Error',
       description: (err as { data?: { message?: string } }).data?.message || 'Invalid credentials',
-      color: 'error'
+      color: 'error',
     })
     loading.value = false
   }

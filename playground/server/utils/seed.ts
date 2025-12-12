@@ -20,7 +20,7 @@ export const seedDatabase = async () => {
         name: roleName,
         status: 'active',
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       }).returning()
       role = inserted
       console.log(`Role ${roleName} seeded.`)
@@ -44,7 +44,7 @@ export const seedDatabase = async () => {
         name: resourceName,
         status: 'active',
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       }).returning()
       resource = inserted
     }
@@ -67,7 +67,7 @@ export const seedDatabase = async () => {
         code: code as any,
         status: 'active',
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       }).returning()
       permission = inserted
     }
@@ -81,7 +81,7 @@ export const seedDatabase = async () => {
     { role: 'public', resource: 'users', perms: [] }, // Explicitly no permissions for public on users by default
     { role: 'public', resource: 'subscribers', perms: ['create'] }, // Allow public to subscribe
     { role: 'public', resource: 'testimonials', perms: ['create', 'read', 'list'] }, // Allow public to create and view testimonials (active only)
-    { role: 'manager', resource: 'testimonials', perms: ['create', 'read', 'update', 'delete', 'list', 'list_all'] }
+    { role: 'manager', resource: 'testimonials', perms: ['create', 'read', 'update', 'delete', 'list', 'list_all'] },
   ]
 
   for (const config of rolePermissionsConfig) {
@@ -97,7 +97,7 @@ export const seedDatabase = async () => {
             .where(and(
               eq(tables.roleResourcePermissions.roleId, rId),
               eq(tables.roleResourcePermissions.resourceId, resId),
-              eq(tables.roleResourcePermissions.permissionId, pId)
+              eq(tables.roleResourcePermissions.permissionId, pId),
             ))
             .get()
 
@@ -107,7 +107,7 @@ export const seedDatabase = async () => {
               resourceId: resId,
               permissionId: pId,
               createdAt: new Date(),
-              updatedAt: new Date()
+              updatedAt: new Date(),
             })
             console.log(`Assigned ${permCode} on ${config.resource} to ${config.role}`)
           }
@@ -122,7 +122,7 @@ export const seedDatabase = async () => {
     { email: config.adminEmail, name: 'Admin User', role: 'admin' },
     { email: 'manager@example.com', name: 'Manager User', role: 'manager' },
     { email: 'moderator@example.com', name: 'Moderator User', role: 'moderator' },
-    { email: 'customer@example.com', name: 'Customer User', role: 'customer' }
+    { email: 'customer@example.com', name: 'Customer User', role: 'customer' },
   ]
 
   for (const userData of usersToSeed) {
@@ -140,7 +140,7 @@ export const seedDatabase = async () => {
         avatar: `https://i.pravatar.cc/150?u=${userData.role}`,
         roleId: roleIds[userData.role],
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       })
       console.log(`User ${userData.email} seeded.`)
       results.push(userData.role)

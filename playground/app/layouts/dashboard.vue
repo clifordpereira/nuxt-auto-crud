@@ -13,7 +13,7 @@ const mainLinks = computed(() => {
     ...item,
     onSelect: () => {
       open.value = false
-    }
+    },
   }))
 
   // Filter out permissions menu for non-admins
@@ -30,7 +30,7 @@ const footerLinks = computed(() => footerMenu.map(item => ({
   ...item,
   onSelect: () => {
     open.value = false
-  }
+  },
 })))
 </script>
 

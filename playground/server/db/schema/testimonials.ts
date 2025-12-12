@@ -8,5 +8,5 @@ export const testimonials = sqliteTable('testimonials', {
   role: text('role').notNull(),
   content: text('content').notNull(),
   avatar: text('avatar'),
-  company: text('company')
+  company: text('company'),
 })

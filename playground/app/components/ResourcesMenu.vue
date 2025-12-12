@@ -8,7 +8,7 @@ const props = defineProps<{
 
 const { schemas } = await useResourceSchemas()
 const resourceNames = computed(() =>
-  Object.keys(schemas.value || {}).filter(name => !['users', 'roles', 'permissions', 'resources', 'roleResourcePermissions'].includes(name))
+  Object.keys(schemas.value || {}).filter(name => !['users', 'roles', 'permissions', 'resources', 'roleResourcePermissions'].includes(name)),
 )
 
 const items = computed(() => [{
@@ -18,8 +18,8 @@ const items = computed(() => [{
   children: resourceNames.value.map(resource => ({
     label: resource.charAt(0).toUpperCase() + resource.slice(1),
     to: `/admin/${resource}`,
-    onSelect: props.onSelect
-  }))
+    onSelect: props.onSelect,
+  })),
 }] satisfies NavigationMenuItem[])
 </script>
 

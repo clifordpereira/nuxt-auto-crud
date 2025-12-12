@@ -4,7 +4,7 @@ export default defineNitroPlugin((nitroApp) => {
       resolveServerUser: async () => {
         const session = await getUserSession(event)
         return session.user ?? null
-      }
+      },
     }
   })
 })
