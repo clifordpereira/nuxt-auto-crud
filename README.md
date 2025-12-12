@@ -469,7 +469,7 @@ You can customize hidden fields by modifying the `modelMapper.ts` utility.
 ## 🔗 Other Helpful Links
 
 - **Template:** [https://github.com/clifordpereira/nuxt-auto-crud_template](https://github.com/clifordpereira/nuxt-auto-crud_template)
-- **Docs:** [https://auto-crud.clifland.in/docs](https://auto-crud.clifland.in/docs)
+- **Docs:** [https://auto-crud.clifland.in/docs](https://auto-crud.clifland.in/docs/auto-crud)
 - **Repo:** [https://github.com/clifordpereira/nuxt-auto-crud](https://github.com/clifordpereira/nuxt-auto-crud)
 - **YouTube (Installation):** [https://youtu.be/M9-koXmhB9k](https://youtu.be/M9-koXmhB9k)
 - **YouTube (Add Schemas):** [https://youtu.be/7gW0KW1KtN0](https://youtu.be/7gW0KW1KtN0)

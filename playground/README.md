@@ -2,7 +2,7 @@
 
 A starter template for [Nuxt Auto CRUD](https://github.com/clifordpereira/nuxt-auto-crud) module.
 
-- [Documentation](https://auto-crud.clifland.in/)
+- [Documentation](https://auto-crud.clifland.in/docs/auto-crud)
 - [Module Repo](https://github.com/clifordpereira/nuxt-auto-crud)
 - [Report Issue](https://github.com/clifordpereira/nuxt-auto-crud/issues)
 - [Creator Website](https://www.clifland.in/)
