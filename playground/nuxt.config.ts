@@ -8,6 +8,7 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
     'nuxt-og-image',
     '@nuxthub/core',
+    '@nuxt/scripts',
     'nuxt-auth-utils',
     'nuxt-authorization',
     '../src/module',
@@ -18,6 +19,13 @@ export default defineNuxtConfig({
   },
 
   css: ['~/assets/css/main.css'],
+  scripts: {
+    registry: {
+      googleAnalytics: {
+        id: "G-2Q3XHYBQC6",
+      },
+    },
+  },
 
   runtimeConfig: {
     adminEmail: 'admin@example.com',
