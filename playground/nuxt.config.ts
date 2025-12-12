@@ -19,13 +19,6 @@ export default defineNuxtConfig({
   },
 
   css: ['~/assets/css/main.css'],
-  scripts: {
-    registry: {
-      googleAnalytics: {
-        id: "G-2Q3XHYBQC6",
-      },
-    },
-  },
 
   runtimeConfig: {
     adminEmail: 'admin@example.com',
@@ -72,6 +65,13 @@ export default defineNuxtConfig({
       stylistic: {
         commaDangle: 'never',
         braceStyle: '1tbs',
+      },
+    },
+  },
+  scripts: {
+    registry: {
+      googleAnalytics: {
+        id: 'G-2Q3XHYBQC6',
       },
     },
   },
