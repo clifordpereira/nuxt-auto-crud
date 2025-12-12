@@ -5,7 +5,7 @@ import { SignJWT } from 'jose'
 
 const JWT_SECRET = 'test-secret-key-123'
 
-describe.skip('JWT Authentication', async () => {
+describe('JWT Authentication', async () => {
   await setup({
     rootDir: fileURLToPath(new URL('./fixtures/jwt', import.meta.url)),
   })

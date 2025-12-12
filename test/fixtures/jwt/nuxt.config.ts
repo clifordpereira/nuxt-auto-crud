@@ -8,11 +8,10 @@ const modulePath = join(currentDir, '../../../dist/module.mjs')
 export default defineNuxtConfig({
   modules: [
     '@nuxthub/core',
-    'nuxt-auth-utils',
-    'nuxt-authorization',
     modulePath,
   ],
 
+  // @ts-ignore
   hub: {
     db: 'sqlite',
   },
