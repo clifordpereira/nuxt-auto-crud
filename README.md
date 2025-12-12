@@ -57,7 +57,7 @@ If you want to add `nuxt-auto-crud` to an existing project, follow these steps:
 
 ```bash
 # Install module and required dependencies
-npm install nuxt-auto-crud @nuxthub/core@latest drizzle-orm
+npm install nuxt-auto-crud @nuxthub/core@^0.10.0 drizzle-orm
 
 # Optional: Install auth dependencies if using Session Auth (Recommended)
 npm install nuxt-auth-utils nuxt-authorization
@@ -462,7 +462,7 @@ You can customize hidden fields by modifying the `modelMapper.ts` utility.
 
 - Nuxt 3 or 4
 - Drizzle ORM (SQLite)
-- NuxtHub (Recommended) or [Custom SQLite Setup](./custom-setup.md)
+- NuxtHub >= 0.10.0 (Recommended) or [Custom SQLite Setup](./custom-setup.md)
 
 ## 🔗 Other Helpful Links
 

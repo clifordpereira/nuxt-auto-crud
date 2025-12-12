@@ -14,7 +14,7 @@ export default defineNuxtConfig({
   ],
 
   hub: {
-    database: true,
+    db: 'sqlite',
   },
 
   autoCrud: {

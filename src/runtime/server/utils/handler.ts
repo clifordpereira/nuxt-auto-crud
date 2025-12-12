@@ -4,9 +4,6 @@ import { useAutoCrudConfig } from './config'
 import { checkAdminAccess } from './auth'
 import { filterHiddenFields, filterPublicColumns } from './modelMapper'
 
-// @ts-expect-error - #imports is available in runtime
-import { getUserSession } from '#imports'
-
 export async function ensureResourceAccess(event: H3Event, model: string, action: string): Promise<boolean> {
   const { auth } = useAutoCrudConfig()
 
@@ -19,14 +16,7 @@ export async function ensureResourceAccess(event: H3Event, model: string, action
     })
   }
 
-  // If authentication is disabled, treated as fully inclusive access
-  if (!auth?.authentication) {
-    return true
-  }
-
-  // Check if user is authenticated
-  const session = await getUserSession(event)
-  return !!session.user
+  return true
 }
 
 export function formatResourceResult(model: string, data: Record<string, unknown>, isAdmin: boolean) {

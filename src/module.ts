@@ -4,6 +4,8 @@ import {
   addServerHandler,
   addServerImportsDir,
   addImportsDir,
+  hasNuxtModule,
+  addServerImports,
 } from '@nuxt/kit'
 
 import type { ModuleOptions, AuthOptions, RuntimeModuleOptions } from './types'
@@ -42,6 +44,22 @@ export default defineNuxtModule<ModuleOptions>({
     nuxt.options.alias['#site/drizzle'] = drizzlePath
 
     addImportsDir(resolver.resolve(nuxt.options.rootDir, 'shared/utils'))
+    
+    // Add stubs for optional modules
+    const stubsPath = resolver.resolve('./runtime/server/stubs/auth')
+    if (!hasNuxtModule('nuxt-auth-utils')) {
+      addServerImports([
+        { name: 'requireUserSession', from: stubsPath },
+        { name: 'getUserSession', from: stubsPath },
+      ])
+    }
+    if (!hasNuxtModule('nuxt-authorization')) {
+      addServerImports([
+        { name: 'allows', from: stubsPath },
+        { name: 'abilities', from: stubsPath },
+        { name: 'abilityLogic', from: stubsPath },
+      ])
+    }
 
     nuxt.options.alias['#authorization'] ||= 'nuxt-authorization/utils'
 

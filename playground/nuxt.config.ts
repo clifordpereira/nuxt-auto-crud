@@ -18,6 +18,8 @@ export default defineNuxtConfig({
     enabled: true,
   },
 
+  ssr: true,
+
   css: ['~/assets/css/main.css'],
 
   runtimeConfig: {

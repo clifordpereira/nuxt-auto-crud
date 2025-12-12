@@ -11,6 +11,7 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "@libsql/client": "^0.15.15",
     "@nuxthub/core": "^0.10.1",
     "drizzle-orm": "^0.38.3",
     "nuxt": "^4.2.1",

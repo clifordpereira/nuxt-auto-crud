@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeAll } from 'vitest'
 import { ofetch } from 'ofetch'
 import { getTableName, getTableColumns } from 'drizzle-orm'
-import * as fullstackSchema from '../playground/server/database/schema'
-import * as backendSchema from '../playground-backendonly/server/database/schema'
+import * as fullstackSchema from '../playground/server/db/schema'
+import * as backendSchema from '../playground-backendonly/server/db/schema'
 
 const schema = (process.env.TEST_SUITE || 'backend') === 'backend' ? backendSchema : fullstackSchema
 

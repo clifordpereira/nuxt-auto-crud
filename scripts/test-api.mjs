@@ -81,7 +81,7 @@ async function main() {
     console.log('Servers ready.')
 
     await runTest('backend', BACKEND_PORT)
-    await runTest('fullstack', FULLSTACK_PORT) // Fullstack test env issues, skipping for now
+    await runTest('fullstack', FULLSTACK_PORT)
 
     console.log('All tests passed!')
     fullstack.kill()
