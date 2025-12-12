@@ -1,3 +1,26 @@
+## v1.18.0
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.17.3...v1.18.0)
+
+### 🚀 Enhancements
+
+- Integrate Drizzle ORM with NuxtHub `hub:db` abstraction, update dependencies, and refactor database tooling. ([0180203](https://github.com/clifordpereira/nuxt-auto-crud/commit/0180203))
+- Add Turso/libSQL support, authorization abilities, and auth stubs, alongside general dependency and configuration updates. ([d6d190a](https://github.com/clifordpereira/nuxt-auto-crud/commit/d6d190a))
+- Add Drizzle ORM schema and migrations, and update API tests with JWT authentication. ([c45e0e4](https://github.com/clifordpereira/nuxt-auto-crud/commit/c45e0e4))
+
+### 💅 Refactors
+
+- Remove `useAutoCrudConfig` from handler and update TypeScript ignore directives and type annotations. ([c110fef](https://github.com/clifordpereira/nuxt-auto-crud/commit/c110fef))
+
+### 🏡 Chore
+
+- Remove trailing commas for consistent formatting and update SEO metadata. ([1641c13](https://github.com/clifordpereira/nuxt-auto-crud/commit/1641c13))
+- Apply consistent formatting and minor syntax fixes across various files. ([2cbd755](https://github.com/clifordpereira/nuxt-auto-crud/commit/2cbd755))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v1.17.3
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.17.2...v1.17.3)
