@@ -1,3 +1,15 @@
+## v1.17.3
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.17.2...v1.17.3)
+
+### 📖 Documentation
+
+- Update documentation links to reflect new path ([a79672e](https://github.com/clifordpereira/nuxt-auto-crud/commit/a79672e))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v1.17.2
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.17.1...v1.17.2)
