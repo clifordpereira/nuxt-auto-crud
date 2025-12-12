@@ -11,7 +11,7 @@ export default defineNuxtConfig({
     modulePath,
   ],
 
-  // @ts-ignore
+  // @ts-expect-error - hub is a valid property but not typed in this context
   hub: {
     db: 'sqlite',
   },

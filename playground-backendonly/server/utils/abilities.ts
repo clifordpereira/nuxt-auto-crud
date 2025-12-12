@@ -1,6 +1,6 @@
 import { defineAbility } from 'nuxt-authorization/utils'
 
-export const abilities = defineAbility({ allowGuest: true }, (user: any, to: any, action: any) => {
+export const abilities = defineAbility({ allowGuest: true }, (_user: unknown, _to: unknown, _action: unknown) => {
   return true
 })
 

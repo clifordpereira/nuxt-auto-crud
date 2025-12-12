@@ -1,4 +1,4 @@
-// @ts-ignore
+// @ts-expect-error - virtual module
 import { db, schema } from 'hub:db'
 
 export const tables = schema
