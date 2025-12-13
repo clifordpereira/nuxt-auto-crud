@@ -110,11 +110,13 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
     },
   }],
 }], [
-  ...(safeUser.value?.role === 'admin' ? [{
-    label: 'Admin Dashboard',
-    icon: 'i-lucide-layout-dashboard',
-    to: '/admin/dashboard',
-  }] : []),
+  ...(safeUser.value?.role === 'admin'
+    ? [{
+        label: 'Admin Dashboard',
+        icon: 'i-lucide-layout-dashboard',
+        to: '/admin/dashboard',
+      }]
+    : []),
 
   ...userMenuLinks,
   {

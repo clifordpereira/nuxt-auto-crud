@@ -5,14 +5,14 @@ const PORT = process.env.TEST_PORT || 3000
 
 describe('Profile Feature Tests', () => {
   let userAApi: typeof ofetch
-  let userA: any
-  let userB: any
+  let userA: { id: number | string, name: string, email: string }
+  let userB: { id: number | string, name: string, email: string }
 
   beforeAll(async () => {
     // 1. Signup User A
     const userAEmail = `user.a.${Date.now()}@test.com`
     let userACookie = ''
-    
+
     try {
       const response = await ofetch.raw(`http://localhost:${PORT}/api/auth/signup`, {
         method: 'POST',
@@ -27,8 +27,10 @@ describe('Profile Feature Tests', () => {
       if (setCookie) {
         userACookie = setCookie
       }
-    } catch (e: any) {
-      console.error('User A Signup failed', e.data || e)
+    }
+    catch (e: unknown) {
+      const err = e as { data?: unknown }
+      console.error('User A Signup failed', err.data || e)
       throw e
     }
 
@@ -50,8 +52,10 @@ describe('Profile Feature Tests', () => {
       })
       userB = response._data.user
       // We don't need User B's session
-    } catch (e: any) {
-      console.error('User B Signup failed', e.data || e)
+    }
+    catch (e: unknown) {
+      const err = e as { data?: unknown }
+      console.error('User B Signup failed', err.data || e)
       throw e
     }
   }, 30000)
@@ -79,9 +83,11 @@ describe('Profile Feature Tests', () => {
       })
       // If it doesn't throw, fail the test
       throw new Error('User A was able to update User B!')
-    } catch (err: any) {
+    }
+    catch (err: unknown) {
       // Expect 403 Forbidden
-      expect(err.statusCode).toBe(403)
+      const e = err as { statusCode: number }
+      expect(e.statusCode).toBe(403)
     }
   })
 })

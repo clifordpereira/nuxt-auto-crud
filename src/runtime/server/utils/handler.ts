@@ -21,7 +21,7 @@ export async function ensureResourceAccess(event: H3Event, model: string, action
 export async function hashPayloadFields(payload: Record<string, unknown>): Promise<void> {
   // Auto-hash fields based on config (default: ['password'])
   const { hashedFields } = useAutoCrudConfig()
-  
+
   if (hashedFields) {
     console.log('[hashPayloadFields] Configured hashedFields:', hashedFields)
     for (const field of hashedFields) {

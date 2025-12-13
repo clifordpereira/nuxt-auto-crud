@@ -3,12 +3,12 @@ import { db, schema } from 'hub:db'
 
 export default eventHandler(async (event) => {
   const session = await getUserSession(event)
-  if (!session.user || !(session.user as any).id) {
+  if (!session.user || !(session.user as { id: number }).id) {
     throw createError({ statusCode: 401, message: 'Not authenticated' })
   }
 
-  const userId = (session.user as any).id
-  
+  const userId = (session.user as { id: number }).id
+
   // Fetch fresh user data
   const result = await db.select({
     user: schema.users,
@@ -20,9 +20,9 @@ export default eventHandler(async (event) => {
     .get()
 
   if (!result || !result.user) {
-      // User deleted? Clear session
-      await clearUserSession(event)
-      throw createError({ statusCode: 401, message: 'User not found' })
+    // User deleted? Clear session
+    await clearUserSession(event)
+    throw createError({ statusCode: 401, message: 'User not found' })
   }
 
   const user = result.user

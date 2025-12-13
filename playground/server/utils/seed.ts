@@ -61,7 +61,7 @@ export const seedDatabase = async () => {
       console.log(`Seeding permission: ${code}...`)
       // Nice formatting for name (update_own -> Update Own)
       const name = code.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
-      
+
       const [inserted] = await db.insert(schema.permissions).values({
         name,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -37,8 +37,6 @@ export default defineNuxtModule<ModuleOptions>({
     )
     nuxt.options.alias['#site/schema'] = schemaPath
 
-
-
     addImportsDir(resolver.resolve(nuxt.options.rootDir, 'shared/utils'))
 
     // Add stubs for optional modules

@@ -8,7 +8,7 @@ interface User {
 }
 
 // Update signature to accept context
-export const abilityLogic = async (user: unknown, model: string, action: string, context?: { id: string | number }) => {
+export const abilityLogic = async (user: unknown, model: string, action: string, _context?: { id: string | number }) => {
   const userRecord = user as User
 
   // 1. Admin has full access

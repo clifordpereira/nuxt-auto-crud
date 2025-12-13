@@ -5,8 +5,6 @@ export interface ModuleOptions {
    */
   schemaPath?: string
 
-
-
   /**
    * Authentication configuration
    */

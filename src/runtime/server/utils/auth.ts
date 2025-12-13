@@ -25,7 +25,7 @@ export async function checkAdminAccess(event: H3Event, model: string, action: st
   // Session based (default)
   let user = null
   try {
-    const session = await (getUserSession as any)(event)
+    const session = await (getUserSession as (event: H3Event) => Promise<{ user: { id: string | number, permissions?: Record<string, string[]> } | null }>)(event)
     user = session.user
   }
   catch {
@@ -38,15 +38,15 @@ export async function checkAdminAccess(event: H3Event, model: string, action: st
       const guestCheck = !user && (typeof abilityLogic === 'function' ? abilityLogic : (typeof globalAbility === 'function' ? globalAbility : null))
 
       const allowed = guestCheck
-        ? await (guestCheck as any)(null, model, action, context)
-        : await (allows as any)(event, globalAbility, model, action, context)
+        ? await (guestCheck as (user: unknown, model: string, action: string, context?: unknown) => Promise<boolean>)(null, model, action, context)
+        : await (allows as (event: H3Event, ability: unknown, model: string, action: string, context?: unknown) => Promise<boolean>)(event, globalAbility, model, action, context)
 
       if (!allowed) {
         // Fallback: Check for "Own Record" permission (e.g. update_own, delete_own)
         if (user && (action === 'update' || action === 'delete') && context && typeof context === 'object' && 'id' in context) {
           const ownAction = `${action}_own`
           const userPermissions = user.permissions?.[model] as string[] | undefined
-          
+
           if (userPermissions && userPermissions.includes(ownAction)) {
             // Verify ownership via DB
             // @ts-expect-error - hub:db virtual alias
@@ -55,27 +55,28 @@ export async function checkAdminAccess(event: H3Event, model: string, action: st
             const { eq } = await import('drizzle-orm')
 
             try {
-               const table = getTableForModel(model)
+              const table = getTableForModel(model)
 
-               // Special case: User updating their own profile (record.id === user.id)
-               if (model === 'users' && String((context as any).id) === String(user.id)) {
-                 return true
-               }
+              // Special case: User updating their own profile (record.id === user.id)
+              if (model === 'users' && String((context as { id: string | number }).id) === String(user.id)) {
+                return true
+              }
 
-               // Standard case: Check 'userId' column for ownership
-               // We need to check if table has userId column. 
-               // We cast to any to check property exist roughly or just try query
-               if ('userId' in table) {
-                 // @ts-expect-error - dyanmic table access
-                 const record = await db.select({ userId: table.userId }).from(table).where(eq(table.id, context.id)).get()
-                 
-                 // If record exists and userId matches session user id
-                 if (record && String(record.userId) === String(user.id)) {
-                   return true
-                 }
-               }
-            } catch (e) {
-               console.error('[checkAdminAccess] Ownership check failed', e)
+              // Standard case: Check 'userId' column for ownership
+              // We need to check if table has userId column.
+              // We cast to any to check property exist roughly or just try query
+              if ('userId' in table) {
+                // @ts-expect-error - dyanmic table access
+                const record = await db.select({ userId: table.userId }).from(table).where(eq(table.id, context.id)).get()
+
+                // If record exists and userId matches session user id
+                if (record && String(record.userId) === String(user.id)) {
+                  return true
+                }
+              }
+            }
+            catch (e) {
+              console.error('[checkAdminAccess] Ownership check failed', e)
             }
           }
         }
@@ -112,5 +113,5 @@ export async function ensureAuthenticated(event: H3Event): Promise<void> {
     return
   }
 
-  await (requireUserSession as any)(event)
+  await (requireUserSession as (event: H3Event) => Promise<void>)(event)
 }

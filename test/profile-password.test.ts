@@ -5,7 +5,7 @@ const PORT = 3000
 
 describe('Profile Password Update Tests', () => {
   let userAApi: typeof ofetch
-  let userA: any
+  let userA: { id: number | string, email: string, name: string }
   let userAEmail: string
   const initialPassword = 'password123'
   const newPassword = 'newpassword456'
@@ -14,7 +14,7 @@ describe('Profile Password Update Tests', () => {
     // 1. Signup User A
     userAEmail = `user.pass.${Date.now()}@test.com`
     let userACookie = ''
-    
+
     try {
       const response = await ofetch.raw(`http://localhost:${PORT}/api/auth/signup`, {
         method: 'POST',
@@ -29,8 +29,10 @@ describe('Profile Password Update Tests', () => {
       if (setCookie) {
         userACookie = setCookie
       }
-    } catch (e: any) {
-      console.error('User Signup failed', e.data || e)
+    }
+    catch (e: unknown) {
+      const err = e as { data?: unknown }
+      console.error('User Signup failed', err.data || e)
       throw e
     }
 
@@ -48,31 +50,33 @@ describe('Profile Password Update Tests', () => {
         password: newPassword,
       },
     })
-    
+
     // Response should NOT contain password
     expect(res.password).toBeUndefined()
 
     // Verify login with OLD password fails
     try {
-        await ofetch(`http://localhost:${PORT}/api/auth/login`, {
-            method: 'POST',
-            body: {
-                email: userAEmail,
-                password: initialPassword
-            }
-        })
-        throw new Error('Should not be able to login with old password')
-    } catch(e: any) {
-        expect(e.statusCode).toBe(401)
+      await ofetch(`http://localhost:${PORT}/api/auth/login`, {
+        method: 'POST',
+        body: {
+          email: userAEmail,
+          password: initialPassword,
+        },
+      })
+      throw new Error('Should not be able to login with old password')
+    }
+    catch (e: unknown) {
+      const err = e as { statusCode: number }
+      expect(err.statusCode).toBe(401)
     }
 
     // Verify login with NEW password succeeds
     const loginRes = await ofetch(`http://localhost:${PORT}/api/auth/login`, {
-        method: 'POST',
-        body: {
-            email: userAEmail,
-            password: newPassword
-        }
+      method: 'POST',
+      body: {
+        email: userAEmail,
+        password: newPassword,
+      },
     })
     expect(loginRes).toBeDefined()
     expect(loginRes.user.email).toBe(userAEmail)

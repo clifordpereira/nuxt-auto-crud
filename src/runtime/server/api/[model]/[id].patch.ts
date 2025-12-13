@@ -8,7 +8,6 @@ import type { TableWithId } from '../../types'
 import { db } from 'hub:db'
 import { ensureResourceAccess, formatResourceResult, hashPayloadFields } from '../../utils/handler'
 
-
 export default eventHandler(async (event) => {
   const { model, id } = getRouterParams(event) as { model: string, id: string }
   // Pass the ID as context for row-level security checks (e.g. self-update)
@@ -22,7 +21,6 @@ export default eventHandler(async (event) => {
   // Auto-hash fields based on config (default: ['password'])
   // Auto-hash fields based on config (default: ['password'])
   await hashPayloadFields(payload)
-
 
   // Automatically update updatedAt if it exists
   if ('updatedAt' in table) {

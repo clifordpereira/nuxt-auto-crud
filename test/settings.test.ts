@@ -11,7 +11,7 @@ describe('Settings / Password Change Tests', () => {
 
   beforeAll(async () => {
     userEmail = `settings.user.${Date.now()}@test.com`
-    
+
     // Cleanup/Setup logic could go here if needed
   })
 
@@ -24,7 +24,7 @@ describe('Settings / Password Change Tests', () => {
         password: originalPassword,
       },
     })
-    
+
     expect(signupRes.status).toBe(200)
     const setCookie = signupRes.headers.get('set-cookie')
     expect(setCookie).toBeDefined()
@@ -41,13 +41,15 @@ describe('Settings / Password Change Tests', () => {
         method: 'POST',
         body: {
           currentPassword: 'wrongpassword',
-          newPassword: newPassword
-        }
+          newPassword: newPassword,
+        },
       })
       throw new Error('Should have failed with invalid current password')
-    } catch (err: any) {
-      expect(err.statusCode).toBe(401)
-      expect(err.data?.message).toContain('Invalid current password')
+    }
+    catch (err: unknown) {
+      const e = err as { statusCode: number, data?: { message: string } }
+      expect(e.statusCode).toBe(401)
+      expect(e.data?.message).toContain('Invalid current password')
     }
   })
 
@@ -56,8 +58,8 @@ describe('Settings / Password Change Tests', () => {
       method: 'POST',
       body: {
         currentPassword: originalPassword,
-        newPassword: newPassword
-      }
+        newPassword: newPassword,
+      },
     })
     expect(res.message).toContain('Password updated successfully')
   })
@@ -67,8 +69,8 @@ describe('Settings / Password Change Tests', () => {
       method: 'POST',
       body: {
         email: userEmail,
-        password: newPassword
-      }
+        password: newPassword,
+      },
     })
     expect(loginRes.user).toBeDefined()
     expect(loginRes.user.email).toBe(userEmail)
@@ -80,12 +82,14 @@ describe('Settings / Password Change Tests', () => {
         method: 'POST',
         body: {
           email: userEmail,
-          password: originalPassword
-        }
+          password: originalPassword,
+        },
       })
       throw new Error('Should have failed login with old password')
-    } catch (err: any) {
-       expect(err.statusCode).toBe(401)
+    }
+    catch (err: unknown) {
+      const e = err as { statusCode: number }
+      expect(e.statusCode).toBe(401)
     }
   })
 })

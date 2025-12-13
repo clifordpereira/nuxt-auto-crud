@@ -10,15 +10,15 @@ const { schemas } = await useResourceSchemas()
 const { user } = useUserSession()
 
 const resourceNames = computed(() =>
-  Object.keys(schemas.value || {}).filter(name => {
+  Object.keys(schemas.value || {}).filter((name) => {
     // Exclude system tables
     if (['users', 'roles', 'permissions', 'resources', 'roleResourcePermissions'].includes(name)) return false
 
     // Admins see everything
-    if ((user.value as any)?.role === 'admin') return true
+    if ((user.value as { role?: string })?.role === 'admin') return true
 
     // Check permissions
-    const perms = (user.value as any)?.permissions?.[name] || []
+    const perms = (user.value as { permissions?: Record<string, string[]> })?.permissions?.[name] || []
     return perms.includes('list') || perms.includes('list_all')
   }),
 )
@@ -27,15 +27,15 @@ const items = computed(() => {
   if (resourceNames.value.length === 0) return []
 
   return [{
-      label: 'Custom Models',
-      icon: 'i-lucide-database',
-      defaultOpen: true,
-      children: resourceNames.value.map(resource => ({
-        label: resource.charAt(0).toUpperCase() + resource.slice(1),
-        to: `/admin/${resource}`,
-        onSelect: props.onSelect,
-      })),
-    }] satisfies NavigationMenuItem[]
+    label: 'Custom Models',
+    icon: 'i-lucide-database',
+    defaultOpen: true,
+    children: resourceNames.value.map(resource => ({
+      label: resource.charAt(0).toUpperCase() + resource.slice(1),
+      to: `/admin/${resource}`,
+      onSelect: props.onSelect,
+    })),
+  }] satisfies NavigationMenuItem[]
 })
 </script>
 
