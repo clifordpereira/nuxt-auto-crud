@@ -3,7 +3,7 @@ import { eventHandler, getRouterParams, readBody } from 'h3'
 import { getTableForModel, filterUpdatableFields } from '../../utils/modelMapper'
 // @ts-expect-error - #site/drizzle is an alias defined by the module
 import { useDrizzle } from '#site/drizzle'
-import { ensureResourceAccess, formatResourceResult } from '../../utils/handler'
+import { ensureResourceAccess, formatResourceResult, hashPayloadFields } from '../../utils/handler'
 
 export default eventHandler(async (event) => {
   const { model } = getRouterParams(event) as { model: string }
@@ -13,6 +13,9 @@ export default eventHandler(async (event) => {
 
   const body = await readBody(event)
   const payload = filterUpdatableFields(model, body)
+
+  // Auto-hash fields based on config (default: ['password'])
+  await hashPayloadFields(payload)
 
   const newRecord = await useDrizzle().insert(table).values(payload).returning().get()
 

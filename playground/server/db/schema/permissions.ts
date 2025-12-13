@@ -21,7 +21,7 @@ export const permissions = sqliteTable('permissions', {
   ...systemFields,
 
   ...baseFields,
-  code: text('code', { enum: ['list', 'list_all', 'create', 'read', 'update', 'delete'] }).notNull(),
+  code: text('code', { enum: ['list', 'list_all', 'create', 'read', 'update', 'delete', 'update_own', 'delete_own'] }).notNull(),
 })
 
 export const roleResourcePermissions = sqliteTable('role_resource_permissions', {

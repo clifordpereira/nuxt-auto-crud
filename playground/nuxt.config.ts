@@ -47,10 +47,6 @@ export default defineNuxtConfig({
       tasks: true,
       openAPI: true,
     },
-    // preset: 'cloudflare_module',
-    // cloudflare: {
-    //   nodeCompat: true
-    // }
   },
 
   hub: {
@@ -71,13 +67,6 @@ export default defineNuxtConfig({
       stylistic: {
         commaDangle: 'never',
         braceStyle: '1tbs',
-      },
-    },
-  },
-  scripts: {
-    registry: {
-      googleAnalytics: {
-        id: process.env.NUXT_PUBLIC_GA_ID || '',
       },
     },
   },

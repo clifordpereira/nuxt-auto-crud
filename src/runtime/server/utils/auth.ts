@@ -2,12 +2,12 @@
 /// <reference path="../../auth.d.ts" />
 import type { H3Event } from 'h3'
 import { createError } from 'h3'
-// @ts-expect-error - #imports is available in runtime
+
 import { requireUserSession, allows, getUserSession, abilities as globalAbility, abilityLogic } from '#imports'
 import { useAutoCrudConfig } from './config'
 import { verifyJwtToken } from './jwt'
 
-export async function checkAdminAccess(event: H3Event, model: string, action: string): Promise<boolean> {
+export async function checkAdminAccess(event: H3Event, model: string, action: string, context?: unknown): Promise<boolean> {
   const { auth } = useAutoCrudConfig()
 
   if (!auth?.authentication) {
@@ -25,7 +25,7 @@ export async function checkAdminAccess(event: H3Event, model: string, action: st
   // Session based (default)
   let user = null
   try {
-    const session = await getUserSession(event)
+    const session = await (getUserSession as any)(event)
     user = session.user
   }
   catch {
@@ -38,10 +38,45 @@ export async function checkAdminAccess(event: H3Event, model: string, action: st
       const guestCheck = !user && (typeof abilityLogic === 'function' ? abilityLogic : (typeof globalAbility === 'function' ? globalAbility : null))
 
       const allowed = guestCheck
-        ? await guestCheck(null, model, action)
-        : await allows(event, globalAbility, model, action)
+        ? await (guestCheck as any)(null, model, action, context)
+        : await (allows as any)(event, globalAbility, model, action, context)
 
       if (!allowed) {
+        // Fallback: Check for "Own Record" permission (e.g. update_own, delete_own)
+        if (user && (action === 'update' || action === 'delete') && context && typeof context === 'object' && 'id' in context) {
+          const ownAction = `${action}_own`
+          // @ts-expect-error - Checking manual permission on user object
+          const userPermissions = user.permissions?.[model] as string[] | undefined
+          
+          if (userPermissions && userPermissions.includes(ownAction)) {
+            // Verify ownership via DB
+            // @ts-expect-error - #site/drizzle alias
+            const { useDrizzle } = await import('#site/drizzle')
+            const { getTableForModel } = await import('./modelMapper')
+            const { eq } = await import('drizzle-orm')
+
+            try {
+               const table = getTableForModel(model)
+               // Assume 'userId' is the ownership column convention
+               // We need to check if table has userId column. 
+               // We cast to any to check property exist roughly or just try query
+               if ('userId' in table) {
+                 const db = useDrizzle()
+                 // @ts-expect-error - dyanmic table access
+                 const record = await db.select({ userId: table.userId }).from(table).where(eq(table.id, context.id)).get()
+                 
+                 // If record exists and userId matches session user id
+                 // @ts-expect-error - user.id exists
+                 if (record && String(record.userId) === String(user.id)) {
+                   return true
+                 }
+               }
+            } catch (e) {
+               console.error('[checkAdminAccess] Ownership check failed', e)
+            }
+          }
+        }
+
         if (user) throw createError({ statusCode: 403, message: 'Forbidden' })
         return false
       }
@@ -49,6 +84,7 @@ export async function checkAdminAccess(event: H3Event, model: string, action: st
     }
     catch (err) {
       if ((err as { statusCode: number }).statusCode === 403) throw err
+      console.error('[checkAdminAccess] Error', err)
       return false
     }
   }
@@ -73,5 +109,5 @@ export async function ensureAuthenticated(event: H3Event): Promise<void> {
     return
   }
 
-  await requireUserSession(event)
+  await (requireUserSession as any)(event)
 }

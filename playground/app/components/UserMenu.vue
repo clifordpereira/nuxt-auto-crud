@@ -17,6 +17,7 @@ const { user } = useUserSession()
 interface User {
   name: string
   avatar: string
+  role?: string
   [key: string]: unknown
 }
 
@@ -29,6 +30,14 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
     src: safeUser.value?.avatar || '',
     alt: safeUser.value?.name || '',
   },
+}], [{
+  label: 'Profile',
+  icon: 'i-lucide-user',
+  to: '/profile',
+}, {
+  label: 'Settings',
+  icon: 'i-lucide-settings',
+  to: '/settings',
 }], [{
   label: 'Theme',
   icon: 'i-lucide-palette',
@@ -101,6 +110,12 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
     },
   }],
 }], [
+  ...(safeUser.value?.role === 'admin' ? [{
+    label: 'Admin Dashboard',
+    icon: 'i-lucide-layout-dashboard',
+    to: '/admin/dashboard',
+  }] : []),
+
   ...userMenuLinks,
   {
     label: 'Log out',

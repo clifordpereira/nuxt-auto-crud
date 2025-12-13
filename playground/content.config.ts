@@ -124,6 +124,7 @@ export const collections = {
         z.object({
           name: z.string().nonempty(),
           to: z.string().nonempty(),
+          twitter: z.string().optional(),
           avatar: z.object({ src: z.string().nonempty().editor({ input: 'media' }) }),
         }),
       ),

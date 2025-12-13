@@ -51,6 +51,7 @@ export default defineNuxtModule<ModuleOptions>({
       addServerImports([
         { name: 'requireUserSession', from: stubsPath },
         { name: 'getUserSession', from: stubsPath },
+        { name: 'hashPassword', from: stubsPath },
       ])
     }
     if (!hasNuxtModule('nuxt-authorization')) {
@@ -81,9 +82,9 @@ export default defineNuxtModule<ModuleOptions>({
         jwtSecret: mergedAuth.jwtSecret,
       },
       resources: {
-
         ...options.resources,
       },
+      hashedFields: options.hashedFields ?? ['password'],
     }
 
     const apiDir = resolver.resolve('./runtime/server/api')

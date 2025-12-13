@@ -23,6 +23,12 @@ export interface ModuleOptions {
   resources?: {
     [modelName: string]: string[]
   }
+
+  /**
+   * Fields that should be automatically hashed before storage
+   * @default ['password']
+   */
+  hashedFields?: string[]
 }
 
 export interface AuthOptions {

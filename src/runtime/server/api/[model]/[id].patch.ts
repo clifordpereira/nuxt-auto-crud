@@ -3,18 +3,26 @@ import { eventHandler, getRouterParams, readBody, createError } from 'h3'
 import { eq } from 'drizzle-orm'
 import { getTableForModel, filterUpdatableFields } from '../../utils/modelMapper'
 import type { TableWithId } from '../../types'
+
 // @ts-expect-error - #site/drizzle is an alias defined by the module
 import { useDrizzle } from '#site/drizzle'
-import { ensureResourceAccess, formatResourceResult } from '../../utils/handler'
+import { ensureResourceAccess, formatResourceResult, hashPayloadFields } from '../../utils/handler'
+
 
 export default eventHandler(async (event) => {
   const { model, id } = getRouterParams(event) as { model: string, id: string }
-  const isAdmin = await ensureResourceAccess(event, model, 'update')
+  // Pass the ID as context for row-level security checks (e.g. self-update)
+  const isAdmin = await ensureResourceAccess(event, model, 'update', { id })
 
   const table = getTableForModel(model) as TableWithId
 
   const body = await readBody(event)
   const payload = filterUpdatableFields(model, body)
+
+  // Auto-hash fields based on config (default: ['password'])
+  // Auto-hash fields based on config (default: ['password'])
+  await hashPayloadFields(payload)
+
 
   // Automatically update updatedAt if it exists
   if ('updatedAt' in table) {
