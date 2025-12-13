@@ -45,7 +45,6 @@ export async function checkAdminAccess(event: H3Event, model: string, action: st
         // Fallback: Check for "Own Record" permission (e.g. update_own, delete_own)
         if (user && (action === 'update' || action === 'delete') && context && typeof context === 'object' && 'id' in context) {
           const ownAction = `${action}_own`
-          // @ts-expect-error - Checking manual permission on user object
           const userPermissions = user.permissions?.[model] as string[] | undefined
           
           if (userPermissions && userPermissions.includes(ownAction)) {
@@ -66,7 +65,6 @@ export async function checkAdminAccess(event: H3Event, model: string, action: st
                  const record = await db.select({ userId: table.userId }).from(table).where(eq(table.id, context.id)).get()
                  
                  // If record exists and userId matches session user id
-                 // @ts-expect-error - user.id exists
                  if (record && String(record.userId) === String(user.id)) {
                    return true
                  }
