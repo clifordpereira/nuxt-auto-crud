@@ -93,7 +93,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         <UDivider label="Security" />
 
         <UFormField label="New Password (Optional)" name="password" help="Leave blank to keep current password">
-          <UInput v-model="state.password" type="password" />
+          <CommonPassword v-model="state.password" />
         </UFormField>
 
         <UButton type="submit" label="Save Changes" block />
