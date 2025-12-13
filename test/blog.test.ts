@@ -4,7 +4,7 @@ import { ofetch } from 'ofetch'
 const PORT = process.env.TEST_PORT || 3000
 const BASE_URL = `http://localhost:${PORT}`
 
-describe('Blog Feature Tests', () => {
+describe.runIf(process.env.TEST_SUITE !== 'backend')('Blog Feature Tests', () => {
   it('should render the blog index page', async () => {
     const html = await ofetch(`${BASE_URL}/blog`)
     expect(html).toContain('<!DOCTYPE html>')

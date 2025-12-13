@@ -3,7 +3,7 @@ import { ofetch } from 'ofetch'
 
 const PORT = 3000
 
-describe('Profile Password Update Tests', () => {
+describe.runIf(process.env.TEST_SUITE !== 'backend')('Profile Password Update Tests', () => {
   let userAApi: typeof ofetch
   let userA: { id: number | string, email: string, name: string }
   let userAEmail: string

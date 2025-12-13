@@ -3,7 +3,7 @@ import { ofetch } from 'ofetch'
 
 const PORT = process.env.TEST_PORT || 3000
 
-describe('Settings / Password Change Tests', () => {
+describe.runIf(process.env.TEST_SUITE !== 'backend')('Settings / Password Change Tests', () => {
   let userApi: typeof ofetch
   let userEmail: string
   const originalPassword = 'password123'

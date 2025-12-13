@@ -3,7 +3,7 @@ import { ofetch } from 'ofetch'
 
 const PORT = process.env.TEST_PORT || '3000'
 
-describe('Status Filtering Tests', () => {
+describe.runIf(process.env.TEST_SUITE !== 'backend')('Status Filtering Tests', () => {
   let adminApi: typeof ofetch
   let publicApi: typeof ofetch
   let activeId: number

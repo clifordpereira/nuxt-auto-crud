@@ -10,6 +10,9 @@ export default defineNuxtConfig({
     '@nuxthub/core',
     modulePath,
   ],
+  alias: {
+    'hub:db': fileURLToPath(new URL('./server/utils/db.ts', import.meta.url)),
+  },
 
   // @ts-expect-error - hub is a valid property but not typed in this context
   hub: {

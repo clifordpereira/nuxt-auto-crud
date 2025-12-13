@@ -3,7 +3,7 @@ import { ofetch } from 'ofetch'
 
 const PORT = process.env.TEST_PORT || 3000
 
-describe('Profile Feature Tests', () => {
+describe.runIf(process.env.TEST_SUITE !== 'backend')('Profile Feature Tests', () => {
   let userAApi: typeof ofetch
   let userA: { id: number | string, name: string, email: string }
   let userB: { id: number | string, name: string, email: string }

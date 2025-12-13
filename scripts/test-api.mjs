@@ -26,7 +26,7 @@ async function waitServer(port) {
 function runTest(suite, port) {
   return new Promise((resolve, reject) => {
     console.log(`Running tests for ${suite} on port ${port}...`)
-    const test = spawn('npx', ['vitest', 'run', 'test/api.test.ts', '--config', 'vitest.api.config.ts'], {
+    const test = spawn('npx', ['vitest', 'run', '--config', 'vitest.api.config.ts'], {
       cwd: rootDir,
       stdio: 'inherit',
       env: {
