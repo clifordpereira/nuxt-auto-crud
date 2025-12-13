@@ -56,7 +56,13 @@ export async function checkAdminAccess(event: H3Event, model: string, action: st
 
             try {
                const table = getTableForModel(model)
-               // Assume 'userId' is the ownership column convention
+
+               // Special case: User updating their own profile (record.id === user.id)
+               if (model === 'users' && String((context as any).id) === String(user.id)) {
+                 return true
+               }
+
+               // Standard case: Check 'userId' column for ownership
                // We need to check if table has userId column. 
                // We cast to any to check property exist roughly or just try query
                if ('userId' in table) {

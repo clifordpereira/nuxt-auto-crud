@@ -63,9 +63,13 @@ const items = computed(() => [{
         />
       </template>
 
-      <UserMenu
+      <UButton
         v-else
+        label="Logout"
+        color="neutral"
+        variant="outline"
         class="hidden lg:inline-flex"
+        @click="logout"
       />
     </template>
 
