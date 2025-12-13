@@ -1,3 +1,7 @@
+## v1.19.1
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.19.0...v1.19.1)
+
 ## v1.19.0
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.18.1...v1.19.0)
