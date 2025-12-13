@@ -1,5 +1,6 @@
 import { eq, sql } from 'drizzle-orm'
 import { z } from 'zod'
+import { db, schema } from 'hub:db'
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -8,29 +9,28 @@ const loginSchema = z.object({
 
 export default eventHandler(async (event) => {
   const body = await readValidatedBody(event, loginSchema.parse)
-  const db = useDrizzle()
 
   let result = await db.select({
-    user: tables.users,
-    role: tables.roles.name,
+    user: schema.users,
+    role: schema.roles.name,
   })
-    .from(tables.users)
-    .leftJoin(tables.roles, eq(tables.users.roleId, tables.roles.id))
-    .where(eq(tables.users.email, body.email))
+    .from(schema.users)
+    .leftJoin(schema.roles, eq(schema.users.roleId, schema.roles.id))
+    .where(eq(schema.users.email, body.email))
     .get()
 
   if (!result && body.email === 'admin@example.com') {
-    const userCount = await db.select({ count: sql`count(*)` }).from(tables.users).get()
+    const userCount = await db.select({ count: sql`count(*)` }).from(schema.users).get()
     if (userCount && userCount.count === 0) {
       await seedDatabase()
       // Fetch again
       result = await db.select({
-        user: tables.users,
-        role: tables.roles.name,
+        user: schema.users,
+        role: schema.roles.name,
       })
-        .from(tables.users)
-        .leftJoin(tables.roles, eq(tables.users.roleId, tables.roles.id))
-        .where(eq(tables.users.email, body.email))
+        .from(schema.users)
+        .leftJoin(schema.roles, eq(schema.users.roleId, schema.roles.id))
+        .where(eq(schema.users.email, body.email))
         .get()
     }
   }
@@ -50,13 +50,13 @@ export default eventHandler(async (event) => {
 
   if (user.roleId) {
     const permissionsData = await db.select({
-      resource: tables.resources.name,
-      action: tables.permissions.code,
+      resource: schema.resources.name,
+      action: schema.permissions.code,
     })
-      .from(tables.roleResourcePermissions)
-      .innerJoin(tables.resources, eq(tables.roleResourcePermissions.resourceId, tables.resources.id))
-      .innerJoin(tables.permissions, eq(tables.roleResourcePermissions.permissionId, tables.permissions.id))
-      .where(eq(tables.roleResourcePermissions.roleId, user.roleId))
+      .from(schema.roleResourcePermissions)
+      .innerJoin(schema.resources, eq(schema.roleResourcePermissions.resourceId, schema.resources.id))
+      .innerJoin(schema.permissions, eq(schema.roleResourcePermissions.permissionId, schema.permissions.id))
+      .where(eq(schema.roleResourcePermissions.roleId, user.roleId))
       .all()
 
     for (const p of permissionsData) {

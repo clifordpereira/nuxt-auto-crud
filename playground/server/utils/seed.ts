@@ -1,10 +1,8 @@
 import { eq, and } from 'drizzle-orm'
-import * as tables from '../db/schema'
+import { db, schema } from 'hub:db'
 
 export const seedDatabase = async () => {
   console.log('Running DB seed task...')
-
-  const db = useDrizzle()
   const results = []
 
   // 1. Seed Roles
@@ -12,11 +10,11 @@ export const seedDatabase = async () => {
   const roleIds: Record<string, number> = {}
 
   for (const roleName of rolesToSeed) {
-    let role = await db.select().from(tables.roles).where(eq(tables.roles.name, roleName)).get()
+    let role = await db.select().from(schema.roles).where(eq(schema.roles.name, roleName)).get()
 
     if (!role) {
       console.log(`Seeding role: ${roleName}...`)
-      const [inserted] = await db.insert(tables.roles).values({
+      const [inserted] = await db.insert(schema.roles).values({
         name: roleName,
         status: 'active',
         createdAt: new Date(),
@@ -36,11 +34,11 @@ export const seedDatabase = async () => {
   const resourceIds: Record<string, number> = {}
 
   for (const resourceName of resourcesToSeed) {
-    let resource = await db.select().from(tables.resources).where(eq(tables.resources.name, resourceName)).get()
+    let resource = await db.select().from(schema.resources).where(eq(schema.resources.name, resourceName)).get()
 
     if (!resource) {
       console.log(`Seeding resource: ${resourceName}...`)
-      const [inserted] = await db.insert(tables.resources).values({
+      const [inserted] = await db.insert(schema.resources).values({
         name: resourceName,
         status: 'active',
         createdAt: new Date(),
@@ -57,14 +55,14 @@ export const seedDatabase = async () => {
 
   for (const code of permissionsToSeed) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let permission = await db.select().from(tables.permissions).where(eq(tables.permissions.code, code as any)).get()
+    let permission = await db.select().from(schema.permissions).where(eq(schema.permissions.code, code as any)).get()
 
     if (!permission) {
       console.log(`Seeding permission: ${code}...`)
       // Nice formatting for name (update_own -> Update Own)
       const name = code.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
       
-      const [inserted] = await db.insert(tables.permissions).values({
+      const [inserted] = await db.insert(schema.permissions).values({
         name,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         code: code as any,
@@ -97,16 +95,16 @@ export const seedDatabase = async () => {
         const pId = permissionIds[permCode]
         if (pId) {
           // Check existence
-          const existing = await db.select().from(tables.roleResourcePermissions)
+          const existing = await db.select().from(schema.roleResourcePermissions)
             .where(and(
-              eq(tables.roleResourcePermissions.roleId, rId),
-              eq(tables.roleResourcePermissions.resourceId, resId),
-              eq(tables.roleResourcePermissions.permissionId, pId),
+              eq(schema.roleResourcePermissions.roleId, rId),
+              eq(schema.roleResourcePermissions.resourceId, resId),
+              eq(schema.roleResourcePermissions.permissionId, pId),
             ))
             .get()
 
           if (!existing) {
-            await db.insert(tables.roleResourcePermissions).values({
+            await db.insert(schema.roleResourcePermissions).values({
               roleId: rId,
               resourceId: resId,
               permissionId: pId,
@@ -130,14 +128,14 @@ export const seedDatabase = async () => {
   ]
 
   for (const userData of usersToSeed) {
-    const existingUser = await db.select().from(tables.users).where(eq(tables.users.email, userData.email)).get()
+    const existingUser = await db.select().from(schema.users).where(eq(schema.users.email, userData.email)).get()
 
     if (!existingUser) {
       console.log(`Seeding user: ${userData.email}...`)
       const passwordToHash = userData.role === 'admin' ? config.adminPassword : '$1Password'
       const hashedPassword = await hashPassword(passwordToHash)
 
-      await db.insert(tables.users).values({
+      await db.insert(schema.users).values({
         email: userData.email,
         password: hashedPassword,
         name: userData.name,

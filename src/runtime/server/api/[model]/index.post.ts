@@ -1,8 +1,8 @@
 // server/api/[model]/index.post.ts
 import { eventHandler, getRouterParams, readBody } from 'h3'
 import { getTableForModel, filterUpdatableFields } from '../../utils/modelMapper'
-// @ts-expect-error - #site/drizzle is an alias defined by the module
-import { useDrizzle } from '#site/drizzle'
+// @ts-expect-error - hub:db is a virtual alias
+import { db } from 'hub:db'
 import { ensureResourceAccess, formatResourceResult, hashPayloadFields } from '../../utils/handler'
 
 export default eventHandler(async (event) => {
@@ -17,7 +17,7 @@ export default eventHandler(async (event) => {
   // Auto-hash fields based on config (default: ['password'])
   await hashPayloadFields(payload)
 
-  const newRecord = await useDrizzle().insert(table).values(payload).returning().get()
+  const newRecord = await db.insert(table).values(payload).returning().get()
 
   return formatResourceResult(model, newRecord as Record<string, unknown>, isAdmin)
 })

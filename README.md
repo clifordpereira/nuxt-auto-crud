@@ -51,7 +51,7 @@ Detailed instructions can be found in [https://auto-crud.clifland.in/docs/auto-c
 
 If you want to add `nuxt-auto-crud` to an existing project, follow these steps:
 
-> **Note:** These instructions assume you are using NuxtHub. If you are using a custom SQLite setup (e.g. better-sqlite3, Turso), please see [Custom Setup](./custom-setup.md).
+> **Note:** These instructions have been simplified for NuxtHub.
 
 #### Install dependencies
 
@@ -121,23 +121,7 @@ export default defineConfig({
 })
 ```
 
-#### Setup Database Connection
 
-Create `server/utils/drizzle.ts` to export the database instance:
-
-```typescript
-// server/utils/drizzle.ts
-import { db, schema } from 'hub:db'
-export { sql, eq, and, or } from 'drizzle-orm'
-
-export const tables = schema
-
-export function useDrizzle() {
-  return db
-}
-
-export type User = typeof schema.users.$inferSelect
-```
 
 #### Define your database schema
 
@@ -462,7 +446,7 @@ You can customize hidden fields by modifying the `modelMapper.ts` utility.
 
 - Nuxt 3 or 4
 - Drizzle ORM (SQLite)
-- NuxtHub >= 0.10.0 (Recommended) or [Custom SQLite Setup](./custom-setup.md)
+- NuxtHub >= 0.10.0
 
 ## 🔗 Other Helpful Links
 

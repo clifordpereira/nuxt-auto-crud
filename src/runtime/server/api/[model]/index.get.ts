@@ -1,8 +1,8 @@
 // server/api/[model]/index.get.ts
 import { eventHandler, getRouterParams } from 'h3'
 import { getTableForModel } from '../../utils/modelMapper'
-// @ts-expect-error - #site/drizzle is an alias defined by the module
-import { useDrizzle } from '#site/drizzle'
+// @ts-expect-error - hub:db is a virtual alias
+import { db } from 'hub:db'
 import { desc, getTableColumns, eq } from 'drizzle-orm'
 import type { TableWithId } from '../../types'
 import { ensureResourceAccess, formatResourceResult } from '../../utils/handler'
@@ -25,7 +25,7 @@ export default eventHandler(async (event) => {
   const table = getTableForModel(model) as TableWithId
   const columns = getTableColumns(table)
 
-  let query = useDrizzle().select().from(table)
+  let query = db.select().from(table)
 
   // Filter active rows for non-admins (or those without list_all) if status field exists
 

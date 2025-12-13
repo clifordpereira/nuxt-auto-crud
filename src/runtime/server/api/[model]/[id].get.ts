@@ -3,8 +3,8 @@ import { eventHandler, getRouterParams, createError } from 'h3'
 import { eq } from 'drizzle-orm'
 import { getTableForModel } from '../../utils/modelMapper'
 import type { TableWithId } from '../../types'
-// @ts-expect-error - #site/drizzle is an alias defined by the module
-import { useDrizzle } from '#site/drizzle'
+// @ts-expect-error - hub:db is a virtual alias
+import { db } from 'hub:db'
 import { ensureResourceAccess, formatResourceResult } from '../../utils/handler'
 import { checkAdminAccess } from '../../utils/auth'
 
@@ -14,7 +14,7 @@ export default eventHandler(async (event) => {
 
   const table = getTableForModel(model) as TableWithId
 
-  const record = await useDrizzle()
+  const record = await db
     .select()
     .from(table)
     .where(eq(table.id, Number(id)))

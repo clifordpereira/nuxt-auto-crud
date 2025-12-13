@@ -49,8 +49,8 @@ export async function checkAdminAccess(event: H3Event, model: string, action: st
           
           if (userPermissions && userPermissions.includes(ownAction)) {
             // Verify ownership via DB
-            // @ts-expect-error - #site/drizzle alias
-            const { useDrizzle } = await import('#site/drizzle')
+            // @ts-expect-error - hub:db virtual alias
+            const { db } = await import('hub:db')
             const { getTableForModel } = await import('./modelMapper')
             const { eq } = await import('drizzle-orm')
 
@@ -66,7 +66,6 @@ export async function checkAdminAccess(event: H3Event, model: string, action: st
                // We need to check if table has userId column. 
                // We cast to any to check property exist roughly or just try query
                if ('userId' in table) {
-                 const db = useDrizzle()
                  // @ts-expect-error - dyanmic table access
                  const record = await db.select({ userId: table.userId }).from(table).where(eq(table.id, context.id)).get()
                  

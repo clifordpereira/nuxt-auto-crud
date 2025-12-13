@@ -5,11 +5,7 @@ export interface ModuleOptions {
    */
   schemaPath?: string
 
-  /**
-   * Path to the drizzle instance file (must export useDrizzle)
-   * @default 'server/utils/drizzle'
-   */
-  drizzlePath?: string
+
 
   /**
    * Authentication configuration

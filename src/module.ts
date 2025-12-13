@@ -25,7 +25,7 @@ export default defineNuxtModule<ModuleOptions>({
   },
   defaults: {
     schemaPath: 'server/db/schema',
-    drizzlePath: 'server/utils/drizzle',
+
     auth: false,
   },
   async setup(options, nuxt) {
@@ -37,11 +37,7 @@ export default defineNuxtModule<ModuleOptions>({
     )
     nuxt.options.alias['#site/schema'] = schemaPath
 
-    const drizzlePath = resolver.resolve(
-      nuxt.options.rootDir,
-      options.drizzlePath!,
-    )
-    nuxt.options.alias['#site/drizzle'] = drizzlePath
+
 
     addImportsDir(resolver.resolve(nuxt.options.rootDir, 'shared/utils'))
 

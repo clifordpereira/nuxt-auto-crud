@@ -4,8 +4,8 @@ import { eq } from 'drizzle-orm'
 import { getTableForModel, filterUpdatableFields } from '../../utils/modelMapper'
 import type { TableWithId } from '../../types'
 
-// @ts-expect-error - #site/drizzle is an alias defined by the module
-import { useDrizzle } from '#site/drizzle'
+// @ts-expect-error - hub:db is a virtual alias
+import { db } from 'hub:db'
 import { ensureResourceAccess, formatResourceResult, hashPayloadFields } from '../../utils/handler'
 
 
@@ -30,7 +30,7 @@ export default eventHandler(async (event) => {
     (payload as any).updatedAt = new Date()
   }
 
-  const updatedRecord = await useDrizzle()
+  const updatedRecord = await db
     .update(table)
     .set(payload)
     .where(eq(table.id, Number(id)))

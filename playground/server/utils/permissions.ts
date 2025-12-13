@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm'
-import { tables, useDrizzle } from './drizzle'
+import { db, schema } from 'hub:db'
 
 let publicPermissionsCache: Record<string, string[]> | null = null
 let lastCacheTime = 0
@@ -11,8 +11,7 @@ export async function getPublicPermissions(): Promise<Record<string, string[]>> 
     return publicPermissionsCache
   }
 
-  const db = useDrizzle()
-  const publicRole = await db.select().from(tables.roles).where(eq(tables.roles.name, 'public')).get()
+  const publicRole = await db.select().from(schema.roles).where(eq(schema.roles.name, 'public')).get()
 
   if (!publicRole) {
     publicPermissionsCache = {}
@@ -20,13 +19,13 @@ export async function getPublicPermissions(): Promise<Record<string, string[]>> 
   }
 
   const permissionsData = await db.select({
-    resource: tables.resources.name,
-    action: tables.permissions.code,
+    resource: schema.resources.name,
+    action: schema.permissions.code,
   })
-    .from(tables.roleResourcePermissions)
-    .innerJoin(tables.resources, eq(tables.roleResourcePermissions.resourceId, tables.resources.id))
-    .innerJoin(tables.permissions, eq(tables.roleResourcePermissions.permissionId, tables.permissions.id))
-    .where(eq(tables.roleResourcePermissions.roleId, publicRole.id))
+    .from(schema.roleResourcePermissions)
+    .innerJoin(schema.resources, eq(schema.roleResourcePermissions.resourceId, schema.resources.id))
+    .innerJoin(schema.permissions, eq(schema.roleResourcePermissions.permissionId, schema.permissions.id))
+    .where(eq(schema.roleResourcePermissions.roleId, publicRole.id))
     .all()
 
   const permissions: Record<string, string[]> = {}

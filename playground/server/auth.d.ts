@@ -1,4 +1,6 @@
-import type { User as DrizzleUser } from './utils/drizzle'
+import { users } from './db/schema/users'
+
+type DrizzleUser = typeof users.$inferSelect
 
 declare module '#auth-utils' {
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type

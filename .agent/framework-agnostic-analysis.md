@@ -213,7 +213,7 @@ export default {
 **Solution**:
 ```javascript
 // Instead of auto-imports, use explicit imports
-import { useDrizzle } from './db/drizzle'
+import { db, schema } from 'hub:db'
 import { allows, abilities } from './auth/permissions'
 ```
 
