@@ -1,3 +1,26 @@
+## v1.19.0
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.18.1...v1.19.0)
+
+### 🚀 Enhancements
+
+- Make Google Analytics ID configurable via environment variable ([af186af](https://github.com/clifordpereira/nuxt-auto-crud/commit/af186af))
+- Implement user profile management with refresh token support and extended permissions. ([40203ac](https://github.com/clifordpereira/nuxt-auto-crud/commit/40203ac))
+- Update header logout button and allow users to update their own profile ([0a278a0](https://github.com/clifordpereira/nuxt-auto-crud/commit/0a278a0))
+- Implement permission-based resource filtering for menu items, including admin override and empty state handling. ([36078d9](https://github.com/clifordpereira/nuxt-auto-crud/commit/36078d9))
+- Improve test infrastructure by adding mock database implementations and refining Vitest exclusions for conditional test execution. ([9d3d5c4](https://github.com/clifordpereira/nuxt-auto-crud/commit/9d3d5c4))
+
+### 💅 Refactors
+
+- Remove `@ts-expect-error` comments from auth utility and update migration metadata. ([044de75](https://github.com/clifordpereira/nuxt-auto-crud/commit/044de75))
+- Use CommonPassword component for password input in profile page. ([acd3a44](https://github.com/clifordpereira/nuxt-auto-crud/commit/acd3a44))
+- Centralize Drizzle ORM integration using `hub:db` virtual alias and remove local `drizzle.ts` files. ([8c7dc59](https://github.com/clifordpereira/nuxt-auto-crud/commit/8c7dc59))
+- Improve type safety for user session handling and error assertions in tests. ([f08ce67](https://github.com/clifordpereira/nuxt-auto-crud/commit/f08ce67))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v1.18.1
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.18.0...v1.18.1)
