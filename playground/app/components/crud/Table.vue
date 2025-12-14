@@ -131,7 +131,7 @@ const paginatedItems = ref<Record<string, unknown>[]>([])
                     </Can>
                     <Can
                       :ability="resourceAbility"
-                      :args="[resource, 'update']"
+                      :args="[resource, 'update', row]"
                     >
                       <CrudEditRow
                         :resource="resource"
@@ -141,7 +141,7 @@ const paginatedItems = ref<Record<string, unknown>[]>([])
                     </Can>
                     <Can
                       :ability="resourceAbility"
-                      :args="[resource, 'delete']"
+                      :args="[resource, 'delete', row]"
                     >
                       <UButton
                         label="Delete"

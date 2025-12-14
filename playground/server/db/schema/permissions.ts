@@ -32,17 +32,47 @@ export const roleResourcePermissions = sqliteTable('role_resource_permissions', 
 })
 
 // Relations
-export const rolesRelations = relations(roles, ({ many }) => ({
+export const rolesRelations = relations(roles, ({ many, one }) => ({
   users: many(users),
   resourcePermissions: many(roleResourcePermissions),
+  creator: one(users, {
+    fields: [roles.createdBy],
+    references: [users.id],
+    relationName: 'creator',
+  }),
+  updater: one(users, {
+    fields: [roles.updatedBy],
+    references: [users.id],
+    relationName: 'updater',
+  }),
 }))
 
-export const resourcesRelations = relations(resources, ({ many }) => ({
+export const resourcesRelations = relations(resources, ({ many, one }) => ({
   rolePermissions: many(roleResourcePermissions),
+  creator: one(users, {
+    fields: [resources.createdBy],
+    references: [users.id],
+    relationName: 'creator',
+  }),
+  updater: one(users, {
+    fields: [resources.updatedBy],
+    references: [users.id],
+    relationName: 'updater',
+  }),
 }))
 
-export const permissionsRelations = relations(permissions, ({ many }) => ({
+export const permissionsRelations = relations(permissions, ({ many, one }) => ({
   rolePermissions: many(roleResourcePermissions),
+  creator: one(users, {
+    fields: [permissions.createdBy],
+    references: [users.id],
+    relationName: 'creator',
+  }),
+  updater: one(users, {
+    fields: [permissions.updatedBy],
+    references: [users.id],
+    relationName: 'updater',
+  }),
 }))
 
 export const roleResourcePermissionsRelations = relations(roleResourcePermissions, ({ one }) => ({
@@ -57,5 +87,15 @@ export const roleResourcePermissionsRelations = relations(roleResourcePermission
   permission: one(permissions, {
     fields: [roleResourcePermissions.permissionId],
     references: [permissions.id],
+  }),
+  creator: one(users, {
+    fields: [roleResourcePermissions.createdBy],
+    references: [users.id],
+    relationName: 'creator',
+  }),
+  updater: one(users, {
+    fields: [roleResourcePermissions.updatedBy],
+    references: [users.id],
+    relationName: 'updater',
   }),
 }))

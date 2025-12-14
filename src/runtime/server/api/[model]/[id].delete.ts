@@ -9,7 +9,7 @@ import { ensureResourceAccess, formatResourceResult } from '../../utils/handler'
 
 export default eventHandler(async (event) => {
   const { model, id } = getRouterParams(event) as { model: string, id: string }
-  const isAdmin = await ensureResourceAccess(event, model, 'delete')
+  const isAdmin = await ensureResourceAccess(event, model, 'delete', { id })
 
   const table = getTableForModel(model) as TableWithId
   const singularName = getModelSingularName(model)

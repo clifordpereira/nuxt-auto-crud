@@ -18,4 +18,15 @@ export const usersRelations = relations(users, ({ one }) => ({
     fields: [users.roleId],
     references: [roles.id],
   }),
+  creator: one(users, {
+    fields: [users.createdBy],
+    references: [users.id],
+    relationName: 'creator',
+  }),
+  updater: one(users, {
+    fields: [users.updatedBy],
+    references: [users.id],
+    relationName: 'updater',
+  }),
 }))
+

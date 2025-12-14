@@ -35,6 +35,28 @@ export default eventHandler(async (event) => {
     roleId: defaultRole?.id,
   }).returning().get()
 
+  // Fetch permissions
+  const permissions: Record<string, string[]> = {}
+
+  if (user.roleId) {
+    const permissionsData = await db.select({
+      resource: schema.resources.name,
+      action: schema.permissions.code,
+    })
+      .from(schema.roleResourcePermissions)
+      .innerJoin(schema.resources, eq(schema.roleResourcePermissions.resourceId, schema.resources.id))
+      .innerJoin(schema.permissions, eq(schema.roleResourcePermissions.permissionId, schema.permissions.id))
+      .where(eq(schema.roleResourcePermissions.roleId, user.roleId))
+      .all()
+
+    for (const p of permissionsData) {
+      if (!permissions[p.resource]) {
+        permissions[p.resource] = []
+      }
+      permissions[p.resource].push(p.action)
+    }
+  }
+
   // Set session
   await setUserSession(event, {
     user: {
@@ -43,7 +65,7 @@ export default eventHandler(async (event) => {
       name: user.name,
       avatar: user.avatar,
       role: defaultRole?.name || 'user',
-      permissions: {},
+      permissions,
     },
   })
 

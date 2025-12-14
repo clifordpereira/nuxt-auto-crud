@@ -3,12 +3,13 @@ import { defineAbility } from 'nuxt-authorization/utils'
 let publicPermissionsPromise: Promise<Record<string, string[]>> | null = null
 
 interface User {
+  id?: string | number
   role?: string
   permissions?: Record<string, string[]>
 }
 
 // Update signature to accept context
-export const abilityLogic = async (user: unknown, model: string, action: string, _context?: { id: string | number }) => {
+export const abilityLogic = async (user: unknown, model: string, action: string, context?: Record<string, any>) => {
   const userRecord = user as User
 
   // 1. Admin has full access
@@ -20,8 +21,34 @@ export const abilityLogic = async (user: unknown, model: string, action: string,
   if (user) {
     const resourcePermissions = userRecord?.permissions?.[model]
 
-    if (Array.isArray(resourcePermissions) && resourcePermissions.includes(action)) {
-      return true
+    if (Array.isArray(resourcePermissions)) {
+      if (resourcePermissions.includes(action)) {
+        return true
+      }
+
+      // Check ownership permissions
+      if ((action === 'update' && resourcePermissions.includes('update_own')) ||
+          (action === 'delete' && resourcePermissions.includes('delete_own'))) {
+
+        if (context) {
+          // Case A: Users table - User updates themselves
+          if (model === 'users') {
+             if (String(context.id) === String(userRecord.id)) {
+               return true
+             }
+          }
+
+          // Case B: Created By check
+          if (context.createdBy && String(context.createdBy) === String(userRecord.id)) {
+             return true
+          }
+           
+          // Case C: Legacy userId check
+          if (context.userId && String(context.userId) === String(userRecord.id)) {
+             return true
+          }
+        }
+      }
     }
   }
 

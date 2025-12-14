@@ -1,40 +1,28 @@
-CREATE TABLE `categories` (
+CREATE TABLE `users` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`status` text DEFAULT 'active',
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
 	`deleted_at` integer,
+	`created_by` integer,
+	`updated_by` integer,
 	`name` text NOT NULL,
-	`description` text,
-	`slug` text NOT NULL,
-	`type` text DEFAULT 'post' NOT NULL
+	`email` text NOT NULL,
+	`password` text NOT NULL,
+	`avatar` text,
+	`role_id` integer,
+	FOREIGN KEY (`role_id`) REFERENCES `roles`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `categories_slug_unique` ON `categories` (`slug`);--> statement-breakpoint
-CREATE TABLE `comments` (
-	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`status` text DEFAULT 'active',
-	`created_at` integer NOT NULL,
-	`updated_at` integer NOT NULL,
-	`deleted_at` integer,
-	`content` text NOT NULL,
-	`resource_type` text NOT NULL,
-	`resource_id` integer NOT NULL,
-	`user_id` integer,
-	`author_name` text,
-	`author_email` text,
-	`rating` integer,
-	`is_approved` integer DEFAULT false,
-	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
-);
---> statement-breakpoint
-CREATE INDEX `resource_idx` ON `comments` (`resource_type`,`resource_id`);--> statement-breakpoint
+CREATE UNIQUE INDEX `users_email_unique` ON `users` (`email`);--> statement-breakpoint
 CREATE TABLE `permissions` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`status` text DEFAULT 'active',
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
 	`deleted_at` integer,
+	`created_by` integer,
+	`updated_by` integer,
 	`name` text NOT NULL,
 	`description` text,
 	`code` text NOT NULL
@@ -46,6 +34,8 @@ CREATE TABLE `resources` (
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
 	`deleted_at` integer,
+	`created_by` integer,
+	`updated_by` integer,
 	`name` text NOT NULL,
 	`description` text
 );
@@ -57,6 +47,8 @@ CREATE TABLE `role_resource_permissions` (
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
 	`deleted_at` integer,
+	`created_by` integer,
+	`updated_by` integer,
 	`role_id` integer NOT NULL,
 	`resource_id` integer NOT NULL,
 	`permission_id` integer NOT NULL,
@@ -71,6 +63,8 @@ CREATE TABLE `roles` (
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
 	`deleted_at` integer,
+	`created_by` integer,
+	`updated_by` integer,
 	`name` text NOT NULL,
 	`description` text
 );
@@ -82,6 +76,8 @@ CREATE TABLE `subscribers` (
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
 	`deleted_at` integer,
+	`created_by` integer,
+	`updated_by` integer,
 	`email` text NOT NULL
 );
 --> statement-breakpoint
@@ -92,25 +88,11 @@ CREATE TABLE `testimonials` (
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
 	`deleted_at` integer,
+	`created_by` integer,
+	`updated_by` integer,
 	`name` text NOT NULL,
 	`role` text NOT NULL,
 	`content` text NOT NULL,
 	`avatar` text,
 	`company` text
 );
---> statement-breakpoint
-CREATE TABLE `users` (
-	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`status` text DEFAULT 'active',
-	`created_at` integer NOT NULL,
-	`updated_at` integer NOT NULL,
-	`deleted_at` integer,
-	`name` text NOT NULL,
-	`email` text NOT NULL,
-	`password` text NOT NULL,
-	`avatar` text,
-	`role_id` integer,
-	FOREIGN KEY (`role_id`) REFERENCES `roles`(`id`) ON UPDATE no action ON DELETE no action
-);
---> statement-breakpoint
-CREATE UNIQUE INDEX `users_email_unique` ON `users` (`email`);

@@ -8,6 +8,8 @@ export const systemFields = {
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
   deletedAt: integer('deleted_at', { mode: 'timestamp' }), // Soft delete
+  createdBy: integer('created_by'), // Track who created this
+  updatedBy: integer('updated_by'), // Track who last updated this
 }
 
 // 3. Base Fields (Common descriptive fields for entities)

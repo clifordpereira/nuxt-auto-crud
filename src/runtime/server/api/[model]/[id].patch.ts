@@ -1,5 +1,7 @@
 // server/api/[model]/[id].patch.ts
 import { eventHandler, getRouterParams, readBody, createError } from 'h3'
+import type { H3Event } from 'h3'
+import { getUserSession } from '#imports'
 import { eq } from 'drizzle-orm'
 import { getTableForModel, filterUpdatableFields } from '../../utils/modelMapper'
 import type { TableWithId } from '../../types'
@@ -26,6 +28,19 @@ export default eventHandler(async (event) => {
   if ('updatedAt' in table) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (payload as any).updatedAt = new Date()
+  }
+
+  // Inject updatedBy if user is authenticated
+  try {
+    const session = await (getUserSession as (event: H3Event) => Promise<{ user: { id: string | number } | null }>)(event)
+    if (session?.user?.id) {
+       if ('updatedBy' in table) {
+         // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         (payload as any).updatedBy = session.user.id
+       }
+    }
+  } catch (e) {
+    // No session available
   }
 
   const updatedRecord = await db
