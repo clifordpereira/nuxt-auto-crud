@@ -1,3 +1,17 @@
+## v1.20.0
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.19.1...v1.20.0)
+
+### 🚀 Enhancements
+
+- Implement resource ownership for authorization by adding `createdBy`/`updatedBy` fields, enhancing ability checks, and auto-populating ownership data.) ([c120087](https://github.com/clifordpereira/nuxt-auto-crud/commit/c120087))
+- Refine ownership checks with improved ability context types and simplified error handling in API routes. ([43b0658](https://github.com/clifordpereira/nuxt-auto-crud/commit/43b0658))
+- Add `update_own` and `delete_own` to permission display order and exclude `resources-ownership.test.ts` from Vitest config. ([ec6a74a](https://github.com/clifordpereira/nuxt-auto-crud/commit/ec6a74a))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v1.19.1
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.19.0...v1.19.1)
