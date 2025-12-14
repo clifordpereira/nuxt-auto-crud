@@ -321,6 +321,29 @@ export default defineNuxtConfig({
 })
 ```
 
+
+## 👤 Owner-based Permissions (RBAC)
+
+In addition to standard `create`, `read`, `update`, and `delete` permissions, you can assign **Ownership Permissions**:
+
+- `update_own`: Allows a user to update a record **only if they created it**.
+- `delete_own`: Allows a user to delete a record **only if they created it**.
+
+**How it works:**
+The module checks for ownership using the following logic:
+1.  **Standard Tables:** Checks if the record has a `createdBy` (or `userId`) column that matches the logged-in user's ID.
+2.  **Users Table:** Checks if the record being accessed is the user's own profile (`id` matches).
+
+**Prerequisites:**
+Ensure your schema includes a `createdBy` field for resources where you want this behavior:
+
+```typescript
+export const posts = sqliteTable('posts', {
+  // ...
+  createdBy: integer('created_by'), // Recommended
+})
+```
+
 ## ⚠️ Known Issues
 
 - **Automatic Relation Expansion:** The module tries to automatically expand foreign keys (e.g., `user_id` -> `user: { name: ... }`). However, this relies on the foreign key column name matching the target table name (e.g., `user_id` for `users`).
