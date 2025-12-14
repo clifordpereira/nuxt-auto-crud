@@ -15,6 +15,7 @@ export default defineVitestConfig({
       '.output',
       'playground',
       'playground-backendonly',
+      'test/resources-ownership.test.ts',
     ],
   },
 })

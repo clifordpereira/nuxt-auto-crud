@@ -177,7 +177,7 @@ const displayResources = computed(() => resources.value?.filter(r =>
 
 const displayPermissions = computed(() => {
   if (!permissions.value) return []
-  const order = ['list', 'create', 'read', 'update', 'delete']
+  const order = ['list', 'create', 'read', 'update', 'delete', 'update_own', 'delete_own']
   return [...permissions.value].sort((a, b) => {
     return order.indexOf(a.code) - order.indexOf(b.code)
   })
