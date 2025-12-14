@@ -34,12 +34,13 @@ export default eventHandler(async (event) => {
   try {
     const session = await (getUserSession as (event: H3Event) => Promise<{ user: { id: string | number } | null }>)(event)
     if (session?.user?.id) {
-       if ('updatedBy' in table) {
-         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-         (payload as any).updatedBy = session.user.id
-       }
+      if ('updatedBy' in table) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (payload as any).updatedBy = session.user.id
+      }
     }
-  } catch (e) {
+  }
+  catch {
     // No session available
   }
 

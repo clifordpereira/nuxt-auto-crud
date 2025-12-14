@@ -63,27 +63,26 @@ export async function checkAdminAccess(event: H3Event, model: string, action: st
               }
 
               // Standard case: Check 'createdBy' or 'userId' column for ownership
-              
-              // @ts-expect-error - dynamic table access
-              const columns = table.columns || {} 
-              
+
+              // const columns = table.columns || {}
+
               const hasCreatedBy = 'createdBy' in table
               const hasUserId = 'userId' in table
-              
+
               if (hasCreatedBy || hasUserId) {
                 // @ts-expect-error - table is dynamic
                 const query = db.select().from(table).where(eq(table.id, Number(context.id)))
                 const record = await query.get()
 
                 if (record) {
-                   // Check createdBy
-                   if (hasCreatedBy) {
-                       if (String(record.createdBy) === String(user.id)) return true
-                   }
-                   // Check userId (legacy)
-                   if (hasUserId) {
-                       if (String(record.userId) === String(user.id)) return true
-                   }
+                  // Check createdBy
+                  if (hasCreatedBy) {
+                    if (String(record.createdBy) === String(user.id)) return true
+                  }
+                  // Check userId (legacy)
+                  if (hasUserId) {
+                    if (String(record.userId) === String(user.id)) return true
+                  }
                 }
               }
             }

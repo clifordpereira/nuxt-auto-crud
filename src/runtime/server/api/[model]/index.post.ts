@@ -23,19 +23,20 @@ export default eventHandler(async (event) => {
   try {
     const session = await (getUserSession as (event: H3Event) => Promise<{ user: { id: string | number } | null }>)(event)
     if (session?.user?.id) {
-       // Check if table has columns before assigning (optional but safer if we had strict types)
-       // Since we are passing payload to .values(), extra keys might be ignored or cause error depending on driver
-       // Using 'in' table check is good practice
-       if ('createdBy' in table) {
-         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-         (payload as any).createdBy = session.user.id
-       }
-       if ('updatedBy' in table) {
-         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-         (payload as any).updatedBy = session.user.id
-       }
+      // Check if table has columns before assigning (optional but safer if we had strict types)
+      // Since we are passing payload to .values(), extra keys might be ignored or cause error depending on driver
+      // Using 'in' table check is good practice
+      if ('createdBy' in table) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (payload as any).createdBy = session.user.id
+      }
+      if ('updatedBy' in table) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (payload as any).updatedBy = session.user.id
+      }
     }
-  } catch (e) {
+  }
+  catch {
     // No session available
   }
 

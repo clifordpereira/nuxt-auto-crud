@@ -29,4 +29,3 @@ export const usersRelations = relations(users, ({ one }) => ({
     relationName: 'updater',
   }),
 }))
-

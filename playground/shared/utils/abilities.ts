@@ -9,7 +9,7 @@ interface User {
 }
 
 // Update signature to accept context
-export const abilityLogic = async (user: unknown, model: string, action: string, context?: Record<string, any>) => {
+export const abilityLogic = async (user: unknown, model: string, action: string, context?: Record<string, unknown> & { id?: string | number, createdBy?: string | number, userId?: string | number }) => {
   const userRecord = user as User
 
   // 1. Admin has full access
@@ -27,25 +27,24 @@ export const abilityLogic = async (user: unknown, model: string, action: string,
       }
 
       // Check ownership permissions
-      if ((action === 'update' && resourcePermissions.includes('update_own')) ||
-          (action === 'delete' && resourcePermissions.includes('delete_own'))) {
-
+      if ((action === 'update' && resourcePermissions.includes('update_own'))
+        || (action === 'delete' && resourcePermissions.includes('delete_own'))) {
         if (context) {
           // Case A: Users table - User updates themselves
           if (model === 'users') {
-             if (String(context.id) === String(userRecord.id)) {
-               return true
-             }
+            if (String(context.id) === String(userRecord.id)) {
+              return true
+            }
           }
 
           // Case B: Created By check
           if (context.createdBy && String(context.createdBy) === String(userRecord.id)) {
-             return true
+            return true
           }
-           
+
           // Case C: Legacy userId check
           if (context.userId && String(context.userId) === String(userRecord.id)) {
-             return true
+            return true
           }
         }
       }
