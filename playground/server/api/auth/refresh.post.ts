@@ -46,7 +46,7 @@ export default eventHandler(async (event) => {
       if (!permissions[p.resource]) {
         permissions[p.resource] = []
       }
-      permissions[p.resource].push(p.action)
+      permissions[p.resource]!.push(p.action)
     }
   }
 

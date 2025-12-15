@@ -25,7 +25,7 @@ sections:
     orientation: horizontal
     reverse: false
     code: |
-      // server/database/schema/users.ts
+      // server/db/schema/users.ts
       import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
 
       export const users = sqliteTable('users', {

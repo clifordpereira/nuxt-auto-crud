@@ -1,16 +1,18 @@
-import { eq, sql } from 'drizzle-orm'
+import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 import { db, schema } from 'hub:db'
+import { verifyUserPassword } from '../../utils/hashing'
+import { InvalidCredentialError } from '../../utils/errors'
 
 const loginSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   password: z.string(),
 })
 
 export default eventHandler(async (event) => {
   const body = await readValidatedBody(event, loginSchema.parse)
 
-  let result = await db.select({
+  const result = await db.select({
     user: schema.users,
     role: schema.roles.name,
   })
@@ -19,33 +21,19 @@ export default eventHandler(async (event) => {
     .where(eq(schema.users.email, body.email))
     .get()
 
-  if (!result && body.email === 'admin@example.com') {
-    const userCount = await db.select({ count: sql`count(*)` }).from(schema.users).get()
-    if (userCount && userCount.count === 0) {
-      await seedDatabase()
-      // Fetch again
-      result = await db.select({
-        user: schema.users,
-        role: schema.roles.name,
-      })
-        .from(schema.users)
-        .leftJoin(schema.roles, eq(schema.users.roleId, schema.roles.id))
-        .where(eq(schema.users.email, body.email))
-        .get()
-    }
+  if (!result || !result.user) {
+    throw new InvalidCredentialError()
   }
 
-  if (!result || !result.user || !await verifyPassword(result.user.password, body.password)) {
-    throw createError({
-      statusCode: 401,
-      message: 'Invalid credentials',
-    })
+  const isPasswordValid = await verifyUserPassword(result.user.password, body.password)
+
+  if (!isPasswordValid) {
+    throw new InvalidCredentialError()
   }
 
   const user = result.user
   const role = result.role || 'user'
 
-  // Fetch permissions
   const permissions: Record<string, string[]> = {}
 
   if (user.roleId) {
@@ -63,7 +51,7 @@ export default eventHandler(async (event) => {
       if (!permissions[p.resource]) {
         permissions[p.resource] = []
       }
-      permissions[p.resource].push(p.action)
+      permissions[p.resource]!.push(p.action)
     }
   }
 
@@ -73,8 +61,8 @@ export default eventHandler(async (event) => {
       email: user.email,
       name: user.name,
       avatar: user.avatar,
-      role: role,
-      permissions: permissions,
+      role,
+      permissions,
     },
   })
 

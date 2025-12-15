@@ -33,7 +33,7 @@ export async function getPublicPermissions(): Promise<Record<string, string[]>> 
     if (!permissions[p.resource]) {
       permissions[p.resource] = []
     }
-    permissions[p.resource].push(p.action)
+    permissions[p.resource]!.push(p.action)
   }
 
   publicPermissionsCache = permissions

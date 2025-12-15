@@ -1,5 +1,6 @@
 import { eq, and } from 'drizzle-orm'
 import { db, schema } from 'hub:db'
+import { hashUserPassword } from './hashing'
 
 export const seedDatabase = async () => {
   console.log('Running DB seed task...')
@@ -46,7 +47,9 @@ export const seedDatabase = async () => {
       }).returning()
       resource = inserted
     }
-    resourceIds[resourceName] = resource.id
+    if (resource) {
+      resourceIds[resourceName] = resource.id
+    }
   }
 
   // 3. Seed Permissions
@@ -72,7 +75,9 @@ export const seedDatabase = async () => {
       }).returning()
       permission = inserted
     }
-    permissionIds[code] = permission.id
+    if (permission) {
+      permissionIds[code] = permission.id
+    }
   }
 
   // 4. Assign Permissions to Roles (Example: Manager gets all on users, Moderator gets read/list on users)
@@ -132,8 +137,8 @@ export const seedDatabase = async () => {
 
     if (!existingUser) {
       console.log(`Seeding user: ${userData.email}...`)
-      const passwordToHash = userData.role === 'admin' ? config.adminPassword : '$1Password'
-      const hashedPassword = await hashPassword(passwordToHash)
+      const passwordToHash = userData.role === 'admin' ? '$1Password' : '$1Password'
+      const hashedPassword = await hashUserPassword(passwordToHash)
 
       await db.insert(schema.users).values({
         email: userData.email,

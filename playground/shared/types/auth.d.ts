@@ -7,3 +7,5 @@ declare module '#auth-utils' {
     permissions: Record<string, string[]>
   }
 }
+
+export {}
