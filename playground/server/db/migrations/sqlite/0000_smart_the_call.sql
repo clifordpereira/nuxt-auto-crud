@@ -4,6 +4,8 @@ CREATE TABLE `categories` (
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
 	`deleted_at` integer,
+	`created_by` integer,
+	`updated_by` integer,
 	`name` text NOT NULL,
 	`description` text,
 	`slug` text NOT NULL,
@@ -17,6 +19,8 @@ CREATE TABLE `comments` (
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
 	`deleted_at` integer,
+	`created_by` integer,
+	`updated_by` integer,
 	`content` text NOT NULL,
 	`resource_type` text NOT NULL,
 	`resource_id` integer NOT NULL,
@@ -35,6 +39,8 @@ CREATE TABLE `permissions` (
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
 	`deleted_at` integer,
+	`created_by` integer,
+	`updated_by` integer,
 	`name` text NOT NULL,
 	`description` text,
 	`code` text NOT NULL
@@ -46,6 +52,8 @@ CREATE TABLE `resources` (
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
 	`deleted_at` integer,
+	`created_by` integer,
+	`updated_by` integer,
 	`name` text NOT NULL,
 	`description` text
 );
@@ -57,6 +65,8 @@ CREATE TABLE `role_resource_permissions` (
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
 	`deleted_at` integer,
+	`created_by` integer,
+	`updated_by` integer,
 	`role_id` integer NOT NULL,
 	`resource_id` integer NOT NULL,
 	`permission_id` integer NOT NULL,
@@ -71,6 +81,8 @@ CREATE TABLE `roles` (
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
 	`deleted_at` integer,
+	`created_by` integer,
+	`updated_by` integer,
 	`name` text NOT NULL,
 	`description` text
 );
@@ -82,6 +94,8 @@ CREATE TABLE `subscribers` (
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
 	`deleted_at` integer,
+	`created_by` integer,
+	`updated_by` integer,
 	`email` text NOT NULL
 );
 --> statement-breakpoint
@@ -92,6 +106,8 @@ CREATE TABLE `testimonials` (
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
 	`deleted_at` integer,
+	`created_by` integer,
+	`updated_by` integer,
 	`name` text NOT NULL,
 	`role` text NOT NULL,
 	`content` text NOT NULL,
@@ -105,6 +121,8 @@ CREATE TABLE `users` (
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
 	`deleted_at` integer,
+	`created_by` integer,
+	`updated_by` integer,
 	`name` text NOT NULL,
 	`email` text NOT NULL,
 	`password` text NOT NULL,
