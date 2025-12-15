@@ -9,7 +9,7 @@ const contentData = {
     },
     {
       title: 'Extend Schema',
-      description: 'Add new tables in server/database/schema and restart the server to use the new tables. If needed use \'npm db:generate\'',
+      description: 'Add new tables in server/db/schema and restart the server to use the new tables. If needed use \'npm db:generate\'',
     },
   ],
 }

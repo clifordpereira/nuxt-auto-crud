@@ -11,7 +11,7 @@ Follow this simple workflow to get your application up and running:
 
 2. **Configure:** Rename `.env.example` to `.env` and set your Admin email & password.
 
-3. **Schema:** Create your Drizzle schema in `server/database/schema` (AI tools like ChatGPT or Gemini can help!) and export them in `server/database/index.ts`.
+3. **Schema:** Create your Drizzle schema in `server/db/schema` (AI tools like ChatGPT or Gemini can help!) and export them in `server/db/index.ts`.
 
 4. **Permissions:** Log in as Admin and configure your resource permissions via the dashboard.
 

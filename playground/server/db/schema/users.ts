@@ -29,3 +29,5 @@ export const usersRelations = relations(users, ({ one }) => ({
     relationName: 'updater',
   }),
 }))
+
+export type User = typeof users.$inferSelect
