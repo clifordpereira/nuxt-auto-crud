@@ -33,6 +33,10 @@ const columns = [{
     label: 'GitHub Discussions',
     to: 'https://github.com/clifordpereira/nuxt-auto-crud/discussions/1',
     target: '_blank',
+  }, {
+    label: 'Report Issue',
+    to: 'https://github.com/clifordpereira/nuxt-auto-crud_template/issues',
+    target: '_blank',
   }],
 }, {
   label: 'YouTube',
@@ -54,7 +58,7 @@ const columns = [{
     target: '_blank',
   }],
 }, {
-  label: 'Built with',
+  label: 'Modules Used',
   children: [{
     label: 'Auto Crud',
     to: 'https://www.npmjs.com/package/nuxt-auto-crud',
@@ -119,7 +123,10 @@ async function onSubmit() {
     class="h-px"
   />
 
-  <UFooter :ui="{ top: 'border-b border-default' }">
+  <UFooter
+    :ui="{ top: 'border-b border-default' }"
+    class="relative"
+  >
     <template #top>
       <UContainer>
         <UFooterColumns :columns="columns">
@@ -155,17 +162,20 @@ async function onSubmit() {
 
     <template #left>
       <p class="text-muted text-sm">
-        Built by <NuxtLink
-          to="https://clifland.in"
-          target="_blank"
-          class="hover:text-primary"
-        >Clifland</NuxtLink>
-        . Built with ❤️ using <NuxtLink
+        Built with ❤️ using <NuxtLink
           to="https://antigravity.google/"
           target="_blank"
           class="hover:text-primary"
         >AntiGravity IDE</NuxtLink>
       </p>
+
+      <div class="absolute left-1/2 -translate-x-1/2 text-muted text-sm hidden sm:block">
+        Built by <NuxtLink
+          to="https://clifland.in"
+          target="_blank"
+          class="hover:text-primary"
+        >Clifland</NuxtLink>
+      </div>
     </template>
 
     <template #right>

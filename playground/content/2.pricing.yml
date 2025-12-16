@@ -28,8 +28,8 @@ plans:
   - title: Standard
     description: Professional setup and support to get your application running smoothly.
     price:
-      month: $100
-      year: $100
+      month: Contact
+      year: Contact
     highlight: true
     scale: true
     button:
@@ -38,15 +38,16 @@ plans:
     features:
       - Turn your idea into web app
       - Web App Setup & Configuration
-      - AI Chat Integration (Tawk.to)
-      - Deployment Assistance
       - Custom Feature Development
+      - Deployment Assistance
+      - AI Chat Integration (Tawk.to)
       - Priority Email Support
+      - One-time payment
   - title: Premium
     description: End-to-end managed solution for complete peace of mind.
     price:
-      month: $10
-      year: $100
+      month: Contact
+      year: Contact
     button:
       label: Contact Sales
       color: neutral
@@ -55,7 +56,6 @@ plans:
     features:
       - Everything in Standard
       - Fully Managed Hosting
-      - Managed Cloud Service
       - Proactive Monitoring
       - Security Updates
       - Performance Optimization
