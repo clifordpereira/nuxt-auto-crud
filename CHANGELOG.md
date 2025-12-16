@@ -1,3 +1,37 @@
+## v1.21.0
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.20.0...v1.21.0)
+
+### 🚀 Enhancements
+
+- Implement robust authentication with password hashing and dedicated error handling, alongside database schema updates and type definitions. ([d7b25be](https://github.com/clifordpereira/nuxt-auto-crud/commit/d7b25be))
+- Implement a `usePermissions` composable to filter UI elements, enhance schema generation with foreign key references for improved CRUD forms, and refine form submission logic. ([5414e0c](https://github.com/clifordpereira/nuxt-auto-crud/commit/5414e0c))
+- Hide CRUD table columns for relations failing with 403 errors by tracking forbidden relations. ([88f2f2c](https://github.com/clifordpereira/nuxt-auto-crud/commit/88f2f2c))
+- Implement resource ownership and authorization checks, update pricing page content, and refine table header display. ([11364cb](https://github.com/clifordpereira/nuxt-auto-crud/commit/11364cb))
+- Rename 'Nuxt Auto Crud' to 'Auto Crud', update pricing plans, add AntiGravity IDE link, and extend schema relations to include `deletedBy`. ([51e876d](https://github.com/clifordpereira/nuxt-auto-crud/commit/51e876d))
+- Update footer links and layout, revise pricing plans, and adjust changelog date ([f9497be](https://github.com/clifordpereira/nuxt-auto-crud/commit/f9497be))
+- Filter out `created_by` and `updated_by` system fields from the CRUD form. ([ba2ace6](https://github.com/clifordpereira/nuxt-auto-crud/commit/ba2ace6))
+- Add favicon and web manifest files ([32c1141](https://github.com/clifordpereira/nuxt-auto-crud/commit/32c1141))
+- Enhance authorization and permissions management across the application and refine various UI components. ([31a0975](https://github.com/clifordpereira/nuxt-auto-crud/commit/31a0975))
+
+### 💅 Refactors
+
+- Consolidate `created_by` and `updated_by` columns into the initial schema snapshot by removing redundant migration files." ([5af900e](https://github.com/clifordpereira/nuxt-auto-crud/commit/5af900e))
+- Improve code consistency and update configurations across the playground. ([5bbecd0](https://github.com/clifordpereira/nuxt-auto-crud/commit/5bbecd0))
+- Improve error handling by typing caught errors as unknown and simplifying empty catch blocks ([c7c5464](https://github.com/clifordpereira/nuxt-auto-crud/commit/c7c5464))
+
+### 📖 Documentation
+
+- Add documentation for owner-based permissions (RBAC) including `update_own` and `delete_own` functionality. ([f91f000](https://github.com/clifordpereira/nuxt-auto-crud/commit/f91f000))
+
+### 🏡 Chore
+
+- **release:** V1.20.0 ([d654643](https://github.com/clifordpereira/nuxt-auto-crud/commit/d654643))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v1.20.0
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.19.1...v1.20.0)
