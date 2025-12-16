@@ -49,12 +49,13 @@ useSeoMeta({
         :value="'```typescript\n' + section.code + '\n```'"
         class="prose prose-primary dark:prose-invert max-w-none"
       />
-      <img
+      <NuxtImg
         v-else-if="(section as any).image"
         :src="(section as any).image"
         :alt="section.title"
         class="w-full rounded-md shadow-xl ring-1 ring-gray-300 dark:ring-gray-700"
-      >
+        loading="lazy"
+      />
       <ImagePlaceholder v-else />
     </UPageSection>
 

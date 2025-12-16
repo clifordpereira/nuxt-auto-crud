@@ -11,7 +11,7 @@ const props = withDefaults(defineProps<{
   speed?: 'slow' | 'normal' | 'fast'
   size?: { min: number, max: number }
 }>(), {
-  starCount: 300,
+  starCount: 150, // Reduced from 300 for mobile performance
   color: 'var(--ui-primary)',
   speed: 'normal',
   size: () => ({
@@ -31,20 +31,22 @@ const generateStars = (count: number): Star[] => {
   }))
 }
 
-// Define speed configurations once
 const speedMap = {
   slow: { duration: 200, opacity: 0.5, ratio: 0.3 },
   normal: { duration: 150, opacity: 0.75, ratio: 0.3 },
   fast: { duration: 100, opacity: 1, ratio: 0.4 },
 }
 
-// Use a more efficient approach to generate and store stars
-const stars = useState<{ slow: Star[], normal: Star[], fast: Star[] }>('stars', () => {
-  return {
+const stars = ref<{ slow: Star[], normal: Star[], fast: Star[] }>({ slow: [], normal: [], fast: [] })
+const isMounted = ref(false)
+
+onMounted(() => {
+  stars.value = {
     slow: generateStars(Math.floor(props.starCount * speedMap.slow.ratio)),
     normal: generateStars(Math.floor(props.starCount * speedMap.normal.ratio)),
     fast: generateStars(Math.floor(props.starCount * speedMap.fast.ratio)),
   }
+  isMounted.value = true
 })
 
 // Compute star layers with different speeds and opacities
