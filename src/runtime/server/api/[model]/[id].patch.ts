@@ -9,6 +9,7 @@ import type { TableWithId } from '../../types'
 // @ts-expect-error - hub:db is a virtual alias
 import { db } from 'hub:db'
 import { ensureResourceAccess, formatResourceResult, hashPayloadFields } from '../../utils/handler'
+import { RecordNotFoundError } from '../../exceptions'
 
 export default eventHandler(async (event) => {
   const { model, id } = getRouterParams(event) as { model: string, id: string }
@@ -20,7 +21,6 @@ export default eventHandler(async (event) => {
   const body = await readBody(event)
   const payload = filterUpdatableFields(model, body)
 
-  // Auto-hash fields based on config (default: ['password'])
   // Auto-hash fields based on config (default: ['password'])
   await hashPayloadFields(payload)
 
@@ -52,10 +52,7 @@ export default eventHandler(async (event) => {
     .get()
 
   if (!updatedRecord) {
-    throw createError({
-      statusCode: 404,
-      message: 'Record not found',
-    })
+    throw new RecordNotFoundError()
   }
 
   return formatResourceResult(model, updatedRecord as Record<string, unknown>, isAdmin)

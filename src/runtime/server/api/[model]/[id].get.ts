@@ -7,6 +7,7 @@ import type { TableWithId } from '../../types'
 import { db } from 'hub:db'
 import { ensureResourceAccess, formatResourceResult } from '../../utils/handler'
 import { checkAdminAccess } from '../../utils/auth'
+import { RecordNotFoundError } from '../../exceptions'
 
 export default eventHandler(async (event) => {
   const { model, id } = getRouterParams(event) as { model: string, id: string }
@@ -21,10 +22,7 @@ export default eventHandler(async (event) => {
     .get()
 
   if (!record) {
-    throw createError({
-      statusCode: 404,
-      message: 'Record not found',
-    })
+    throw new RecordNotFoundError()
   }
 
   // Filter inactive rows for non-admins (or those without list_all) if status field exists
@@ -32,10 +30,7 @@ export default eventHandler(async (event) => {
   if ('status' in record && (record as any).status !== 'active') {
     const canListAll = await checkAdminAccess(event, model, 'list_all')
     if (!canListAll) {
-      throw createError({
-        statusCode: 404,
-        message: 'Record not found',
-      })
+      throw new RecordNotFoundError()
     }
   }
 
