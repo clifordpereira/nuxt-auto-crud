@@ -28,8 +28,8 @@ plans:
   - title: Standard
     description: Professional setup and support to get your application running smoothly.
     price:
-      month: Contact
-      year: Contact
+      month: $100
+      year: $100
     highlight: true
     scale: true
     button:
@@ -45,8 +45,8 @@ plans:
   - title: Premium
     description: End-to-end managed solution for complete peace of mind.
     price:
-      month: Contact
-      year: Contact
+      month: $10
+      year: $100
     button:
       label: Contact Sales
       color: neutral
@@ -66,7 +66,7 @@ faq:
   description: Everything you need to know about Nuxt Auto CRUD.
   items:
     - label: Which databases are supported?
-      content: We have currently tested Nuxt Auto CRUD with SQLite only. Support for other Drizzle ORM compatible databases will be added in future updates.
+      content: We have currently tested Auto Crud with SQLite only. Support for other Drizzle ORM compatible databases will be added in future updates.
     - label: Can I create custom APIs?
       content: Yes! The exposed APIs are suitable for most tasks. You can leverage them for standard operations, and for things like reports or analytics dashboards, you can build custom APIs exactly as you would in any other project.
     - label: How is authentication handled?
@@ -74,7 +74,7 @@ faq:
     - label: How do I go from idea to production?
       content: Check out our Quick Start Guide in the documentation (link in header) for a step-by-step workflow.
     - label: Can I use it with existing projects?
-      content: Yes, you can add Nuxt Auto CRUD to any existing Nuxt project. Check out the Installation Guide in the documentation (link in header) to get started.
+      content: Yes, you can add Auto Crud to any existing Nuxt project. Check out the Installation Guide in the documentation (link in header) to get started.
     - label: Do you offer support?
       content: We have channels for community discussion on GitHub Discussions and Discord (links in footer). For paid support and setup assistance, please contact me at clifordpereira@gmail.com.
     - label: Where can I report bugs?

@@ -56,7 +56,7 @@ const columns = [{
 }, {
   label: 'Built with',
   children: [{
-    label: 'Nuxt Auto Crud',
+    label: 'Auto Crud',
     to: 'https://www.npmjs.com/package/nuxt-auto-crud',
     target: '_blank',
   }, {
@@ -160,6 +160,11 @@ async function onSubmit() {
           target="_blank"
           class="hover:text-primary"
         >Clifland</NuxtLink>
+        . Built with ❤️ using <NuxtLink
+          to="https://antigravity.google/"
+          target="_blank"
+          class="hover:text-primary"
+        >AntiGravity IDE</NuxtLink>
       </p>
     </template>
 
@@ -168,7 +173,7 @@ async function onSubmit() {
         to="https://discord.gg/hGgyEaGu"
         target="_blank"
         icon="i-simple-icons-discord"
-        aria-label="Nuxt Auto CRUD on Discord"
+        aria-label="Auto Crud on Discord"
         color="neutral"
         variant="ghost"
       />
@@ -176,7 +181,7 @@ async function onSubmit() {
         to="https://github.com/clifordpereira/nuxt-auto-crud"
         target="_blank"
         icon="i-simple-icons-github"
-        aria-label="Nuxt Auto CRUD on GitHub"
+        aria-label="Auto Crud on GitHub"
         color="neutral"
         variant="ghost"
       />

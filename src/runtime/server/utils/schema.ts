@@ -108,7 +108,7 @@ export async function getRelations() {
         columnToProperty[columnName] = key
         
         // Auto-link createdBy/updatedBy to users table
-        if (['createdBy', 'created_by', 'updatedBy', 'updated_by'].includes(key)) {
+        if (['createdBy', 'created_by', 'updatedBy', 'updated_by', 'deletedBy', 'deleted_by'].includes(key)) {
           tableRelations[key] = 'users'
         }
       }
