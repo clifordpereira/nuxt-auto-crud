@@ -19,7 +19,7 @@ const { data } = await useFetch(`${crudBaseUrl}/${props.resource}`, {
 })
 
 // Fetch relations
-const { fetchRelations, getDisplayValue } = useRelationDisplay(props.schema)
+const { fetchRelations, getDisplayValue, forbiddenRelations } = useRelationDisplay(props.schema)
 await fetchRelations()
 
 async function onDelete(id: number) {
@@ -67,14 +67,18 @@ const paginatedItems = ref<Record<string, unknown>[]>([])
           class="bg-gray-50 dark:bg-gray-800"
         >
           <tr>
-            <th
+            <template
               v-for="(value, key) in data[0]"
               :key="key"
-              scope="col"
-              class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white"
             >
-              {{ useChangeCase(String(key), 'capitalCase').value }}
-            </th>
+              <th
+                v-if="!forbiddenRelations.has(String(key))"
+                scope="col"
+                class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white"
+              >
+                {{ useChangeCase(String(key), 'capitalCase').value }}
+              </th>
+            </template>
             <th
               scope="col"
               class="relative py-3.5 pl-3 pr-4 sm:pr-6"
@@ -100,13 +104,18 @@ const paginatedItems = ref<Record<string, unknown>[]>([])
             :key="i"
             class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
           >
-            <td
+            <template
               v-for="(value, key) in row"
               :key="key"
-              class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400"
             >
-              {{ getDisplayValue(String(key), value) }}
-            </td>
+              <td
+                v-if="!forbiddenRelations.has(String(key))"
+                class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400"
+              >
+                {{ getDisplayValue(String(key), value) }}
+              </td>
+            </template>
+
             <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
               <UPopover
                 :content="{ align: 'end', side: 'bottom' }"
