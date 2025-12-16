@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
-  layout: 'docs'
+  layout: 'docs',
 })
 
 const route = useRoute()
@@ -12,7 +12,7 @@ if (!page.value) {
 
 const { data: surround } = await useAsyncData(`${route.path}-surround`, () => {
   return queryCollectionItemSurroundings('docs', route.path, {
-    fields: ['description']
+    fields: ['description'],
   })
 })
 
@@ -23,7 +23,7 @@ useSeoMeta({
   title,
   ogTitle: title,
   description,
-  ogDescription: description
+  ogDescription: description,
 })
 
 defineOgImageComponent('Saas')

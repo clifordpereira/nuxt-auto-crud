@@ -12,7 +12,7 @@ const state = computed(() => {
   if (!props.schema) return {}
   // exclude system fields
   const filteredFields = props.schema.fields.filter(
-    field => !['id', 'created_at', 'updated_at', 'deleted_at', 'createdAt', 'updatedAt', 'deletedAt'].includes(field.name)
+    field => !['id', 'created_at', 'updated_at', 'deleted_at', 'createdAt', 'updatedAt', 'deletedAt'].includes(field.name),
   )
 
   return useFormState(filteredFields, props.row)

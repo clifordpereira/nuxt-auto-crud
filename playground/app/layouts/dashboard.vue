@@ -15,7 +15,7 @@ const mainLinks = computed(() => {
     ...item,
     onSelect: () => {
       open.value = false
-    }
+    },
   }))
 
   return links.filter((link) => {
@@ -33,7 +33,7 @@ const footerLinks = computed(() => footerMenu.map(item => ({
   ...item,
   onSelect: () => {
     open.value = false
-  }
+  },
 })))
 </script>
 

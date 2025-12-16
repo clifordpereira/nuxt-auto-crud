@@ -1,13 +1,13 @@
 <script setup lang="ts">
 definePageMeta({
-  layout: 'default'
+  layout: 'default',
 })
 
 const coreConcepts = [
   { term: 'Users', description: 'The actual people logging in.' },
   { term: 'Roles', description: 'Labels like "Admin", "Manager", or "Support" that group users together.' },
   { term: 'Resources', description: 'The parts of your application you want to protect (e.g., "users", "tickets", "products").' },
-  { term: 'Permissions', description: 'The specific actions allowed (e.g., "create", "read", "update", "delete", "list").' }
+  { term: 'Permissions', description: 'The specific actions allowed (e.g., "create", "read", "update", "delete", "list").' },
 ]
 
 const managementSteps = [
@@ -15,26 +15,26 @@ const managementSteps = [
     title: 'Create a New Role',
     description: 'If you need a new type of user (e.g., "Editor"), you simply add a row to the roles table.',
     action: 'Insert a new record into the `roles` table.',
-    example: 'Name = "Editor"'
+    example: 'Name = "Editor"',
   },
   {
     title: 'Define a Resource',
     description: 'If you create a new feature (e.g., a "Blog"), you need to register it as a resource.',
     action: 'Insert a new record into the `resources` table.',
-    example: 'Name = "blog_posts"'
+    example: 'Name = "blog_posts"',
   },
   {
     title: 'Grant Permissions',
     description: 'To say "Editors can update blog posts", you link the three concepts together in the role_resource_permissions table.',
     action: 'Insert a record linking Role ID, Resource ID, and Permission ID.',
-    example: 'Link Editor ID + blog_posts ID + update ID'
+    example: 'Link Editor ID + blog_posts ID + update ID',
   },
   {
     title: 'Assign a Role to a User',
     description: 'Finally, to give a user these powers, you just assign them the role.',
     action: 'Select the Role for a specific user in the `users` table.',
-    example: 'Select "Editor" for user "john@example.com"'
-  }
+    example: 'Select "Editor" for user "john@example.com"',
+  },
 ]
 </script>
 

@@ -10,18 +10,18 @@ export const testimonials = sqliteTable('testimonials', {
   role: text('role').notNull(),
   content: text('content').notNull(),
   avatar: text('avatar'),
-  company: text('company')
+  company: text('company'),
 })
 
 export const testimonialsRelations = relations(testimonials, ({ one }) => ({
   creator: one(users, {
     fields: [testimonials.createdBy],
     references: [users.id],
-    relationName: 'creator'
+    relationName: 'creator',
   }),
   updater: one(users, {
     fields: [testimonials.updatedBy],
     references: [users.id],
-    relationName: 'updater'
-  })
+    relationName: 'updater',
+  }),
 }))

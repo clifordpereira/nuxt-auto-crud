@@ -11,13 +11,13 @@ export default defineNuxtConfig({
     '@nuxt/scripts',
     'nuxt-auth-utils',
     'nuxt-authorization',
-    '../src/module'
+    '../src/module',
   ],
 
   ssr: true,
 
   devtools: {
-    enabled: true
+    enabled: true,
   },
 
   css: ['~/assets/css/main.css'],
@@ -26,12 +26,12 @@ export default defineNuxtConfig({
     adminEmail: 'admin@example.com',
     adminPassword: '$1Password',
     public: {
-      crudBaseUrl: '/api'
-    }
+      crudBaseUrl: '/api',
+    },
   },
 
   routeRules: {
-    '/docs': { redirect: '/docs/auto-crud', prerender: false }
+    '/docs': { redirect: '/docs/auto-crud', prerender: false },
   },
 
   compatibilityDate: '2024-07-11',
@@ -39,18 +39,18 @@ export default defineNuxtConfig({
   nitro: {
     prerender: {
       routes: [
-        '/'
+        '/',
       ],
-      crawlLinks: true
+      crawlLinks: true,
     },
     experimental: {
       tasks: true,
-      openAPI: true
-    }
+      openAPI: true,
+    },
   },
 
   hub: {
-    db: 'sqlite'
+    db: 'sqlite',
   },
 
   autoCrud: {
@@ -58,16 +58,16 @@ export default defineNuxtConfig({
     auth: {
       type: 'session',
       authentication: true,
-      authorization: true
-    }
+      authorization: true,
+    },
   },
 
   eslint: {
     config: {
       stylistic: {
         commaDangle: 'never',
-        braceStyle: '1tbs'
-      }
-    }
-  }
+        braceStyle: '1tbs',
+      },
+    },
+  },
 })

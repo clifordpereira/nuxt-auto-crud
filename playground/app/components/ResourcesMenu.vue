@@ -15,7 +15,7 @@ const resourceNames = computed(() =>
     if (['users', 'roles', 'permissions', 'resources', 'roleResourcePermissions'].includes(name)) return false
 
     return hasPermission(name, 'list')
-  })
+  }),
 )
 
 const items = computed(() => {
@@ -28,8 +28,8 @@ const items = computed(() => {
     children: resourceNames.value.map(resource => ({
       label: resource.charAt(0).toUpperCase() + resource.slice(1),
       to: `/admin/${resource}`,
-      onSelect: props.onSelect
-    }))
+      onSelect: props.onSelect,
+    })),
   }] satisfies NavigationMenuItem[]
 })
 </script>

@@ -28,16 +28,16 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
   label: safeUser.value?.name || undefined,
   avatar: {
     src: safeUser.value?.avatar || '',
-    alt: safeUser.value?.name || ''
-  }
+    alt: safeUser.value?.name || '',
+  },
 }], [{
   label: 'Profile',
   icon: 'i-lucide-user',
-  to: '/profile'
+  to: '/profile',
 }, {
   label: 'Settings',
   icon: 'i-lucide-settings',
-  to: '/settings'
+  to: '/settings',
 }], [{
   label: 'Theme',
   icon: 'i-lucide-palette',
@@ -47,7 +47,7 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
     chip: appConfig.ui.colors.primary,
     content: {
       align: 'center',
-      collisionPadding: 16
+      collisionPadding: 16,
     },
     children: colors.map(color => ({
       label: color,
@@ -59,15 +59,15 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
         e.preventDefault()
 
         appConfig.ui.colors.primary = color
-      }
-    }))
+      },
+    })),
   }, {
     label: 'Neutral',
     slot: 'chip',
     chip: appConfig.ui.colors.neutral === 'neutral' ? 'old-neutral' : appConfig.ui.colors.neutral,
     content: {
       align: 'end',
-      collisionPadding: 16
+      collisionPadding: 16,
     },
     children: neutrals.map(color => ({
       label: color,
@@ -79,9 +79,9 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
         e.preventDefault()
 
         appConfig.ui.colors.neutral = color
-      }
-    }))
-  }]
+      },
+    })),
+  }],
 }, {
   label: 'Appearance',
   icon: 'i-lucide-sun-moon',
@@ -94,7 +94,7 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
       e.preventDefault()
 
       colorMode.preference = 'light'
-    }
+    },
   }, {
     label: 'Dark',
     icon: 'i-lucide-moon',
@@ -107,14 +107,14 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
     },
     onSelect(e: Event) {
       e.preventDefault()
-    }
-  }]
+    },
+  }],
 }], [
   ...(safeUser.value?.role === 'admin'
     ? [{
         label: 'Admin Dashboard',
         icon: 'i-lucide-layout-dashboard',
-        to: '/admin/dashboard'
+        to: '/admin/dashboard',
       }]
     : []),
 
@@ -126,7 +126,7 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
       await $fetch('/api/auth/logout', { method: 'POST' })
       // Force a reload to ensure layout changes (admin -> guest) are applied
       window.location.href = '/'
-    }
+    },
   }]]))
 </script>
 
@@ -142,7 +142,7 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
         name: safeUser?.name || undefined,
         avatar: safeUser?.avatar ? { src: safeUser.avatar, alt: safeUser?.name || undefined } : undefined,
         label: collapsed ? undefined : (safeUser?.name || undefined),
-        trailingIcon: collapsed ? undefined : 'i-lucide-chevrons-up-down'
+        trailingIcon: collapsed ? undefined : 'i-lucide-chevrons-up-down',
       }"
       color="neutral"
       variant="ghost"
@@ -150,7 +150,7 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
       :square="collapsed"
       class="data-[state=open]:bg-elevated"
       :ui="{
-        trailingIcon: 'text-dimmed'
+        trailingIcon: 'text-dimmed',
       }"
     />
 
@@ -160,7 +160,7 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
           class="rounded-full ring ring-bg bg-(--chip-light) dark:bg-(--chip-dark) size-2"
           :style="{
             '--chip-light': `var(--color-${(item as any).chip}-500)`,
-            '--chip-dark': `var(--color-${(item as any).chip}-400)`
+            '--chip-dark': `var(--color-${(item as any).chip}-400)`,
           }"
         />
       </div>

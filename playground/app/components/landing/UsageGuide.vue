@@ -5,13 +5,13 @@ const contentData = {
   steps: [
     {
       title: 'Test Auth',
-      description: 'Log in with different roles (Admin, Manager, Moderator) to see the effect. Permissions are now fully Database-Driven!'
+      description: 'Log in with different roles (Admin, Manager, Moderator) to see the effect. Permissions are now fully Database-Driven!',
     },
     {
       title: 'Extend Schema',
-      description: 'Add new tables in server/db/schema and restart the server to use the new tables. If needed use \'npm db:generate\''
-    }
-  ]
+      description: 'Add new tables in server/db/schema and restart the server to use the new tables. If needed use \'npm db:generate\'',
+    },
+  ],
 }
 </script>
 

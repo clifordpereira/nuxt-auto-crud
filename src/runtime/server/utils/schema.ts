@@ -37,20 +37,21 @@ export function drizzleTableToFields(table: any, resourceName: string) {
     config.foreignKeys.forEach((fk: any) => {
       const sourceColumnName = fk.reference().columns[0].name
       // Find the field that matches this column
-      const field = fields.find(f => {
-        // In simple cases, field.name matches column name. 
-        // If camelCase mapping handles it differently, we might need adjustments, 
+      const field = fields.find((f) => {
+        // In simple cases, field.name matches column name.
+        // If camelCase mapping handles it differently, we might need adjustments,
         // but typically Drizzle key = field name.
         return f.name === sourceColumnName
       })
-      
+
       if (field) {
         // Get target table name
         const targetTable = fk.reference().foreignTable[Symbol.for('drizzle:Name')] as string
         field.references = targetTable
       }
     })
-  } catch (e) {
+  }
+  catch (e) {
     // Ignore error if getTableConfig fails (e.g. not a Drizzle table)
   }
 
@@ -106,7 +107,7 @@ export async function getRelations() {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const columnName = (col as any).name
         columnToProperty[columnName] = key
-        
+
         // Auto-link createdBy/updatedBy to users table
         if (['createdBy', 'created_by', 'updatedBy', 'updated_by', 'deletedBy', 'deleted_by'].includes(key)) {
           tableRelations[key] = 'users'

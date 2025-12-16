@@ -10,24 +10,24 @@ export const users = sqliteTable('users', {
   email: text('email').notNull().unique(),
   password: text('password').notNull(),
   avatar: text('avatar'),
-  roleId: integer('role_id').references(() => roles.id)
+  roleId: integer('role_id').references(() => roles.id),
 })
 
 export const usersRelations = relations(users, ({ one }) => ({
   assignedRole: one(roles, {
     fields: [users.roleId],
-    references: [roles.id]
+    references: [roles.id],
   }),
   creator: one(users, {
     fields: [users.createdBy],
     references: [users.id],
-    relationName: 'creator'
+    relationName: 'creator',
   }),
   updater: one(users, {
     fields: [users.updatedBy],
     references: [users.id],
-    relationName: 'updater'
-  })
+    relationName: 'updater',
+  }),
 }))
 
 export type User = typeof users.$inferSelect
