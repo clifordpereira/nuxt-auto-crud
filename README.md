@@ -326,6 +326,8 @@ export default defineNuxtConfig({
 
 In addition to standard `create`, `read`, `update`, and `delete` permissions, you can assign **Ownership Permissions**:
 
+- `list`: Allows a user to view a list of active records (status='active').
+- `list_all`: Allows a user to view **all** records, including inactive ones (e.g., status='inactive', 'draft').
 - `update_own`: Allows a user to update a record **only if they created it**.
 - `delete_own`: Allows a user to delete a record **only if they created it**.
 

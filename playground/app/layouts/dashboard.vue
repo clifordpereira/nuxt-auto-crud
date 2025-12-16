@@ -8,6 +8,8 @@ const collapsed = ref(false)
 
 // Map menus to add onSelect handler
 const { user } = useUserSession()
+const { hasPermission } = usePermissions()
+
 const mainLinks = computed(() => {
   const links = mainMenu.map(item => ({
     ...item,
@@ -15,15 +17,16 @@ const mainLinks = computed(() => {
       open.value = false
     },
   }))
-
-  // Filter out permissions menu for non-admins
-  // Assuming 'admin' is the role name for administrators
-  // You might need to adjust this logic based on your actual role implementation
-  if ((user.value as { role?: string })?.role !== 'admin') {
-    return links.filter(link => link.label !== 'Roles & Permissions')
-  }
-
-  return links
+  
+  return links.filter((link) => {
+    if (link.label === 'Users') {
+      return hasPermission('users', 'list')
+    }
+    if (link.label === 'Roles & Permissions') {
+      return (user.value as { role?: string })?.role === 'admin'
+    }
+    return true
+  })
 })
 
 const footerLinks = computed(() => footerMenu.map(item => ({

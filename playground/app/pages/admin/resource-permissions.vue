@@ -50,7 +50,6 @@ const { data: roleResourcePermissions, refresh } = await useFetch<RoleResourcePe
   headers: crudHeaders(),
 })
 
-// Tabs configuration - Exclude 'admin'
 const items = computed(() => roles.value?.filter(r => r.name !== 'admin').map(role => ({
   label: role.name,
   roleId: role.id,
@@ -152,6 +151,7 @@ const saveChanges = async () => {
       promises.push($fetch(`${crudBaseUrl}/roleResourcePermissions/${id}`, {
         method: 'DELETE',
         headers: crudHeaders(),
+        body: undefined // Explicitly undefined for DELETE generally, though not strictly needed
       }))
     }
 
@@ -177,18 +177,13 @@ const displayResources = computed(() => resources.value?.filter(r =>
 
 const displayPermissions = computed(() => {
   if (!permissions.value) return []
-  const order = ['list', 'create', 'read', 'update', 'delete', 'update_own', 'delete_own']
+  // 'list' = view active records only (if status col exists)
+  // 'list_all' = view all records including inactive/draft
+  const order = ['list', 'list_all', 'create', 'read', 'update', 'delete', 'update_own', 'delete_own']
   return [...permissions.value].sort((a, b) => {
     return order.indexOf(a.code) - order.indexOf(b.code)
   })
 })
-
-// Ensure a role is selected
-watch(items, (newItems) => {
-  if (newItems.length > 0) {
-    selectedIndex.value = 0
-  }
-}, { immediate: true })
 </script>
 
 <template>

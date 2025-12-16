@@ -11,15 +11,11 @@ const props = defineProps<{
       type: string
       required?: boolean
       selectOptions?: string[]
+      references?: string
     }[]
   }
   initialState?: Record<string, unknown>
 }>()
-
-// We can pass relations via props if needed, or derive them.
-// For now, we'll rely on the field name convention (ending in _id) or explicit configuration.
-// The original code fetched relations, but we want to avoid hard dependencies if possible.
-// However, the NameList component handles fetching the related data.
 
 const emit = defineEmits<{
   (e: 'submit', event: Record<string, unknown>): void
@@ -79,7 +75,11 @@ const processedFields = computed(() =>
 )
 
 function handleSubmit(event: FormSubmitEvent<Record<string, unknown>>) {
-  emit('submit', event.data)
+  const data = { ...event.data }
+  if (props.initialState && 'password' in data) {
+    delete data.password
+  }
+  emit('submit', data)
   emit('close')
 }
 </script>
@@ -102,6 +102,7 @@ function handleSubmit(event: FormSubmitEvent<Record<string, unknown>>) {
         >
           <UCheckbox
             v-if="field.type === 'boolean'"
+            :id="field.name"
             v-model="state[field.name] as boolean"
           />
 
@@ -109,6 +110,7 @@ function handleSubmit(event: FormSubmitEvent<Record<string, unknown>>) {
             v-else-if="field.name.endsWith('_id') || field.name.endsWith('Id')"
             v-model="state[field.name] as string | number | null"
             :field-name="field.name"
+            :table-name="field.references"
           />
 
           <template v-else-if="field.name === 'password'">

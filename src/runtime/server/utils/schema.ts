@@ -2,10 +2,18 @@ import { getTableColumns } from 'drizzle-orm'
 import { getTableConfig } from 'drizzle-orm/sqlite-core'
 import { modelTableMap } from './modelMapper'
 
+export interface Field {
+  name: string
+  type: string
+  required: boolean
+  selectOptions?: string[]
+  references?: string
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function drizzleTableToFields(table: any, resourceName: string) {
   const columns = getTableColumns(table)
-  const fields = []
+  const fields: Field[] = []
 
   for (const [key, col] of Object.entries(columns)) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -20,6 +28,30 @@ export function drizzleTableToFields(table: any, resourceName: string) {
       required: isRequired,
       selectOptions,
     })
+  }
+
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const config = getTableConfig(table as any)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    config.foreignKeys.forEach((fk: any) => {
+      const sourceColumnName = fk.reference().columns[0].name
+      // Find the field that matches this column
+      const field = fields.find(f => {
+        // In simple cases, field.name matches column name. 
+        // If camelCase mapping handles it differently, we might need adjustments, 
+        // but typically Drizzle key = field name.
+        return f.name === sourceColumnName
+      })
+      
+      if (field) {
+        // Get target table name
+        const targetTable = fk.reference().foreignTable[Symbol.for('drizzle:Name')] as string
+        field.references = targetTable
+      }
+    })
+  } catch (e) {
+    // Ignore error if getTableConfig fails (e.g. not a Drizzle table)
   }
 
   return {

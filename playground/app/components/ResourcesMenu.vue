@@ -7,19 +7,14 @@ const props = defineProps<{
 }>()
 
 const { schemas } = await useResourceSchemas()
-const { user } = useUserSession()
+const { hasPermission } = usePermissions()
 
 const resourceNames = computed(() =>
   Object.keys(schemas.value || {}).filter((name) => {
     // Exclude system tables
     if (['users', 'roles', 'permissions', 'resources', 'roleResourcePermissions'].includes(name)) return false
 
-    // Admins see everything
-    if ((user.value as { role?: string })?.role === 'admin') return true
-
-    // Check permissions
-    const perms = (user.value as { permissions?: Record<string, string[]> })?.permissions?.[name] || []
-    return perms.includes('list') || perms.includes('list_all')
+    return hasPermission(name, 'list')
   }),
 )
 

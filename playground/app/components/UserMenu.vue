@@ -138,7 +138,7 @@ const items = computed<DropdownMenuItem[][]>(() => ([[{
   >
     <UButton
       v-bind="{
-        ...user,
+        ...safeUser,
         name: safeUser?.name || undefined,
         avatar: safeUser?.avatar ? { src: safeUser.avatar, alt: safeUser?.name || undefined } : undefined,
         label: collapsed ? undefined : (safeUser?.name || undefined),
