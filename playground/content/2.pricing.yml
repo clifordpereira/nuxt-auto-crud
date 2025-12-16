@@ -55,19 +55,12 @@ plans:
     features:
       - Everything in Standard
       - Fully Managed Hosting
-      - Firebase / NuxtHub / Vercel
+      - Managed Cloud Service
       - Proactive Monitoring
       - Security Updates
       - Performance Optimization
       - Dedicated Support Channel
-logos:
-  title: Trusted by the world's best
-  icons:
-    - i-simple-icons-firebase
-    - i-simple-icons-render
-    - i-simple-icons-netlify
-    - i-simple-icons-vercel
-    - i-simple-icons-cloudflare
+
 faq:
   title: Frequently asked questions
   description: Everything you need to know about Nuxt Auto CRUD.

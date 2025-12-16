@@ -61,7 +61,7 @@ const items = ref([
       </UPricingPlans>
     </UContainer>
 
-    <UPageSection>
+    <UPageSection v-if="page.logos">
       <UPageLogos>
         <UIcon
           v-for="icon in page.logos.icons"

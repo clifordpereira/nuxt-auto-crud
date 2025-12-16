@@ -95,19 +95,25 @@ export async function getRelations() {
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const config = getTableConfig(table as any)
-      if (config.foreignKeys.length > 0) {
-        const tableRelations: Record<string, string> = {}
-        relations[tableName] = tableRelations
+      const tableRelations: Record<string, string> = {}
+      relations[tableName] = tableRelations
 
-        // Map column names to property names
+      // Map column names to property names
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const columns = getTableColumns(table as any)
+      const columnToProperty: Record<string, string> = {}
+      for (const [key, col] of Object.entries(columns)) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const columns = getTableColumns(table as any)
-        const columnToProperty: Record<string, string> = {}
-        for (const [key, col] of Object.entries(columns)) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          columnToProperty[(col as any).name] = key
+        const columnName = (col as any).name
+        columnToProperty[columnName] = key
+        
+        // Auto-link createdBy/updatedBy to users table
+        if (['createdBy', 'created_by', 'updatedBy', 'updated_by'].includes(key)) {
+          tableRelations[key] = 'users'
         }
+      }
 
+      if (config.foreignKeys.length > 0) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         config.foreignKeys.forEach((fk: any) => {
           const sourceColumnName = fk.reference().columns[0].name

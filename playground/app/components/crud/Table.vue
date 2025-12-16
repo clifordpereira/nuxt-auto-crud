@@ -76,7 +76,7 @@ const paginatedItems = ref<Record<string, unknown>[]>([])
                 scope="col"
                 class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white"
               >
-                {{ useChangeCase(String(key), 'capitalCase').value }}
+                {{ useChangeCase(String(key).replace(/(_id|Id)$/, ''), 'capitalCase').value }}
               </th>
             </template>
             <th
