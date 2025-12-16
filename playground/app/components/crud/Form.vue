@@ -24,7 +24,7 @@ const emit = defineEmits<{
 
 // filter out system fields
 const filteredFields = props.schema.fields.filter(
-  field => !['id', 'created_at', 'updated_at', 'deleted_at', 'createdAt', 'updatedAt', 'deletedAt'].includes(field.name),
+  field => !['id', 'created_at', 'updated_at', 'deleted_at', 'createdAt', 'updatedAt', 'deletedAt', 'created_by', 'updated_by', 'createdBy', 'updatedBy'].includes(field.name),
 )
 
 // dynamically build zod schema
