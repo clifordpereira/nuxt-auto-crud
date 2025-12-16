@@ -20,7 +20,7 @@ export async function getPublicPermissions(): Promise<Record<string, string[]>> 
 
   const permissionsData = await db.select({
     resource: schema.resources.name,
-    action: schema.permissions.code,
+    action: schema.permissions.code
   })
     .from(schema.roleResourcePermissions)
     .innerJoin(schema.resources, eq(schema.roleResourcePermissions.resourceId, schema.resources.id))

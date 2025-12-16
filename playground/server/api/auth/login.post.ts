@@ -6,7 +6,7 @@ import { InvalidCredentialError } from '../../utils/errors'
 
 const loginSchema = z.object({
   email: z.email(),
-  password: z.string(),
+  password: z.string()
 })
 
 export default eventHandler(async (event) => {
@@ -14,7 +14,7 @@ export default eventHandler(async (event) => {
 
   const result = await db.select({
     user: schema.users,
-    role: schema.roles.name,
+    role: schema.roles.name
   })
     .from(schema.users)
     .leftJoin(schema.roles, eq(schema.users.roleId, schema.roles.id))
@@ -39,7 +39,7 @@ export default eventHandler(async (event) => {
   if (user.roleId) {
     const permissionsData = await db.select({
       resource: schema.resources.name,
-      action: schema.permissions.code,
+      action: schema.permissions.code
     })
       .from(schema.roleResourcePermissions)
       .innerJoin(schema.resources, eq(schema.roleResourcePermissions.resourceId, schema.resources.id))
@@ -62,8 +62,8 @@ export default eventHandler(async (event) => {
       name: user.name,
       avatar: user.avatar,
       role,
-      permissions,
-    },
+      permissions
+    }
   })
 
   return { user }

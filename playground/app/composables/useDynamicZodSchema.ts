@@ -12,7 +12,7 @@ import { z } from 'zod'
 
 export function useDynamicZodSchema(
   fields: { name: string, type: string, required?: boolean }[],
-  isEdit = false,
+  isEdit = false
 ) {
   const validators: Record<string, z.ZodType> = {}
 
@@ -21,8 +21,7 @@ export function useDynamicZodSchema(
       if (isEdit) {
         // optional on edit
         validators.password = z.string().optional()
-      }
-      else {
+      } else {
         // required on create
         validators.password = z
           .string()
@@ -39,27 +38,22 @@ export function useDynamicZodSchema(
         validators[field.name] = field.required
           ? z.string().email()
           : z.string().email().optional()
-      }
-      else {
+      } else {
         validators[field.name] = field.required
           ? z.string().min(1, `${field.name} is required`)
           : z.string().optional()
       }
-    }
-    else if (field.type === 'number') {
+    } else if (field.type === 'number') {
       validators[field.name] = field.required
         ? z.coerce.number()
         : z.coerce.number().optional()
-    }
-    else if (field.type === 'date') {
+    } else if (field.type === 'date') {
       validators[field.name] = field.required
         ? z.coerce.date()
         : z.coerce.date().optional()
-    }
-    else if (field.type === 'boolean') {
+    } else if (field.type === 'boolean') {
       validators[field.name] = z.boolean().optional()
-    }
-    else if (field.type === 'enum') {
+    } else if (field.type === 'enum') {
       validators[field.name] = field.required
         ? z.string().min(1, `${field.name} is required`)
         : z.string().optional()

@@ -21,7 +21,7 @@ const searchedItems = computed(() => {
     Object.values(row)
       .join(' ')
       .toLowerCase()
-      .includes(search.value.toLowerCase()),
+      .includes(search.value.toLowerCase())
   )
 })
 
@@ -37,7 +37,7 @@ watch(
   () => {
     emit('update:paginated', paginatedItems.value)
   },
-  { immediate: true },
+  { immediate: true }
 )
 
 watch([search], () => {

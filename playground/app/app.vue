@@ -7,46 +7,46 @@ useHead({
   meta: [
     { charset: 'utf-8' },
     { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-    { key: 'theme-color', name: 'theme-color', content: color },
+    { key: 'theme-color', name: 'theme-color', content: color }
   ],
   link: [
-    { rel: 'icon', href: '/favicon.ico' },
+    { rel: 'icon', href: '/favicon.ico' }
   ],
   htmlAttrs: {
-    lang: 'en',
-  },
+    lang: 'en'
+  }
 })
 
 useSeoMeta({
   titleTemplate: '%s - Nuxt SaaS template',
   ogImage: 'https://ui.nuxt.com/assets/templates/nuxt/saas-light.png',
   twitterImage: 'https://ui.nuxt.com/assets/templates/nuxt/saas-light.png',
-  twitterCard: 'summary_large_image',
+  twitterCard: 'summary_large_image'
 })
 
 const { data: navigation } = await useAsyncData('navigation', () => queryCollectionNavigation('docs'), {
-  transform: data => data.find(item => item.path === '/docs')?.children || [],
+  transform: data => data.find(item => item.path === '/docs')?.children || []
 })
 const { data: files } = useLazyAsyncData('search', () => queryCollectionSearchSections('docs'), {
-  server: false,
+  server: false
 })
 
 const links = [{
   label: 'Docs',
   icon: 'i-lucide-book',
-  to: '/docs/auto-crud',
+  to: '/docs/auto-crud'
 }, {
   label: 'Pricing',
   icon: 'i-lucide-credit-card',
-  to: '/pricing',
+  to: '/pricing'
 }, {
   label: 'Blog',
   icon: 'i-lucide-pencil',
-  to: '/blog',
+  to: '/blog'
 }, {
   label: 'Changelog',
   icon: 'i-lucide-history',
-  to: '/changelog',
+  to: '/changelog'
 }]
 
 provide('navigation', navigation)

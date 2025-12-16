@@ -12,8 +12,7 @@ const emit = defineEmits(['update:modelValue'])
 let urlPath = ''
 if (props.tableName) {
   urlPath = props.tableName
-}
-else if (props.fieldName) {
+} else if (props.fieldName) {
   const baseName = props.fieldName.replace(/(_id|Id)$/, '')
   urlPath = pluralize(baseName) // e.g., user_id → users
 }
@@ -29,18 +28,18 @@ const { data: options } = await useFetch(() => `${crudBaseUrl}/${urlPath}`, {
       return {
         label: r.name || r.title || `#${r.id}`,
         value: r.id,
-        extra: r.email,
+        extra: r.email
       }
     }),
   lazy: true,
-  headers: crudHeaders(),
+  headers: crudHeaders()
 })
 
 const selected = computed({
   get: () => options.value?.find(opt => opt.value == props.modelValue),
   set: (val: { value: string | number } | null) => {
     emit('update:modelValue', val?.value)
-  },
+  }
 })
 </script>
 

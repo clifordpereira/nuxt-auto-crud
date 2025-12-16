@@ -15,9 +15,9 @@ const mainLinks = computed(() => {
     ...item,
     onSelect: () => {
       open.value = false
-    },
+    }
   }))
-  
+
   return links.filter((link) => {
     if (link.label === 'Users') {
       return hasPermission('users', 'list')
@@ -33,7 +33,7 @@ const footerLinks = computed(() => footerMenu.map(item => ({
   ...item,
   onSelect: () => {
     open.value = false
-  },
+  }
 })))
 </script>
 
