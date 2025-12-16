@@ -51,7 +51,7 @@ export function drizzleTableToFields(table: any, resourceName: string) {
       }
     })
   }
-  catch (e) {
+  catch {
     // Ignore error if getTableConfig fails (e.g. not a Drizzle table)
   }
 

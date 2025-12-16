@@ -47,9 +47,10 @@ export const useRelationDisplay = (
             )
           }
         }
-        catch (error: any) {
+        catch (error: unknown) {
           console.error(`Failed to fetch relation data for ${targetTable}:`, error)
-          if (error.statusCode === 403) {
+          const err = error as { statusCode?: number }
+          if (err?.statusCode === 403) {
             forbiddenRelations.value.add(fieldName)
           }
         }
