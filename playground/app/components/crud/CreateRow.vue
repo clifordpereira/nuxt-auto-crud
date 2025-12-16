@@ -9,13 +9,16 @@ const props = defineProps<{
   }
 }>()
 
+const open = ref(false)
+
 async function onSubmit(data: Record<string, unknown>) {
   await useCrudFetch('POST', props.resource, null, data)
+  open.value = false
 }
 </script>
 
 <template>
-  <UModal>
+  <UModal v-model:open="open">
     <UButton
       :label="`Add New ${useChangeCase(props.resource, 'capitalCase').value}`"
       color="neutral"

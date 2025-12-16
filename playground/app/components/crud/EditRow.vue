@@ -18,13 +18,16 @@ const state = computed(() => {
   return useFormState(filteredFields, props.row)
 })
 
+const open = ref(false)
+
 async function onSubmit(data: Record<string, unknown>) {
   await useCrudFetch('PATCH', props.resource, props.row.id as number, data)
+  open.value = false
 }
 </script>
 
 <template>
-  <UModal>
+  <UModal v-model:open="open">
     <UButton
       label="Edit"
       color="primary"
