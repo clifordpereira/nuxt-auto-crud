@@ -10,7 +10,11 @@ useHead({
     { key: 'theme-color', name: 'theme-color', content: color },
   ],
   link: [
-    { rel: 'icon', href: '/favicon.ico' },
+    { rel: 'icon', href: '/favicon_io/favicon.ico' },
+    { rel: 'apple-touch-icon', sizes: '180x180', href: '/favicon_io/apple-touch-icon.png' },
+    { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon_io/favicon-32x32.png' },
+    { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon_io/favicon-16x16.png' },
+    { rel: 'manifest', href: '/favicon_io/site.webmanifest' },
   ],
   htmlAttrs: {
     lang: 'en',
@@ -18,9 +22,9 @@ useHead({
 })
 
 useSeoMeta({
-  titleTemplate: '%s - Nuxt SaaS template',
-  ogImage: 'https://ui.nuxt.com/assets/templates/nuxt/saas-light.png',
-  twitterImage: 'https://ui.nuxt.com/assets/templates/nuxt/saas-light.png',
+  titleTemplate: '%s - Nuxt Auto CRUD',
+  ogImage: '/favicon_io/android-chrome-192x192.png',
+  twitterImage: '/favicon_io/android-chrome-192x192.png',
   twitterCard: 'summary_large_image',
 })
 
