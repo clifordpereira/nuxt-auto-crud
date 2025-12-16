@@ -12,50 +12,44 @@ const props = defineProps<{
 async function onSubmit(data: Record<string, unknown>) {
   await useCrudFetch('POST', props.resource, null, data)
 }
-
-const isModalOpen = ref(false)
 </script>
 
 <template>
-  <div>
-    <UModal v-model:open="isModalOpen">
-      <!-- Trigger button -->
-      <UButton
-        :label="`Add New ${useChangeCase(props.resource, 'capitalCase').value}`"
-        color="neutral"
-        variant="subtle"
-      />
+  <UModal>
+    <UButton
+      :label="`Add New ${useChangeCase(props.resource, 'capitalCase').value}`"
+      color="neutral"
+      variant="subtle"
+    />
 
-      <template #content>
-        <div class="p-6 w-[400px] rounded-lg shadow-lg">
-          <!-- Modal header -->
-          <h2 class="text-lg font-semibold mb-4">
-            Add New {{ props.resource }}
-          </h2>
-          <hr>
+    <template #content>
+      <div class="p-6 w-[400px] rounded-lg shadow-lg">
+        <!-- Modal header -->
+        <h2 class="text-lg font-semibold mb-4">
+          Add New {{ props.resource }}
+        </h2>
+        <hr>
 
-          <div class="mt-4">
-            <!-- Dynamic form -->
-            <div v-if="schema">
-              <CrudForm
-                :schema="schema"
-                @submit="onSubmit"
-                @close="isModalOpen = false"
-              />
-            </div>
-
-            <!-- Fallback -->
-            <p
-              v-else
-              class="text-gray-500"
-            >
-              No schema provided for {{ props.resource }}
-            </p>
+        <div class="mt-4">
+          <!-- Dynamic form -->
+          <div v-if="schema">
+            <CrudForm
+              :schema="schema"
+              @submit="onSubmit"
+            />
           </div>
+
+          <!-- Fallback -->
+          <p
+            v-else
+            class="text-gray-500"
+          >
+            No schema provided for {{ props.resource }}
+          </p>
         </div>
-      </template>
-    </UModal>
-  </div>
+      </div>
+    </template>
+  </UModal>
 </template>
 
 <style scoped>
