@@ -44,7 +44,8 @@ export default defineNuxtConfig({
         clientId: process.env.NUXT_OAUTH_GOOGLE_CLIENT_ID,
         clientSecret: process.env.NUXT_OAUTH_GOOGLE_CLIENT_SECRET
       }
-    }
+    },
+    resendApiKey: process.env.NUXT_RESEND_API_KEY,
   },
 
   routeRules: {

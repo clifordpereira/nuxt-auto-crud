@@ -77,7 +77,21 @@ For a detailed guide on managing permissions, see [PERMISSIONS.md](PERMISSIONS.m
 ### Public Access:
 Public (unauthenticated) access is controlled by the `public` role in the database. Assign permissions to the `public` role to allow access to resources for non-logged-in users.
 
-## Database Reset & Seeding
+## Password Reset & Email Testing
+
+This template includes a full password reset flow. To test it locally for free without using a real email service:
+
+1. Go to [Ethereal.email](https://ethereal.email/) and click **"Create Ethereal Account"**.
+2. Copy the SMTP credentials provided.
+3. Update your `.env` file with these credentials:
+   ```bash
+   NUXT_NODEMAILER_USER=your_ethereal_user
+   NUXT_NODEMAILER_AUTH_PASS=your_ethereal_password
+   ```
+4. Go to `/auth/forgot-password` in the app.
+5. Enter a user's email and check the **Messages** tab in Ethereal to see the reset link.
+
+**Database Reset & Seeding**
 
 If you want to delete all data and start fresh:
 
