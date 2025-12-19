@@ -25,14 +25,30 @@ export default eventHandler(async (event) => {
       })
       .where(eq(schema.users.id, user.id))
 
-    // In a real app, send an email here.
-    // For this playground, we'll log it and return it for demo purposes if in dev.
     const host = getRequestHeader(event, 'host') || 'localhost:3000'
     const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http'
     const resetUrl = `${protocol}://${host}/auth/reset-password?token=${resetToken}`
     
-    console.log(`Password reset token for ${body.email}: ${resetToken}`)
-    console.log(`Reset URL: ${resetUrl}`)
+    // Send Email
+    const { sendMail } = useNodeMailer()
+    await sendMail({
+      to: user.email,
+      subject: 'Password Reset Request',
+      html: `
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+          <h2 style="color: #0f172a;">Password Reset</h2>
+          <p>You requested a password reset for your account. Click the button below to set a new password:</p>
+          <div style="margin: 30px 0;">
+            <a href="${resetUrl}" style="background-color: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 500;">Reset Password</a>
+          </div>
+          <p style="color: #64748b; font-size: 14px;">This link will expire in 1 hour.</p>
+          <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;">
+          <p style="color: #94a3b8; font-size: 12px;">If you didn't request this, you can safely ignore this email.</p>
+        </div>
+      `,
+    })
+
+    console.log(`Password reset email sent to ${body.email}`)
   }
 
   return {

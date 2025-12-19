@@ -41,6 +41,8 @@
     "drizzle-kit": "^0.31.8",
     "eslint": "^9.39.1",
     "happy-dom": "^20.0.11",
+    "nodemailer": "^7.0.11",
+    "nuxt-nodemailer": "^1.1.4",
     "typescript": "^5.9.3",
     "vue-tsc": "^3.1.5",
     "wrangler": "^4.53.0"

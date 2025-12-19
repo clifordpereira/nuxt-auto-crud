@@ -10,6 +10,7 @@ export default defineNuxtConfig({
     '@nuxthub/core',
     'nuxt-auth-utils',
     'nuxt-authorization',
+    'nuxt-nodemailer',
     '../src/module',
   ],
 
@@ -84,6 +85,16 @@ export default defineNuxtConfig({
         commaDangle: 'never',
         braceStyle: '1tbs',
       },
+    },
+  },
+  nodemailer: {
+    from: process.env.NUXT_NODEMAILER_FROM || '"Cliford Pereira" <cliford.pereira@gmail.com>',
+    host: process.env.NUXT_NODEMAILER_HOST || 'smtp.gmail.com',
+    port: parseInt(process.env.NUXT_NODEMAILER_PORT || '465'),
+    secure: process.env.NUXT_NODEMAILER_SECURE !== 'false', // Default to true
+    auth: {
+      user: process.env.NUXT_NODEMAILER_USER || 'cliford.pereira@gmail.com',
+      pass: process.env.NUXT_NODEMAILER_AUTH_PASS || '',
     },
   },
 })
