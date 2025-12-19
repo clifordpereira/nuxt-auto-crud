@@ -60,7 +60,7 @@ export const useExport = () => {
       },
       margin: { top: 35, right: 14, bottom: 20, left: 14 },
       didDrawPage: (data) => {
-        // Footer: Page X of Y
+        // Footer: Page X
         const pageSize = doc.internal.pageSize
         const pageHeight = pageSize.height ? pageSize.height : pageSize.getHeight()
         const pageWidth = pageSize.width ? pageSize.width : pageSize.getWidth()
@@ -68,7 +68,7 @@ export const useExport = () => {
         doc.setFontSize(10)
         doc.setTextColor(148, 163, 184) // Slate 400
         
-        const str = 'Page ' + doc.internal.getCurrentPageInfo().pageNumber
+        const str = 'Page ' + data.pageNumber
         doc.text(str, pageWidth - 30, pageHeight - 10)
         doc.text('Confidential - Internal Use Only', 14, pageHeight - 10)
       }

@@ -13,6 +13,13 @@ export default defineNuxtConfig({
     '../src/module',
   ],
 
+  fonts: {
+    devtools: false,
+    providers: {
+      google: false // Disable google provider if it's causing timeouts
+    }
+  },
+
   ssr: true,
 
   devtools: {
