@@ -157,7 +157,7 @@ async function onSubmit() {
               color="neutral"
               variant="outline"
               block
-              to="/api/auth/github"
+              to="/auth/github"
               external
             />
             <UButton
@@ -166,7 +166,7 @@ async function onSubmit() {
               color="neutral"
               variant="outline"
               block
-              to="/api/auth/google"
+              to="/auth/google"
               external
             />
           </div>

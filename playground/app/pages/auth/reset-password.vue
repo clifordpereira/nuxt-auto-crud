@@ -1,24 +1,49 @@
 <script setup lang="ts">
+import * as z from 'zod'
+import type { FormSubmitEvent } from '@nuxt/ui'
+
 definePageMeta({
-  layout: 'default',
+  layout: 'auth'
+})
+
+useSeoMeta({
+  title: 'Reset Password',
+  description: 'Enter your new password below'
 })
 
 const route = useRoute()
-const token = route.query.token as string
-
-const state = reactive({
-  token,
-  password: '',
-  confirmPassword: '',
-})
-
+const toast = useToast()
 const loading = ref(false)
 const success = ref(false)
-const toast = useToast()
+const token = route.query.token as string
 
-async function onSubmit() {
-  if (state.password !== state.confirmPassword) {
-    toast.add({ title: 'Error', description: 'Passwords do not match', color: 'error' })
+const fields = [{
+  name: 'password',
+  type: 'password' as const,
+  label: 'New Password',
+  placeholder: 'Enter your new password',
+  required: true
+}, {
+  name: 'confirmPassword',
+  type: 'password' as const,
+  label: 'Confirm Password',
+  placeholder: 'Confirm your new password',
+  required: true
+}]
+
+const schema = z.object({
+  password: z.string().min(8, 'Must be at least 8 characters'),
+  confirmPassword: z.string().min(8, 'Must be at least 8 characters')
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"]
+})
+
+type Schema = z.output<typeof schema>
+
+async function onSubmit(payload: FormSubmitEvent<Schema>) {
+  if (!token) {
+    toast.add({ title: 'Error', description: 'Invalid or missing token', color: 'error' })
     return
   }
 
@@ -27,21 +52,21 @@ async function onSubmit() {
     await $fetch('/api/auth/reset-password', {
       method: 'POST',
       body: {
-        token: state.token,
-        password: state.password,
-      },
+        token,
+        password: payload.data.password
+      }
     })
     success.value = true
-    toast.add({ title: 'Success', description: 'Password reset successfully', color: 'success' })
+    toast.add({ title: 'Success', description: 'Password reset successfully' })
     setTimeout(() => {
-      navigateTo('/')
+      navigateTo('/login')
     }, 2000)
   }
   catch (err: any) {
     toast.add({
       title: 'Error',
       description: err.data?.message || 'Something went wrong',
-      color: 'error',
+      color: 'error'
     })
   }
   finally {
@@ -51,73 +76,55 @@ async function onSubmit() {
 </script>
 
 <template>
-  <div class="min-h-[60vh] flex items-center justify-center px-4">
-    <UCard class="w-full max-w-md">
-      <div v-if="!success">
-        <div class="text-center mb-6">
-          <h1 class="text-2xl font-bold">
-            Reset Password
-          </h1>
-          <p class="text-sm text-gray-500 mt-2">
-            Enter your new password below.
-          </p>
-        </div>
-
-        <form
-          class="space-y-4"
-          @submit.prevent="onSubmit"
+  <template v-if="!token">
+    <UAuthForm
+      title="Invalid Link"
+      description="The password reset link is invalid or has expired. Please request a new one."
+      icon="i-lucide-alert-circle"
+      align="top"
+    >
+      <template #footer>
+        <UButton
+          to="/auth/forgot-password"
+          color="primary"
+          block
         >
-          <UFormField
-            label="New Password"
-            name="password"
-          >
-            <UInput
-              v-model="state.password"
-              type="password"
-              placeholder="••••••••"
-              required
-              block
-            />
-          </UFormField>
+          Request new link
+        </UButton>
+      </template>
+    </UAuthForm>
+  </template>
 
-          <UFormField
-            label="Confirm New Password"
-            name="confirmPassword"
-          >
-            <UInput
-              v-model="state.confirmPassword"
-              type="password"
-              placeholder="••••••••"
-              required
-              block
-            />
-          </UFormField>
+  <template v-else-if="!success">
+    <UAuthForm
+      :fields="fields"
+      :schema="schema"
+      title="Reset Password"
+      description="Please enter your new password below."
+      icon="i-lucide-lock-keyhole"
+      align="top"
+      :loading="loading"
+      @submit="onSubmit"
+    />
+  </template>
 
-          <UButton
-            type="submit"
-            block
-            :loading="loading"
-          >
-            Reset Password
-          </UButton>
-        </form>
-      </div>
-
-      <div
-        v-else
-        class="text-center py-8"
-      >
-        <UIcon
-          name="i-heroicons-check-circle"
-          class="h-12 w-12 text-green-500 mx-auto"
-        />
-        <h2 class="text-xl font-bold mt-4">
-          Password Reset!
-        </h2>
-        <p class="text-gray-500 mt-2">
-          Your password has been changed. Redirecting to login...
-        </p>
-      </div>
-    </UCard>
-  </div>
+  <template v-else>
+    <UAuthForm
+      title="Password Reset!"
+      description="Your password has been successfully changed. Redirecting to login..."
+      icon="i-lucide-check-circle"
+      align="top"
+    >
+      <template #footer>
+        <UButton
+          to="/login"
+          color="neutral"
+          variant="subtle"
+          block
+        >
+          Go to Login
+        </UButton>
+      </template>
+    </UAuthForm>
+  </template>
 </template>

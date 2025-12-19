@@ -27,8 +27,12 @@ export default eventHandler(async (event) => {
 
     // In a real app, send an email here.
     // For this playground, we'll log it and return it for demo purposes if in dev.
+    const host = getRequestHeader(event, 'host') || 'localhost:3000'
+    const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http'
+    const resetUrl = `${protocol}://${host}/auth/reset-password?token=${resetToken}`
+    
     console.log(`Password reset token for ${body.email}: ${resetToken}`)
-    console.log(`Reset URL: http://localhost:3000/auth/reset-password?token=${resetToken}`)
+    console.log(`Reset URL: ${resetUrl}`)
   }
 
   return {
