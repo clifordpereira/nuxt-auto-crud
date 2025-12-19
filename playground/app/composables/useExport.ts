@@ -29,9 +29,9 @@ export const useExport = () => {
       startY: 30,
       head: [columns.map(col => col.toUpperCase())],
       body: tableRows,
-      theme: 'striped',
-      headStyles: { fillColor: 200, textColor: 0, fontStyle: 'bold' },
-      styles: { fontSize: 9 },
+      theme: 'grid',
+      headStyles: { fillColor: [240, 240, 240], textColor: 0, fontStyle: 'bold', lineWidth: 0.1 },
+      styles: { fontSize: 9, lineWidth: 0.1 },
     })
     
     doc.save(`${fileName}.pdf`)
