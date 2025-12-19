@@ -53,6 +53,29 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
     toast.add({ title: 'Error', description: message, color: 'error' })
   }
 }
+const route = useRoute()
+
+watchEffect(() => {
+  if (route.query.auth_error) {
+    const errorMessages: Record<string, string> = {
+      github: 'Failed to login with GitHub.',
+      google: 'Failed to login with Google.',
+      no_email: 'Your social account did not provide an email address.',
+      user_creation_failed: 'Failed to create a user account.'
+    }
+    
+    toast.add({
+      title: 'Authentication Error',
+      description: errorMessages[route.query.auth_error as string] || 'An unknown error occurred during authentication.',
+      color: 'error'
+    })
+
+    // Clean up query params
+    const query = { ...route.query }
+    delete query.auth_error
+    navigateTo({ path: route.path, query }, { replace: true })
+  }
+})
 </script>
 
 <template>

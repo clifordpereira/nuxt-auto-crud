@@ -28,6 +28,8 @@ async function onDelete(id: number) {
   await useCrudFetch('DELETE', props.resource, id)
 }
 
+const { exportToExcel, exportToPDF } = useExport()
+
 const paginatedItems = ref<Record<string, unknown>[]>([])
 </script>
 
@@ -48,15 +50,31 @@ const paginatedItems = ref<Record<string, unknown>[]>([])
         :items-per-page="10"
         @update:paginated="paginatedItems = $event"
       />
-      <Can
-        :ability="resourceAbility"
-        :args="[resource, 'create']"
-      >
-        <CrudCreateRow
-          :resource="resource"
-          :schema="schema"
-        />
-      </Can>
+      <div class="flex items-center gap-2">
+        <UDropdown
+          v-if="data?.length"
+          :items="[
+            [{ label: 'Excel', icon: 'i-lucide-file-spreadsheet', onSelect: () => exportToExcel(data, resource) }],
+            [{ label: 'PDF', icon: 'i-lucide-file-text', onSelect: () => exportToPDF(data, resource, Object.keys(data[0])) }]
+          ]"
+        >
+          <UButton
+            label="Export"
+            icon="i-lucide-download"
+            color="neutral"
+            variant="outline"
+          />
+        </UDropdown>
+        <Can
+          :ability="resourceAbility"
+          :args="[resource, 'create']"
+        >
+          <CrudCreateRow
+            :resource="resource"
+            :schema="schema"
+          />
+        </Can>
+      </div>
     </div>
 
     <!-- Table -->

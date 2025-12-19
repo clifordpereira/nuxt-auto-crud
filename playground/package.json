@@ -25,10 +25,13 @@
     "bcryptjs": "^3.0.3",
     "better-sqlite3": "^12.4.6",
     "drizzle-orm": "^0.45.0",
+    "jspdf": "^3.0.4",
+    "jspdf-autotable": "^5.0.2",
     "nuxt": "^4.2.1",
     "nuxt-auth-utils": "^0.5.26",
     "nuxt-authorization": "^0.3.5",
     "nuxt-og-image": "^5.1.12",
+    "xlsx": "^0.18.5",
     "zod": "^4.1.13"
   },
   "devDependencies": {

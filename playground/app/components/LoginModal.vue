@@ -102,6 +102,18 @@ async function onSubmit() {
             label="Password"
             name="password"
           >
+            <template #label>
+              <div class="flex items-center justify-between w-full">
+                <span>Password</span>
+                <ULink
+                  to="/auth/forgot-password"
+                  class="text-xs text-primary-500 hover:text-primary-600 font-medium"
+                  @click="isOpen = false"
+                >
+                  Forgot password?
+                </ULink>
+              </div>
+            </template>
             <UInput
               v-model="state.password"
               type="password"
@@ -125,6 +137,40 @@ async function onSubmit() {
             </UButton>
           </div>
         </form>
+
+        <div class="mt-6">
+          <div class="relative">
+            <div class="absolute inset-0 flex items-center">
+              <div class="w-full border-t border-gray-300 dark:border-gray-700" />
+            </div>
+            <div class="relative flex justify-center text-sm">
+              <span class="px-2 bg-white dark:bg-gray-900 text-gray-500">
+                Or continue with
+              </span>
+            </div>
+          </div>
+
+          <div class="mt-6 grid grid-cols-2 gap-3">
+            <UButton
+              icon="i-simple-icons-github"
+              label="GitHub"
+              color="neutral"
+              variant="outline"
+              block
+              to="/api/auth/github"
+              external
+            />
+            <UButton
+              icon="i-simple-icons-google"
+              label="Google"
+              color="neutral"
+              variant="outline"
+              block
+              to="/api/auth/google"
+              external
+            />
+          </div>
+        </div>
 
         <div class="mt-6">
           <div class="relative">

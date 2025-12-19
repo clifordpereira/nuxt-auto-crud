@@ -86,6 +86,10 @@ function mapColumnType(column: any): { type: string, selectOptions?: string[] } 
     return { type: 'number' }
   }
 
+  if (['content', 'description', 'bio', 'message'].includes(column.name)) {
+    return { type: 'textarea' }
+  }
+
   return { type: 'string' }
 }
 
