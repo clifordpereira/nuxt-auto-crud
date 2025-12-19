@@ -1,4 +1,4 @@
-import { eq, and } from 'drizzle-orm'
+import { eq, and, sql } from 'drizzle-orm'
 import { db, schema } from 'hub:db'
 import { hashUserPassword } from './hashing'
 
@@ -30,8 +30,11 @@ export const seedDatabase = async () => {
     }
   }
 
-  // 2. Seed Resources
-  const resourcesToSeed = ['users', 'subscribers', 'testimonials']
+  // 2. SEED RESOURCES
+  const excludedTables = ['roles', 'permissions', 'resources', 'roleResourcePermissions', 'systemFields', 'baseFields']
+  const resourcesToSeed = Object.keys(schema).filter(key =>
+    !key.endsWith('Relations') && !excludedTables.includes(key)
+  )
   const resourceIds: Record<string, number> = {}
 
   for (const resourceName of resourcesToSeed) {
@@ -52,7 +55,7 @@ export const seedDatabase = async () => {
     }
   }
 
-  // 3. Seed Permissions
+  // 3. SEED PERMISSIONS
   const permissionsToSeed = ['create', 'read', 'update', 'delete', 'update_own', 'delete_own', 'list', 'list_all']
   const permissionIds: Record<string, number> = {}
 
@@ -62,7 +65,6 @@ export const seedDatabase = async () => {
 
     if (!permission) {
       console.log(`Seeding permission: ${code}...`)
-      // Nice formatting for name (update_own -> Update Own)
       const name = code.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
 
       const [inserted] = await db.insert(schema.permissions).values({
@@ -80,26 +82,29 @@ export const seedDatabase = async () => {
     }
   }
 
-  // 4. Assign Permissions to Roles (Example: Manager gets all on users, Moderator gets read/list on users)
-  const rolePermissionsConfig = [
-    { role: 'manager', resource: 'users', perms: ['create', 'read', 'update', 'delete', 'list', 'list_all'] },
-    { role: 'moderator', resource: 'users', perms: ['read', 'list'] },
-    { role: 'user', resource: 'users', perms: ['read', 'update_own'] }, // Allow users to read and update their own profile
-    { role: 'public', resource: 'users', perms: [] }, // Explicitly no permissions for public on users by default
-    { role: 'public', resource: 'subscribers', perms: ['create'] }, // Allow public to subscribe
-    { role: 'public', resource: 'testimonials', perms: ['create', 'read', 'list'] }, // Allow public to create and view testimonials (active only)
-    { role: 'manager', resource: 'testimonials', perms: ['create', 'read', 'update', 'delete', 'list', 'list_all'] },
-  ]
+  // 4. ASSIGN PERMISSIONS DYNAMICALLY
+  for (const roleName of rolesToSeed) {
+    // Admin usually bypasses or gets all; Public gets nothing by default
+    if (roleName === 'admin' || roleName === 'public') continue
 
-  for (const config of rolePermissionsConfig) {
-    const rId = roleIds[config.role]
-    const resId = resourceIds[config.resource]
+    const rId = roleIds[roleName]
+    for (const resourceName of resourcesToSeed) {
+      const resId = resourceIds[resourceName]
+      if (!rId || !resId) continue
 
-    if (rId && resId) {
-      for (const permCode of config.perms) {
+      let permsToAssign: string[] = []
+      if (roleName === 'manager') {
+        // Managers get full operational access to every resource
+        permsToAssign = [...permissionsToSeed]
+      } else {
+        // Others (Support, Customer, User) only get control over their own records
+        // Admin must explicitly grant 'read' or 'list' via the UI to show tables in their dashboard
+        permsToAssign = ['update_own', 'delete_own']
+      }
+
+      for (const permCode of permsToAssign) {
         const pId = permissionIds[permCode]
         if (pId) {
-          // Check existence
           const existing = await db.select().from(schema.roleResourcePermissions)
             .where(and(
               eq(schema.roleResourcePermissions.roleId, rId),
@@ -116,14 +121,13 @@ export const seedDatabase = async () => {
               createdAt: new Date(),
               updatedAt: new Date(),
             })
-            console.log(`Assigned ${permCode} on ${config.resource} to ${config.role}`)
           }
         }
       }
     }
   }
 
-  // 5. Seed Users
+  // 5. SEED USERS
   const config = useRuntimeConfig()
   const usersToSeed = [
     { email: config.adminEmail, name: 'Admin User', role: 'admin' },

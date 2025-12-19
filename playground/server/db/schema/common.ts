@@ -1,4 +1,5 @@
 import { sqliteTable, text, index, integer } from 'drizzle-orm/sqlite-core'
+import { relations } from 'drizzle-orm'
 import { systemFields, baseFields } from './utils'
 import { users } from './users'
 
@@ -26,4 +27,11 @@ export const comments = sqliteTable('comments', {
   isApproved: integer('is_approved', { mode: 'boolean' }).default(false),
 }, t => ({
   resourceIdx: index('resource_idx').on(t.resourceType, t.resourceId),
+}))
+
+export const commentsRelations = relations(comments, ({ one }) => ({
+  user: one(users, {
+    fields: [comments.userId],
+    references: [users.id],
+  }),
 }))

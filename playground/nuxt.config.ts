@@ -8,7 +8,6 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
     'nuxt-og-image',
     '@nuxthub/core',
-    '@nuxt/scripts',
     'nuxt-auth-utils',
     'nuxt-authorization',
     '../src/module',

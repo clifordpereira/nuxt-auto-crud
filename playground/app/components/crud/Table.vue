@@ -72,7 +72,7 @@ const paginatedItems = ref<Record<string, unknown>[]>([])
               :key="key"
             >
               <th
-                v-if="!forbiddenRelations.has(String(key))"
+                v-if="!forbiddenRelations.has(String(key)) && !['updatedAt', 'deletedAt', 'createdBy', 'updatedBy'].includes(String(key))"
                 scope="col"
                 class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white"
               >
@@ -109,7 +109,7 @@ const paginatedItems = ref<Record<string, unknown>[]>([])
               :key="key"
             >
               <td
-                v-if="!forbiddenRelations.has(String(key))"
+                v-if="!forbiddenRelations.has(String(key)) && !['updatedAt', 'deletedAt', 'createdBy', 'updatedBy'].includes(String(key))"
                 class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400"
               >
                 {{ getDisplayValue(String(key), value) }}

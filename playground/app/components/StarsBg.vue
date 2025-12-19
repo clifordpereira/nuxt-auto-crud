@@ -41,12 +41,14 @@ const stars = ref<{ slow: Star[], normal: Star[], fast: Star[] }>({ slow: [], no
 const isMounted = ref(false)
 
 onMounted(() => {
-  stars.value = {
-    slow: generateStars(Math.floor(props.starCount * speedMap.slow.ratio)),
-    normal: generateStars(Math.floor(props.starCount * speedMap.normal.ratio)),
-    fast: generateStars(Math.floor(props.starCount * speedMap.fast.ratio)),
-  }
-  isMounted.value = true
+  setTimeout(() => {
+    stars.value = {
+      slow: generateStars(Math.floor(props.starCount * speedMap.slow.ratio)),
+      normal: generateStars(Math.floor(props.starCount * speedMap.normal.ratio)),
+      fast: generateStars(Math.floor(props.starCount * speedMap.fast.ratio)),
+    }
+    isMounted.value = true
+  }, 100)
 })
 
 // Compute star layers with different speeds and opacities

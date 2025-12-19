@@ -203,7 +203,7 @@ const displayPermissions = computed(() => {
       </div>
     </div>
 
-    <div class="p-4 flex-1 overflow-auto">
+    <div class="flex-1 overflow-auto">
       <div
         v-if="!roles || !resources || !permissions"
         class="flex justify-center items-center h-64"
@@ -215,11 +215,12 @@ const displayPermissions = computed(() => {
       </div>
 
       <template v-else>
-        <UTabs
-          v-model="selectedIndex"
-          :items="items"
-          class="mb-6"
-        />
+        <div class="sticky top-0 z-20 bg-white dark:bg-gray-900 -mx-4 px-4 pt-2 pb-4 border-b border-gray-200 dark:border-gray-700 mb-6 -mt-4">
+          <UTabs
+            v-model="selectedIndex"
+            :items="items"
+          />
+        </div>
 
         <UCard
           v-if="selectedRole"
@@ -267,6 +268,24 @@ const displayPermissions = computed(() => {
                   </td>
                 </tr>
               </tbody>
+              <tfoot class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 font-medium"
+                  >
+                    Resource
+                  </th>
+                  <th
+                    v-for="perm in displayPermissions"
+                    :key="perm.id"
+                    scope="col"
+                    class="px-6 py-3 font-medium text-center"
+                  >
+                    {{ perm.name }}
+                  </th>
+                </tr>
+              </tfoot>
             </table>
           </div>
         </UCard>

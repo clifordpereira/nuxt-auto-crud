@@ -15,7 +15,7 @@ const resourceNames = computed(() =>
     if (['users', 'roles', 'permissions', 'resources', 'roleResourcePermissions'].includes(name)) return false
 
     return hasPermission(name, 'list')
-  }),
+  }).sort((a, b) => b.localeCompare(a)),
 )
 
 const items = computed(() => {
