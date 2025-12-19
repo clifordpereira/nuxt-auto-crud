@@ -29,6 +29,17 @@ const fields = [{
   type: 'password' as const,
   placeholder: 'Enter your password',
 }]
+const { fetch, openInPopup } = useUserSession()
+
+const providers = [{
+  label: 'Google',
+  icon: 'i-simple-icons-google',
+  onClick: () => { window.location.href = '/auth/google' }
+}, {
+  label: 'GitHub',
+  icon: 'i-simple-icons-github',
+  onClick: () => { window.location.href = '/auth/github' }
+}]
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -44,7 +55,6 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
       method: 'POST',
       body: payload.data,
     })
-    const { fetch } = useUserSession()
     await fetch()
     toast.add({ title: 'Success', description: 'Account created successfully' })
     await navigateTo('/admin/dashboard')
@@ -60,6 +70,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
   <UAuthForm
     :fields="fields"
     :schema="schema"
+    :providers="providers"
     title="Create an account"
     :submit="{ label: 'Create account' }"
     @submit="onSubmit"

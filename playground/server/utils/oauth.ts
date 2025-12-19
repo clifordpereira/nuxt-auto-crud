@@ -92,5 +92,5 @@ export async function handleOAuthSuccess(event: H3Event, oauthUser: OAuthUser) {
     },
   })
 
-  return sendRedirect(event, '/')
+  return sendRedirect(event, '/admin/dashboard')
 }

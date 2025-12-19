@@ -3,14 +3,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "nuxt build",
-    "dev": "nuxt dev",
-    "preview": "nuxt preview",
-    "postinstall": "nuxt prepare",
+    "build": "nuxi build",
+    "dev": "nuxi dev --bun",
+    "preview": "nuxi preview --bun",
+    "postinstall": "nuxi prepare",
     "lint": "eslint .",
-    "typecheck": "nuxt typecheck",
+    "typecheck": "nuxi typecheck",
     "test": "vitest",
-    "db:generate": "nuxt db generate"
+    "db:generate": "nuxi db generate"
   },
   "dependencies": {
     "@iconify-json/lucide": "^1.2.75",
@@ -45,5 +45,5 @@
     "vue-tsc": "^3.1.5",
     "wrangler": "^4.53.0"
   },
-  "packageManager": "pnpm@10.23.0"
+  "packageManager": "bun@1.2.5"
 }

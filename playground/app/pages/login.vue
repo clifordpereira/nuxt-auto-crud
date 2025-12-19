@@ -31,18 +31,16 @@ const fields = [{
   type: 'checkbox' as const
 }]
 
+const { fetch, openInPopup } = useUserSession()
+
 const providers = [{
   label: 'Google',
   icon: 'i-simple-icons-google',
-  onSelect: () => {
-    window.location.href = '/auth/google'
-  }
+  onClick: () => { window.location.href = '/auth/google' }
 }, {
   label: 'GitHub',
   icon: 'i-simple-icons-github',
-  onSelect: () => {
-    window.location.href = '/auth/github'
-  }
+  onClick: () => { window.location.href = '/auth/github' }
 }]
 
 const schema = z.object({
@@ -58,7 +56,6 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
       method: 'POST',
       body: payload.data
     })
-    const { fetch } = useUserSession()
     await fetch()
     toast.add({ title: 'Success', description: 'Logged in successfully' })
     await navigateTo('/admin/dashboard')
