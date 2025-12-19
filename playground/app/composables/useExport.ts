@@ -1,6 +1,6 @@
 import * as XLSX from 'xlsx'
 import { jsPDF } from 'jspdf'
-import 'jspdf-autotable'
+import autoTable from 'jspdf-autotable'
 
 export const useExport = () => {
   const exportToExcel = (data: any[], fileName: string) => {
@@ -11,18 +11,29 @@ export const useExport = () => {
   }
 
   const exportToPDF = (data: any[], fileName: string, columns: string[]) => {
-    const doc = new jsPDF()
+    const doc = new jsPDF({
+      orientation: 'landscape',
+      unit: 'mm',
+      format: 'a4',
+    })
+
+    const title = fileName.toUpperCase()
+    doc.setFontSize(18)
+    doc.text(title, 14, 22)
+    doc.setFontSize(11)
+    doc.setTextColor(100)
+
     const tableRows = data.map(item => columns.map(col => item[col]))
 
-    /**
-     * The leading semicolon is a "defensive semicolon" to prevent errors 
-     * when the previous line or this line starts with a parenthesis or bracket.
-     */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ;(doc as any).autoTable({
+    autoTable(doc, {
+      startY: 30,
       head: [columns.map(col => col.toUpperCase())],
       body: tableRows,
+      theme: 'striped',
+      headStyles: { fillColor: 200, textColor: 0, fontStyle: 'bold' },
+      styles: { fontSize: 9 },
     })
+    
     doc.save(`${fileName}.pdf`)
   }
 

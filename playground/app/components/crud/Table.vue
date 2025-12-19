@@ -30,7 +30,43 @@ async function onDelete(id: number) {
 
 const { exportToExcel, exportToPDF } = useExport()
 
-const paginatedItems = ref<Record<string, unknown>[]>([])
+const visibleColumns = computed(() => {
+  if (!data.value?.length) return []
+  return Object.keys(data.value[0]).filter(key => 
+    !forbiddenRelations.value.has(String(key)) && 
+    !['updatedAt', 'deletedAt', 'createdBy', 'updatedBy'].includes(String(key))
+  )
+})
+
+const getExportData = () => {
+  if (!data.value) return []
+  const items = (Array.isArray(data.value) ? data.value : []) as Record<string, any>[]
+  return items.map((row: Record<string, any>) => {
+    const exportRow: Record<string, any> = {}
+    visibleColumns.value.forEach((col) => {
+      const label = useChangeCase(String(col).replace(/(_id|Id)$/, ''), 'capitalCase').value
+      exportRow[label] = getDisplayValue(col, row[col])
+    })
+    return exportRow
+  })
+}
+
+const handleExportExcel = () => {
+  console.log('Exporting to Excel...')
+  const exportData = getExportData()
+  exportToExcel(exportData, props.resource)
+}
+
+const handleExportPDF = () => {
+  console.log('Exporting to PDF...')
+  const exportData = getExportData()
+  const firstRow = exportData[0]
+  if (!firstRow) return
+  const headers = Object.keys(firstRow)
+  exportToPDF(exportData, props.resource, headers)
+}
+
+const paginatedItems = ref<any[]>([])
 </script>
 
 <template>
@@ -51,11 +87,13 @@ const paginatedItems = ref<Record<string, unknown>[]>([])
         @update:paginated="paginatedItems = $event"
       />
       <div class="flex items-center gap-2">
-        <UDropdown
+        <UDropdownMenu
           v-if="data?.length"
           :items="[
-            [{ label: 'Excel', icon: 'i-lucide-file-spreadsheet', onSelect: () => exportToExcel(data, resource) }],
-            [{ label: 'PDF', icon: 'i-lucide-file-text', onSelect: () => exportToPDF(data, resource, Object.keys(data[0])) }]
+            [
+              { label: 'Excel', icon: 'i-lucide-file-spreadsheet', onSelect: handleExportExcel },
+              { label: 'PDF', icon: 'i-lucide-file-text', onSelect: handleExportPDF }
+            ]
           ]"
         >
           <UButton
@@ -64,7 +102,7 @@ const paginatedItems = ref<Record<string, unknown>[]>([])
             color="neutral"
             variant="outline"
           />
-        </UDropdown>
+        </UDropdownMenu>
         <Can
           :ability="resourceAbility"
           :args="[resource, 'create']"
@@ -86,15 +124,14 @@ const paginatedItems = ref<Record<string, unknown>[]>([])
         >
           <tr>
             <template
-              v-for="(value, key) in data[0]"
-              :key="key"
+              v-for="col in visibleColumns"
+              :key="col"
             >
               <th
-                v-if="!forbiddenRelations.has(String(key)) && !['updatedAt', 'deletedAt', 'createdBy', 'updatedBy'].includes(String(key))"
                 scope="col"
                 class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white"
               >
-                {{ useChangeCase(String(key).replace(/(_id|Id)$/, ''), 'capitalCase').value }}
+                {{ useChangeCase(String(col).replace(/(_id|Id)$/, ''), 'capitalCase').value }}
               </th>
             </template>
             <th
@@ -123,14 +160,13 @@ const paginatedItems = ref<Record<string, unknown>[]>([])
             class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
           >
             <template
-              v-for="(value, key) in row"
-              :key="key"
+              v-for="col in visibleColumns"
+              :key="col"
             >
               <td
-                v-if="!forbiddenRelations.has(String(key)) && !['updatedAt', 'deletedAt', 'createdBy', 'updatedBy'].includes(String(key))"
                 class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400"
               >
-                {{ getDisplayValue(String(key), value) }}
+                {{ getDisplayValue(String(col), row[col]) }}
               </td>
             </template>
 
