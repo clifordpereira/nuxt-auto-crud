@@ -346,12 +346,6 @@ export const posts = sqliteTable('posts', {
 })
 ```
 
-## ⚠️ Known Issues
-
-- **Automatic Relation Expansion:** The module tries to automatically expand foreign keys (e.g., `user_id` -> `user: { name: ... }`). However, this relies on the foreign key column name matching the target table name (e.g., `user_id` for `users`).
-  - **Limitation:** If you have custom FK names like `customer_id` or `author_id` pointing to `users`, the automatic expansion will not work yet.
-  - **Workaround:** Ensure your FK columns follow the `tablename_id` convention where possible for now.
-
 ## 🎮 Try the Playground
 
 Want to see it in action? Clone this repo and try the playground:
