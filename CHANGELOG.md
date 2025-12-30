@@ -1,3 +1,40 @@
+## v1.22.0
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.21.0...v1.22.0)
+
+### 🚀 Enhancements
+
+- Introduce custom `RecordNotFoundError` for 404 responses and add error handling tests. ([81bbaf9](https://github.com/clifordpereira/nuxt-auto-crud/commit/81bbaf9))
+- Add comprehensive favicon links and update SEO meta title and image paths. ([6d67e89](https://github.com/clifordpereira/nuxt-auto-crud/commit/6d67e89))
+- Automatically close `CreateRow` and `EditRow` modals after form submission. ([06d3e51](https://github.com/clifordpereira/nuxt-auto-crud/commit/06d3e51))
+- Defer promotional video loading, optimize star background performance, and lazy load images. ([1875e5b](https://github.com/clifordpereira/nuxt-auto-crud/commit/1875e5b))
+- Implement OAuth (Google, GitHub), forgot/reset password, and CRUD table export functionality ([23b0616](https://github.com/clifordpereira/nuxt-auto-crud/commit/23b0616))
+- Implement dynamic column visibility for table display and export, and enhance PDF export formatting. ([f609833](https://github.com/clifordpereira/nuxt-auto-crud/commit/f609833))
+- Update PDF export table styling to use grid theme and add borders ([8967b3c](https://github.com/clifordpereira/nuxt-auto-crud/commit/8967b3c))
+- Improve authentication pages with UAuthForm, add social login, and enhance PDF export formatting ([82d6da9](https://github.com/clifordpereira/nuxt-auto-crud/commit/82d6da9))
+- Update PDF footer to display current page number only and disable Google Fonts provider. ([70a1daa](https://github.com/clifordpereira/nuxt-auto-crud/commit/70a1daa))
+- Refactor OAuth provider handling for login/signup, update redirect path, migrate to Bun, and introduce session password configuration. ([3b773dd](https://github.com/clifordpereira/nuxt-auto-crud/commit/3b773dd))
+- Send password reset emails using Nodemailer and add related configuration ([4bc8f99](https://github.com/clifordpereira/nuxt-auto-crud/commit/4bc8f99))
+- Implement flexible password reset email sending via Resend API or Nodemailer with background processing and updated documentation. ([0baa7ec](https://github.com/clifordpereira/nuxt-auto-crud/commit/0baa7ec))
+- Add configurable column hiding and data export exclusions for CRUD tables, introduce a posts table, and update user authentication fields. ([b69f541](https://github.com/clifordpereira/nuxt-auto-crud/commit/b69f541))
+- Enhance foreign key resolution in schema utility, refactor comments schema to use `authorId`, and remove the posts table. ([470f5b2](https://github.com/clifordpereira/nuxt-auto-crud/commit/470f5b2))
+- Add admin email/password env variables, update Nuxthub/db commands, simplify local email config, and remove known issues documentation. ([83314fd](https://github.com/clifordpereira/nuxt-auto-crud/commit/83314fd))
+- Add nuxt-auth-utils and nuxt-authorization modules ([b83d6ca](https://github.com/clifordpereira/nuxt-auto-crud/commit/b83d6ca))
+
+### 💅 Refactors
+
+- Remove explicit modal state management and `CrudForm` close events from CreateRow and EditRow components. ([5a0eb7e](https://github.com/clifordpereira/nuxt-auto-crud/commit/5a0eb7e))
+- Enhance type safety and clarity across server routes, composables, and UI pages, and remove unused imports. ([e22350f](https://github.com/clifordpereira/nuxt-auto-crud/commit/e22350f))
+
+### 🏡 Chore
+
+- **release:** V1.21.0 ([13eb9e9](https://github.com/clifordpereira/nuxt-auto-crud/commit/13eb9e9))
+- Update dependencies and hide audit columns in CRUD tables. ([140fbf3](https://github.com/clifordpereira/nuxt-auto-crud/commit/140fbf3))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v1.21.0
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.20.0...v1.21.0)
