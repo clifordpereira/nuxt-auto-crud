@@ -29,16 +29,16 @@ const fields = [{
   type: 'password' as const,
   placeholder: 'Enter your password',
 }]
-const { fetch, openInPopup } = useUserSession()
+const { fetch } = useUserSession()
 
 const providers = [{
   label: 'Google',
   icon: 'i-simple-icons-google',
-  onClick: () => { window.location.href = '/auth/google' }
+  onClick: () => { window.location.href = '/auth/google' },
 }, {
   label: 'GitHub',
   icon: 'i-simple-icons-github',
-  onClick: () => { window.location.href = '/auth/github' }
+  onClick: () => { window.location.href = '/auth/github' },
 }]
 
 const schema = z.object({

@@ -11,12 +11,10 @@ definePageMeta({
 const config = useRuntimeConfig().public
 const crudBaseUrl = config.crudBaseUrl || '/api'
 
-const { data: users, status } = useFetch<unknown[]>(`${crudBaseUrl}/users`, {
+const { data: users } = useFetch<unknown[]>(`${crudBaseUrl}/users`, {
   headers: crudHeaders(),
   lazy: true,
 })
-
-const pending = computed(() => status.value === 'pending')
 
 const userCount = computed(() => users.value?.length || 0)
 </script>

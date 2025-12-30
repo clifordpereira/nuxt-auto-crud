@@ -14,13 +14,6 @@ export default defineNuxtConfig({
     '../src/module',
   ],
 
-  fonts: {
-    devtools: false,
-    providers: {
-      google: false // Disable google provider if it's causing timeouts
-    }
-  },
-
   ssr: true,
 
   devtools: {
@@ -38,12 +31,12 @@ export default defineNuxtConfig({
     oauth: {
       github: {
         clientId: process.env.NUXT_OAUTH_GITHUB_CLIENT_ID,
-        clientSecret: process.env.NUXT_OAUTH_GITHUB_CLIENT_SECRET
+        clientSecret: process.env.NUXT_OAUTH_GITHUB_CLIENT_SECRET,
       },
       google: {
         clientId: process.env.NUXT_OAUTH_GOOGLE_CLIENT_ID,
-        clientSecret: process.env.NUXT_OAUTH_GOOGLE_CLIENT_SECRET
-      }
+        clientSecret: process.env.NUXT_OAUTH_GOOGLE_CLIENT_SECRET,
+      },
     },
     resendApiKey: process.env.NUXT_RESEND_API_KEY,
   },
@@ -52,7 +45,7 @@ export default defineNuxtConfig({
     '/docs': { redirect: '/docs/auto-crud', prerender: false },
   },
 
-  compatibilityDate: '2024-07-11',
+  compatibilityDate: '2025-12-30',
 
   nitro: {
     prerender: {
@@ -88,10 +81,17 @@ export default defineNuxtConfig({
       },
     },
   },
+
+  fonts: {
+    devtools: false,
+    providers: {
+      google: false, // Disable google provider if it's causing timeouts
+    },
+  },
   nodemailer: {
     from: process.env.NUXT_NODEMAILER_FROM || '"Cliford Pereira" <cliford.pereira@gmail.com>',
     host: process.env.NUXT_NODEMAILER_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.NUXT_NODEMAILER_PORT || '465'),
+    port: Number.parseInt(process.env.NUXT_NODEMAILER_PORT || '465'),
     secure: process.env.NUXT_NODEMAILER_SECURE !== 'false', // Default to true
     auth: {
       user: process.env.NUXT_NODEMAILER_USER || 'cliford.pereira@gmail.com',

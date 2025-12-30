@@ -11,7 +11,6 @@ useSeoMeta({
   ogDescription: description,
 })
 
-
 const isYearly = ref('0')
 
 const items = ref([

@@ -1,5 +1,5 @@
 // server/api/[model]/[id].patch.ts
-import { eventHandler, getRouterParams, readBody, createError } from 'h3'
+import { eventHandler, getRouterParams, readBody } from 'h3'
 import type { H3Event } from 'h3'
 import { getUserSession } from '#imports'
 import { eq } from 'drizzle-orm'

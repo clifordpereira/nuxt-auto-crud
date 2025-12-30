@@ -1,4 +1,4 @@
-import { eq, and, sql } from 'drizzle-orm'
+import { eq, and } from 'drizzle-orm'
 import { db, schema } from 'hub:db'
 import { hashUserPassword } from './hashing'
 
@@ -33,7 +33,7 @@ export const seedDatabase = async () => {
   // 2. SEED RESOURCES
   const excludedTables = ['roles', 'permissions', 'resources', 'roleResourcePermissions', 'systemFields', 'baseFields']
   const resourcesToSeed = Object.keys(schema).filter(key =>
-    !key.endsWith('Relations') && !excludedTables.includes(key)
+    !key.endsWith('Relations') && !excludedTables.includes(key),
   )
   const resourceIds: Record<string, number> = {}
 
@@ -96,7 +96,8 @@ export const seedDatabase = async () => {
       if (roleName === 'manager') {
         // Managers get full operational access to every resource
         permsToAssign = [...permissionsToSeed]
-      } else {
+      }
+      else {
         // Others (Support, Customer, User) only get control over their own records
         // Admin must explicitly grant 'read' or 'list' via the UI to show tables in their dashboard
         permsToAssign = ['update_own', 'delete_own']

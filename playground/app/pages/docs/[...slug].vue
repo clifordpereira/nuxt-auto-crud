@@ -25,7 +25,6 @@ useSeoMeta({
   description,
   ogDescription: description,
 })
-
 </script>
 
 <template>

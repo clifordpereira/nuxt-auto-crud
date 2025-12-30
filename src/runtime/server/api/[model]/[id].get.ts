@@ -1,5 +1,5 @@
 // server/api/[model]/[id].get.ts
-import { eventHandler, getRouterParams, createError } from 'h3'
+import { eventHandler, getRouterParams } from 'h3'
 import { eq } from 'drizzle-orm'
 import { getTableForModel } from '../../utils/modelMapper'
 import type { TableWithId } from '../../types'

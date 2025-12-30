@@ -42,10 +42,12 @@ export default eventHandler(async (event) => {
       if (seededUser && seededUser.user) {
         // Proceed with login logic using the newly seeded user
         result = seededUser
-      } else {
+      }
+      else {
         throw new InvalidCredentialError()
       }
-    } else {
+    }
+    else {
       throw new InvalidCredentialError()
     }
   }

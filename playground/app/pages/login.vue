@@ -3,12 +3,12 @@ import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
 
 definePageMeta({
-  layout: 'auth'
+  layout: 'auth',
 })
 
 useSeoMeta({
   title: 'Login',
-  description: 'Login to your account to continue'
+  description: 'Login to your account to continue',
 })
 
 const toast = useToast()
@@ -19,33 +19,33 @@ const fields = [{
   type: 'text' as const,
   label: 'Email',
   placeholder: 'Enter your email',
-  required: true
+  required: true,
 }, {
   name: 'password',
   label: 'Password',
   type: 'password' as const,
-  placeholder: 'Enter your password'
+  placeholder: 'Enter your password',
 }, {
   name: 'remember',
   label: 'Remember me',
-  type: 'checkbox' as const
+  type: 'checkbox' as const,
 }]
 
-const { fetch, openInPopup } = useUserSession()
+const { fetch } = useUserSession()
 
 const providers = [{
   label: 'Google',
   icon: 'i-simple-icons-google',
-  onClick: () => { window.location.href = '/auth/google' }
+  onClick: () => { window.location.href = '/auth/google' },
 }, {
   label: 'GitHub',
   icon: 'i-simple-icons-github',
-  onClick: () => { window.location.href = '/auth/github' }
+  onClick: () => { window.location.href = '/auth/github' },
 }]
 
 const schema = z.object({
   email: z.string().email('Invalid email'),
-  password: z.string().min(8, 'Must be at least 8 characters')
+  password: z.string().min(8, 'Must be at least 8 characters'),
 })
 
 type Schema = z.output<typeof schema>
@@ -54,7 +54,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
   try {
     await $fetch('/api/auth/login', {
       method: 'POST',
-      body: payload.data
+      body: payload.data,
     })
     await fetch()
     toast.add({ title: 'Success', description: 'Logged in successfully' })
@@ -72,13 +72,13 @@ watchEffect(() => {
       github: 'Failed to login with GitHub.',
       google: 'Failed to login with Google.',
       no_email: 'Your social account did not provide an email address.',
-      user_creation_failed: 'Failed to create a user account.'
+      user_creation_failed: 'Failed to create a user account.',
     }
-    
+
     toast.add({
       title: 'Authentication Error',
       description: errorMessages[route.query.auth_error as string] || 'An unknown error occurred during authentication.',
-      color: 'error'
+      color: 'error',
     })
 
     // Clean up query params

@@ -35,9 +35,9 @@ const crudConfig = appConfig.crud
 const visibleColumns = computed(() => {
   if (!data.value?.length) return []
   const hideList = crudConfig?.globalHide || ['updatedAt', 'deletedAt', 'createdBy', 'updatedBy']
-  return Object.keys(data.value[0]).filter(key => 
-    !forbiddenRelations.value.has(String(key)) && 
-    !hideList.includes(String(key))
+  return Object.keys(data.value[0]).filter(key =>
+    !forbiddenRelations.value.has(String(key))
+    && !hideList.includes(String(key)),
   )
 })
 
@@ -45,15 +45,15 @@ const getExportExclusions = (type: 'pdf' | 'excel') => {
   const config = crudConfig?.exports?.[type]
   if (!config) return []
   const global = config.globalExclude || []
-  const resourceSpecific = (config.resourceExclude as any)?.[props.resource] || []
+  const resourceSpecific = (config.resourceExclude as Record<string, string[]>)?.[props.resource] || []
   return [...new Set([...global, ...resourceSpecific])]
 }
 
 const getExportData = (exclude: string[] = []) => {
   if (!data.value) return []
-  const items = (Array.isArray(data.value) ? data.value : []) as Record<string, any>[]
-  return items.map((row: Record<string, any>) => {
-    const exportRow: Record<string, any> = {}
+  const items = (Array.isArray(data.value) ? data.value : []) as Record<string, unknown>[]
+  return items.map((row: Record<string, unknown>) => {
+    const exportRow: Record<string, unknown> = {}
     visibleColumns.value.forEach((col) => {
       if (exclude.includes(String(col))) return
       const label = useChangeCase(String(col).replace(/(_id|Id)$/, ''), 'capitalCase').value
@@ -78,7 +78,7 @@ const handleExportPDF = () => {
   exportToPDF(exportData, props.resource, headers)
 }
 
-const paginatedItems = ref<any[]>([])
+const paginatedItems = ref<Record<string, unknown>[]>([])
 </script>
 
 <template>
@@ -104,8 +104,8 @@ const paginatedItems = ref<any[]>([])
           :items="[
             [
               { label: 'Excel', icon: 'i-lucide-file-spreadsheet', onSelect: handleExportExcel },
-              { label: 'PDF', icon: 'i-lucide-file-text', onSelect: handleExportPDF }
-            ]
+              { label: 'PDF', icon: 'i-lucide-file-text', onSelect: handleExportPDF },
+            ],
           ]"
         >
           <UButton

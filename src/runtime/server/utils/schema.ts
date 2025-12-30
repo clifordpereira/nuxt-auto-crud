@@ -36,7 +36,7 @@ export function drizzleTableToFields(table: any, resourceName: string) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     config.foreignKeys.forEach((fk: any) => {
       const sourceColumnName = fk.reference().columns[0].name
-      
+
       // Find the TS property name (key) that corresponds to this SQL column name
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const propertyName = Object.entries(columns).find(([_, col]: [string, any]) => col.name === sourceColumnName)?.[0]

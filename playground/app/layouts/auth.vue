@@ -1,7 +1,7 @@
 <template>
   <div class="h-screen flex items-center justify-center px-4 relative overflow-hidden bg-white dark:bg-black">
     <StarsBg />
-    
+
     <div class="absolute inset-0 bg-linear-to-b from-primary-500/10 via-transparent to-transparent pointer-events-none" />
 
     <UButton

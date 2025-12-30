@@ -5,8 +5,8 @@ export default defineOAuthGitHubEventHandler({
   async onSuccess(event, { user: oauthUser }) {
     return handleOAuthSuccess(event, {
       email: oauthUser.email,
-      name: oauthUser.name || (oauthUser as any).login,
-      avatar: (oauthUser as any).avatar_url,
+      name: oauthUser.name || (oauthUser as { login: string }).login,
+      avatar: (oauthUser as { avatar_url: string }).avatar_url,
       providerId: String(oauthUser.id),
       provider: 'github',
     })

@@ -17,7 +17,6 @@ export async function handleOAuthSuccess(event: H3Event, oauthUser: OAuthUser) {
 
   const providerField = oauthUser.provider === 'github' ? 'githubId' : 'googleId'
 
-  // @ts-ignore - Dynamic key access on schema.users
   let user = await db.select()
     .from(schema.users)
     .where(eq(schema.users[providerField], oauthUser.providerId))
