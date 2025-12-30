@@ -36,18 +36,18 @@ export function drizzleTableToFields(table: any, resourceName: string) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     config.foreignKeys.forEach((fk: any) => {
       const sourceColumnName = fk.reference().columns[0].name
-      // Find the field that matches this column
-      const field = fields.find((f) => {
-        // In simple cases, field.name matches column name.
-        // If camelCase mapping handles it differently, we might need adjustments,
-        // but typically Drizzle key = field name.
-        return f.name === sourceColumnName
-      })
+      
+      // Find the TS property name (key) that corresponds to this SQL column name
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const propertyName = Object.entries(columns).find(([_, col]: [string, any]) => col.name === sourceColumnName)?.[0]
 
-      if (field) {
-        // Get target table name
-        const targetTable = fk.reference().foreignTable[Symbol.for('drizzle:Name')] as string
-        field.references = targetTable
+      if (propertyName) {
+        const field = fields.find(f => f.name === propertyName)
+        if (field) {
+          // Get target table name
+          const targetTable = fk.reference().foreignTable[Symbol.for('drizzle:Name')] as string
+          field.references = targetTable
+        }
       }
     })
   }

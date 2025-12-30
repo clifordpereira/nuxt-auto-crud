@@ -19,7 +19,7 @@ export const comments = sqliteTable('comments', {
   resourceType: text('resource_type').notNull(),
   resourceId: integer('resource_id').notNull(),
 
-  userId: integer('user_id').references(() => users.id), // Optional: for logged-in users
+  authorId: integer('author_id').references(() => users.id),
   authorName: text('author_name'), // For guest comments
   authorEmail: text('author_email'), // For guest comments
 
@@ -30,8 +30,9 @@ export const comments = sqliteTable('comments', {
 }))
 
 export const commentsRelations = relations(comments, ({ one }) => ({
-  user: one(users, {
-    fields: [comments.userId],
+  author: one(users, {
+    fields: [comments.authorId],
     references: [users.id],
+    relationName: 'comment_author',
   }),
 }))
