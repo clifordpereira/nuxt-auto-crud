@@ -1,6 +1,6 @@
 # Nuxt Auto CRUD
 
-> **Note:** This module is widely used in MVP development and is rapidly maturing. While currently in **Beta**, the core API (CRUD) is stable. Breaking changes may still occur in configuration or advanced features. Production use is encouraged with version pinning.
+> **Note:** This module is production-ready and actively maintained. The core CRUD API is stable. Minor breaking changes may occasionally occur in advanced features or configuration. We recommend version pinning for production deployments.
 
 Auto-expose RESTful CRUD APIs for your **Nuxt** application based solely on your database schema. Minimal configuration required.
 
@@ -56,19 +56,12 @@ If you want to add `nuxt-auto-crud` to an existing project, follow these steps:
 #### Install dependencies
 
 ```bash
-# Install module and required dependencies
 npm install nuxt-auto-crud @nuxthub/core@^0.10.0 drizzle-orm
-
-# Optional: Install auth dependencies if using Session Auth (Recommended)
-npm install nuxt-auth-utils nuxt-authorization
-
+npm install nuxt-auth-utils nuxt-authorization  # Optional: for authentication
 npm install --save-dev wrangler drizzle-kit
-
-# Or using bun
-bun add nuxt-auto-crud @nuxthub/core@latest drizzle-orm
-bun add nuxt-auth-utils nuxt-authorization
-bun add --dev wrangler drizzle-kit
 ```
+
+> You can also use `bun` or `pnpm` instead of `npm`.
 
 #### Configure Nuxt
 
@@ -227,81 +220,18 @@ export default defineConfig({
 })
 ```
 
-## 🔐 Authentication Configuration
+## 🔐 Authentication
 
-The module enables authentication by default. To test APIs without authentication, you can set `auth: false`.
+Authentication is enabled by default using **Session Auth** (requires `nuxt-auth-utils` and `nuxt-authorization`).
 
-### Session Auth (Default)
-
-Requires `nuxt-auth-utils` and `nuxt-authorization` to be installed in your project.
-
-```bash
-npm install nuxt-auth-utils nuxt-authorization
-```
-
+To disable auth for testing:
 ```typescript
-export default defineNuxtConfig({
-  modules: [
-    'nuxt-auth-utils',
-    'nuxt-authorization',
-    'nuxt-auto-crud'
-  ],
-  autoCrud: {
-    auth: {
-      type: 'session',
-      authentication: true, // Enables requireUserSession() check
-      authorization: true // Enables authorize(model, action) check
-    }
-  }
-})
+autoCrud: { auth: false }
 ```
 
-### JWT Auth
+For **JWT Auth** (backend-only apps) or advanced configuration, see the [Authentication docs](https://auto-crud.clifland.in/docs/configuration/authentication).
 
-Useful for backend-only apps. Does **not** require `nuxt-auth-utils`.
 
-```typescript
-export default defineNuxtConfig({
-  autoCrud: {
-    auth: {
-      type: 'jwt',
-      authentication: true,
-      jwtSecret: process.env.JWT_SECRET,
-      authorization: true
-    }
-  }
-})
-```
-
-### Disabling Auth
-
-You can disable authentication entirely for testing or public APIs.
-
-```typescript
-export default defineNuxtConfig({
-  autoCrud: {
-    auth: {
-      authentication: false,
-      authorization: false
-    }
-    // OR simply:
-    // auth: false
-  }
-})
-```
-
-## 🧪 Testing
-
-This module is tested using **Vitest**.
-
-- **Unit Tests:** We cover utility functions and helpers.
-- **E2E Tests:** We verify the API endpoints using a real Nuxt server instance.
-
-To run the tests locally:
-
-```bash
-npm run test
-```
 
 ## 🛡️ Public View Configuration (Field Visibility)
 
@@ -415,51 +345,7 @@ await $fetch("/api/users/1", {
 > - **Fullstack App:** The module integrates with `nuxt-auth-utils`, so session cookies are handled automatically.
 > - **Backend-only App:** You must include the `Authorization: Bearer <token>` header in your requests.
 
-## Configuration
 
-### Module Options
-
-```typescript
-
-export default defineNuxtConfig({
-  autoCrud: {
-    // Path to your database schema file (relative to project root)
-    schemaPath: "server/db/schema", // default
-    
-    // Authentication configuration (see "Authentication Configuration" section)
-    auth: {
-        // ...
-    },
-
-    // Public Guest View Configuration (Field Visibility)
-    resources: {
-        users: ['id', 'name', 'avatar'],
-    },
-  },
-});
-```
-
-### Protected Fields
-
-By default, the following fields are protected from updates:
-
-- `id`
-- `createdAt`
-- `created_at`
-- `updatedAt`
-- `updated_at`
-
-You can customize updatable fields in your schema by modifying the `modelMapper.ts` utility.
-
-### Hidden Fields
-
-By default, the following fields are hidden from API responses for security:
-
-- `password`
-- `secret`
-- `token`
-
-You can customize hidden fields by modifying the `modelMapper.ts` utility.
 
 ## 🔧 Requirements
 
@@ -467,18 +353,12 @@ You can customize hidden fields by modifying the `modelMapper.ts` utility.
 - Drizzle ORM (SQLite)
 - NuxtHub >= 0.10.0
 
-## 🔗 Other Helpful Links
+## 🔗 Links
 
-- **Template:** [https://github.com/clifordpereira/nuxt-auto-crud_template](https://github.com/clifordpereira/nuxt-auto-crud_template)
-- **Docs:** [https://auto-crud.clifland.in/docs/auto-crud](https://auto-crud.clifland.in/docs/auto-crud)
-- **Repo:** [https://github.com/clifordpereira/nuxt-auto-crud](https://github.com/clifordpereira/nuxt-auto-crud)
-- **YouTube (Installation):** [https://youtu.be/M9-koXmhB9k](https://youtu.be/M9-koXmhB9k)
-- **YouTube (Add Schemas):** [https://youtu.be/7gW0KW1KtN0](https://youtu.be/7gW0KW1KtN0)
-- **YouTube (Various Permissions):** [https://www.youtube.com/watch?v=Yty3OCYbwOo](https://www.youtube.com/watch?v=Yty3OCYbwOo)
-- **YouTube (Dynamic RBAC):** [https://www.youtube.com/watch?v=W0ju4grRC9M](https://www.youtube.com/watch?v=W0ju4grRC9M)
-- **npm:** [https://www.npmjs.com/package/nuxt-auto-crud](https://www.npmjs.com/package/nuxt-auto-crud)
-- **Github Discussions:** [https://github.com/clifordpereira/nuxt-auto-crud/discussions/1](https://github.com/clifordpereira/nuxt-auto-crud/discussions/1)
-- **Discord:** [https://discord.gg/hGgyEaGu](https://discord.gg/hGgyEaGu)
+- **📚 Documentation:** [auto-crud.clifland.in](https://auto-crud.clifland.in/docs/auto-crud)
+- **🎬 Video Tutorials:** [YouTube Channel](https://www.youtube.com/@ClifordPereira)
+- **💬 Community:** [Discord](https://discord.gg/FBkQQfRFJM) • [GitHub Discussions](https://github.com/clifordpereira/nuxt-auto-crud/discussions/1)
+- **📦 npm:** [nuxt-auto-crud](https://www.npmjs.com/package/nuxt-auto-crud)
 
 ## 🤝 Contributing
 
