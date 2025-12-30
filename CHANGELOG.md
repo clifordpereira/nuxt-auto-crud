@@ -1,3 +1,19 @@
+## v1.22.1
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.22.0...v1.22.1)
+
+### 📖 Documentation
+
+- Update README to reflect production readiness, simplify installation, externalize detailed authentication and configuration, and streamline links. ([92ff396](https://github.com/clifordpereira/nuxt-auto-crud/commit/92ff396))
+
+### 🏡 Chore
+
+- **release:** V1.22.0 ([88fab6c](https://github.com/clifordpereira/nuxt-auto-crud/commit/88fab6c))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v1.22.0
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.21.0...v1.22.0)
