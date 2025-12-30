@@ -25,9 +25,8 @@ export default eventHandler(async (event) => {
       })
       .where(eq(schema.users.id, user.id))
 
-    const host = getRequestHeader(event, 'host') || 'localhost:3000'
-    const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http'
-    const resetUrl = `${protocol}://${host}/auth/reset-password?token=${resetToken}`
+    const url = getRequestURL(event)
+    const resetUrl = `${url.protocol}//${url.host}/auth/reset-password?token=${resetToken}`
     const config = useRuntimeConfig(event)
     const resendApiKey = config.resendApiKey
 
@@ -54,7 +53,7 @@ export default eventHandler(async (event) => {
             'Content-Type': 'application/json',
           },
           body: {
-            from: process.env.NUXT_NODEMAILER_FROM || 'Nuxt Auto CRUD <noreply@auto-crud.clifland.in>',
+            from: config.emailFrom,
             to: user.email,
             subject: 'Password Reset Request',
             html: emailTemplate,
@@ -62,13 +61,11 @@ export default eventHandler(async (event) => {
         }).catch(err => console.error('Background Email Error (Resend):', err))
       }
       else {
-        // LOCAL: Use Nodemailer (SMTP)
-        const { sendMail } = useNodeMailer()
-        await sendMail({
-          to: user.email,
-          subject: 'Password Reset Request',
-          html: emailTemplate,
-        }).catch(err => console.error('Background Email Error (Nodemailer):', err))
+        // LOCAL: Log to console (so you can copy the link in dev)
+        console.warn('--- Development Email Log ---')
+        console.warn(`To: ${user.email}`)
+        console.warn(`Reset URL: ${resetUrl}`)
+        console.warn('------------------------------')
       }
     }
 

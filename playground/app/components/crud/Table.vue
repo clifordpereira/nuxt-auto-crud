@@ -29,21 +29,33 @@ async function onDelete(id: number) {
 }
 
 const { exportToExcel, exportToPDF } = useExport()
+const appConfig = useAppConfig()
+const crudConfig = appConfig.crud
 
 const visibleColumns = computed(() => {
   if (!data.value?.length) return []
+  const hideList = crudConfig?.globalHide || ['updatedAt', 'deletedAt', 'createdBy', 'updatedBy']
   return Object.keys(data.value[0]).filter(key => 
     !forbiddenRelations.value.has(String(key)) && 
-    !['updatedAt', 'deletedAt', 'createdBy', 'updatedBy'].includes(String(key))
+    !hideList.includes(String(key))
   )
 })
 
-const getExportData = () => {
+const getExportExclusions = (type: 'pdf' | 'excel') => {
+  const config = crudConfig?.exports?.[type]
+  if (!config) return []
+  const global = config.globalExclude || []
+  const resourceSpecific = (config.resourceExclude as any)?.[props.resource] || []
+  return [...new Set([...global, ...resourceSpecific])]
+}
+
+const getExportData = (exclude: string[] = []) => {
   if (!data.value) return []
   const items = (Array.isArray(data.value) ? data.value : []) as Record<string, any>[]
   return items.map((row: Record<string, any>) => {
     const exportRow: Record<string, any> = {}
     visibleColumns.value.forEach((col) => {
+      if (exclude.includes(String(col))) return
       const label = useChangeCase(String(col).replace(/(_id|Id)$/, ''), 'capitalCase').value
       exportRow[label] = getDisplayValue(col, row[col])
     })
@@ -53,13 +65,13 @@ const getExportData = () => {
 
 const handleExportExcel = () => {
   console.log('Exporting to Excel...')
-  const exportData = getExportData()
+  const exportData = getExportData(getExportExclusions('excel'))
   exportToExcel(exportData, props.resource)
 }
 
 const handleExportPDF = () => {
   console.log('Exporting to PDF...')
-  const exportData = getExportData()
+  const exportData = getExportData(getExportExclusions('pdf'))
   const firstRow = exportData[0]
   if (!firstRow) return
   const headers = Object.keys(firstRow)

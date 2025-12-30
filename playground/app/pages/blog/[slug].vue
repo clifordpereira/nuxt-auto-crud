@@ -22,16 +22,6 @@ useSeoMeta({
   ogDescription: description,
 })
 
-if (post.value.image?.src) {
-  defineOgImage({
-    url: post.value.image.src,
-  })
-}
-else {
-  defineOgImageComponent('Saas', {
-    headline: 'Blog',
-  })
-}
 </script>
 
 <template>
