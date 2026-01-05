@@ -31,5 +31,20 @@
         "to": "/admin/resource-permissions"
       }
     ]
+  },
+  {
+    "label": "Template Models",
+    "icon": "i-lucide-layout-template",
+    "defaultOpen": false,
+    "children": [
+      {
+        "label": "Testimonials",
+        "to": "/admin/testimonials"
+      },
+      {
+        "label": "Subscribers",
+        "to": "/admin/subscribers"
+      }
+    ]
   }
 ]

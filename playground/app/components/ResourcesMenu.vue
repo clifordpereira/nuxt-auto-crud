@@ -12,10 +12,10 @@ const { hasPermission } = usePermissions()
 const resourceNames = computed(() =>
   Object.keys(schemas.value || {}).filter((name) => {
     // Exclude system tables
-    if (['users', 'roles', 'permissions', 'resources', 'roleResourcePermissions'].includes(name)) return false
+    if (['users', 'roles', 'permissions', 'resources', 'roleResourcePermissions', 'testimonials', 'subscribers'].includes(name)) return false
 
     return hasPermission(name, 'list')
-  }).sort((a, b) => b.localeCompare(a)),
+  }).sort((a, b) => b.localeCompare(a))
 )
 
 const items = computed(() => {
@@ -28,8 +28,8 @@ const items = computed(() => {
     children: resourceNames.value.map(resource => ({
       label: resource.charAt(0).toUpperCase() + resource.slice(1),
       to: `/admin/${resource}`,
-      onSelect: props.onSelect,
-    })),
+      onSelect: props.onSelect
+    }))
   }] satisfies NavigationMenuItem[]
 })
 </script>

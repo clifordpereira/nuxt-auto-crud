@@ -11,12 +11,28 @@ const { user } = useUserSession()
 const { hasPermission } = usePermissions()
 
 const mainLinks = computed(() => {
-  const links = mainMenu.map(item => ({
-    ...item,
-    onSelect: () => {
-      open.value = false
-    },
-  }))
+  const links = mainMenu.map((item) => {
+    const link = {
+      ...item,
+      onSelect: () => {
+        open.value = false
+      }
+    }
+
+    if (link.children) {
+      link.children = link.children.filter((child) => {
+        if (child.label === 'Testimonials') {
+          return hasPermission('testimonials', 'list')
+        }
+        if (child.label === 'Subscribers') {
+          return hasPermission('subscribers', 'list')
+        }
+        return true
+      })
+    }
+
+    return link
+  })
 
   return links.filter((link) => {
     if (link.label === 'Users') {
@@ -24,6 +40,9 @@ const mainLinks = computed(() => {
     }
     if (link.label === 'Roles & Permissions') {
       return (user.value as { role?: string })?.role === 'admin'
+    }
+    if (link.label === 'Template Models') {
+      return link.children && link.children.length > 0
     }
     return true
   })
@@ -33,7 +52,7 @@ const footerLinks = computed(() => footerMenu.map(item => ({
   ...item,
   onSelect: () => {
     open.value = false
-  },
+  }
 })))
 </script>
 

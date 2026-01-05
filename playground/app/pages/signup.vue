@@ -1,67 +1,67 @@
 <script setup lang="ts">
-import * as z from 'zod'
-import type { FormSubmitEvent } from '@nuxt/ui'
+import * as z from "zod";
+import type { FormSubmitEvent } from "@nuxt/ui";
 
 definePageMeta({
-  layout: 'auth',
-})
+  layout: "auth",
+});
 
 useSeoMeta({
-  title: 'Sign up',
-  description: 'Create an account to get started',
-})
+  title: "Sign up",
+  description: "Create an account to get started",
+});
 
-const toast = useToast()
+const toast = useToast();
+const { providers } = useAuthSettings();
+const { handleAuthQueryError, handleSubmitError } = useAuthErrorHandling();
 
-const fields = [{
-  name: 'name',
-  type: 'text' as const,
-  label: 'Name',
-  placeholder: 'Enter your name',
-}, {
-  name: 'email',
-  type: 'text' as const,
-  label: 'Email',
-  placeholder: 'Enter your email',
-}, {
-  name: 'password',
-  label: 'Password',
-  type: 'password' as const,
-  placeholder: 'Enter your password',
-}]
-const { fetch } = useUserSession()
+handleAuthQueryError();
 
-const providers = [{
-  label: 'Google',
-  icon: 'i-simple-icons-google',
-  onClick: () => { window.location.href = '/auth/google' },
-}, {
-  label: 'GitHub',
-  icon: 'i-simple-icons-github',
-  onClick: () => { window.location.href = '/auth/github' },
-}]
+const fields = [
+  {
+    name: "name",
+    type: "text" as const,
+    label: "Name",
+    placeholder: "Enter your name",
+  },
+  {
+    name: "email",
+    type: "text" as const,
+    label: "Email",
+    placeholder: "Enter your email",
+  },
+  {
+    name: "password",
+    label: "Password",
+    type: "password" as const,
+    placeholder: "Enter your password",
+  },
+];
+
+const { fetch } = useUserSession();
 
 const schema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  email: z.string().email('Invalid email'),
-  password: z.string().min(8, 'Must be at least 8 characters'),
-})
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email"),
+  password: z.string().min(8, "Must be at least 8 characters"),
+});
 
-type Schema = z.output<typeof schema>
+type Schema = z.output<typeof schema>;
 
 async function onSubmit(payload: FormSubmitEvent<Schema>) {
   try {
-    await $fetch('/api/auth/signup', {
-      method: 'POST',
+    await $fetch("/api/auth/signup", {
+      method: "POST",
       body: payload.data,
-    })
-    await fetch()
-    toast.add({ title: 'Success', description: 'Account created successfully' })
-    await navigateTo('/admin/dashboard')
-  }
-  catch (error) {
-    const message = (error as { data?: { message?: string } })?.data?.message || 'Signup failed'
-    toast.add({ title: 'Error', description: message, color: 'error' })
+    });
+    await fetch();
+    toast.add({
+      title: "Success",
+      description: "Account created successfully",
+    });
+    await navigateTo("/admin/dashboard");
+  } catch (error) {
+    handleSubmitError(error, "Signup failed");
   }
 }
 </script>
@@ -76,17 +76,13 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
     @submit="onSubmit"
   >
     <template #description>
-      Already have an account? <ULink
-        to="/login"
-        class="text-primary font-medium"
-      >Login</ULink>.
+      Already have an account?
+      <ULink to="/login" class="text-primary font-medium">Login</ULink>.
     </template>
 
     <template #footer>
-      By signing up, you agree to our <ULink
-        to="/"
-        class="text-primary font-medium"
-      >Terms of Service</ULink>.
+      By signing up, you agree to our
+      <ULink to="/" class="text-primary font-medium">Terms of Service</ULink>.
     </template>
   </UAuthForm>
 </template>
