@@ -1,6 +1,7 @@
 // server/api/[model]/index.post.ts
 import { eventHandler, getRouterParams, readBody } from 'h3'
 import type { H3Event } from 'h3'
+// @ts-expect-error - #imports is a virtual alias
 import { getUserSession } from '#imports'
 import { getTableForModel, filterUpdatableFields } from '../../utils/modelMapper'
 // @ts-expect-error - hub:db is a virtual alias
@@ -23,9 +24,7 @@ export default eventHandler(async (event) => {
   try {
     const session = await (getUserSession as (event: H3Event) => Promise<{ user: { id: string | number } | null }>)(event)
     if (session?.user?.id) {
-      // Check if table has columns before assigning (optional but safer if we had strict types)
-      // Since we are passing payload to .values(), extra keys might be ignored or cause error depending on driver
-      // Using 'in' table check is good practice
+      // Using 'in' table check is good practice to ensure column exists
       if ('createdBy' in table) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (payload as any).createdBy = session.user.id

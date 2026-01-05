@@ -10,9 +10,8 @@ export const posts = sqliteTable('posts', {
   content: text('content'),
   excerpt: text('excerpt'),
   coverImage: text('cover_image'),
-  userId: integer('user_id').references(() => users.id),
   categoryId: integer('category_id').references(() => categories.id),
   isPublished: integer('is_published', { mode: 'boolean' }).default(false),
-  status: text('status', { enum: ['draft', 'published', 'archived'] }).default('draft'),
+  status: text('status', { enum: ['draft', 'active', 'archived'] }).default('draft'),
   publishedAt: integer('published_at', { mode: 'timestamp' })
 })

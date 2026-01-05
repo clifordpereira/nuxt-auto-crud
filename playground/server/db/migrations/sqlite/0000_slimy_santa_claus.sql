@@ -59,11 +59,9 @@ CREATE TABLE `posts` (
 	`content` text,
 	`excerpt` text,
 	`cover_image` text,
-	`user_id` integer,
 	`category_id` integer,
 	`is_published` integer DEFAULT false,
 	`published_at` integer,
-	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`category_id`) REFERENCES `categories`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint

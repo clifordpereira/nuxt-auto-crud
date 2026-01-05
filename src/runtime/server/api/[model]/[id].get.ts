@@ -11,7 +11,7 @@ import { RecordNotFoundError } from '../../exceptions'
 
 export default eventHandler(async (event) => {
   const { model, id } = getRouterParams(event) as { model: string, id: string }
-  const isAdmin = await ensureResourceAccess(event, model, 'read')
+  const isAdmin = await ensureResourceAccess(event, model, 'read', { id })
 
   const table = getTableForModel(model) as TableWithId
 
@@ -25,11 +25,14 @@ export default eventHandler(async (event) => {
     throw new RecordNotFoundError()
   }
 
-  // Filter inactive rows for non-admins (or those without list_all) if status field exists
+  // Filter inactive rows for non-admins (or those without list_all or read_own) if status field exists
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   if ('status' in record && (record as any).status !== 'active') {
-    const canListAll = await checkAdminAccess(event, model, 'list_all')
-    if (!canListAll) {
+    const [canListAll, canReadOwn] = await Promise.all([
+      checkAdminAccess(event, model, 'list_all').catch(() => false),
+      checkAdminAccess(event, model, 'read_own', { id }).catch(() => false)
+    ])
+    if (!canListAll && !canReadOwn) {
       throw new RecordNotFoundError()
     }
   }

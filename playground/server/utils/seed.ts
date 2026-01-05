@@ -56,7 +56,7 @@ export const seedDatabase = async () => {
   }
 
   // 3. SEED PERMISSIONS
-  const permissionsToSeed = ['create', 'read', 'update', 'delete', 'update_own', 'delete_own', 'list', 'list_all']
+  const permissionsToSeed = ['create', 'read', 'read_own', 'update', 'delete', 'update_own', 'delete_own', 'list', 'list_all', 'list_own']
   const permissionIds: Record<string, number> = {}
 
   for (const code of permissionsToSeed) {
@@ -123,7 +123,7 @@ export const seedDatabase = async () => {
       } else {
         // Others (Support, Customer, User) only get control over their own records
         // Admin must explicitly grant 'read' or 'list' via the UI to show tables in their dashboard
-        permsToAssign = ['update_own', 'delete_own']
+        permsToAssign = ['list_own', 'read_own', 'update_own', 'delete_own']
       }
 
       for (const permCode of permsToAssign) {

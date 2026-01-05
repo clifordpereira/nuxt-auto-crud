@@ -172,15 +172,17 @@ const displayResources = computed(() => resources.value?.filter(r =>
   !['roles', 'permissions', 'resources', 'roleResourcePermissions'].includes(r.name)
 ) || [])
 
-const displayPermissions = computed(() => {
-  if (!permissions.value) return []
-  // 'list' = view active records only (if status col exists)
-  // 'list_all' = view all records including inactive/draft
-  const order = ['list', 'list_all', 'create', 'read', 'update', 'delete', 'update_own', 'delete_own']
-  return [...permissions.value].sort((a, b) => {
-    return order.indexOf(a.code) - order.indexOf(b.code)
-  })
-})
+const crudGroups = [
+  { label: 'List', any: 'list', anyLabel: 'Any', own: 'list_own', ownLabel: 'Own', all: 'list_all' },
+  { label: 'Read', any: 'read', anyLabel: 'Others', own: 'read_own', ownLabel: 'Own' },
+  { label: 'Create', any: 'create', anyLabel: 'Own' },
+  { label: 'Update', any: 'update', anyLabel: 'Others', own: 'update_own', ownLabel: 'Own' },
+  { label: 'Delete', any: 'delete', anyLabel: 'Others', own: 'delete_own', ownLabel: 'Own' }
+]
+
+const getPermissionId = (code: string) => {
+  return permissions.value?.find(p => p.code === code)?.id
+}
 </script>
 
 <template>
@@ -234,12 +236,12 @@ const displayPermissions = computed(() => {
                     Resource
                   </th>
                   <th
-                    v-for="perm in displayPermissions"
-                    :key="perm.id"
+                    v-for="group in crudGroups"
+                    :key="group.label"
                     scope="col"
                     class="px-6 py-3 font-medium text-center"
                   >
-                    {{ perm.name }}
+                    {{ group.label }}
                   </th>
                 </tr>
               </thead>
@@ -253,15 +255,52 @@ const displayPermissions = computed(() => {
                     {{ res.name }}
                   </td>
                   <td
-                    v-for="perm in displayPermissions"
-                    :key="perm.id"
+                    v-for="group in crudGroups"
+                    :key="group.label"
                     class="px-6 py-4 text-center"
                   >
-                    <UCheckbox
-                      :model-value="hasPermission(res.id, perm.id)"
-                      class="justify-center"
-                      @update:model-value="(val) => togglePermission(res.id, perm.id, Boolean(val))"
-                    />
+                    <div class="flex flex-col items-center gap-1.5 min-w-[120px]">
+                      <div class="flex items-center gap-4">
+                        <!-- Any/Others (Universal) -->
+                        <div v-if="group.any" class="flex flex-col items-center">
+                          <UTooltip :text="`${group.anyLabel || 'Any'} ${group.label}`">
+                            <UCheckbox
+                              :model-value="getPermissionId(group.any) ? hasPermission(res.id, getPermissionId(group.any)!) : false"
+                              :disabled="!getPermissionId(group.any)"
+                              @update:model-value="(val) => getPermissionId(group.any) && togglePermission(res.id, getPermissionId(group.any)!, Boolean(val))"
+                            />
+                          </UTooltip>
+                          <span class="text-[9px] text-gray-400 mt-0.5 uppercase">{{ group.anyLabel || 'Any' }}</span>
+                        </div>
+
+                        <!-- Own (Personal) -->
+                        <div v-if="group.own" class="flex flex-col items-center">
+                          <UTooltip :text="`${group.ownLabel || 'Own'} ${group.label} Only`">
+                            <UCheckbox
+                              :model-value="getPermissionId(group.own) ? hasPermission(res.id, getPermissionId(group.own)!) : false"
+                              :disabled="!getPermissionId(group.own)"
+                              color="primary"
+                              @update:model-value="(val) => getPermissionId(group.own) && togglePermission(res.id, getPermissionId(group.own)!, Boolean(val))"
+                            />
+                          </UTooltip>
+                          <span class="text-[9px] text-orange-500/70 mt-0.5 uppercase font-medium">{{ group.ownLabel || 'Own' }}</span>
+                        </div>
+                      </div>
+
+                      <!-- List All (Special) -->
+                      <div v-if="group.all" class="flex items-center gap-1.5 mt-1 pt-1 border-t border-gray-100 dark:border-gray-700 w-full justify-center">
+                        <UTooltip text="List All (Inc. Inactive)">
+                          <UCheckbox
+                            :model-value="getPermissionId(group.all) ? hasPermission(res.id, getPermissionId(group.all)!) : false"
+                            :disabled="!getPermissionId(group.all)"
+                            color="secondary"
+                            size="xs"
+                            @update:model-value="(val) => getPermissionId(group.all) && togglePermission(res.id, getPermissionId(group.all)!, Boolean(val))"
+                          />
+                        </UTooltip>
+                        <span class="text-[9px] text-indigo-500/70 uppercase">All Status</span>
+                      </div>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -274,12 +313,12 @@ const displayPermissions = computed(() => {
                     Resource
                   </th>
                   <th
-                    v-for="perm in displayPermissions"
-                    :key="perm.id"
+                    v-for="group in crudGroups"
+                    :key="group.label"
                     scope="col"
                     class="px-6 py-3 font-medium text-center"
                   >
-                    {{ perm.name }}
+                    {{ group.label }}
                   </th>
                 </tr>
               </tfoot>

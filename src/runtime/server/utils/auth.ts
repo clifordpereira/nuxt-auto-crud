@@ -3,6 +3,7 @@
 import type { H3Event } from 'h3'
 import { createError } from 'h3'
 
+// @ts-expect-error - #imports is a virtual alias
 import { requireUserSession, allows, getUserSession, abilities as globalAbility, abilityLogic } from '#imports'
 import { useAutoCrudConfig } from './config'
 import { verifyJwtToken } from './jwt'
@@ -43,7 +44,7 @@ export async function checkAdminAccess(event: H3Event, model: string, action: st
 
       if (!allowed) {
         // Fallback: Check for "Own Record" permission (e.g. update_own, delete_own)
-        if (user && (action === 'update' || action === 'delete') && context && typeof context === 'object' && 'id' in context) {
+        if (user && (action === 'read' || action === 'update' || action === 'delete') && context && typeof context === 'object' && 'id' in context) {
           const ownAction = `${action}_own`
           const userPermissions = user.permissions?.[model] as string[] | undefined
 
@@ -63,8 +64,6 @@ export async function checkAdminAccess(event: H3Event, model: string, action: st
               }
 
               // Standard case: Check 'createdBy' or 'userId' column for ownership
-
-              // const columns = table.columns || {}
 
               const hasCreatedBy = 'createdBy' in table
               const hasUserId = 'userId' in table

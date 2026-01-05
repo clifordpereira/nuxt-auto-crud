@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "847aa52c-dac8-4999-a10b-e832a10ec706",
+  "id": "973b31bb-b5de-4b53-83d0-2f3ab80d1c41",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "categories": {
@@ -410,13 +410,6 @@
           "notNull": false,
           "autoincrement": false
         },
-        "user_id": {
-          "name": "user_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
         "category_id": {
           "name": "category_id",
           "type": "integer",
@@ -450,19 +443,6 @@
         }
       },
       "foreignKeys": {
-        "posts_user_id_users_id_fk": {
-          "name": "posts_user_id_users_id_fk",
-          "tableFrom": "posts",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
         "posts_category_id_categories_id_fk": {
           "name": "posts_category_id_categories_id_fk",
           "tableFrom": "posts",

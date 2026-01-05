@@ -27,8 +27,8 @@ export const abilityLogic = async (user: unknown, model: string, action: string,
       }
 
       // Check ownership permissions
-      if ((action === 'update' && resourcePermissions.includes('update_own'))
-        || (action === 'delete' && resourcePermissions.includes('delete_own'))) {
+      const ownAction = `${action}_own`
+      if (resourcePermissions.includes(ownAction)) {
         if (context) {
           // Case A: Users table - User updates themselves
           if (model === 'users') {
