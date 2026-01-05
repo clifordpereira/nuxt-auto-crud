@@ -4,7 +4,7 @@ const props = defineProps<{
 }>()
 
 const iconMap: Record<string, string> = {
-  users: 'i-lucide-user',
+  users: 'i-lucide-user'
 }
 
 const stats = computed(() =>
@@ -12,8 +12,8 @@ const stats = computed(() =>
     title: resource.charAt(0).toUpperCase() + resource.slice(1),
     icon: iconMap[resource] || 'i-lucide-database',
     value: count,
-    to: `/resource/${resource}`,
-  })),
+    to: `/resource/${resource}`
+  }))
 )
 </script>
 
@@ -30,7 +30,7 @@ const stats = computed(() =>
         container: 'gap-y-1.5',
         wrapper: 'items-start',
         leading: 'p-2.5 rounded-full bg-primary/10 ring ring-inset ring-primary/25 flex-col',
-        title: 'font-normal text-muted text-xs uppercase',
+        title: 'font-normal text-muted text-xs uppercase'
       }"
       class="lg:rounded-none first:rounded-l-lg last:rounded-r-lg hover:z-1"
     >

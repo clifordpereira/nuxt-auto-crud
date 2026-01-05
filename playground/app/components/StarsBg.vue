@@ -16,8 +16,8 @@ const props = withDefaults(defineProps<{
   speed: 'normal',
   size: () => ({
     min: 1,
-    max: 2,
-  }),
+    max: 2
+  })
 })
 
 // Generate random star positions and sizes
@@ -27,14 +27,14 @@ const generateStars = (count: number): Star[] => {
     y: Math.floor(Math.random() * 2000),
     size: typeof props.size === 'number'
       ? props.size
-      : Math.random() * (props.size.max - props.size.min) + props.size.min,
+      : Math.random() * (props.size.max - props.size.min) + props.size.min
   }))
 }
 
 const speedMap = {
   slow: { duration: 200, opacity: 0.5, ratio: 0.3 },
   normal: { duration: 150, opacity: 0.75, ratio: 0.3 },
-  fast: { duration: 100, opacity: 1, ratio: 0.4 },
+  fast: { duration: 100, opacity: 1, ratio: 0.4 }
 }
 
 const stars = ref<{ slow: Star[], normal: Star[], fast: Star[] }>({ slow: [], normal: [], fast: [] })
@@ -45,7 +45,7 @@ onMounted(() => {
     stars.value = {
       slow: generateStars(Math.floor(props.starCount * speedMap.slow.ratio)),
       normal: generateStars(Math.floor(props.starCount * speedMap.normal.ratio)),
-      fast: generateStars(Math.floor(props.starCount * speedMap.fast.ratio)),
+      fast: generateStars(Math.floor(props.starCount * speedMap.fast.ratio))
     }
     isMounted.value = true
   }, 100)
@@ -55,7 +55,7 @@ onMounted(() => {
 const starLayers = computed(() => [
   { stars: stars.value.fast, ...speedMap.fast },
   { stars: stars.value.normal, ...speedMap.normal },
-  { stars: stars.value.slow, ...speedMap.slow },
+  { stars: stars.value.slow, ...speedMap.slow }
 ])
 </script>
 
@@ -129,7 +129,7 @@ const starLayers = computed(() => [
         :style="{
           '--star-duration': `${layer.duration}s`,
           '--star-opacity': layer.opacity,
-          '--star-color': color,
+          '--star-color': color
         }"
       >
         <div
@@ -142,7 +142,7 @@ const starLayers = computed(() => [
             width: `${star.size}px`,
             height: `${star.size}px`,
             backgroundColor: 'var(--star-color)',
-            opacity: 'var(--star-opacity)',
+            opacity: 'var(--star-opacity)'
           }"
         />
       </div>

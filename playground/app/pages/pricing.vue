@@ -8,7 +8,7 @@ useSeoMeta({
   title,
   ogTitle: title,
   description,
-  ogDescription: description,
+  ogDescription: description
 })
 
 const isYearly = ref('0')
@@ -16,12 +16,12 @@ const isYearly = ref('0')
 const items = ref([
   {
     label: 'Monthly',
-    value: '0',
+    value: '0'
   },
   {
     label: 'Yearly',
-    value: '1',
-  },
+    value: '1'
+  }
 ])
 </script>
 
@@ -41,7 +41,7 @@ const items = ref([
           :ui="{
             list: 'ring ring-accented rounded-full',
             indicator: 'rounded-full',
-            trigger: 'w-1/2',
+            trigger: 'w-1/2'
           }"
         />
       </template>
@@ -82,7 +82,7 @@ const items = ref([
         class="max-w-3xl mx-auto"
         :ui="{
           trigger: 'text-base text-highlighted',
-          body: 'text-base text-muted',
+          body: 'text-base text-muted'
         }"
       />
     </UPageSection>

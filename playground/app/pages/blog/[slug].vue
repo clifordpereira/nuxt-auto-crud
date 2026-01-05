@@ -8,7 +8,7 @@ if (!post.value) {
 
 const { data: surround } = await useAsyncData(`${route.path}-surround`, () => {
   return queryCollectionItemSurroundings('posts', route.path, {
-    fields: ['description'],
+    fields: ['description']
   })
 })
 
@@ -19,7 +19,7 @@ useSeoMeta({
   title,
   ogTitle: title,
   description,
-  ogDescription: description,
+  ogDescription: description
 })
 </script>
 

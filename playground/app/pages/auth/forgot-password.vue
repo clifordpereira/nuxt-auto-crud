@@ -3,12 +3,12 @@ import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
 
 definePageMeta({
-  layout: 'auth',
+  layout: 'auth'
 })
 
 useSeoMeta({
   title: 'Forgot Password',
-  description: 'Reset your password to regain access',
+  description: 'Reset your password to regain access'
 })
 
 const toast = useToast()
@@ -21,11 +21,11 @@ const fields = [{
   type: 'text' as const,
   label: 'Email',
   placeholder: 'Enter your email',
-  required: true,
+  required: true
 }]
 
 const schema = z.object({
-  email: z.string().email('Invalid email'),
+  email: z.string().email('Invalid email')
 })
 
 type Schema = z.output<typeof schema>
@@ -36,19 +36,17 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
   try {
     await $fetch('/api/auth/forgot-password', {
       method: 'POST',
-      body: payload.data,
+      body: payload.data
     })
     success.value = true
-  }
-  catch (err: unknown) {
+  } catch (err: unknown) {
     const message = (err as { data?: { message?: string } })?.data?.message || 'Something went wrong'
     toast.add({
       title: 'Error',
       description: message,
-      color: 'error',
+      color: 'error'
     })
-  }
-  finally {
+  } finally {
     loading.value = false
   }
 }

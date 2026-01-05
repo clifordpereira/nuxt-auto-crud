@@ -14,7 +14,7 @@ export const useExport = () => {
     const doc = new jsPDF({
       orientation: 'landscape',
       unit: 'mm',
-      format: 'a4',
+      format: 'a4'
     })
 
     const title = fileName.replace(/_/g, ' ').toUpperCase()
@@ -45,10 +45,10 @@ export const useExport = () => {
         textColor: [255, 255, 255],
         fontStyle: 'bold',
         lineWidth: 0.1,
-        halign: 'left',
+        halign: 'left'
       },
       alternateRowStyles: {
-        fillColor: [248, 250, 252], // Slate 50
+        fillColor: [248, 250, 252] // Slate 50
       },
       styles: {
         fontSize: 9,
@@ -56,7 +56,7 @@ export const useExport = () => {
         cellPadding: 3,
         overflow: 'linebreak',
         textColor: [51, 65, 85], // Slate 700
-        lineColor: [226, 232, 240], // Slate 200
+        lineColor: [226, 232, 240] // Slate 200
       },
       margin: { top: 35, right: 14, bottom: 20, left: 14 },
       didDrawPage: (data) => {
@@ -71,7 +71,7 @@ export const useExport = () => {
         const str = 'Page ' + data.pageNumber
         doc.text(str, pageWidth - 30, pageHeight - 10)
         doc.text('Confidential - Internal Use Only', 14, pageHeight - 10)
-      },
+      }
     })
 
     doc.save(`${fileName}_${new Date().getTime()}.pdf`)
@@ -79,6 +79,6 @@ export const useExport = () => {
 
   return {
     exportToExcel,
-    exportToPDF,
+    exportToPDF
   }
 }

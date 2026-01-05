@@ -7,50 +7,50 @@ useHead({
   meta: [
     { charset: 'utf-8' },
     { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-    { key: 'theme-color', name: 'theme-color', content: color },
+    { key: 'theme-color', name: 'theme-color', content: color }
   ],
   link: [
     { rel: 'icon', href: '/favicon_io/favicon.ico' },
     { rel: 'apple-touch-icon', sizes: '180x180', href: '/favicon_io/apple-touch-icon.png' },
     { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon_io/favicon-32x32.png' },
     { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon_io/favicon-16x16.png' },
-    { rel: 'manifest', href: '/favicon_io/site.webmanifest' },
+    { rel: 'manifest', href: '/favicon_io/site.webmanifest' }
   ],
   htmlAttrs: {
-    lang: 'en',
-  },
+    lang: 'en'
+  }
 })
 
 useSeoMeta({
   titleTemplate: '%s - Nuxt Auto CRUD',
   ogImage: '/favicon_io/android-chrome-192x192.png',
   twitterImage: '/favicon_io/android-chrome-192x192.png',
-  twitterCard: 'summary_large_image',
+  twitterCard: 'summary_large_image'
 })
 
 const { data: navigation } = await useAsyncData('navigation', () => queryCollectionNavigation('docs'), {
-  transform: data => data.find(item => item.path === '/docs')?.children || [],
+  transform: data => data.find(item => item.path === '/docs')?.children || []
 })
 const { data: files } = useLazyAsyncData('search', () => queryCollectionSearchSections('docs'), {
-  server: false,
+  server: false
 })
 
 const links = [{
   label: 'Docs',
   icon: 'i-lucide-book',
-  to: '/docs/auto-crud',
+  to: '/docs/auto-crud'
 }, {
   label: 'Pricing',
   icon: 'i-lucide-credit-card',
-  to: '/pricing',
+  to: '/pricing'
 }, {
   label: 'Blog',
   icon: 'i-lucide-pencil',
-  to: '/blog',
+  to: '/blog'
 }, {
   label: 'Changelog',
   icon: 'i-lucide-history',
-  to: '/changelog',
+  to: '/changelog'
 }]
 
 provide('navigation', navigation)

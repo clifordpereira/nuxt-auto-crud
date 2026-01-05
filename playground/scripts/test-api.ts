@@ -22,17 +22,16 @@ async function testScenario(role: string, email: string) {
       if (setCookie) {
         cookies = [setCookie.split(';')[0]]
       }
-    },
+    }
   })
 
   try {
     await client('/api/auth/login', {
       method: 'POST',
-      body: { email, password: '$1Password' },
+      body: { email, password: '$1Password' }
     })
     console.log('✅ Login successful')
-  }
-  catch (e) {
+  } catch (e) {
     console.error('❌ Login failed:', e)
     return
   }
@@ -43,13 +42,11 @@ async function testScenario(role: string, email: string) {
     const response = await client('/api/users')
     users = response.data || response
     console.log(`✅ List Users: Allowed (${users.length} users found)`)
-  }
-  catch (error: unknown) {
+  } catch (error: unknown) {
     const e = error as { statusCode: number }
     if (e.statusCode === 403 || e.statusCode === 401) {
       console.log('🚫 List Users: Denied')
-    }
-    else {
+    } else {
       console.log(`❌ List Users: Failed with ${e.statusCode}`)
     }
   }
@@ -62,28 +59,24 @@ async function testScenario(role: string, email: string) {
       body: {
         email: `test-${role}-${Date.now()}@example.com`,
         password: 'password',
-        name: 'Test User',
-      },
+        name: 'Test User'
+      }
     })
     createdUserId = newUser.id
     if (role === 'Admin') {
       console.log('✅ Create User: Allowed (Expected for Admin)')
-    }
-    else {
+    } else {
       console.log('⚠️ Create User: Allowed (Unexpected for ' + role + ')')
     }
-  }
-  catch (error: unknown) {
+  } catch (error: unknown) {
     const e = error as { statusCode: number }
     if (e.statusCode === 403 || e.statusCode === 401) {
       if (role !== 'Admin') {
         console.log(`✅ Create User: Denied (Expected for ${role})`)
-      }
-      else {
+      } else {
         console.log(`❌ Create User: Denied (Unexpected for Admin)`)
       }
-    }
-    else {
+    } else {
       console.log(`❌ Create User: Failed with ${e.statusCode}`)
     }
   }
@@ -98,21 +91,18 @@ async function testScenario(role: string, email: string) {
   if (targetId) {
     try {
       await client(`/api/users/${targetId}`, {
-        method: 'DELETE',
+        method: 'DELETE'
       })
       console.log(`⚠️ Delete User: Allowed (Unexpected for ${role} based on config)`)
-    }
-    catch (error: unknown) {
+    } catch (error: unknown) {
       const e = error as { statusCode: number }
       if (e.statusCode === 403 || e.statusCode === 401) {
         console.log(`✅ Delete User: Denied (Expected for ${role})`)
-      }
-      else {
+      } else {
         console.log(`❌ Delete User: Failed with ${e.statusCode}`)
       }
     }
-  }
-  else {
+  } else {
     console.log('ℹ️ Skipping Delete User test (no user created to delete)')
   }
 }

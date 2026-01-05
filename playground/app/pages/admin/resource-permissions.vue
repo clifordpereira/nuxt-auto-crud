@@ -26,7 +26,7 @@ interface RoleResourcePermission {
 
 definePageMeta({
   layout: 'dashboard',
-  middleware: 'auth',
+  middleware: 'auth'
 })
 
 const config = useRuntimeConfig().public
@@ -35,24 +35,24 @@ const toast = useToast()
 
 // Fetch all necessary data
 const { data: roles } = await useFetch<Role[]>(`${crudBaseUrl}/roles`, {
-  headers: crudHeaders(),
+  headers: crudHeaders()
 })
 
 const { data: resources } = await useFetch<Resource[]>(`${crudBaseUrl}/resources`, {
-  headers: crudHeaders(),
+  headers: crudHeaders()
 })
 
 const { data: permissions } = await useFetch<Permission[]>(`${crudBaseUrl}/permissions`, {
-  headers: crudHeaders(),
+  headers: crudHeaders()
 })
 
 const { data: roleResourcePermissions, refresh } = await useFetch<RoleResourcePermission[]>(`${crudBaseUrl}/roleResourcePermissions`, {
-  headers: crudHeaders(),
+  headers: crudHeaders()
 })
 
 const items = computed(() => roles.value?.filter(r => r.name !== 'admin').map(role => ({
   label: role.name,
-  roleId: role.id,
+  roleId: role.id
 })) || [])
 
 const selectedIndex = ref(0)
@@ -92,8 +92,7 @@ const togglePermission = (resourceId: number, permissionId: number, value: boole
   const key = `${resourceId}-${permissionId}`
   if (value) {
     localPermissions.value.set(key, true)
-  }
-  else {
+  } else {
     localPermissions.value.delete(key)
   }
   isDirty.value = true
@@ -142,7 +141,7 @@ const saveChanges = async () => {
       promises.push($fetch(`${crudBaseUrl}/roleResourcePermissions`, {
         method: 'POST',
         headers: crudHeaders(),
-        body: item,
+        body: item
       }))
     }
 
@@ -151,7 +150,7 @@ const saveChanges = async () => {
       promises.push($fetch(`${crudBaseUrl}/roleResourcePermissions/${id}`, {
         method: 'DELETE',
         headers: crudHeaders(),
-        body: undefined, // Explicitly undefined for DELETE generally, though not strictly needed
+        body: undefined // Explicitly undefined for DELETE generally, though not strictly needed
       }))
     }
 
@@ -160,19 +159,17 @@ const saveChanges = async () => {
     await refresh()
     isDirty.value = false
     toast.add({ title: 'Success', description: 'Permissions updated successfully.' })
-  }
-  catch (error) {
+  } catch (error) {
     console.error('Failed to save permissions:', error)
     toast.add({ title: 'Error', description: 'Failed to save permissions.', color: 'error' })
-  }
-  finally {
+  } finally {
     isSaving.value = false
   }
 }
 
 // Filter out system resources
 const displayResources = computed(() => resources.value?.filter(r =>
-  !['roles', 'permissions', 'resources', 'roleResourcePermissions'].includes(r.name),
+  !['roles', 'permissions', 'resources', 'roleResourcePermissions'].includes(r.name)
 ) || [])
 
 const displayPermissions = computed(() => {
