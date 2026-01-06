@@ -1,3 +1,15 @@
+## v1.24.0
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.23.1...v1.24.0)
+
+### 🚀 Enhancements
+
+- Import createError from h3 ([7b61ce4](https://github.com/clifordpereira/nuxt-auto-crud/commit/7b61ce4))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v1.23.1
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.23.0...v1.23.1)
