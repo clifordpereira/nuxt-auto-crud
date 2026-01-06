@@ -7,7 +7,8 @@ import { UserAlreadyExistsError } from '../../utils/errors'
 const signupSchema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
-  password: z.string().min(8)
+  password: z.string().min(8),
+  roleId: z.coerce.number().optional()
 })
 
 export default eventHandler(async (event) => {
@@ -25,13 +26,22 @@ export default eventHandler(async (event) => {
   // Get default role (user)
   const defaultRole = await db.select().from(schema.roles).where(eq(schema.roles.name, 'user')).get()
 
+  // Use provided roleId if it exists and is NOT a protected role
+  let roleToAssign = defaultRole
+  if (body.roleId) {
+    const requestedRole = await db.select().from(schema.roles).where(eq(schema.roles.id, body.roleId)).get()
+    if (requestedRole && !['public', 'user', 'manager', 'admin'].includes(requestedRole.name)) {
+      roleToAssign = requestedRole
+    }
+  }
+
   // Insert user
   const user = await db.insert(schema.users).values({
     name: body.name,
     email: body.email,
     password: hashedPassword,
     status: 'active',
-    roleId: defaultRole?.id
+    roleId: roleToAssign?.id
   }).returning().get()
 
   // Fetch permissions
@@ -63,7 +73,7 @@ export default eventHandler(async (event) => {
       email: user.email,
       name: user.name,
       avatar: user.avatar,
-      role: defaultRole?.name || 'user',
+      role: roleToAssign?.name || 'user',
       permissions
     }
   })

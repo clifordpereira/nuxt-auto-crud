@@ -31,7 +31,7 @@ export const seedDatabase = async () => {
   }
 
   // 2. SEED RESOURCES
-  const excludedTables = ['roles', 'permissions', 'resources', 'roleResourcePermissions', 'systemFields', 'baseFields']
+  const excludedTables = ['permissions', 'resources', 'roleResourcePermissions', 'systemFields', 'baseFields']
   const resourcesToSeed = Object.keys(schema).filter(key =>
     !key.endsWith('Relations') && !excludedTables.includes(key)
   )
@@ -137,7 +137,8 @@ export const seedDatabase = async () => {
   if (publicRoleId) {
     const publicGrants: Record<string, string[]> = {
       testimonials: ['list', 'read', 'create'],
-      subscribers: ['create']
+      subscribers: ['create'],
+      roles: ['list']
     }
 
     for (const [resourceName, perms] of Object.entries(publicGrants)) {

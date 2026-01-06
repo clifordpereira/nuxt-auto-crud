@@ -1,6 +1,8 @@
 import { defineAbility } from 'nuxt-authorization/utils'
 
-let publicPermissionsPromise: Promise<Record<string, string[]>> | null = null
+let publicPermissionsCache: Record<string, string[]> | null = null
+let lastFetchTime = 0
+const TTL = 60000 // 60 seconds cache for abilities logic fallback
 
 interface User {
   id?: string | number
@@ -53,15 +55,19 @@ export const abilityLogic = async (user: unknown, model: string, action: string,
 
   // 3. Fallback: Check Public/Unauthenticated Access
   // (Allows logged-in users to perform public actions if they don't have explicit overrides)
-  if (!publicPermissionsPromise) {
-    publicPermissionsPromise = $fetch<Record<string, string[]>>('/api/public-permissions')
-      .catch((e) => {
-        console.error('Failed to fetch public permissions', e)
-        publicPermissionsPromise = null
-        return {}
-      })
+  const now = Date.now()
+  if (!publicPermissionsCache || (now - lastFetchTime > TTL)) {
+    try {
+      // Use $fetch which handles both client and server (Nitro internal fetch)
+      publicPermissionsCache = await $fetch<Record<string, string[]>>('/api/public-permissions')
+      lastFetchTime = now
+    } catch (e) {
+      console.error('Failed to fetch public permissions', e)
+      // Don't overwrite cache if it exists, so we have stale-while-revalidate behavior
+      publicPermissionsCache = publicPermissionsCache || {}
+    }
   }
-  const publicPermissions = await publicPermissionsPromise
+  const publicPermissions = publicPermissionsCache || {}
   const resourcePublicPermissions = publicPermissions[model]
 
   if (Array.isArray(resourcePublicPermissions)) {

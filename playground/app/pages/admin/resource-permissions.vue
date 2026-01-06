@@ -169,7 +169,7 @@ const saveChanges = async () => {
 
 // Filter out system resources
 const displayResources = computed(() => resources.value?.filter(r =>
-  !['roles', 'permissions', 'resources', 'roleResourcePermissions'].includes(r.name)
+  !['permissions', 'resources', 'roleResourcePermissions'].includes(r.name)
 ) || [])
 
 const crudGroups = [
