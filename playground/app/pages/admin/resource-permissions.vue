@@ -26,7 +26,7 @@ interface RoleResourcePermission {
 
 definePageMeta({
   layout: 'dashboard',
-  middleware: 'auth'
+  middleware: 'auth',
 })
 
 const config = useRuntimeConfig().public
@@ -35,24 +35,24 @@ const toast = useToast()
 
 // Fetch all necessary data
 const { data: roles } = await useFetch<Role[]>(`${crudBaseUrl}/roles`, {
-  headers: crudHeaders()
+  headers: crudHeaders(),
 })
 
 const { data: resources } = await useFetch<Resource[]>(`${crudBaseUrl}/resources`, {
-  headers: crudHeaders()
+  headers: crudHeaders(),
 })
 
 const { data: permissions } = await useFetch<Permission[]>(`${crudBaseUrl}/permissions`, {
-  headers: crudHeaders()
+  headers: crudHeaders(),
 })
 
 const { data: roleResourcePermissions, refresh } = await useFetch<RoleResourcePermission[]>(`${crudBaseUrl}/roleResourcePermissions`, {
-  headers: crudHeaders()
+  headers: crudHeaders(),
 })
 
 const items = computed(() => roles.value?.filter(r => r.name !== 'admin').map(role => ({
   label: role.name,
-  roleId: role.id
+  roleId: role.id,
 })) || [])
 
 const selectedIndex = ref(0)
@@ -92,7 +92,8 @@ const togglePermission = (resourceId: number, permissionId: number, value: boole
   const key = `${resourceId}-${permissionId}`
   if (value) {
     localPermissions.value.set(key, true)
-  } else {
+  }
+  else {
     localPermissions.value.delete(key)
   }
   isDirty.value = true
@@ -141,7 +142,7 @@ const saveChanges = async () => {
       promises.push($fetch(`${crudBaseUrl}/roleResourcePermissions`, {
         method: 'POST',
         headers: crudHeaders(),
-        body: item
+        body: item,
       }))
     }
 
@@ -150,7 +151,7 @@ const saveChanges = async () => {
       promises.push($fetch(`${crudBaseUrl}/roleResourcePermissions/${id}`, {
         method: 'DELETE',
         headers: crudHeaders(),
-        body: undefined // Explicitly undefined for DELETE generally, though not strictly needed
+        body: undefined, // Explicitly undefined for DELETE generally, though not strictly needed
       }))
     }
 
@@ -159,17 +160,19 @@ const saveChanges = async () => {
     await refresh()
     isDirty.value = false
     toast.add({ title: 'Success', description: 'Permissions updated successfully.' })
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Failed to save permissions:', error)
     toast.add({ title: 'Error', description: 'Failed to save permissions.', color: 'error' })
-  } finally {
+  }
+  finally {
     isSaving.value = false
   }
 }
 
 // Filter out system resources
 const displayResources = computed(() => resources.value?.filter(r =>
-  !['permissions', 'resources', 'roleResourcePermissions'].includes(r.name)
+  !['permissions', 'resources', 'roleResourcePermissions'].includes(r.name),
 ) || [])
 
 const crudGroups = [
@@ -177,7 +180,7 @@ const crudGroups = [
   { label: 'Read', any: 'read', anyLabel: 'Others', own: 'read_own', ownLabel: 'Own' },
   { label: 'Create', any: 'create', anyLabel: 'Own' },
   { label: 'Update', any: 'update', anyLabel: 'Others', own: 'update_own', ownLabel: 'Own', status: 'update_status' },
-  { label: 'Delete', any: 'delete', anyLabel: 'Others', own: 'delete_own', ownLabel: 'Own' }
+  { label: 'Delete', any: 'delete', anyLabel: 'Others', own: 'delete_own', ownLabel: 'Own' },
 ]
 
 const getPermissionId = (code: string) => {
@@ -262,7 +265,10 @@ const getPermissionId = (code: string) => {
                     <div class="flex flex-col items-center gap-1.5 min-w-[120px]">
                       <div class="flex items-center gap-4">
                         <!-- Any/Others (Universal) -->
-                        <div v-if="group.any" class="flex flex-col items-center">
+                        <div
+                          v-if="group.any"
+                          class="flex flex-col items-center"
+                        >
                           <UTooltip :text="`${group.anyLabel || 'Any'} ${group.label}`">
                             <UCheckbox
                               :model-value="getPermissionId(group.any) ? hasPermission(res.id, getPermissionId(group.any)!) : false"
@@ -274,7 +280,10 @@ const getPermissionId = (code: string) => {
                         </div>
 
                         <!-- Own (Personal) -->
-                        <div v-if="group.own" class="flex flex-col items-center">
+                        <div
+                          v-if="group.own"
+                          class="flex flex-col items-center"
+                        >
                           <UTooltip :text="`${group.ownLabel || 'Own'} ${group.label} Only`">
                             <UCheckbox
                               :model-value="getPermissionId(group.own) ? hasPermission(res.id, getPermissionId(group.own)!) : false"
@@ -288,7 +297,10 @@ const getPermissionId = (code: string) => {
                       </div>
 
                       <!-- List All (Special) -->
-                      <div v-if="group.all" class="flex items-center gap-1.5 mt-1 pt-1 border-t border-gray-100 dark:border-gray-700 w-full justify-center">
+                      <div
+                        v-if="group.all"
+                        class="flex items-center gap-1.5 mt-1 pt-1 border-t border-gray-100 dark:border-gray-700 w-full justify-center"
+                      >
                         <UTooltip text="List All (Inc. Inactive)">
                           <UCheckbox
                             :model-value="getPermissionId(group.all) ? hasPermission(res.id, getPermissionId(group.all)!) : false"
@@ -302,7 +314,10 @@ const getPermissionId = (code: string) => {
                       </div>
 
                       <!-- Update Status (Special) -->
-                      <div v-if="group.status" class="flex items-center gap-1.5 mt-1 pt-1 border-t border-gray-100 dark:border-gray-700 w-full justify-center">
+                      <div
+                        v-if="group.status"
+                        class="flex items-center gap-1.5 mt-1 pt-1 border-t border-gray-100 dark:border-gray-700 w-full justify-center"
+                      >
                         <UTooltip text="Update Status Permission">
                           <UCheckbox
                             :model-value="getPermissionId(group.status) ? hasPermission(res.id, getPermissionId(group.status)!) : false"

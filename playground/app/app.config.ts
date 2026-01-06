@@ -2,8 +2,8 @@ export default defineAppConfig({
   ui: {
     colors: {
       primary: 'blue',
-      neutral: 'slate'
-    }
+      neutral: 'slate',
+    },
   },
   crud: {
     // Columns to always hide from the UI table
@@ -15,15 +15,15 @@ export default defineAppConfig({
         globalExclude: ['avatar', 'resetToken', 'resetExpires'],
         // Resource specific overrides
         resourceExclude: {
-          users: ['password', 'googleId', 'githubId']
-        }
+          users: ['password', 'googleId', 'githubId'],
+        },
       },
       excel: {
         globalExclude: [],
         resourceExclude: {
-          users: ['password']
-        }
-      }
-    }
-  }
+          users: ['password'],
+        },
+      },
+    },
+  },
 })

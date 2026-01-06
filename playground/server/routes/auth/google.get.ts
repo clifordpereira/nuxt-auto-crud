@@ -5,11 +5,11 @@ export default defineOAuthGoogleEventHandler({
       name: oauthUser.name,
       avatar: oauthUser.picture,
       providerId: oauthUser.sub,
-      provider: 'google'
+      provider: 'google',
     })
   },
   onError(event, error) {
     console.error('Google OAuth error:', error)
     return sendRedirect(event, '/login?auth_error=google')
-  }
+  },
 })

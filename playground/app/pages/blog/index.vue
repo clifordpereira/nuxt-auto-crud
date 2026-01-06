@@ -11,7 +11,7 @@ useSeoMeta({
   title,
   ogTitle: title,
   description,
-  ogDescription: description
+  ogDescription: description,
 })
 </script>
 
@@ -38,7 +38,7 @@ useSeoMeta({
           :class="[index === 0 && 'col-span-full']"
           variant="naked"
           :ui="{
-            description: 'line-clamp-2'
+            description: 'line-clamp-2',
           }"
         />
       </UBlogPosts>

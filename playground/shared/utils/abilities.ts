@@ -61,7 +61,8 @@ export const abilityLogic = async (user: unknown, model: string, action: string,
       // Use $fetch which handles both client and server (Nitro internal fetch)
       publicPermissionsCache = await $fetch<Record<string, string[]>>('/api/public-permissions')
       lastFetchTime = now
-    } catch (e) {
+    }
+    catch (e) {
       console.error('Failed to fetch public permissions', e)
       // Don't overwrite cache if it exists, so we have stale-while-revalidate behavior
       publicPermissionsCache = publicPermissionsCache || {}

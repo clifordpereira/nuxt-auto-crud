@@ -1,7 +1,7 @@
 // composables/useFormState.ts
 export function useFormState(
   fields: { name: string, type: string, required?: boolean }[],
-  initialState?: Record<string, unknown>
+  initialState?: Record<string, unknown>,
 ) {
   const state = reactive<Record<string, unknown>>({})
 

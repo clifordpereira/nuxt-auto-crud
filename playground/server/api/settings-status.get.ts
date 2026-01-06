@@ -1,10 +1,10 @@
 // server/api/settings-status.get.ts
 
 export default defineEventHandler((event) => {
-  const config = useRuntimeConfig(event);
+  const config = useRuntimeConfig(event)
 
-  const DEFAULT_ADMIN_EMAIL = "admin@example.com";
-  const DEFAULT_ADMIN_PASSWORD = "$1Password";
+  const DEFAULT_ADMIN_EMAIL = 'admin@example.com'
+  const DEFAULT_ADMIN_PASSWORD = '$1Password'
 
   return {
     // Session Password Checks
@@ -37,5 +37,5 @@ export default defineEventHandler((event) => {
       config.oauth.github.clientId && config.oauth.google.clientId
     ),
     isEmailFullyConfigured: !!(config.emailFrom && config.resendApiKey),
-  };
-});
+  }
+})

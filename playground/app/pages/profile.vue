@@ -4,7 +4,7 @@ import type { FormSubmitEvent } from '#ui/types'
 
 definePageMeta({
   middleware: 'auth',
-  layout: 'dashboard'
+  layout: 'dashboard',
 })
 
 const { user, fetch: refreshSession } = useUserSession()
@@ -14,7 +14,7 @@ const schema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Invalid email'),
   avatar: z.string().url('Must be a valid URL').optional().or(z.literal('')),
-  password: z.string().min(6, 'Password must be at least 6 characters').optional().or(z.literal(''))
+  password: z.string().min(6, 'Password must be at least 6 characters').optional().or(z.literal('')),
 })
 
 type Schema = z.output<typeof schema>
@@ -25,14 +25,14 @@ const state = reactive({
   name: user.value?.name || '',
   email: user.value?.email || '',
   avatar: user.value?.avatar || '',
-  password: ''
+  password: '',
 })
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
   try {
     const payload = {
       name: event.data.name,
-      avatar: event.data.avatar
+      avatar: event.data.avatar,
     }
 
     // Only send password if provided
@@ -45,7 +45,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
     await $fetch(`/api/users/${userId}`, {
       method: 'PATCH',
-      body: payload
+      body: payload,
     })
 
     await $fetch('/api/auth/refresh', { method: 'POST' })
@@ -54,12 +54,13 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
     // Reset password field
     state.password = ''
-  } catch (error: unknown) {
+  }
+  catch (error: unknown) {
     const err = error as { data?: { message?: string }, message: string }
     toast.add({
       title: 'Update failed',
       description: err.data?.message || err.message,
-      color: 'error'
+      color: 'error',
     })
   }
 }

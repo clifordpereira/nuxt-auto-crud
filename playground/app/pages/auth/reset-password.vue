@@ -3,12 +3,12 @@ import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
 
 definePageMeta({
-  layout: 'auth'
+  layout: 'auth',
 })
 
 useSeoMeta({
   title: 'Reset Password',
-  description: 'Enter your new password below'
+  description: 'Enter your new password below',
 })
 
 const route = useRoute()
@@ -22,21 +22,21 @@ const fields = [{
   type: 'password' as const,
   label: 'New Password',
   placeholder: 'Enter your new password',
-  required: true
+  required: true,
 }, {
   name: 'confirmPassword',
   type: 'password' as const,
   label: 'Confirm Password',
   placeholder: 'Confirm your new password',
-  required: true
+  required: true,
 }]
 
 const schema = z.object({
   password: z.string().min(8, 'Must be at least 8 characters'),
-  confirmPassword: z.string().min(8, 'Must be at least 8 characters')
+  confirmPassword: z.string().min(8, 'Must be at least 8 characters'),
 }).refine(data => data.password === data.confirmPassword, {
   message: 'Passwords don\'t match',
-  path: ['confirmPassword']
+  path: ['confirmPassword'],
 })
 
 type Schema = z.output<typeof schema>
@@ -53,22 +53,24 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
       method: 'POST',
       body: {
         token,
-        password: payload.data.password
-      }
+        password: payload.data.password,
+      },
     })
     success.value = true
     toast.add({ title: 'Success', description: 'Password reset successfully' })
     setTimeout(() => {
       navigateTo('/login')
     }, 2000)
-  } catch (err: unknown) {
+  }
+  catch (err: unknown) {
     const message = (err as { data?: { message?: string } })?.data?.message || 'Something went wrong'
     toast.add({
       title: 'Error',
       description: message,
-      color: 'error'
+      color: 'error',
     })
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }

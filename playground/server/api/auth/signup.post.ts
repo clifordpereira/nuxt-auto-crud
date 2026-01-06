@@ -8,7 +8,7 @@ const signupSchema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
   password: z.string().min(8),
-  roleId: z.coerce.number().optional()
+  roleId: z.coerce.number().optional(),
 })
 
 export default eventHandler(async (event) => {
@@ -41,7 +41,7 @@ export default eventHandler(async (event) => {
     email: body.email,
     password: hashedPassword,
     status: 'active',
-    roleId: roleToAssign?.id
+    roleId: roleToAssign?.id,
   }).returning().get()
 
   // Fetch permissions
@@ -50,7 +50,7 @@ export default eventHandler(async (event) => {
   if (user.roleId) {
     const permissionsData = await db.select({
       resource: schema.resources.name,
-      action: schema.permissions.code
+      action: schema.permissions.code,
     })
       .from(schema.roleResourcePermissions)
       .innerJoin(schema.resources, eq(schema.roleResourcePermissions.resourceId, schema.resources.id))
@@ -74,8 +74,8 @@ export default eventHandler(async (event) => {
       name: user.name,
       avatar: user.avatar,
       role: roleToAssign?.name || 'user',
-      permissions
-    }
+      permissions,
+    },
   })
 
   return { user }

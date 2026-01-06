@@ -1,4 +1,5 @@
 // server/api/[model]/index.get.ts
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { eventHandler, getRouterParams } from 'h3'
 import { getTableForModel } from '../../utils/modelMapper'
 // @ts-expect-error - hub:db is a virtual alias
@@ -22,7 +23,7 @@ export default eventHandler(async (event) => {
   const [anyAccess, allAccess, ownAccess] = await Promise.all([
     checkAdminAccess(event, model, 'list').catch(() => false),
     checkAdminAccess(event, model, 'list_all').catch(() => false),
-    checkAdminAccess(event, model, 'list_own').catch(() => false)
+    checkAdminAccess(event, model, 'list_own').catch(() => false),
   ])
 
   canListAny = anyAccess
@@ -45,31 +46,37 @@ export default eventHandler(async (event) => {
 
   if (canListAll) {
     // No filters needed for List All
-  } else if (canListAny && canListOwn && userId) {
+  }
+  else if (canListAny && canListOwn && userId) {
     // Can see everyone's ACTIVE records OR OWN records (any status)
-    const ownershipFilter = 'createdBy' in columns 
-      ? eq((table as any).createdBy, userId) 
+    const ownershipFilter = 'createdBy' in columns
+      ? eq((table as any).createdBy, userId)
       : ('userId' in columns ? eq((table as any).userId, userId) : null)
-    
+
     const activeFilter = 'status' in columns ? eq((table as any).status, 'active') : null
 
     if (ownershipFilter && activeFilter) {
       filters.push(or(activeFilter, ownershipFilter))
-    } else if (activeFilter) {
+    }
+    else if (activeFilter) {
       filters.push(activeFilter)
-    } else if (ownershipFilter) {
+    }
+    else if (ownershipFilter) {
       filters.push(ownershipFilter)
     }
-  } else if (canListAny) {
+  }
+  else if (canListAny) {
     // Only Any: see everyone's ACTIVE records
     if ('status' in columns) {
       filters.push(eq((table as any).status, 'active'))
     }
-  } else if (canListOwn && userId) {
+  }
+  else if (canListOwn && userId) {
     // Only Own: see ONLY own records (all statuses)
     if ('createdBy' in columns) {
       filters.push(eq((table as any).createdBy, userId))
-    } else if ('userId' in columns) {
+    }
+    else if ('userId' in columns) {
       filters.push(eq((table as any).userId, userId))
     }
   }

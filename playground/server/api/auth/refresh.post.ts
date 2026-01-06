@@ -12,7 +12,7 @@ export default eventHandler(async (event) => {
   // Fetch fresh user data
   const result = await db.select({
     user: schema.users,
-    role: schema.roles.name
+    role: schema.roles.name,
   })
     .from(schema.users)
     .leftJoin(schema.roles, eq(schema.users.roleId, schema.roles.id))
@@ -34,7 +34,7 @@ export default eventHandler(async (event) => {
   if (user.roleId) {
     const permissionsData = await db.select({
       resource: schema.resources.name,
-      action: schema.permissions.code
+      action: schema.permissions.code,
     })
       .from(schema.roleResourcePermissions)
       .innerJoin(schema.resources, eq(schema.roleResourcePermissions.resourceId, schema.resources.id))
@@ -57,8 +57,8 @@ export default eventHandler(async (event) => {
       name: user.name,
       avatar: user.avatar,
       role: role,
-      permissions: permissions
-    }
+      permissions: permissions,
+    },
   })
 
   return { user: session.user }

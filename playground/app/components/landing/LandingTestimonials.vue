@@ -10,7 +10,7 @@ interface Testimonial {
 }
 
 const { data: testimonials } = await useFetch<Testimonial[]>('/api/testimonials', {
-  default: () => []
+  default: () => [],
 })
 </script>
 
@@ -45,8 +45,8 @@ const { data: testimonials } = await useFetch<Testimonial[]>('/api/testimonials'
             { name: 'role', type: 'text', required: true },
             { name: 'company', type: 'text', required: false },
             { name: 'avatar', type: 'text', required: false },
-            { name: 'content', type: 'textarea', required: true }
-          ]
+            { name: 'content', type: 'textarea', required: true },
+          ],
         }"
       />
     </div>

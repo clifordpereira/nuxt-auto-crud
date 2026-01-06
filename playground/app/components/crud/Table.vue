@@ -15,7 +15,7 @@ const config = useRuntimeConfig().public
 const crudBaseUrl = config.crudBaseUrl || '/api'
 
 const { data } = await useFetch(`${crudBaseUrl}/${props.resource}`, {
-  headers: crudHeaders()
+  headers: crudHeaders(),
 })
 
 // Fetch relations
@@ -37,7 +37,7 @@ const visibleColumns = computed(() => {
   const hideList = crudConfig?.globalHide || ['updatedAt', 'deletedAt', 'createdBy', 'updatedBy']
   return Object.keys(data.value[0]).filter(key =>
     !forbiddenRelations.value.has(String(key))
-    && !hideList.includes(String(key))
+    && !hideList.includes(String(key)),
   )
 })
 
@@ -88,7 +88,7 @@ const paginatedItems = ref<Record<string, unknown>[]>([])
       root: 'divide-y divide-gray-200 dark:divide-gray-700',
       header: 'px-4 py-5',
       body: 'divide-y divide-gray-200 dark:divide-gray-700',
-      footer: 'p-4'
+      footer: 'p-4',
     }"
   >
     <!-- Filters / Pagination Area -->
@@ -104,8 +104,8 @@ const paginatedItems = ref<Record<string, unknown>[]>([])
           :items="[
             [
               { label: 'Excel', icon: 'i-lucide-file-spreadsheet', onSelect: handleExportExcel },
-              { label: 'PDF', icon: 'i-lucide-file-text', onSelect: handleExportPDF }
-            ]
+              { label: 'PDF', icon: 'i-lucide-file-text', onSelect: handleExportPDF },
+            ],
           ]"
         >
           <UButton

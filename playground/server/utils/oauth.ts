@@ -34,7 +34,8 @@ export async function handleOAuthSuccess(event: H3Event, oauthUser: OAuthUser) {
       await db.update(schema.users)
         .set({ [providerField]: oauthUser.providerId })
         .where(eq(schema.users.id, user.id))
-    } else {
+    }
+    else {
       // Create new user (assign default role 'user' if exists)
       const defaultRole = await db.select().from(schema.roles).where(eq(schema.roles.name, 'user')).get()
       const [newUser] = await db.insert(schema.users).values({
@@ -45,7 +46,7 @@ export async function handleOAuthSuccess(event: H3Event, oauthUser: OAuthUser) {
         password: '', // No password for social login users
         roleId: defaultRole?.id || null,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       }).returning()
       user = newUser
     }
@@ -60,7 +61,7 @@ export async function handleOAuthSuccess(event: H3Event, oauthUser: OAuthUser) {
   if (user.roleId) {
     const permissionsData = await db.select({
       resource: schema.resources.name,
-      action: schema.permissions.code
+      action: schema.permissions.code,
     })
       .from(schema.roleResourcePermissions)
       .innerJoin(schema.resources, eq(schema.roleResourcePermissions.resourceId, schema.resources.id))
@@ -86,8 +87,8 @@ export async function handleOAuthSuccess(event: H3Event, oauthUser: OAuthUser) {
       name: user.name,
       avatar: user.avatar,
       role: roleName,
-      permissions
-    }
+      permissions,
+    },
   })
 
   return sendRedirect(event, '/admin/dashboard')

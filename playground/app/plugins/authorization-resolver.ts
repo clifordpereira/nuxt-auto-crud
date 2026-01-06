@@ -5,9 +5,9 @@ export default defineNuxtPlugin({
     return {
       provide: {
         authorization: {
-          resolveClientUser: () => useUserSession().user.value
-        }
-      }
+          resolveClientUser: () => useUserSession().user.value,
+        },
+      },
     }
-  }
+  },
 })

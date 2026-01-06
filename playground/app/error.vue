@@ -4,40 +4,40 @@ import type { NuxtError } from '#app'
 defineProps({
   error: {
     type: Object as PropType<NuxtError>,
-    required: true
-  }
+    required: true,
+  },
 })
 
 useHead({
   htmlAttrs: {
-    lang: 'en'
-  }
+    lang: 'en',
+  },
 })
 
 useSeoMeta({
   title: 'Page not found',
-  description: 'We are sorry but this page could not be found.'
+  description: 'We are sorry but this page could not be found.',
 })
 
 const { data: navigation } = await useAsyncData('navigation', () => queryCollectionNavigation('docs'), {
-  transform: data => data.find(item => item.path === '/docs')?.children || []
+  transform: data => data.find(item => item.path === '/docs')?.children || [],
 })
 const { data: files } = useLazyAsyncData('search', () => queryCollectionSearchSections('docs'), {
-  server: false
+  server: false,
 })
 
 const links = [{
   label: 'Docs',
   icon: 'i-lucide-book',
-  to: '/docs/auto-crud'
+  to: '/docs/auto-crud',
 }, {
   label: 'Pricing',
   icon: 'i-lucide-credit-card',
-  to: '/pricing'
+  to: '/pricing',
 }, {
   label: 'Blog',
   icon: 'i-lucide-pencil',
-  to: '/blog'
+  to: '/blog',
 }]
 </script>
 

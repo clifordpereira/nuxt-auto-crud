@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { db, schema } from 'hub:db'
 
 const forgotPasswordSchema = z.object({
-  email: z.string().email()
+  email: z.string().email(),
 })
 
 export default eventHandler(async (event) => {
@@ -21,7 +21,7 @@ export default eventHandler(async (event) => {
     await db.update(schema.users)
       .set({
         resetToken,
-        resetExpires
+        resetExpires,
       })
       .where(eq(schema.users.id, user.id))
 
@@ -50,16 +50,17 @@ export default eventHandler(async (event) => {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${resendApiKey}`,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
           },
           body: {
             from: config.emailFrom,
             to: user.email,
             subject: 'Password Reset Request',
-            html: emailTemplate
-          }
+            html: emailTemplate,
+          },
         }).catch(err => console.error('Background Email Error (Resend):', err))
-      } else {
+      }
+      else {
         // LOCAL: Log to console (so you can copy the link in dev)
         console.warn('--- Development Email Log ---')
         console.warn(`To: ${user.email}`)
@@ -74,6 +75,6 @@ export default eventHandler(async (event) => {
   }
 
   return {
-    message: 'If a user with that email exists, a password reset link has been sent.'
+    message: 'If a user with that email exists, a password reset link has been sent.',
   }
 })

@@ -30,7 +30,7 @@ export default eventHandler(async (event) => {
   if ('status' in record && (record as any).status !== 'active') {
     const [canListAll, canReadOwn] = await Promise.all([
       checkAdminAccess(event, model, 'list_all').catch(() => false),
-      checkAdminAccess(event, model, 'read_own', { id }).catch(() => false)
+      checkAdminAccess(event, model, 'read_own', { id }).catch(() => false),
     ])
     if (!canListAll && !canReadOwn) {
       throw new RecordNotFoundError()
