@@ -7,7 +7,10 @@ export const seedDatabase = async () => {
   const results = []
 
   // 1. Seed Roles
-  const rolesToSeed = ['admin', 'manager', 'moderator', 'customer', 'user', 'public']
+  const appConfig = useAppConfig()
+  const systemRoles = ['admin', 'manager', 'user', 'public']
+  const configRoles = appConfig.crud?.rolesToSeed || []
+  const rolesToSeed = Array.from(new Set([...systemRoles, ...configRoles]))
   const roleIds: Record<string, number> = {}
 
   for (const roleName of rolesToSeed) {

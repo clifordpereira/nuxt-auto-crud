@@ -6,6 +6,9 @@ export default defineAppConfig({
     },
   },
   crud: {
+    // Roles to seed (excluding system roles: admin, manager, user, public)
+    rolesToSeed: ['moderator', 'customer'],
+    
     // Columns to always hide from the UI table
     globalHide: ['updatedAt', 'deletedAt', 'createdBy', 'updatedBy', 'resetToken'],
     // Export specific settings
