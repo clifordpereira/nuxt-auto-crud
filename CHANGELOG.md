@@ -1,3 +1,30 @@
+## v1.23.0
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.22.1...v1.23.0)
+
+### 🚀 Enhancements
+
+- Introduce CMS schema, settings page, and auth error handling, alongside various schema, form, and authentication flow refinements. ([cc0b992](https://github.com/clifordpereira/nuxt-auto-crud/commit/cc0b992))
+- Enhance authentication, authorization, database schema, and CRUD functionalities across the application. ([9384853](https://github.com/clifordpereira/nuxt-auto-crud/commit/9384853))
+- Implement `read_own` and `list_own` permissions with server-side ownership-based filtering for resource access. ([b45fd73](https://github.com/clifordpereira/nuxt-auto-crud/commit/b45fd73))
+- Implement `update_status` permission with UI and logic, and update database schema. ([e6ccdd1](https://github.com/clifordpereira/nuxt-auto-crud/commit/e6ccdd1))
+- Allow role selection during signup, enable roles resource management, and cache public abilities. ([5cfc2b8](https://github.com/clifordpereira/nuxt-auto-crud/commit/5cfc2b8))
+- **docs:** Enhance deployment guide with Cloudflare instructions and introduce owner-based permissions. ([6d11f3e](https://github.com/clifordpereira/nuxt-auto-crud/commit/6d11f3e))
+- Add optional `command` and `commandNote` string fields to the content schema. ([8b9db1a](https://github.com/clifordpereira/nuxt-auto-crud/commit/8b9db1a))
+- Implement comprehensive authentication, authorization, and CRUD functionalities with updated schemas and UI components ([d527165](https://github.com/clifordpereira/nuxt-auto-crud/commit/d527165))
+
+### 📖 Documentation
+
+- Add v1.22.0 changelog detailing numerous enhancements, refactors, and dependency updates. ([3b91390](https://github.com/clifordpereira/nuxt-auto-crud/commit/3b91390))
+
+### 🏡 Chore
+
+- **release:** V1.22.1 ([b44f38a](https://github.com/clifordpereira/nuxt-auto-crud/commit/b44f38a))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v1.22.1
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.22.0...v1.22.1)
