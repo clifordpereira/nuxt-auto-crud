@@ -1,6 +1,6 @@
 // server/api/[model]/index.get.ts
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { eventHandler, getRouterParams } from 'h3'
+import { eventHandler, getRouterParams, createError } from 'h3'
 import { getTableForModel } from '../../utils/modelMapper'
 // @ts-expect-error - hub:db is a virtual alias
 import { db } from 'hub:db'
