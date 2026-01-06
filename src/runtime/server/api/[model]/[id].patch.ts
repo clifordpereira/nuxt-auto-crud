@@ -1,6 +1,7 @@
 // server/api/[model]/[id].patch.ts
 import { eventHandler, getRouterParams, readBody } from 'h3'
 import type { H3Event } from 'h3'
+// @ts-expect-error - #imports is a virtual alias
 import { getUserSession } from '#imports'
 import { eq } from 'drizzle-orm'
 import { getTableForModel, filterUpdatableFields } from '../../utils/modelMapper'
@@ -20,6 +21,15 @@ export default eventHandler(async (event) => {
 
   const body = await readBody(event)
   const payload = filterUpdatableFields(model, body)
+
+  // Custom check for status update permission
+  if ('status' in payload) {
+    const { checkAdminAccess } = await import('../../utils/auth')
+    const hasStatusPermission = await checkAdminAccess(event, model, 'update_status', { id })
+    if (!hasStatusPermission) {
+      delete payload.status
+    }
+  }
 
   // Auto-hash fields based on config (default: ['password'])
   await hashPayloadFields(payload)

@@ -176,7 +176,7 @@ const crudGroups = [
   { label: 'List', any: 'list', anyLabel: 'Any', own: 'list_own', ownLabel: 'Own', all: 'list_all' },
   { label: 'Read', any: 'read', anyLabel: 'Others', own: 'read_own', ownLabel: 'Own' },
   { label: 'Create', any: 'create', anyLabel: 'Own' },
-  { label: 'Update', any: 'update', anyLabel: 'Others', own: 'update_own', ownLabel: 'Own' },
+  { label: 'Update', any: 'update', anyLabel: 'Others', own: 'update_own', ownLabel: 'Own', status: 'update_status' },
   { label: 'Delete', any: 'delete', anyLabel: 'Others', own: 'delete_own', ownLabel: 'Own' }
 ]
 
@@ -299,6 +299,20 @@ const getPermissionId = (code: string) => {
                           />
                         </UTooltip>
                         <span class="text-[9px] text-indigo-500/70 uppercase">All Status</span>
+                      </div>
+
+                      <!-- Update Status (Special) -->
+                      <div v-if="group.status" class="flex items-center gap-1.5 mt-1 pt-1 border-t border-gray-100 dark:border-gray-700 w-full justify-center">
+                        <UTooltip text="Update Status Permission">
+                          <UCheckbox
+                            :model-value="getPermissionId(group.status) ? hasPermission(res.id, getPermissionId(group.status)!) : false"
+                            :disabled="!getPermissionId(group.status)"
+                            color="info"
+                            size="xs"
+                            @update:model-value="(val) => getPermissionId(group.status) && togglePermission(res.id, getPermissionId(group.status)!, Boolean(val))"
+                          />
+                        </UTooltip>
+                        <span class="text-[9px] text-blue-500/70 uppercase">Change Status</span>
                       </div>
                     </div>
                   </td>

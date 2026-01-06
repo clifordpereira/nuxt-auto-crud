@@ -56,7 +56,7 @@ export const seedDatabase = async () => {
   }
 
   // 3. SEED PERMISSIONS
-  const permissionsToSeed = ['create', 'read', 'read_own', 'update', 'delete', 'update_own', 'delete_own', 'list', 'list_all', 'list_own']
+  const permissionsToSeed = ['create', 'read', 'read_own', 'update', 'delete', 'update_own', 'delete_own', 'list', 'list_all', 'list_own', 'update_status']
   const permissionIds: Record<string, number> = {}
 
   for (const code of permissionsToSeed) {

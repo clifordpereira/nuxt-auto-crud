@@ -24,8 +24,21 @@ const emit = defineEmits<{
 
 // filter out system fields
 const filteredFields = props.schema.fields.filter(
-  field => !['id', 'created_at', 'updated_at', 'deleted_at', 'createdAt', 'updatedAt', 'deletedAt', 'created_by', 'updated_by', 'createdBy', 'updatedBy'].includes(field.name)
+  (field) => {
+    const isSystem = ['id', 'created_at', 'updated_at', 'deleted_at', 'createdAt', 'updatedAt', 'deletedAt', 'created_by', 'updated_by', 'createdBy', 'updatedBy'].includes(field.name)
+    if (isSystem) return false
+    // Hide status during creation
+    if (field.name === 'status' && !props.initialState) return false
+    return true
+  }
 )
+
+const { user } = useUserSession()
+
+const canUpdateStatus = computed(() => {
+  const userPerms = (user.value as any)?.permissions?.[props.schema.resource] as string[] | undefined
+  return user.value?.role === 'admin' || (Array.isArray(userPerms) && userPerms.includes('update_status'))
+})
 
 // dynamically build zod schema
 const formSchema = useDynamicZodSchema(filteredFields, !!props.initialState)
@@ -136,6 +149,7 @@ function handleSubmit(event: FormSubmitEvent<Record<string, unknown>>) {
             :items="field.selectOptions"
             placeholder="Select "
             class="w-full"
+            :disabled="field.name === 'status' && !canUpdateStatus"
           />
 
           <UTextarea
@@ -150,6 +164,7 @@ function handleSubmit(event: FormSubmitEvent<Record<string, unknown>>) {
             v-model="state[field.name] as string"
             :type="field.type"
             :required="field.required"
+            :disabled="field.name === 'status' && !canUpdateStatus"
           />
         </UFormField>
       </template>

@@ -17,6 +17,15 @@ export default eventHandler(async (event) => {
   const body = await readBody(event)
   const payload = filterUpdatableFields(model, body)
 
+  // Custom check for status update permission (or just remove it during creation as per requirement)
+  if ('status' in payload) {
+    const { checkAdminAccess } = await import('../../utils/auth')
+    const hasStatusPermission = await checkAdminAccess(event, model, 'update_status')
+    if (!hasStatusPermission) {
+      delete payload.status
+    }
+  }
+
   // Auto-hash fields based on config (default: ['password'])
   await hashPayloadFields(payload)
 
