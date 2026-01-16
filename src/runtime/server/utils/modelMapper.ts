@@ -6,6 +6,7 @@ import { pascalCase } from 'scule'
 import { getTableColumns as getDrizzleTableColumns, getTableName } from 'drizzle-orm'
 import type { SQLiteTable } from 'drizzle-orm/sqlite-core'
 import { createError } from 'h3'
+// @ts-expect-error - '#imports' is a virtual alias
 import { useRuntimeConfig } from '#imports'
 import { createInsertSchema } from 'drizzle-zod'
 import type { z } from 'zod'
