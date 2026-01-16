@@ -1,7 +1,6 @@
 // server/api/[model]/index.post.ts
 import { eventHandler, getRouterParams, readBody } from 'h3'
 import type { H3Event } from 'h3'
-// @ts-expect-error - #imports is a virtual alias
 import { getUserSession } from '#imports'
 import { getTableForModel, getZodSchema } from '../../utils/modelMapper'
 // @ts-expect-error - hub:db is a virtual alias
