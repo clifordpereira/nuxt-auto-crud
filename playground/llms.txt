@@ -1,0 +1,18 @@
+# Nuxt Auto-CRUD Template
+> A working implementation and live reference for the `nuxt-auto-crud`.
+
+## 🚀 Lifecycle & Seeding
+- **Auto-Seed Logic**: Database seeding is automatically triggered on the first login attempt. 
+- **Trigger**: Keyed to `NUXT_ADMIN_EMAIL` env or `admin@example.com`.
+- **Task Implementation**: `server/tasks/seed.ts` (Meta definition) calls `seedDatabase()` logic in `server/utils/seed.ts`.
+- **Manual Execution**: Nitro tasks are accessible via `/_nitro/tasks/db:seed` during development.
+
+## 🍱 nac stack: Fully Dynamic UI
+- **Working Implementation**: More than a dashboard, this is a live example of the `nuxt-auto-crud` module in production.
+- **Dynamic Listing**: Tables are generated on-the-fly using schema metadata.
+- **Dynamic Operations**: All CRUD forms and action triggers are schema-hydrated.
+- **Email Service**: Password reset flows use the **Resend** API.
+
+## 🔐 Access & Permissions
+- **RBAC Storage**: Persisted in `roles`, `permissions`, and `role_resource_permissions` tables.
+- **Default Login**: `admin@example.com` / `$1Password`.

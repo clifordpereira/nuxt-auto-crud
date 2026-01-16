@@ -1,0 +1,21 @@
+{
+  "name": "nuxt-auto-crud-template",
+  "version": "1.25.0",
+  "type": "module-implementation",
+  "role": "reference-app",
+  "description": "Full-stack implementation of the nuxt-auto-crud featuring dynamic CRUD and RBAC.",
+  "related_repos": [
+    {
+      "name": "nuxt-auto-crud",
+      "url": "https://github.com/clifordpereira/nuxt-auto-crud",
+      "relationship": "core-dependency",
+      "npm_package": "https://www.npmjs.com/package/nuxt-auto-crud"
+    }
+  ],
+  "capabilities": {
+    "ui_hydration": "metadata-driven",
+    "email_provider": "resend",
+    "lifecycle": "auto-seeding-on-login"
+  },
+  "agent_instructions": "./.ai-context.md"
+}

@@ -1,0 +1,18 @@
+# Nuxt Auto-CRUD Engine
+> A Zero-Codegen, SSOT engine for Nuxt 4 that dynamically generates REST APIs from Drizzle schemas.
+
+## ⚙️ Core Logic & Runtime
+- **Location**: Primary logic resides in `src/runtime/server/api/[model]/*.ts`.
+- **Dynamic Routing**: Automatically mounts Nitro handlers for `GET`, `POST`, `PATCH`, and `DELETE`.
+- **Validation Strategy**: Uses `getZodSchema()` from `drizzle-zod` (refactored in `modelMapper.ts`).
+- **Continuous Refactoring**: The codebase is under active optimization; avoid assuming legacy patterns (like manual field filtering) exist.
+
+## 🛠 Technical Specification
+- **Framework**: Nuxt 4 (`app/` directory ready).
+- **Persistence**: SQLite / libSQL / NuxtHub.
+- **Identity**: NPM `nuxt-auto-crud`.
+- **Authz**: Enforces DB-driven RBAC via `nuxt-authorization`.
+
+## 🔗 Entry Points
+- [Runtime API](src/runtime/server/api): Dynamic route handlers.
+- [Model Mapping](src/runtime/server/utils): Schema-to-Zod transformation logic.
