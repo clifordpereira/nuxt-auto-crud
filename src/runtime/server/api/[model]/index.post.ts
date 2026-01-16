@@ -3,7 +3,7 @@ import { eventHandler, getRouterParams, readBody } from 'h3'
 import type { H3Event } from 'h3'
 // @ts-expect-error - #imports is a virtual alias
 import { getUserSession } from '#imports'
-import { getTableForModel, filterUpdatableFields } from '../../utils/modelMapper'
+import { getTableForModel, getZodSchema } from '../../utils/modelMapper'
 // @ts-expect-error - hub:db is a virtual alias
 import { db } from 'hub:db'
 import { ensureResourceAccess, formatResourceResult, hashPayloadFields } from '../../utils/handler'
@@ -15,7 +15,8 @@ export default eventHandler(async (event) => {
   const table = getTableForModel(model)
 
   const body = await readBody(event)
-  const payload = filterUpdatableFields(model, body)
+  const schema = getZodSchema(model, 'insert')
+  const payload = await schema.parseAsync(body)
 
   // Custom check for status update permission (or just remove it during creation as per requirement)
   if ('status' in payload) {

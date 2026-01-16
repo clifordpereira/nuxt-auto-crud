@@ -7,6 +7,8 @@ import { getTableColumns as getDrizzleTableColumns, getTableName } from 'drizzle
 import type { SQLiteTable } from 'drizzle-orm/sqlite-core'
 import { createError } from 'h3'
 import { useRuntimeConfig } from '#imports'
+import { createInsertSchema } from 'drizzle-zod'
+import type { z } from 'zod'
 
 /**
  * Fields that should never be updatable via PATCH requests
@@ -260,4 +262,43 @@ export function filterHiddenFields(modelName: string, data: Record<string, unkno
   }
 
   return filtered
+}
+
+/**
+ * Gets a Zod schema for a model using drizzle-zod
+ * @param modelName - The name of the model
+ * @param type - 'insert' (full) or 'patch' (partial)
+ * @returns Zod schema
+ */
+export function getZodSchema(modelName: string, type: 'insert' | 'patch' = 'insert'): z.ZodObject<any> {
+  const table = getTableForModel(modelName)
+  const schema = createInsertSchema(table)
+
+  if (type === 'patch') {
+    return schema.partial() as z.ZodObject<any>
+  }
+
+  // Fields to omit on creation (managed by server)
+  const OMIT_ON_CREATE = [
+    ...PROTECTED_FIELDS,
+    'createdBy',
+    'updatedBy',
+    'created_by',
+    'updated_by',
+    'deletedAt',
+    'deleted_at',
+    'deletedBy',
+    'deleted_by',
+  ]
+
+  const columns = getDrizzleTableColumns(table)
+  const fieldsToOmit: Record<string, boolean> = {}
+
+  OMIT_ON_CREATE.forEach((field) => {
+    if (columns[field]) {
+      fieldsToOmit[field] = true
+    }
+  })
+
+  return (schema as any).omit(fieldsToOmit)
 }

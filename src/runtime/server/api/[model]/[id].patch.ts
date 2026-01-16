@@ -4,7 +4,7 @@ import type { H3Event } from 'h3'
 // @ts-expect-error - #imports is a virtual alias
 import { getUserSession } from '#imports'
 import { eq } from 'drizzle-orm'
-import { getTableForModel, filterUpdatableFields } from '../../utils/modelMapper'
+import { getTableForModel, getZodSchema } from '../../utils/modelMapper'
 import type { TableWithId } from '../../types'
 
 // @ts-expect-error - hub:db is a virtual alias
@@ -20,7 +20,8 @@ export default eventHandler(async (event) => {
   const table = getTableForModel(model) as TableWithId
 
   const body = await readBody(event)
-  const payload = filterUpdatableFields(model, body)
+  const schema = getZodSchema(model, 'patch')
+  const payload = await schema.parseAsync(body)
 
   // Custom check for status update permission
   if ('status' in payload) {
