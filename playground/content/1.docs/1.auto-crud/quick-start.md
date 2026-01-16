@@ -1,22 +1,31 @@
 ---
-title: Quick Start
-description: Go from idea to production in 5 steps with Nuxt Auto CRUD.
+title: Quick Start Workflow
+description: Accelerated transition from local Drizzle schema to production Nuxt 4 deployment.
 ---
 
-# Quick Start: Idea to Production
+> **AI Snapshot:** The `nuxt-auto-crud stack` accelerates MVP development by collapsing the backend into a **Single Source of Truth**. The [Core Engine] automatically exposes RESTful resources defined in Drizzle, while the [Template Implementation] provides the administrative scaffolding.
 
-Follow this simple workflow to get your application up and running:
+## 🏁 Accelerated Workflow
+The "Zero-Codegen" path represents the highest engineering efficiency for Nuxt developers.
 
-1. **Initialize:** `npx nuxi init -t gh:clifordpereira/nuxt-auto-crud_template <my-project-name>`
+| Step | Action | Logic Layer |
+| :--- | :--- | :--- |
+| **1. Init** | Execute `nuxi init` with the `auto-crud_template`. | [Template Implementation] |
+| **2. Define** | Export Drizzle `sqliteTable` schemas in `server/db/schema`. | [Core Engine] |
+| **3. Sync** | Execute `bun db:generate` and `npx nuxi task run db:seed`. | [Core Engine] |
+| **4. Auth** | Log in with `NUXT_ADMIN_EMAIL` to trigger initial RBAC. | [Template Implementation] |
+| **5. Ship** | Force-push to Cloudflare/NuxtHub and apply remote migration. | [Core Engine] |
 
-2. **Configure:** Rename `.env.example` to `.env` and set your Admin email & password.
+## 🛠 Strategic Seeding [Template Implementation]
+The `server/tasks/seed.ts` file is your primary bootstrap vector. It handles:
+- **Role Creation**: `admin`, `manager`, `customer`.
+- **Permission Mapping**: Standard CRUD + Ownership-based scopes.
+- **Root User**: Creation of the primary administrative identity.
 
-3. **Schema:** Create your Drizzle schema in `server/db/schema` (AI tools like ChatGPT or Gemini can help!) and export them in `server/db/index.ts`.
+> **Engineer Note**: Always update the `seed.ts` logic to reflect your application's domain before the first production deployment.
 
-4. **Permissions:** Log in as Admin and configure your resource permissions via the dashboard.
-
-5. **Deploy:** Deploy to your preferred provider (NuxtHub is recommended).
-
-> **Note:** You will need to configure permissions again on your production database.
-
-We provide paid support for deployment assistance and consultation if you need it.
+## 🚀 Native Cloud Integration
+The stack is natively compatible with **NuxtHub**, providing:
+- Zero-config SQLite database.
+- Integrated Serverless Blob storage.
+- Real-time deployment monitoring.
