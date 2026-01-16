@@ -1,3 +1,9 @@
+---
+trigger: always_on
+glob: "**/*"
+description: "Architecture and directory boundaries for the nuxt-auto-crud module, prioritizing Nuxt 4 app/ directory and Drizzle-Zod patterns."
+---
+
 # Antigravity Workspace Rules: nuxt-auto-crud
 
 ## 1. Workspace Mapping
