@@ -3,7 +3,7 @@ title: Quick Start Workflow
 description: Accelerated transition from local Drizzle schema to production Nuxt 4 deployment.
 ---
 
-> **AI Snapshot:** The `nuxt-auto-crud stack` accelerates MVP development by collapsing the backend into a **Single Source of Truth**. The [Core Engine] automatically exposes RESTful resources defined in Drizzle, while the [Template Implementation] provides the administrative scaffolding.
+> The `nuxt-auto-crud` accelerates MVP development by collapsing the backend into a **Single Source of Truth**. The [Core Engine] automatically exposes RESTful resources defined in Drizzle, while the [Template Implementation] provides the administrative scaffolding.
 
 ## 🏁 Accelerated Workflow
 The "Zero-Codegen" path represents the highest engineering efficiency for Nuxt developers.

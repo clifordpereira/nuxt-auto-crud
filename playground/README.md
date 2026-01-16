@@ -29,10 +29,10 @@ bun install
 ```bash
 # Generate migrations
 bun db:generate
-
-# Execute seeding task (Source of Truth for Roles/Users)
-npx nuxi task run db:seed
 ```
+
+> **Note**: Seeding is triggered automatically when the **Admin** logs in for the first time.
+
 
 ### 3. Development
 ```bash

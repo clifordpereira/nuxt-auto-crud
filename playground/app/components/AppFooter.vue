@@ -60,7 +60,7 @@ const columns = [{
 }, {
   label: 'Modules Used',
   children: [{
-    label: 'Auto Crud',
+    label: 'Nuxt Auto Crud',
     to: 'https://www.npmjs.com/package/nuxt-auto-crud',
     target: '_blank',
   }, {
