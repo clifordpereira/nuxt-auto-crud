@@ -1,121 +1,63 @@
-# Nuxt Auto CRUD Starter
+# Nuxt Auto-CRUD Template ⚡️
 
-A starter template for [Nuxt Auto CRUD](https://github.com/clifordpereira/nuxt-auto-crud) module.
+This is the official **Reference Implementation** for [`nuxt-auto-crud`](https://github.com/clifordpereira/nuxt-auto-crud). It demonstrates a high-end, production-ready admin interface built with Nuxt UI 4.
 
+| Component | Technology |
+| :--- | :--- |
+| **Framework** | Nuxt 4 (`app/` directory) |
+| **UI Library** | Nuxt UI 4 (Tailwind 4) |
+| **Engine** | `nuxt-auto-crud` |
+| **Auth** | `nuxt-auth-utils` + `nuxt-authorization` |
+| **Database** | SQLite / NuxtHub |
+
+## 🛡️ Database-Driven RBAC
+
+Unlike static configuration systems, this template uses a fully dynamic, database-stored permission system.
+
+- **Storage**: Roles and permissions are persisted in `roles`, `permissions`, and `role_resource_permissions` tables.
+- **Source of Truth**: `server/tasks/seed.ts` manages the initial bootstrap.
+- **Dynamic UI**: Components hydrate their state and action visibility (Edit/Delete) based on these runtime permissions.
+
+## 🚀 Setup & Initialization
+
+### 1. Install Dependencies
+```bash
+bun install
+```
+
+### 2. Database Schema & Seeding
+```bash
+# Generate migrations
+bun db:generate
+
+# Execute seeding task (Source of Truth for Roles/Users)
+npx nuxi task run db:seed
+```
+
+### 3. Development
+```bash
+bun dev
+```
+
+## 🎨 UI & UX Logic
+
+- **Dynamic Hydration**: Tables and Forms are generated on-the-fly using the metadata provided by the Core Engine.
+- **Custom Flair**: High-end styling applied via Nuxt UI 4's `ui` prop system.
+- **Micro-Animations**: Subtle transitions for form submissions and navigation.
+
+## 👤 Default Credentials
+
+Validated users created during `db:seed` (Password: `$1Password`):
+
+| Role | Email | access |
+| :--- | :--- | :--- |
+| **Admin** | `admin@example.com` | Root Access |
+| **Manager** | `manager@example.com` | Full CRUD |
+| **Customer** | `customer@example.com` | Own Records |
+
+---
+
+## 🔗 Project Links
 - [Documentation](https://auto-crud.clifland.in/docs/auto-crud)
-- [Module Repo](https://github.com/clifordpereira/nuxt-auto-crud)
-- [Report Issue](https://github.com/clifordpereira/nuxt-auto-crud/issues)
-- [Creator Website](https://www.clifland.in/)
-
-## Setup
-
-Make sure to install the dependencies:
-
-```bash
-pnpm install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-pnpm dev
-```
-
-## Production
-
-Build the application for production:
-
-```bash
-pnpm build
-```
-
-Locally preview production build:
-
-```bash
-pnpm preview
-```
-
-## Usage Modes
-
-This template comes pre-configured with `nuxt-auto-crud` for a fullstack experience.
-
-### Fullstack (Default)
-
-No extra steps needed. `nuxt-auto-crud` is installed and configured.
-
-### Frontend Only
-
-If you wish to use this template as a frontend-only application:
-
-1. Uninstall the module:
-   ```bash
-   npm uninstall nuxt-auto-crud
-   ```
-2. Open `nuxt.config.ts` and remove `'nuxt-auto-crud'` from the `modules` list.
-3. Remove the `autoCrud` configuration block from `nuxt.config.ts`.
-
-## Permissions & Roles
-
-This template uses a **Database-Driven Permissions System**. 
-
-Unlike previous versions that used JSON configuration files, all roles and permissions are now stored in the database (`roles`, `resources`, `permissions`, `role_resource_permissions` tables).
-
-### How it works:
-1. **Roles**: Defined in the `roles` table (e.g., `admin`, `manager`, `public`).
-2. **Resources**: Defined in the `resources` table (e.g., `users`, `posts`).
-3. **Permissions**: Defined in the `permissions` table (e.g., `create`, `read`, `update`, `delete`, `list`).
-4. **Assignment**: The `role_resource_permissions` table links them together.
-
-### Managing Permissions:
-- **Seeding**: Initial permissions are set up via `server/tasks/seed.ts`. You can modify this file to change default permissions.
-- **Runtime**: You can build a UI to manage these records directly in the database, allowing for dynamic permission updates without redeploying.
-
-For a detailed guide on managing permissions, see [PERMISSIONS.md](PERMISSIONS.md).
-
-### Public Access:
-Public (unauthenticated) access is controlled by the `public` role in the database. Assign permissions to the `public` role to allow access to resources for non-logged-in users.
-
-## Password Reset & Email Testing
-
-This template includes a full password reset flow. To test it locally for free without using a real email service:
-
-1. Go to [Ethereal.email](https://ethereal.email/) and click **"Create Ethereal Account"**.
-2. Copy the SMTP credentials provided.
-3. Update your `.env` file with these credentials:
-   ```bash
-   NUXT_NODEMAILER_USER=your_ethereal_user
-   NUXT_NODEMAILER_AUTH_PASS=your_ethereal_password
-   ```
-4. Go to `/auth/forgot-password` in the app.
-5. Enter a user's email and check the **Messages** tab in Ethereal to see the reset link.
-
-**Database Reset & Seeding**
-
-If you want to delete all data and start fresh:
-
-1. Delete the `.data` directory.
-2. Run the database generation command:
-   ```bash
-   bun db:generate
-   ```
-3. Run the seed task (this will create default roles, permissions, and users):
-   ```bash
-   npx nuxi task run db:seed (or take tasks in dev tools)
-   ```
-4. Restart the server:
-   ```bash
-   bun run dev
-   ```
-
-**Default Users:**
-
-The seed task creates the following users (Password: `$1Password`):
-- **Admin:** `admin@example.com` (Full Access)
-- **Manager:** `manager@example.com`
-- **Moderator:** `moderator@example.com`
-- **Customer:** `customer@example.com`
-
-**Security Note:**
-Log in with the admin credentials, create a new admin user, and then delete the default admin user.
+- [Core Engine Repo](https://github.com/clifordpereira/nuxt-auto-crud)
+- [Creator](https://www.clifland.in/)
