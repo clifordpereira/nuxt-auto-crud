@@ -1,6 +1,6 @@
-# Nuxt Auto-CRUD
+# Nuxt Auto CRUD
 
-**Nuxt Auto-CRUD is a headless, zero-codegen CRUD engine that transforms Drizzle ORM schemas into fully functional RESTful APIs for Nuxt 4.** 
+**Nuxt Auto CRUD is a headless, zero-codegen CRUD engine that transforms Drizzle ORM schemas into fully functional RESTful APIs for Nuxt 4.** 
 
 | Specification | Details |
 | :--- | :--- |
@@ -37,5 +37,7 @@ It is highly recommended to use the [Template](https://auto-crud.clifland.in/doc
 If you are adding it to an existing application, refer to the [Manual Installation](https://auto-crud.clifland.in/docs/manual-installation) guide.
 
 [YouTube Walkthrough](https://www.youtube.com/watch?v=_o0cddJUU50&list=PLnbvxcojhIixqM1J08Tnm7vmMdx2wsy4B)
+
+[NPM Package](https://www.npmjs.com/package/nuxt-auto-crud)
 
 [Creator: Clifland](https://www.clifland.in/)

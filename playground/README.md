@@ -1,6 +1,6 @@
-# Nuxt Auto-CRUD Template
+# Nuxt Auto CRUD Template
 
-**The Nuxt Auto-CRUD Template is the production-ready Nuxt 4 + Nuxt UI 4 implementation of nuxt-auto-crud.** It serves as the blueprint for creating specialized apps with zero-rebuild core logic.
+**The Nuxt Auto CRUD Template is the production-ready Nuxt 4 + Nuxt UI 4 implementation of nuxt-auto-crud.** It serves as the blueprint for creating specialized apps with zero-rebuild core logic.
 
 | Component | Technology Stack |
 | :--- | :--- |

@@ -25,7 +25,7 @@ const items = computed(() => [{
   <UHeader>
     <template #left>
       <NuxtLink to="/">
-        <h1>Nuxt Auto CRUD</h1>
+        <h1>Nuxt Auto CRUD Template</h1>
       </NuxtLink>
     </template>
 
