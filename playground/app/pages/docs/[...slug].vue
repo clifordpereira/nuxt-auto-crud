@@ -32,7 +32,19 @@ useSeoMeta({
     <UPageHeader
       :title="page.title"
       :description="page.description"
-    />
+    >
+      <template v-if="page.summary" #description>
+        <div class="space-y-4">
+          <p>{{ page.description }}</p>
+          <UAlert
+            variant="subtle"
+            color="primary"
+            class="text-xs italic"
+            :description="page.summary"
+          />
+        </div>
+      </template>
+    </UPageHeader>
 
     <UPageBody>
       <ContentRenderer

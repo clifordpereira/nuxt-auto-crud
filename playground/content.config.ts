@@ -79,6 +79,10 @@ export const collections = {
   docs: defineCollection({
     source: '1.docs/**/*',
     type: 'page',
+    path: '/docs',
+    schema: z.object({
+      summary: z.string().optional(),
+    }),
   }),
   pricing: defineCollection({
     source: '2.pricing.yml',
