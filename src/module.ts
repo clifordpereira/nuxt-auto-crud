@@ -98,6 +98,11 @@ export default defineNuxtModule<ModuleOptions>({
       method: 'get',
       handler: resolver.resolve(apiDir, '_relations.get'),
     })
+    addServerHandler({
+      route: '/api/_meta',
+      method: 'get',
+      handler: resolver.resolve(apiDir, '_meta.get'),
+    })
 
     addServerHandler({
       route: '/api/:model',

@@ -11,8 +11,7 @@ import { useRuntimeConfig } from '#imports'
 import { createInsertSchema } from 'drizzle-zod'
 import type { z } from 'zod'
 
-const PROTECTED_FIELDS = ['id', 'created_at', 'updated_at', 'createdAt', 'updatedAt']
-const HIDDEN_FIELDS = ['password', 'secret', 'token']
+import { PROTECTED_FIELDS, HIDDEN_FIELDS } from './constants'
 
 export const customUpdatableFields: Record<string, string[]> = {}
 export const customHiddenFields: Record<string, string[]> = {}
@@ -81,7 +80,7 @@ export function getUpdatableFields(modelName: string): string[] {
   if (!table) return []
 
   const allColumns = getTableColumns(table)
-  return allColumns.filter(col => !PROTECTED_FIELDS.includes(col))
+  return allColumns.filter(col => !PROTECTED_FIELDS.includes(col) && !HIDDEN_FIELDS.includes(col))
 }
 
 /**
@@ -180,8 +179,7 @@ export function getZodSchema(modelName: string, type: 'insert' | 'patch' = 'inse
 
   const OMIT_ON_CREATE = [
     ...PROTECTED_FIELDS,
-    'createdBy', 'updatedBy', 'created_by', 'updated_by',
-    'deletedAt', 'deleted_at', 'deletedBy', 'deleted_by',
+    ...HIDDEN_FIELDS,
   ]
 
   const columns = getDrizzleTableColumns(table)
