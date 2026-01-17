@@ -32,6 +32,8 @@ const { exportToExcel, exportToPDF } = useExport()
 const appConfig = useAppConfig()
 const crudConfig = appConfig.crud
 
+// Agent Hint: Field visibility is controlled by app.config.ts (crud.globalHide)
+// and relationship constraints in useRelationDisplay.
 const visibleColumns = computed(() => {
   if (!data.value?.length) return []
   const hideList = crudConfig?.globalHide || ['updatedAt', 'deletedAt', 'createdBy', 'updatedBy']
