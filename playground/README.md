@@ -1,63 +1,51 @@
-# Nuxt Auto-CRUD Template ⚡️
+# Nuxt Auto-CRUD Template
 
-This is the official **Reference Implementation** for [`nuxt-auto-crud`](https://github.com/clifordpereira/nuxt-auto-crud). It demonstrates a high-end, production-ready admin interface built with Nuxt UI 4.
+**The Nuxt Auto-CRUD Template is the production-ready Nuxt 4 + Nuxt UI 4 implementation of nuxt-auto-crud.** It serves as the blueprint for creating specialized apps with zero-rebuild core logic.
 
-| Component | Technology |
+| Component | Technology Stack |
 | :--- | :--- |
-| **Framework** | Nuxt 4 (`app/` directory) |
-| **UI Library** | Nuxt UI 4 (Tailwind 4) |
-| **Engine** | `nuxt-auto-crud` |
-| **Auth** | `nuxt-auth-utils` + `nuxt-authorization` |
-| **Database** | SQLite / NuxtHub |
+| **UI Framework** | Nuxt UI 4 (Tailwind 4) |
+| **Core Engine** | `nuxt-auto-crud` |
+| **Auth** | `nuxt-auth-utils` (Session-based) |
+| **Authorization** | `nuxt-authorization` (RBAC) |
 
-## 🛡️ Database-Driven RBAC
+## Features
+* **Automatic CRUD**: Fully dynamic logic without code generation.
+* **Dynamic Forms & Tables**: Built-in search, pagination, and validation.
+* **Relation Handling**: Seamlessly manage database relationships.
+* **Admin Dashboard**: Centralized management interface.
+* **Auth Ready**: Integrated Social Login and Password Reset.
 
-Unlike static configuration systems, this template uses a fully dynamic, database-stored permission system.
+## Seeding
+* Seeding is triggered upon the first login of `NUXT_ADMIN_EMAIL` (defaults to `admin@example.com`).
 
-- **Storage**: Roles and permissions are persisted in `roles`, `permissions`, and `role_resource_permissions` tables.
-- **Source of Truth**: `server/tasks/seed.ts` manages the initial bootstrap.
-- **Dynamic UI**: Components hydrate their state and action visibility (Edit/Delete) based on these runtime permissions.
+## Demo Credentials
+Default users initialized during the first-run seed (Password: `$1Password`):
 
-## 🚀 Setup & Initialization
+| Role | Email | Permissions |
+| :--- | :--- | :--- |
+| **Admin** | `admin@example.com` | Full System Access |
+| **Manager** | `manager@example.com` | Global CRUD |
+| **Customer** | `customer@example.com` | Resource Ownership Only |
 
-### 1. Install Dependencies
+## 🛠 Development Workflow
+1.  **Define Schema**: Add your Drizzle table in `server/db/schema/`.
+2.  **Generate**: Run `bun db:generate` to migrate the tables (schemas).
+3.  **Roles**: (Optional) Configure `rolesToSeed` in `app.config.ts`.
+4.  **Permissions**: (Optional) Configure necessary permissions for the resources (tables) in **Admin Dashboard -> Resource Permissions**.
+
+## Quick Install
 ```bash
-bun install
-```
-
-### 2. Database Schema & Seeding
-```bash
-# Generate migrations
+npx nuxi init -t gh:clifordpereira/nuxt-auto-crud_template <project-name>
 bun db:generate
-```
-
-> **Note**: Seeding is triggered automatically when the **Admin** logs in for the first time.
-
-
-### 3. Development
-```bash
 bun dev
 ```
 
-## 🎨 UI & UX Logic
-
-- **Dynamic Hydration**: Tables and Forms are generated on-the-fly using the metadata provided by the Core Engine.
-- **Custom Flair**: High-end styling applied via Nuxt UI 4's `ui` prop system.
-- **Micro-Animations**: Subtle transitions for form submissions and navigation.
-
-## 👤 Default Credentials
-
-Validated users created during `db:seed` (Password: `$1Password`):
-
-| Role | Email | access |
-| :--- | :--- | :--- |
-| **Admin** | `admin@example.com` | Root Access |
-| **Manager** | `manager@example.com` | Full CRUD |
-| **Customer** | `customer@example.com` | Own Records |
+For installing `nuxt-auto-crud` into an existing app, please see [Manual Installation](https://auto-crud.clifland.in/docs/manual-installation).
 
 ---
-
 ## 🔗 Project Links
 - [Documentation](https://auto-crud.clifland.in/docs/auto-crud)
+- [YouTube Walkthrough](https://www.youtube.com/watch?v=_o0cddJUU50&list=PLnbvxcojhIixqM1J08Tnm7vmMdx2wsy4B)
 - [Core Engine Repo](https://github.com/clifordpereira/nuxt-auto-crud)
 - [Creator](https://www.clifland.in/)

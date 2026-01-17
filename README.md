@@ -1,64 +1,26 @@
-# Nuxt Auto-CRUD Engine 🚀
+# Nuxt Auto-CRUD
 
-A high-performance, **Zero-Codegen CRUD Engine** for Nuxt 4. This module dynamically exposes RESTful APIs by treating your Drizzle ORM schema as the Single Source of Truth (SSOT).
+**Nuxt Auto-CRUD is a headless, zero-codegen CRUD engine that transforms Drizzle ORM schemas into fully functional RESTful APIs for Nuxt 4.** 
 
-| Feature | Specification |
+| Specification | Details |
 | :--- | :--- |
-| **Framework** | Nuxt 4 (`app/` directory ready) |
-| **Persistence** | SQLite / libSQL (via NuxtHub) |
-| **ORM** | Drizzle ORM |
+| **Runtime** | Nuxt 4 (`app/` directory), Nitro |
+| **Persistence** | SQLite / libSQL (Optimized for Cloudflare D1) |
+| **ORM & SSOT** | Drizzle ORM (Schema-driven) |
 | **Validation** | `drizzle-zod` (Dynamic derivation) |
-| **AI Ready** | `.ai-context.md` included for Agentic workflows |
 
-## 🛠 Core Philosophy: SSOT
+## 🛠 Architectural Logic: Zero-Codegen
+NAC treats your Drizzle schema as the **Single Source of Truth (SSOT)**. Unlike traditional scaffolds, it does not generate physical files; it mounts dynamic Nitro handlers at runtime.
 
-Nuxt Auto-CRUD eliminates boilerplate. It scans your database migration/schema files and automatically mounts Nitro event handlers.
+* **Dynamic Routing**: Automatically maps `GET|POST|PATCH|DELETE` to your Drizzle tables.
+* **Agentic Compatibility**: Built with an MCP-friendly structure to allow AI Agents to interact directly with the schema-driven API.
 
-- **No Code-Gen**: No per-entity controllers or repositories required.
-- **Dynamic Routing**: Automatic mounting of `GET|POST|PATCH|DELETE` handlers for all exported tables.
-- **Type Safety**: Validation schemas are derived at runtime using `getZodSchema()` from `drizzle-zod`.
-
-## ⚙️ Architecture: Drizzle-Zod Integration
-
-The engine leverages `modelMapper.ts` to transform Drizzle table definitions into runtime validation logic.
-
-- **Validation**: Replaced legacy manual filtering with comprehensive `drizzle-zod` schemas.
-- **`getZodSchema(model, type)`**: Generates strict `insert` (POST) or `partial` (PATCH) schemas.
-- **Protected Fields**: Automatically omits manage-identity fields (`id`, `createdAt`, `createdBy`, etc.) from creation payloads.
-
-## 🚀 Quick Start (Existing Project)
-
-### 1. Install Dependencies
-```bash
-bun add nuxt-auto-crud drizzle-orm drizzle-zod
-bun add -d drizzle-kit
-```
-
-### 2. Configure `nuxt.config.ts`
-```typescript
-export default defineNuxtConfig({
-  modules: ['@nuxthub/core', 'nuxt-auto-crud'],
-  autoCrud: {
-    schemaPath: 'server/db/schema',
-    auth: {
-      type: 'session',
-      authentication: true,
-      authorization: true,
-    }
-  }
-})
-```
-
-## 🔐 Permission System (RBAC)
-
-The engine supports database-driven RBAC via `nuxt-authorization`. 
-
-- `list`: View active records.
-- `list_all`: View all records (including drafts).
-- `update_own` / `delete_own`: Ownership-based logic using `createdBy` or `userId` columns.
+## 🔐 RBAC & Permissions
+Integrates with `nuxt-authorization` for database-driven Role-Based Access Control.
+* **Ownership Logic**: Supports `update_own` and `delete_own` via `createdBy` column reflection.
+* **Granular Scopes**: Fine-grained control over `list` vs `list_all` (drafts/soft-deleted).
 
 ## 🌐 Endpoints
-
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
 | `GET` | `/api/:model` | List with filtering/paging |
@@ -69,10 +31,11 @@ The engine supports database-driven RBAC via `nuxt-authorization`.
 
 ---
 
-## 👨‍💻 Reference Implementation
-See the [Playground](./playground) for a full Nuxt 4 + Nuxt UI 4 implementation including a database-driven seeding strategy.
+## Installation
+It is highly recommended to use the [Template](https://auto-crud.clifland.in/docs/auto-crud) for new installations.
 
-## 🔗 Links
-- [📚 Documentation](https://auto-crud.clifland.in/docs/auto-crud)
-- [✨ Release Notes](./CHANGELOG.md)
-- [🗺️ Roadmap](./ROADMAP.md)
+If you are adding it to an existing application, refer to the [Manual Installation](https://auto-crud.clifland.in/docs/manual-installation) guide.
+
+[YouTube Walkthrough](https://www.youtube.com/watch?v=_o0cddJUU50&list=PLnbvxcojhIixqM1J08Tnm7vmMdx2wsy4B)
+
+[Creator: Clifland](https://www.clifland.in/)
