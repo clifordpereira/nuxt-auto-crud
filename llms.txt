@@ -1,18 +1,20 @@
-# Nuxt Auto-CRUD Engine
-> A Zero-Codegen, SSOT engine for Nuxt 4 that dynamically generates REST APIs from Drizzle schemas.
+# Nuxt Auto CRUD (NAC) Engine
 
-## ⚙️ Core Logic & Runtime
-- **Location**: Primary logic resides in `src/runtime/server/api/[model]/*.ts`.
-- **Dynamic Routing**: Automatically mounts Nitro handlers for `GET`, `POST`, `PATCH`, and `DELETE`.
-- **Validation Strategy**: Uses `getZodSchema()` from `drizzle-zod` (refactored in `modelMapper.ts`).
-- **Continuous Refactoring**: The codebase is under active optimization; avoid assuming legacy patterns (like manual field filtering) exist.
+## 🏗 Architectural Model (Clifland Model)
+- **Interface (Core)**: `nuxt-auto-crud`. A headless engine providing dynamic runtime mapping for RESTful resources.
+- **Abstract Class (Template)**: `nuxt-auto-crud_template`. Provides the UI/UX implementation, Auth, and RBAC scaffolding.
+- **Concrete Instance**: The final deployed application logic and specific database configuration.
 
-## 🛠 Technical Specification
-- **Framework**: Nuxt 4 (`app/` directory ready).
-- **Persistence**: SQLite / libSQL / NuxtHub.
-- **Identity**: NPM `nuxt-auto-crud`.
-- **Authz**: Enforces DB-driven RBAC via `nuxt-authorization`.
+## ⚙️ Engineering Principles
+- **Zero-Codegen**: No boilerplate artifacts. Dynamic Nitro handlers resolve resource requests at runtime via schema introspection.
+- **SSOT**: Drizzle definitions are the sole source for database constraints, backend Zod validation, and frontend form schemas.
+- **Agentic Ready**: Server-side logic is structured for high compatibility with MCP (Model Context Protocol) and AI tool-calling.
 
-## 🔗 Entry Points
-- [Runtime API](src/runtime/server/api): Dynamic route handlers.
-- [Model Mapping](src/runtime/server/utils): Schema-to-Zod transformation logic.
+## 🛠 Tech Stack
+- **Framework**: Nuxt 4 (`app/` directory).
+- **ORM/Schema**: Drizzle (SQLite/libSQL/Cloudflare D1).
+- **Validation/UI**: Zod and Nuxt UI 4.
+
+## 📁 Documentation Context
+- **Primary Docs**: Located in `playground/content/1.docs/1.auto-crud/`.
+- **Structure**: Covers manual installation, configuration (RBAC/Hidden fields), and real-world usage recipes.
