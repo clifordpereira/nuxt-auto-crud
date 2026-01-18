@@ -33,7 +33,10 @@ useSeoMeta({
       :title="page.title"
       :description="page.description"
     >
-      <template v-if="page.summary" #description>
+      <template
+        v-if="page.summary"
+        #description
+      >
         <div class="space-y-4">
           <p>{{ page.description }}</p>
           <UAlert

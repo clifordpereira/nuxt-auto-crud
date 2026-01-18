@@ -11,34 +11,38 @@ import { ensureAuthenticated } from '../utils/auth'
 export default eventHandler(async (event) => {
   await ensureAuthenticated(event)
 
-  const models = getAvailableModels().length > 0 
-    ? getAvailableModels() 
+  const models = getAvailableModels().length > 0
+    ? getAvailableModels()
     : Object.keys(db?.query || {})
 
   const resources = models.map((model) => {
     try {
       const table = getTableForModel(model)
       const columns = getDrizzleTableColumns(table)
-      const config = getTableConfig(table as any)
-      
+      const config = getTableConfig(table)
+
       // Map columns to fields
       const fields = Object.entries(columns)
         .filter(([name]) => !PROTECTED_FIELDS.includes(name) && !HIDDEN_FIELDS.includes(name))
-        .map(([name, col]: [string, any]) => {
+        .map(([name, col]) => {
           let references = null
 
           // 1. Check for Foreign Keys via getTableConfig (Robust Drizzle Reflection)
-          const fk = config.foreignKeys.find((f: any) => 
-            f.reference().columns[0].name === col.name
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const fk = config?.foreignKeys.find((f: any) =>
+            f.reference().columns[0].name === col.name,
           )
-          
+
           if (fk) {
-            references = (fk.reference().foreignTable as any)[Symbol.for('drizzle:Name')]
-          } 
+            // @ts-expect-error - Drizzle internals
+            references = fk.reference().foreignTable[Symbol.for('drizzle:Name')]
+          }
           // 2. Fallback to inline reference config if symbol lookup fails
-          else if (col.referenceConfig?.foreignTable) {
-             references = (col.referenceConfig.foreignTable as any)[Symbol.for('drizzle:Name')] 
-                         || (col.referenceConfig.foreignTable as any).name
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          else if ((col as any).referenceConfig?.foreignTable) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const foreignTable = (col as any).referenceConfig.foreignTable
+            references = foreignTable[Symbol.for('drizzle:Name')] || foreignTable.name
           }
 
           // Semantic Normalization
@@ -51,24 +55,25 @@ export default eventHandler(async (event) => {
             isEnum: !!col.enumValues,
             options: col.enumValues || null,
             references,
-            isRelation: !!references
+            isRelation: !!references,
           }
         })
 
       // 3. Implement Clifland Label Heuristic (name > title > email > id)
       const fieldNames = fields.map(f => f.name)
-      const labelField = fieldNames.find(n => n === 'name') 
-                   || fieldNames.find(n => n === 'title') 
-                   || fieldNames.find(n => n === 'email') 
-                   || 'id'
+      const labelField = fieldNames.find(n => n === 'name')
+        || fieldNames.find(n => n === 'title')
+        || fieldNames.find(n => n === 'email')
+        || 'id'
 
       return {
         resource: model,
         endpoint: `/api/${model}`,
         labelField,
-        fields
+        fields,
       }
-    } catch (e) {
+    }
+    catch {
       return null
     }
   }).filter(Boolean)
@@ -76,6 +81,6 @@ export default eventHandler(async (event) => {
   return {
     architecture: 'Clifland-NAC',
     version: '1.0.0-agentic',
-    resources
+    resources,
   }
 })

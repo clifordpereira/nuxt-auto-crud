@@ -6,7 +6,6 @@ import { pascalCase } from 'scule'
 import { getTableColumns as getDrizzleTableColumns, getTableName } from 'drizzle-orm'
 import type { SQLiteTable } from 'drizzle-orm/sqlite-core'
 import { createError } from 'h3'
-// @ts-expect-error - '#imports' is a virtual alias
 import { useRuntimeConfig } from '#imports'
 import { createInsertSchema } from 'drizzle-zod'
 import type { z } from 'zod'
@@ -169,12 +168,14 @@ export function filterHiddenFields(modelName: string, data: Record<string, unkno
 /**
  * Generates Zod schema via drizzle-zod, omitting server-managed and protected fields.
  */
-export function getZodSchema(modelName: string, type: 'insert' | 'patch' = 'insert'): z.ZodObject<any> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function getZodSchema(modelName: string, type: 'insert' | 'patch' = 'insert'): z.ZodObject<any, any> {
   const table = getTableForModel(modelName)
   const schema = createInsertSchema(table)
 
   if (type === 'patch') {
-    return schema.partial() as z.ZodObject<any>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return schema.partial() as z.ZodObject<any, any>
   }
 
   const OMIT_ON_CREATE = [
@@ -183,7 +184,7 @@ export function getZodSchema(modelName: string, type: 'insert' | 'patch' = 'inse
   ]
 
   const columns = getDrizzleTableColumns(table)
-  const fieldsToOmit: Record<string, boolean> = {}
+  const fieldsToOmit: Record<string, true> = {}
 
   OMIT_ON_CREATE.forEach((field) => {
     if (columns[field]) {
@@ -191,5 +192,6 @@ export function getZodSchema(modelName: string, type: 'insert' | 'patch' = 'inse
     }
   })
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (schema as any).omit(fieldsToOmit)
 }

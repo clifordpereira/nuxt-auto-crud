@@ -32,10 +32,10 @@ export function drizzleTableToFields(table: any, resourceName: string) {
 
   // Clifland Heuristic: Auto-detect the primary label for the resource
   const fieldNames = fields.map(f => f.name)
-  const labelField = fieldNames.find(n => n === 'name') 
-               || fieldNames.find(n => n === 'title') 
-               || fieldNames.find(n => n === 'email') 
-               || 'id'
+  const labelField = fieldNames.find(n => n === 'name')
+    || fieldNames.find(n => n === 'title')
+    || fieldNames.find(n => n === 'email')
+    || 'id'
 
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
