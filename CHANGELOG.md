@@ -1,3 +1,50 @@
+## v1.25.0
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.24.0...v1.25.0)
+
+### 🚀 Enhancements
+
+- Enable configurable roles for seeding via app config and update seeding utility to use them ([03b2728](https://github.com/clifordpereira/nuxt-auto-crud/commit/03b2728))
+- Integrate `drizzle-zod` for robust request body validation and field filtering in model creation and update API endpoints. ([6ffa348](https://github.com/clifordpereira/nuxt-auto-crud/commit/6ffa348))
+- Add new component for displaying user profiles. ([a0a5565](https://github.com/clifordpereira/nuxt-auto-crud/commit/a0a5565))
+- Add AI context markdown files for the core module and playground. ([542c227](https://github.com/clifordpereira/nuxt-auto-crud/commit/542c227))
+- Add module and playground manifests, LLM context files, and simplify authentication documentation. ([0a2795b](https://github.com/clifordpereira/nuxt-auto-crud/commit/0a2795b))
+- Introduce `/api/_meta` endpoint for dynamic Drizzle model metadata reflection, including fields, types, relations, and label heuristics. ([971540f](https://github.com/clifordpereira/nuxt-auto-crud/commit/971540f))
+- Introduce `summary` field for docs pages with UI display and expand AI context documentation for API discovery. ([e1272cb](https://github.com/clifordpereira/nuxt-auto-crud/commit/e1272cb))
+- Update agent rules and AI context to detail CAM architecture, dynamic API discovery via `_meta` endpoint, and module boundaries. ([a70c823](https://github.com/clifordpereira/nuxt-auto-crud/commit/a70c823))
+
+### 🩹 Fixes
+
+- Enhance Drizzle foreign key detection and refine TypeScript `any` usage in server utilities and API meta-data generation. ([aa16275](https://github.com/clifordpereira/nuxt-auto-crud/commit/aa16275))
+
+### 💅 Refactors
+
+- Remove `filterUpdatableFields` utility function. ([1271c4a](https://github.com/clifordpereira/nuxt-auto-crud/commit/1271c4a))
+- **docs:** Reorganize installation guides ([0c566c6](https://github.com/clifordpereira/nuxt-auto-crud/commit/0c566c6))
+
+### 📖 Documentation
+
+- Add `rolesToSeed` configuration option to resource configuration documentation ([5afe745](https://github.com/clifordpereira/nuxt-auto-crud/commit/5afe745))
+- Replace framework-agnostic analysis with internal agent workspace rules for nuxt-auto-crud. ([e59c8c9](https://github.com/clifordpereira/nuxt-auto-crud/commit/e59c8c9))
+- Revamp playground README as a detailed reference implementation guide and simplify the root README. ([5da2f43](https://github.com/clifordpereira/nuxt-auto-crud/commit/5da2f43))
+- Revise and expand documentation to introduce Core Engine/Template Implementation architecture, detail Drizzle-Zod validation, and streamline authentication configuration. ([22b2ff0](https://github.com/clifordpereira/nuxt-auto-crud/commit/22b2ff0))
+- Update README seeding instructions, refine `nuxt-auto-crud` descriptions, and adjust footer module label. ([f068f08](https://github.com/clifordpereira/nuxt-auto-crud/commit/f068f08))
+- Refactor readme of module and playground ([829285e](https://github.com/clifordpereira/nuxt-auto-crud/commit/829285e))
+- Consolidate playground quick start and feature set documentation into a new core features file, and update AI context. ([063d9c2](https://github.com/clifordpereira/nuxt-auto-crud/commit/063d9c2))
+- Refine documentation by updating helpful links with a new YouTube playlist, clarifying module terminology, and removing 'AI Snapshot' prefixes from introductory descriptions. ([104dd88](https://github.com/clifordpereira/nuxt-auto-crud/commit/104dd88))
+- Add agent discovery guides, API protocol documentation, and contributing files for core and playground, including a `Table.vue` visibility hint. ([721b631](https://github.com/clifordpereira/nuxt-auto-crud/commit/721b631))
+- Enhance and clarify documentation for installation, API protocol, type mapping, module options, and field privacy. ([c5099c2](https://github.com/clifordpereira/nuxt-auto-crud/commit/c5099c2))
+- Refine AI context and architectural definitions, emphasizing agentic tools and `_meta` as the primary discovery mechanism. ([481dcdf](https://github.com/clifordpereira/nuxt-auto-crud/commit/481dcdf))
+
+### 🏡 Chore
+
+- Add `ts-expect-error` directives for virtual imports in server API handler and model mapper utility. ([7775cfc](https://github.com/clifordpereira/nuxt-auto-crud/commit/7775cfc))
+- Temporary commit ([9cdf31b](https://github.com/clifordpereira/nuxt-auto-crud/commit/9cdf31b))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v1.24.0
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.23.1...v1.24.0)
