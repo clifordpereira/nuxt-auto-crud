@@ -8,7 +8,7 @@
 ## ⚙️ Engineering Principles
 - **Zero-Codegen**: No boilerplate artifacts. Dynamic Nitro handlers resolve resource requests at runtime via schema introspection.
 - **SSOT**: Drizzle definitions are the sole source for database constraints, backend Zod validation, and frontend form schemas.
-- **Agentic Ready**: Server-side logic is structured for high compatibility with MCP (Model Context Protocol) and AI tool-calling.
+- **Agentic Tools**: Dynamic endpoints and `GET /api/_meta` are primary high-fidelity tools for AI agents to introspect and interact with the data model.
 
 ## 🛠 Tech Stack
 - **Framework**: Nuxt 4 (`app/` directory).

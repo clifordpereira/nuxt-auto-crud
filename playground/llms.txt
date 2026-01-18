@@ -7,11 +7,10 @@
 - **Task Implementation**: `server/tasks/seed.ts` (Meta definition) calls `seedDatabase()` logic in `server/utils/seed.ts`.
 - **Manual Execution**: Nitro tasks are accessible via `/_nitro/tasks/db:seed` during development.
 
-## 🍱 nac stack: Fully Dynamic UI
-- **Working Implementation**: More than a dashboard, this is a live example of the `nuxt-auto-crud` module in production.
-- **Dynamic Listing**: Tables are generated on-the-fly using schema metadata.
-- **Dynamic Operations**: All CRUD forms and action triggers are schema-hydrated.
-- **Email Service**: Password reset flows use the **Resend** API.
+## 🍱 nac stack: Dynamic UI (Tool Consumers)
+- **UI Implementation**: Located in `app/components/crud/`. These components are consumers of the core agentic engine.
+- **Dynamic Listing**: Tables generated via `_meta` tool logic.
+- **Dynamic Operations**: CRUD forms hydrated by Drizzle-Zod schema reflection.
 
 ## 🔐 Access & Permissions
 - **RBAC Storage**: Persisted in `roles`, `permissions`, and `role_resource_permissions` tables.
