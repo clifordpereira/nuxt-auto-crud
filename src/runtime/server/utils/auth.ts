@@ -15,11 +15,11 @@ export async function checkAdminAccess(event: H3Event, model: string, action: st
     return true
   }
 
-// 1. Bearer Token or Query Check (Agentic/MCP Tooling)
+  // 1. Bearer Token or Query Check (Agentic/MCP Tooling)
   const authHeader = getHeader(event, 'authorization')
   const query = getQuery(event)
   const apiToken = useRuntimeConfig(event).apiSecretToken
-  
+
   // Extract token from Header or fallback to Query param
   const token = (authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null) || query.token
 
@@ -133,12 +133,12 @@ export async function ensureAuthenticated(event: H3Event): Promise<void> {
   const authHeader = getHeader(event, 'authorization')
   const query = getQuery(event)
   const apiToken = runtimeConfig.apiSecretToken
-  
+
   const token = (authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null) || query.token
 
   // 1. API Token Check (Agentic/MCP)
   if (token && apiToken && token === apiToken) {
-    return 
+    return
   }
 
   // 2. JWT Check

@@ -27,16 +27,17 @@ export default eventHandler(async (event) => {
         .filter(([name]) => !HIDDEN_FIELDS.includes(name))
         .map(([name, col]) => {
           let references = null
-          const fk = config?.foreignKeys.find((f: any) =>
-            f.reference().columns[0].name === col.name,
-          )
+          // @ts-expect-error - Drizzle foreign key internals
+          const fk = config?.foreignKeys.find(f => f.reference().columns[0].name === col.name)
 
           if (fk) {
             // @ts-expect-error - Drizzle internals
             references = fk.reference().foreignTable[Symbol.for('drizzle:Name')]
           }
-          else if ((col as any).referenceConfig?.foreignTable) {
-            const foreignTable = (col as any).referenceConfig.foreignTable
+          // @ts-expect-error - Drizzle internal referenceConfig
+          else if (col.referenceConfig?.foreignTable) {
+            // @ts-expect-error - Drizzle internal referenceConfig
+            const foreignTable = col.referenceConfig.foreignTable
             references = foreignTable[Symbol.for('drizzle:Name')] || foreignTable.name
           }
 
@@ -86,22 +87,23 @@ export default eventHandler(async (event) => {
   // --- CONTENT NEGOTIATION FOR AGENTIC TOOLS ---
   if (query.format === 'md' || acceptHeader.includes('text/markdown')) {
     let markdown = `# ${payload.architecture} API Manifest (v${payload.version})\n\n`
-    
-    payload.resources.forEach((res: any) => {
+
+    payload.resources.forEach((res) => {
+      if (!res) return
       markdown += `### Resource: ${res.resource}\n`
       markdown += `- **Endpoint**: \`${res.endpoint}${tokenSuffix}\`\n`
       markdown += `- **Methods**: ${res.methods.join(', ')}\n`
       markdown += `- **Primary Label**: \`${res.labelField}\`\n\n`
       markdown += `| Field | Type | Required | Writable | Details |\n`
       markdown += `| :--- | :--- | :--- | :--- | :--- |\n`
-      
-      res.fields.forEach((f: any) => {
-        const details = f.isEnum ? `Options: ${f.options.join(', ')}` : (f.references ? `Refs: ${f.references}` : '-')
+
+      res.fields.forEach((f) => {
+        const details = f.isEnum && f.options ? `Options: ${f.options.join(', ')}` : (f.references ? `Refs: ${f.references}` : '-')
         markdown += `| ${f.name} | ${f.type} | ${f.required ? '✅' : '❌'} | ${f.isReadOnly ? '❌' : '✅'} | ${details} |\n`
       })
       markdown += `\n---\n`
     })
-    
+
     return markdown
   }
 
