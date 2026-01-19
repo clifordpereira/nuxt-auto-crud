@@ -1,3 +1,19 @@
+## v1.26.0
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.25.0...v1.26.0)
+
+### 🚀 Enhancements
+
+- Add agentic API token authentication and markdown output to `_meta` endpoint, including resource methods and field writability. ([ab27bd1](https://github.com/clifordpereira/nuxt-auto-crud/commit/ab27bd1))
+
+### 🩹 Fixes
+
+- Improve Drizzle type handling and markdown output in meta API, and correct authentication flow in auth utility. ([7d2f941](https://github.com/clifordpereira/nuxt-auto-crud/commit/7d2f941))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v1.25.0
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.24.0...v1.25.0)
