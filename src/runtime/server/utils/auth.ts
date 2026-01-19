@@ -15,6 +15,18 @@ export async function checkAdminAccess(event: H3Event, model: string, action: st
     return true
   }
 
+// 1. Bearer Token or Query Check (Agentic/MCP Tooling)
+  const authHeader = getHeader(event, 'authorization')
+  const query = getQuery(event)
+  const apiToken = useRuntimeConfig(event).apiSecretToken
+  
+  // Extract token from Header or fallback to Query param
+  const token = (authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null) || query.token
+
+  if (token && apiToken && token === apiToken) {
+    return true
+  }
+
   if (auth.type === 'jwt') {
     if (!auth.jwtSecret) {
       console.warn('JWT Secret is not configured but auth type is jwt')
@@ -113,15 +125,28 @@ export async function checkAdminAccess(event: H3Event, model: string, action: st
 
 export async function ensureAuthenticated(event: H3Event): Promise<void> {
   const { auth } = useAutoCrudConfig()
+  const runtimeConfig = useRuntimeConfig(event)
 
   if (!auth?.authentication) return
 
-  if (auth.type === 'jwt' && auth.jwtSecret) {
-    if (!await verifyJwtToken(event, auth.jwtSecret)) {
-      throw createError({ statusCode: 401, message: 'Unauthorized' })
-    }
-    return
+  // Extract Token: Priority 1: Authorization Header | Priority 2: Query String (?token=)
+  const authHeader = getHeader(event, 'authorization')
+  const query = getQuery(event)
+  const apiToken = runtimeConfig.apiSecretToken
+  
+  const token = (authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null) || query.token
+
+  // 1. API Token Check (Agentic/MCP)
+  if (token && apiToken && token === apiToken) {
+    return 
   }
 
+  // 2. JWT Check
+  if (auth.type === 'jwt' && auth.jwtSecret) {
+    if (await verifyJwtToken(event, auth.jwtSecret)) return
+    throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
+  }
+
+  // 3. Session Check (Standard UI)
   await (requireUserSession as (event: H3Event) => Promise<void>)(event)
 }

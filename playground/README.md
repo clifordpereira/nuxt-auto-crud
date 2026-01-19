@@ -34,6 +34,14 @@ Default users initialized during the first-run seed (Password: `$1Password`):
 3.  **Roles**: (Optional) Configure `rolesToSeed` in `app.config.ts`.
 4.  **Permissions**: (Optional) Configure necessary permissions for the resources (tables) in **Admin Dashboard -> Resource Permissions**.
 
+## 🤖 Agentic Ready
+This project is optimized for Agentic Workflows. AI agents can dynamically explore the application's runtime schema and API capabilities without reading source code.
+
+### Protocol for Agents:
+1. **Introspection** Always use `@mcp:nac-schema-inspector:get_markdown` on `/api/_meta?format=md` to understand current data structures and protected fields.
+2. **Authentication**: Use the `token` parameter provided in your environment configuration for all requests.
+3. **Exploration**: NAC generates dynamic routes; use the manifest retrieved in step 1 to navigate endpoints.
+
 ## Quick Install
 ```bash
 npx nuxi init -t gh:clifordpereira/nuxt-auto-crud_template <project-name>
