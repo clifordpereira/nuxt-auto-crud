@@ -35,12 +35,17 @@ Default users initialized during the first-run seed (Password: `$1Password`):
 4.  **Permissions**: (Optional) Configure necessary permissions for the resources (tables) in **Admin Dashboard -> Resource Permissions**.
 
 ## 🤖 Agentic Ready
-This project is optimized for Agentic Workflows. AI agents can dynamically explore the application's runtime schema and API capabilities without reading source code.
+This project is optimized for Agentic Workflows using the **Model Context Protocol (MCP)**. It provides structured intelligence to AI agents, allowing them to build, explore, and interact with the application seamlessly.
+
+### Core MCP Servers (Standard)
+1.  **`nac-schema-inspector` (Discovery)**: Performs introspection on the runtime engine. Use it to fetch the `/api/_meta` manifest and understand the dynamic schema without reading source files.
+2.  **`nuxt` (Framework Intelligence)**: Provides deep context on Nuxt 4 patterns, auto-imports, and directory structures. Essential for framework-native refactoring.
+3.  **`nuxt-ui` (Design Logic)**: Real-time documentation for Nuxt UI 4 components. Used by agents to generate premium, `U-` prefixed interfaces consistent with this template.
 
 ### Protocol for Agents:
-1. **Introspection** Always use `@mcp:nac-schema-inspector:get_markdown` on `/api/_meta?format=md` to understand current data structures and protected fields.
-2. **Authentication**: Use the `token` parameter provided in your environment configuration for all requests.
-3. **Exploration**: NAC generates dynamic routes; use the manifest retrieved in step 1 to navigate endpoints.
+1. **Introspection**: Use `nac-schema-inspector` on `/api/_meta?format=md` to map available pluralized endpoints and data structures.
+2. **Standard Implementation**: Leverage `nuxt` and `nuxt-ui` servers to ensure code matches the Nuxt 4 + Tailwind 4 architectural standards.
+
 
 ## Quick Install
 ```bash
