@@ -15,7 +15,7 @@ const isLoaded = ref(false)
         @click="isLoaded = true"
       >
         <NuxtImg
-          src="https://img.youtube.com/vi/W0ju4grRC9M/maxresdefault.jpg"
+          src="https://img.youtube.com/vi/Ot3qMzWe4OU/maxresdefault.jpg"
           alt="Promotional Video"
           class="w-full h-full object-cover rounded-xl"
           loading="lazy"
@@ -31,7 +31,7 @@ const isLoaded = ref(false)
         v-else
         width="100%"
         height="400"
-        src="https://www.youtube-nocookie.com/embed/W0ju4grRC9M?autoplay=1&mute=1"
+        src="https://www.youtube-nocookie.com/embed/Ot3qMzWe4OU?autoplay=1&mute=1"
         title="YouTube video player"
         frameborder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
