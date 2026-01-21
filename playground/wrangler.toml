@@ -1,0 +1,19 @@
+# wrangler.toml
+name = "nuxt-auto-crud-template"
+compatibility_date = "2026-01-21"
+main = ".output/server/index.mjs"
+
+compatibility_flags = ["nodejs_compat"]
+[[d1_databases]]
+binding = "DB"
+database_name = "nac-template-db"
+database_id = "caee4ecf-0847-4c6d-bb12-5947dd6981c8"
+migrations_dir = "server/db/migrations/sqlite"
+
+[observability]
+enabled = true
+head_sampling_rate = 1
+
+[assets]
+directory = ".output/public"
+binding = "ASSETS"
