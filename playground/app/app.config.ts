@@ -11,6 +11,7 @@ export default defineAppConfig({
 
     // Columns to always hide from the UI table
     globalHide: ['updatedAt', 'deletedAt', 'createdBy', 'updatedBy', 'resetToken'],
+    
     // Export specific settings
     exports: {
       pdf: {
