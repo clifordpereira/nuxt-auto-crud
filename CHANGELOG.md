@@ -1,3 +1,15 @@
+## v1.28.0
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.27.0...v1.28.0)
+
+### 🚀 Enhancements
+
+- Import `getQuery` from `h3` in the server auth utility. ([333dde8](https://github.com/clifordpereira/nuxt-auto-crud/commit/333dde8))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v1.27.0
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.26.0...v1.27.0)
