@@ -1,3 +1,33 @@
+## v1.27.0
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.26.0...v1.27.0)
+
+### 🚀 Enhancements
+
+- Enhance Cloudflare deployment documentation, update footer navigation with YouTube demos, and add MCP server documentation for AI agents. ([9c109c3](https://github.com/clifordpereira/nuxt-auto-crud/commit/9c109c3))
+- Enhance RBAC documentation with static `app.config.ts` UI/agentic constraints and clarify deployment steps. ([53d2fe3](https://github.com/clifordpereira/nuxt-auto-crud/commit/53d2fe3))
+- **docs:** Add video tutorial link for Drizzle schema creation. ([55d9b04](https://github.com/clifordpereira/nuxt-auto-crud/commit/55d9b04))
+- Add Cloudflare Workers deployment configuration and update compatibilityDate to 2026-01-21 across project files. ([e4c7e2b](https://github.com/clifordpereira/nuxt-auto-crud/commit/e4c7e2b))
+- Introduce agentic MCP features, add v1.26.0 changelog, and update blog content with localized images. ([6aba21a](https://github.com/clifordpereira/nuxt-auto-crud/commit/6aba21a))
+
+### 💅 Refactors
+
+- Add `getHeader` and `useRuntimeConfig` imports to `auth.ts` utility. ([b5f2572](https://github.com/clifordpereira/nuxt-auto-crud/commit/b5f2572))
+
+### 📖 Documentation
+
+- Add and update documentation for Agentic & Model Context Protocol (MCP) workflows, including server details and configuration. ([893f821](https://github.com/clifordpereira/nuxt-auto-crud/commit/893f821))
+- Update documentation to clarify project focus on the full-stack template and de-prioritize backend-only mode. ([385b115](https://github.com/clifordpereira/nuxt-auto-crud/commit/385b115))
+- Clarify backend-only mode development priority in documentation. ([67aa6ad](https://github.com/clifordpereira/nuxt-auto-crud/commit/67aa6ad))
+
+### 🎨 Styles
+
+- Remove extraneous blank line in `app.config.ts`. ([227f12f](https://github.com/clifordpereira/nuxt-auto-crud/commit/227f12f))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v1.26.0
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.25.0...v1.26.0)
