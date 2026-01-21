@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="../../auth.d.ts" />
 import type { H3Event } from 'h3'
-import { createError, getHeader } from 'h3'
+import { createError, getHeader, getQuery } from 'h3'
 
 // @ts-expect-error - #imports is a virtual alias
 import { requireUserSession, allows, getUserSession, abilities as globalAbility, abilityLogic, useRuntimeConfig } from '#imports'
