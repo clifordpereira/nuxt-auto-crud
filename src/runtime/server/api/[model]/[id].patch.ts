@@ -66,7 +66,7 @@ export default eventHandler(async (event) => {
     .set(payload)
     .where(eq(table.id, Number(id)))
     .returning()
-    .get() as Record<string, any>
+    .get() as Record<string, unknown>
 
   if (!updatedRecord) {
     throw new RecordNotFoundError()

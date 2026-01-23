@@ -95,7 +95,7 @@ export default defineNuxtConfig({
     // Fields exposed to guest users.
     // Ensure the `list` permission for the `public` role is enabled for these resources in the Admin Dashboard.
     resources: {
-      testimonials: ['name', 'content', 'avatar', 'company', 'createdAt']
+      testimonials: ['name', 'content', 'avatar', 'company', 'createdAt'],
     },
   },
   delayHydration: {

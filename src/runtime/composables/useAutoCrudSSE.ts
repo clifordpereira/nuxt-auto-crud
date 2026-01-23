@@ -1,6 +1,13 @@
 import { onMounted, onBeforeUnmount } from '#imports'
 
-export function useAutoCrudSSE(onEvent: (e: any) => void) {
+export interface AutoCrudEvent {
+  table: string
+  action: 'create' | 'update' | 'delete'
+  data: Record<string, unknown>
+  primaryKey: string | number
+}
+
+export function useAutoCrudSSE(onEvent: (e: AutoCrudEvent) => void) {
   let source: EventSource | null = null
 
   onMounted(() => {

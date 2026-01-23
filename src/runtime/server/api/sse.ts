@@ -1,6 +1,6 @@
 import { eventHandler, setHeader } from 'h3'
 import { addClient, removeClient } from '../utils/sse-bus'
-import { randomUUID } from 'crypto'
+import { randomUUID } from 'node:crypto'
 
 export default eventHandler((event) => {
   console.log('SSE client connected')

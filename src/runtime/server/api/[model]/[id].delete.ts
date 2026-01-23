@@ -27,7 +27,7 @@ export default eventHandler(async (event) => {
     .delete(table)
     .where(eq(table.id, Number(id)))
     .returning()
-    .get() as Record<string, any>
+    .get() as Record<string, unknown>
 
   if (!deletedRecord) {
     throw new RecordNotFoundError(`${singularName} not found`)

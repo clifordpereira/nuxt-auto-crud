@@ -85,21 +85,22 @@ const paginatedItems = ref<Record<string, unknown>[]>([])
 // Real-time updates
 const currentTable = computed(() => props.resource)
 const store = {
-  updateRow: (id: any, rowData: any) => {
+  updateRow: (id: string | number, rowData: Record<string, unknown>) => {
     if (!data.value) return
-    const index = data.value.findIndex((r: any) => r.id === id)
+    const index = data.value.findIndex((r: Record<string, unknown>) => r.id === id)
     if (index !== -1) {
       const updated = [...data.value]
       updated[index] = { ...updated[index], ...rowData }
       data.value = updated
     }
   },
-  addRow: (rowData: any) => {
+  addRow: (rowData: Record<string, unknown>) => {
     data.value = [rowData, ...(data.value || [])]
   },
-  removeRow: (id: any) => {
+  removeRow: (id: string | number) => {
     if (!data.value) return
-    data.value = data.value.filter((r: any) => r.id !== id)
+    const items = data.value as Record<string, unknown>[]
+    data.value = items.filter(r => r.id !== id)
   },
 }
 

@@ -50,7 +50,7 @@ export default eventHandler(async (event) => {
     // No session available
   }
 
-  const newRecord = await db.insert(table).values(payload).returning().get() as Record<string, any>
+  const newRecord = await db.insert(table).values(payload).returning().get() as Record<string, unknown>
 
   broadcast('crud', {
     table: model,
@@ -59,12 +59,14 @@ export default eventHandler(async (event) => {
     data: newRecord,
   })
 
-
   let isGuest = true
   try {
-     const session = await (getUserSession as (event: H3Event) => Promise<{ user: { id: string | number } | null }>)(event)
-     if (session?.user) isGuest = false
-  } catch {}
+    const session = await (getUserSession as (event: H3Event) => Promise<{ user: { id: string | number } | null }>)(event)
+    if (session?.user) isGuest = false
+  }
+  catch {
+    // No session available
+  }
 
   return formatResourceResult(model, newRecord, isGuest)
 })
