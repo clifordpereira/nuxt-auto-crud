@@ -1,3 +1,19 @@
+## v1.30.0
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.29.0...v1.30.0)
+
+### 🚀 Enhancements
+
+- Relatime code update for cloudflare. ([2d128d3](https://github.com/clifordpereira/nuxt-auto-crud/commit/2d128d3))
+
+### 🩹 Fixes
+
+- Lint errors ([539c346](https://github.com/clifordpereira/nuxt-auto-crud/commit/539c346))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v1.29.0
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.28.0...v1.29.0)
