@@ -7,6 +7,7 @@ import type { TableWithId } from '../../types'
 import { db } from 'hub:db'
 import { ensureResourceAccess, formatResourceResult } from '../../utils/handler'
 import { RecordNotFoundError } from '../../exceptions'
+import { broadcast } from '../../utils/sse-bus'
 
 export default eventHandler(async (event) => {
   const { model, id } = getRouterParams(event) as { model: string, id: string }
@@ -19,11 +20,18 @@ export default eventHandler(async (event) => {
     .delete(table)
     .where(eq(table.id, Number(id)))
     .returning()
-    .get()
+    .get() as Record<string, any>
 
   if (!deletedRecord) {
     throw new RecordNotFoundError(`${singularName} not found`)
   }
 
-  return formatResourceResult(model, deletedRecord as Record<string, unknown>, isAdmin)
+  broadcast('crud', {
+    table: model,
+    action: 'delete',
+    primaryKey: deletedRecord.id,
+    data: deletedRecord,
+  })
+
+  return formatResourceResult(model, deletedRecord, isAdmin)
 })

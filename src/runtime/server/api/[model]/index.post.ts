@@ -7,6 +7,7 @@ import { getTableForModel, getZodSchema } from '../../utils/modelMapper'
 // @ts-expect-error - 'hub:db' is a virtual alias
 import { db } from 'hub:db'
 import { ensureResourceAccess, formatResourceResult, hashPayloadFields } from '../../utils/handler'
+import { broadcast } from '../../utils/sse-bus'
 
 export default eventHandler(async (event) => {
   const { model } = getRouterParams(event) as { model: string }
@@ -49,7 +50,14 @@ export default eventHandler(async (event) => {
     // No session available
   }
 
-  const newRecord = await db.insert(table).values(payload).returning().get()
+  const newRecord = await db.insert(table).values(payload).returning().get() as Record<string, any>
 
-  return formatResourceResult(model, newRecord as Record<string, unknown>, isAdmin)
+  broadcast('crud', {
+    table: model,
+    action: 'create',
+    primaryKey: newRecord.id,
+    data: newRecord,
+  })
+
+  return formatResourceResult(model, newRecord, isAdmin)
 })

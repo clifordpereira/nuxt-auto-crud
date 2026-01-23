@@ -81,6 +81,43 @@ const handleExportPDF = () => {
 }
 
 const paginatedItems = ref<Record<string, unknown>[]>([])
+
+// Real-time updates
+const currentTable = computed(() => props.resource)
+const store = {
+  updateRow: (id: any, rowData: any) => {
+    if (!data.value) return
+    const index = data.value.findIndex((r: any) => r.id === id)
+    if (index !== -1) {
+      const updated = [...data.value]
+      updated[index] = { ...updated[index], ...rowData }
+      data.value = updated
+    }
+  },
+  addRow: (rowData: any) => {
+    data.value = [rowData, ...(data.value || [])]
+  },
+  removeRow: (id: any) => {
+    if (!data.value) return
+    data.value = data.value.filter((r: any) => r.id !== id)
+  },
+}
+
+useAutoCrudSSE(({ table, action, data: sseData, primaryKey }) => {
+  if (table !== currentTable.value) return
+
+  if (action === 'update') {
+    store.updateRow(primaryKey, sseData)
+  }
+
+  if (action === 'create') {
+    store.addRow(sseData)
+  }
+
+  if (action === 'delete') {
+    store.removeRow(primaryKey)
+  }
+})
 </script>
 
 <template>

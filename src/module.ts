@@ -103,6 +103,11 @@ export default defineNuxtModule<ModuleOptions>({
       method: 'get',
       handler: resolver.resolve(apiDir, '_meta.get'),
     })
+    addServerHandler({
+      route: '/api/sse',
+      method: 'get',
+      handler: resolver.resolve(apiDir, 'sse'),
+    })
 
     addServerHandler({
       route: '/api/:model',
