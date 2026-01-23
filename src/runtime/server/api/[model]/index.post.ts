@@ -11,7 +11,7 @@ import { broadcast } from '../../utils/sse-bus'
 
 export default eventHandler(async (event) => {
   const { model } = getRouterParams(event) as { model: string }
-  const isAdmin = await ensureResourceAccess(event, model, 'create')
+  await ensureResourceAccess(event, model, 'create')
 
   const table = getTableForModel(model)
 
@@ -59,5 +59,12 @@ export default eventHandler(async (event) => {
     data: newRecord,
   })
 
-  return formatResourceResult(model, newRecord, isAdmin)
+
+  let isGuest = true
+  try {
+     const session = await (getUserSession as (event: H3Event) => Promise<{ user: { id: string | number } | null }>)(event)
+     if (session?.user) isGuest = false
+  } catch {}
+
+  return formatResourceResult(model, newRecord, isGuest)
 })

@@ -1,6 +1,6 @@
 # CRUD Components
 
-This directory contains the components used for the auto-generated CRUD interface.
+This directory contains the components used for the dynamic CRUD interface.
 
 - **Table.vue**: The main table component that displays the list of resources. It handles pagination, sorting (via API), and actions.
 - **CreateRow.vue**: A modal component for creating a new resource record.

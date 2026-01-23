@@ -1,5 +1,5 @@
 /**
- * Dynamically generates a Zod validation schema from a list of field definitions.
+ * Constructs a Zod validation schema from a list of field definitions.
  *
  * Example:
  *  const fields = [

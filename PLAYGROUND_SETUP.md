@@ -36,7 +36,7 @@ Updated to include:
 Created a beautiful, interactive playground UI featuring:
 
 - **Welcome Section** - Introduction to the module
-- **Available Models** - Visual display of all auto-generated endpoints
+- **Available Models** - Visual display of all dynamic endpoints
 - **Quick Start Guide** - Step-by-step setup instructions
 - **API Examples** - Code examples for all CRUD operations
 - **Features Showcase** - Highlighting key module capabilities
@@ -96,7 +96,7 @@ These tools allow users to:
 - Generate and manage migrations
 - Quickly iterate on schema changes during development
 
-## Auto-Generated APIs
+## Dynamic APIs
 
 With the sample schema, the following endpoints are automatically available:
 
@@ -167,7 +167,7 @@ With the sample schema, the following endpoints are automatically available:
 
 ## Key Features Demonstrated
 
-✅ **Zero Configuration** - Just define your schema, APIs are auto-generated
+✅ **Zero Configuration** - Just define your schema, APIs are automatically exposed
 ✅ **Auto-Detection** - Automatically finds all tables in your schema
 ✅ **Type Safety** - Full TypeScript support
 ✅ **Protected Fields** - id and createdAt are automatically protected

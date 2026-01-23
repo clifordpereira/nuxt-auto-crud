@@ -2,7 +2,7 @@
 
 ## Automated Tests
 
-We use `vitest` for automated API testing. The tests are dynamically generated based on the Drizzle schema defined in `playground/server/database/schema.ts`.
+We use `vitest` for automated API testing. The tests are dynamically executed against the Drizzle schema defined in `playground/server/database/schema.ts`.
 
 ### Test Scenarios
 
@@ -30,9 +30,9 @@ To run unit tests:
 npm run test
 ```
 
-### Dynamic Test Generation
+### Dynamic Test Execution
 
-The tests in `test/api.test.ts` import the schema and generate test cases for each supported model (currently `users`). This ensures that tests stay in sync with the schema.
+The tests in `test/api.test.ts` import the schema and constructs test cases for each supported model (currently `users`). This ensures that tests stay in sync with the schema.
 
 1.  **Backend-only (No Auth)**
     - Verifies that APIs are accessible without authentication.

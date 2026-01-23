@@ -41,7 +41,7 @@ sections:
         description: Your database schema is the single source of truth. APIs are automatically exposed based on your table definitions.
         icon: i-lucide-database
       - name: Type Safe
-        description: Full TypeScript support with automatically generated types for your API responses and request bodies.
+        description: Full TypeScript support with automatically inferred types for your API responses and request bodies.
         icon: i-lucide-file-code
       - name: Relationship Handling
         description: Automatically handles relationships between tables, allowing for deep fetching and complex queries out of the box.
@@ -97,27 +97,33 @@ features:
   title: Core Features
   description: A complete full-stack foundation with admin panel, authentication, and automatic CRUD APIs.
   items:
-    - title: Admin Dashboard
-      description: Ready-to-use admin panel with dynamic tables for all your schemas. Includes search, pagination, and export to PDF/Excel.
-      icon: i-lucide-layout-dashboard
-    - title: Dynamic Forms & Tables
-      description: Single robust components automatically handle all tables. Create, edit, delete operations work for any schema without writing code.
-      icon: i-lucide-table
-    - title: Automatic REST APIs
-      description: GET, POST, PATCH, DELETE endpoints for every table. Define schemas once, APIs are instantly available.
-      icon: i-lucide-route
-    - title: Built-in Authentication
-      description: Social login (GitHub, Google) and traditional email/password with registration and password reset flows.
-      icon: i-lucide-shield-check
-    - title: Robust RBAC System
-      description: Manage roles and permissions directly in the admin panel. Control resource access with ease.
-      icon: i-lucide-users
     - title: Zero Code Generation
       description: Unlike other CRUD tools, no code bloat. One set of code handles unlimited tables through smart routing.
       icon: i-lucide-zap
+    - title: Dynamic REST APIs
+      description: GET, POST, PATCH, DELETE endpoints for every table. Define schemas once, APIs are instantly available.
+      icon: i-lucide-route
+    - title: Dynamic Forms & Tables
+      description: Single robust components automatically handle all tables. Create, edit, delete operations work for any schema without writing code.
+      icon: i-lucide-table
+    - title: Built-in Authentication
+      description: Social login (GitHub, Google) and traditional email/password with registration and password reset flows.
+      icon: i-lucide-shield-check
+    - title: Real-time Updates
+      description: Zero-config SSE broadcasting. UI and data stay instantly synchronized across all connected clients.
+      icon: i-lucide-refresh-cw
+    - title: Agentic Ready
+      description: Native MCP support allows AI agents to inspect schemas and interact with your API directly.
+      icon: i-lucide-bot
+    - title: Robust RBAC System
+      description: Manage roles and permissions directly in the admin panel. Control resource access with ease.
+      icon: i-lucide-users
     - title: Smart Relation Handling
       description: Foreign keys automatically display related data (names, titles) in the admin panel. Define relations in Drizzle and APIs handle them seamlessly.
       icon: i-lucide-link
+    - title: Admin Dashboard
+      description: Ready-to-use admin panel with dynamic tables for all your schemas. Includes search, pagination, and export to PDF/Excel.
+      icon: i-lucide-layout-dashboard
 
 testimonials:
   headline: Your Voice Matters

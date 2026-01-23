@@ -33,11 +33,11 @@ export async function hashPayloadFields(payload: Record<string, unknown>): Promi
   }
 }
 
-export function formatResourceResult(model: string, data: Record<string, unknown>, isAdmin: boolean) {
-  if (isAdmin) {
-    return filterHiddenFields(model, data)
+export function formatResourceResult(model: string, data: Record<string, unknown>, isGuest: boolean) {
+  if (isGuest) {
+    return filterPublicColumns(model, data)
   }
   else {
-    return filterPublicColumns(model, data)
+    return filterHiddenFields(model, data)
   }
 }

@@ -166,7 +166,7 @@ export function filterHiddenFields(modelName: string, data: Record<string, unkno
 }
 
 /**
- * Generates Zod schema via drizzle-zod, omitting server-managed and protected fields.
+ * Derives Zod schema via drizzle-zod, omitting server-managed and protected fields.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getZodSchema(modelName: string, type: 'insert' | 'patch' = 'insert'): z.ZodObject<any, any> {

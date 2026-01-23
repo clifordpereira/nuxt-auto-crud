@@ -14,6 +14,7 @@
 * **Dynamic Forms & Tables**: Built-in search, pagination, and validation.
 * **Relation Handling**: Seamlessly manage database relationships.
 * **Admin Dashboard**: Centralized management interface.
+* **Real-time Sync**: Zero-config SSE broadcasting for instant UI updates.
 * **Auth Ready**: Integrated Social Login and Password Reset.
 
 ## Seeding
@@ -33,6 +34,7 @@ Default users initialized during the first-run seed (Password: `$1Password`):
 2.  **Generate**: Run `bun db:generate` to migrate the tables (schemas).
 3.  **Roles**: (Optional) Configure `rolesToSeed` in `app.config.ts`.
 4.  **Permissions**: (Optional) Configure necessary permissions for the resources (tables) in **Admin Dashboard -> Resource Permissions**.
+5.  **Guest View**: (Optional) Define public columns in `nuxt.config.ts` under `autoCrud.resources`.
 
 ## 🤖 Agentic Ready
 This project is optimized for Agentic Workflows using the **Model Context Protocol (MCP)**. It provides structured intelligence to AI agents, allowing them to build, explore, and interact with the application seamlessly.

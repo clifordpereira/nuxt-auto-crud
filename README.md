@@ -13,6 +13,7 @@
 NAC treats your Drizzle schema as the **Single Source of Truth (SSOT)**. Unlike traditional scaffolds, it does not generate physical files; it mounts dynamic Nitro handlers at runtime.
 
 * **Dynamic Routing**: Automatically maps `GET|POST|PATCH|DELETE` to your Drizzle tables.
+* **Real-time Sync**: Built-in SSE broadcasting for `create`, `update`, and `delete` events.
 * **Agentic Compatibility**: Built with an MCP-friendly structure to allow AI Agents to interact directly with the schema-driven API.
 
 ## 🔐 RBAC & Permissions

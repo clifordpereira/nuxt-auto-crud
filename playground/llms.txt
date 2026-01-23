@@ -9,7 +9,7 @@
 
 ## 🍱 nac stack: Dynamic UI (Tool Consumers)
 - **UI Implementation**: Located in `app/components/crud/`. These components are consumers of the core agentic engine.
-- **Dynamic Listing**: Tables generated via `_meta` tool logic.
+- **Dynamic Listing**: Tables derived via `_meta` tool logic.
 - **Dynamic Operations**: CRUD forms hydrated by Drizzle-Zod schema reflection.
 
 ## 🔐 Access & Permissions

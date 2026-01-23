@@ -4,7 +4,7 @@
       <div class="header-content">
         <h1>🚀 Nuxt Auto CRUD Playground</h1>
         <p class="subtitle">
-          Auto-generated RESTful CRUD APIs from your database schema
+          Dynamic RESTful CRUD APIs from your database schema
         </p>
       </div>
     </header>
@@ -16,12 +16,12 @@
         <p>
           This playground demonstrates the
           <strong>nuxt-auto-crud</strong> module in action. The module
-          automatically generates RESTful CRUD APIs based on your database
+          automatically exposes RESTful CRUD APIs based on your database
           schema.
         </p>
         <p>
           Check out the <code>server/database/schema.ts</code> file to see the
-          sample schema, and explore the auto-generated API endpoints below.
+          sample schema, and explore the dynamic API endpoints below.
         </p>
       </section>
 
@@ -195,7 +195,7 @@ await $fetch('/api/users/1', {
             Modify <code>server/database/schema.ts</code> to add your own tables
           </li>
           <li>
-            Restart the dev server to see your new APIs automatically generated
+            Restart the dev server to see your new APIs automatically available
           </li>
           <li>
             Check out the

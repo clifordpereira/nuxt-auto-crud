@@ -16,7 +16,12 @@ import { broadcast } from '../../utils/sse-bus'
 export default eventHandler(async (event) => {
   const { model, id } = getRouterParams(event) as { model: string, id: string }
   // Pass the ID as context for row-level security checks (e.g. self-update)
-  const isAdmin = await ensureResourceAccess(event, model, 'update', { id })
+  await ensureResourceAccess(event, model, 'update', { id })
+
+  // Determine if request is from an authenticated user (Admin/User) or Guest
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const session = await (getUserSession as any)(event)
+  const isGuest = !session?.user
 
   const table = getTableForModel(model) as TableWithId
 
@@ -74,5 +79,5 @@ export default eventHandler(async (event) => {
     data: updatedRecord,
   })
 
-  return formatResourceResult(model, updatedRecord, isAdmin)
+  return formatResourceResult(model, updatedRecord, isGuest)
 })

@@ -85,9 +85,9 @@ export default eventHandler(async (event) => {
     query = query.where(and(...filters)) as any
   }
 
-  const isAdmin = true // Result formatting control
+  const isGuest = !userId // Result formatting control
 
   const results = await query.orderBy(desc(table.id)).all()
 
-  return results.map((item: Record<string, unknown>) => formatResourceResult(model, item, isAdmin))
+  return results.map((item: Record<string, unknown>) => formatResourceResult(model, item, isGuest))
 })
