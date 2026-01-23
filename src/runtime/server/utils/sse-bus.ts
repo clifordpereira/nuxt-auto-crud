@@ -1,7 +1,7 @@
 // server/utils/sse-bus.ts
 import type { WritableStreamDefaultWriter } from 'node:stream/web'
 
-type SSEClient = { id: string; res: WritableStreamDefaultWriter }
+type SSEClient = { id: string, res: WritableStreamDefaultWriter }
 const clients = new Map<string, SSEClient>()
 const encoder = new TextEncoder()
 

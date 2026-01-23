@@ -28,7 +28,12 @@ export default eventHandler(async (event) => {
   event.node.req.on('close', () => {
     clearInterval(ping)
     removeClient(id)
-    try { writer.close() } catch {}
+    try {
+      writer.close()
+    }
+    catch {
+      // Ignore close errors
+    }
   })
 
   return readable
