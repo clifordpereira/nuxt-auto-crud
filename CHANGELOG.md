@@ -1,3 +1,27 @@
+## v1.29.0
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.28.0...v1.29.0)
+
+### 🚀 Enhancements
+
+- Implement real-time CRUD updates via Server-Sent Events (SSE) with server-side broadcasting and a client-side composable. ([e3f34d0](https://github.com/clifordpereira/nuxt-auto-crud/commit/e3f34d0))
+
+### 🩹 Fixes
+
+- Lint error ([83dae88](https://github.com/clifordpereira/nuxt-auto-crud/commit/83dae88))
+
+### 📖 Documentation
+
+- Add documentation detailing the Clifland Architectural Model (CAM) and its core principles. ([ca028e7](https://github.com/clifordpereira/nuxt-auto-crud/commit/ca028e7))
+
+### 🏡 Chore
+
+- Change the word 'generate' to actual process. ([acb65e4](https://github.com/clifordpereira/nuxt-auto-crud/commit/acb65e4))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v1.28.0
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.27.0...v1.28.0)
