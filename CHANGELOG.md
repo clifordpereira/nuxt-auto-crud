@@ -1,3 +1,15 @@
+## v1.31.0
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.30.0...v1.31.0)
+
+### 🚀 Enhancements
+
+- Refactor SSE implementation for improved robustness and compatibility, and configure Nuxt to optimize for serverless environments by aliasing Node.js polyfills. ([1d95ac0](https://github.com/clifordpereira/nuxt-auto-crud/commit/1d95ac0))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v1.30.0
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.29.0...v1.30.0)
