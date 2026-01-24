@@ -84,19 +84,19 @@ export default defineNuxtConfig({
     },
     externals: {
       external: ['better-sqlite3', '@libsql/client', 'xlsx'],
-      inline: ['@nuxthub/kv']
+      inline: ['@nuxthub/kv'],
     },
     alias: {
       'node:crypto': 'crypto',
       'node:stream/web': 'stream/web',
       'node:events': 'events',
-      'node:stream': 'stream'
-    }
+      'node:stream': 'stream',
+    },
   },
 
   hub: {
     db: 'sqlite',
-    kv: true
+    kv: true,
   },
 
   autoCrud: {

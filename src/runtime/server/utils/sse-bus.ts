@@ -29,6 +29,6 @@ export async function broadcast(payload: unknown) {
   // Each isolated instance has its own KV namespace via Nuxt Hub
   await kv.set('nac_signal', {
     ts: Date.now(),
-    payload
+    payload,
   }, { ttl: 60 })
 }

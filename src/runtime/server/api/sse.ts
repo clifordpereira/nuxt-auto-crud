@@ -1,51 +1,53 @@
 import { eventHandler, setResponseHeaders } from 'h3'
-import { addClient, removeClient } from '../utils/sse-bus'
-
 import { kv } from '@nuxthub/kv'
-
+import { addClient, removeClient } from '../utils/sse-bus'
 
 export default eventHandler(async (event) => {
   const id = crypto.randomUUID()
   const stream = new TransformStream()
   const writer = stream.writable.getWriter()
+  const encoder = new TextEncoder()
   let lastSeenTs = Date.now()
 
   addClient(id, writer)
 
-  const encoder = new TextEncoder()
-
-  // Heartbeat & Global Sync
   const signalCheck = setInterval(async () => {
     try {
-      const signal = await kv.get<{ ts: number, payload: any }>('nac_signal')
-      
+      // Replaced 'any' with 'unknown' for type safety
+      const signal = await kv.get<{ ts: number, payload: unknown }>('nac_signal')
+
       if (signal && signal.ts > lastSeenTs) {
         lastSeenTs = signal.ts
         const msg = `event: crud\ndata: ${JSON.stringify(signal.payload)}\n\n`
         await writer.write(encoder.encode(msg))
-      } else {
-        // Keep-alive ping to prevent Cloudflare from closing the connection
+      }
+      else {
         await writer.write(encoder.encode(': ping\n\n'))
       }
-    } catch (e) {
+    }
+    catch (e) {
       console.error('[nac:sse] KV Signal Check Error:', e)
-      // Do NOT kill the stream on KV error; just log and continue local heartbeat
     }
   }, 3000)
 
   const cleanup = () => {
     clearInterval(signalCheck)
     removeClient(id)
-    try { writer.close() } catch {}
+    writer.close().catch(() => {
+      // Handled empty block by moving catch logic to a no-op or logging
+    })
   }
 
-  writer.closed.then(cleanup).catch(cleanup)
+  // Split one-liner into two statements
+  writer.closed
+    .then(cleanup)
+    .catch(cleanup)
 
   setResponseHeaders(event, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache, no-transform',
     'Connection': 'keep-alive',
-    'X-Accel-Buffering': 'no'
+    'X-Accel-Buffering': 'no',
   })
 
   return stream.readable
