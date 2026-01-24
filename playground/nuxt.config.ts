@@ -1,7 +1,5 @@
 import { defineNuxtConfig } from 'nuxt/config'
 
-// https://nuxt.com/docs/api/configuration/nuxt-config
-// Force restart
 export default defineNuxtConfig({
   modules: [
     '@nuxt/ui',
@@ -25,7 +23,6 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     // Private keys (Server-side only)
-    apiSecretToken: '',
     sessionPassword: '',
     adminEmail: 'admin@example.com',
     adminPassword: '$1Password', // Overridden by NUXT_ADMIN_PASSWORD
@@ -61,6 +58,15 @@ export default defineNuxtConfig({
   routeRules: {
     '/': { isr: 3600 },
     '/docs/**': { isr: 86400 },
+    '/api/sse': {
+      cache: false,
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache, no-transform',
+        'Connection': 'keep-alive',
+        'X-Accel-Buffering': 'no',
+      },
+    },
   },
 
   future: {
@@ -70,7 +76,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2026-01-21',
 
   nitro: {
-    compressPublicAssets: true,
+    compressPublicAssets: false,
     minify: true,
     experimental: {
       tasks: true,
@@ -78,6 +84,12 @@ export default defineNuxtConfig({
     },
     externals: {
       external: ['better-sqlite3', '@libsql/client'],
+    },
+    // Crucial: Use 'unenv' to kill Node polyfills that cause build hangs
+    alias: {
+      'node:crypto': 'unenv/runtime/mock/empty',
+      'node:stream/web': 'unenv/runtime/mock/empty',
+      'node:events': 'unenv/runtime/mock/empty',
     },
   },
 
@@ -123,6 +135,7 @@ export default defineNuxtConfig({
       googleAnalytics: true, // Tell the module to enable GA
     },
   },
+
   security: {
     headers: {
       contentSecurityPolicy: false,
