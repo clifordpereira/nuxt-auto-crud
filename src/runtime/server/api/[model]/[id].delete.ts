@@ -33,7 +33,7 @@ export default eventHandler(async (event) => {
     throw new RecordNotFoundError(`${singularName} not found`)
   }
 
-  broadcast('crud', {
+  broadcast({
     table: model,
     action: 'delete',
     primaryKey: deletedRecord.id,

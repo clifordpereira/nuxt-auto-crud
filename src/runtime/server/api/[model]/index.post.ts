@@ -52,7 +52,7 @@ export default eventHandler(async (event) => {
 
   const newRecord = await db.insert(table).values(payload).returning().get() as Record<string, unknown>
 
-  broadcast('crud', {
+  broadcast({
     table: model,
     action: 'create',
     primaryKey: newRecord.id,

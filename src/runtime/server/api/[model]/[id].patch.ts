@@ -72,7 +72,7 @@ export default eventHandler(async (event) => {
     throw new RecordNotFoundError()
   }
 
-  broadcast('crud', {
+  broadcast({
     table: model,
     action: 'update',
     primaryKey: updatedRecord.id,
