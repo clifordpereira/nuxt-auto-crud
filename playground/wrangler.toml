@@ -14,6 +14,10 @@ migrations_dir = "server/db/migrations/sqlite"
 enabled = true
 head_sampling_rate = 1
 
+[[kv_namespaces]]
+binding = "KV"
+id = "12850c35c07a4574ad0a51ba6e6832ec"
+
 [assets]
 directory = ".output/public"
 binding = "ASSETS"

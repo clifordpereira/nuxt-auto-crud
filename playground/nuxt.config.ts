@@ -83,18 +83,20 @@ export default defineNuxtConfig({
       openAPI: false,
     },
     externals: {
-      external: ['better-sqlite3', '@libsql/client'],
+      external: ['better-sqlite3', '@libsql/client', 'xlsx'],
+      inline: ['@nuxthub/kv']
     },
-    // Crucial: Use 'unenv' to kill Node polyfills that cause build hangs
     alias: {
-      'node:crypto': 'unenv/runtime/mock/empty',
-      'node:stream/web': 'unenv/runtime/mock/empty',
-      'node:events': 'unenv/runtime/mock/empty',
-    },
+      'node:crypto': 'crypto',
+      'node:stream/web': 'stream/web',
+      'node:events': 'events',
+      'node:stream': 'stream'
+    }
   },
 
   hub: {
     db: 'sqlite',
+    kv: true
   },
 
   autoCrud: {
