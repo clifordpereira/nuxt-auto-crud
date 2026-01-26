@@ -1,4 +1,3 @@
-import { defineNuxtConfig } from 'nuxt/config'
 import { fileURLToPath } from 'node:url'
 import MyModule from '../../../src/module'
 
@@ -7,7 +6,6 @@ export default defineNuxtConfig({
     '@nuxthub/core',
     'nuxt-auth-utils',
     'nuxt-authorization',
-    '@nuxt/test-utils/module',
     MyModule,
   ],
   runtimeConfig: {
