@@ -4,10 +4,11 @@ import MyModule from '../../../src/module'
 
 export default defineNuxtConfig({
   modules: [
-    MyModule,
+    '@nuxthub/core',
     'nuxt-auth-utils',
     'nuxt-authorization',
-    '@nuxthub/core',
+    '@nuxt/test-utils/module',
+    MyModule,
   ],
   runtimeConfig: {
     session: {
@@ -23,4 +24,8 @@ export default defineNuxtConfig({
       nitroConfig.plugins.unshift(fileURLToPath(new URL('./server/plugins/mock-hub.ts', import.meta.url)))
     },
   },
+  future: {
+    compatibilityVersion: 4,
+  },
+  compatibilityDate: '2026-01-26',
 })

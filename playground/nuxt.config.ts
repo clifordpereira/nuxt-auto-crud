@@ -15,6 +15,7 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@nuxt/scripts',
     '@nuxt/fonts',
+    '@nuxt/test-utils/module',
   ],
 
   devtools: { enabled: true },
@@ -109,7 +110,7 @@ export default defineNuxtConfig({
     // Fields exposed to guest users.
     // Ensure the `list` permission for the `public` role is enabled for these resources in the Admin Dashboard.
     resources: {
-      testimonials: ['name', 'content', 'avatar', 'company', 'createdAt'],
+      testimonials: ['id', 'name', 'content', 'avatar', 'company', 'createdAt'],
     },
   },
   delayHydration: {
