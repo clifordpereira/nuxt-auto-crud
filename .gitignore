@@ -56,4 +56,5 @@ Temporary Items
 .apdisk
 
 playground/.data
-playground-backendonly/.data
+test/fixtures/basic/.data
+test/fixtures/crud/.data

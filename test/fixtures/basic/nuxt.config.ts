@@ -4,24 +4,9 @@ import MyModule from '../../../src/module'
 export default defineNuxtConfig({
   modules: [
     '@nuxthub/core',
-    'nuxt-auth-utils',
-    'nuxt-authorization',
     MyModule,
   ],
-  runtimeConfig: {
-    session: {
-      password: 'password-must-be-at-least-32-characters-long-right',
-    },
-  },
-  alias: {
-    'hub:db': fileURLToPath(new URL('./server/utils/db.ts', import.meta.url)),
-  },
-  hooks: {
-    'nitro:config': (nitroConfig) => {
-      nitroConfig.plugins = nitroConfig.plugins || []
-      nitroConfig.plugins.unshift(fileURLToPath(new URL('./server/plugins/mock-hub.ts', import.meta.url)))
-    },
-  },
+  hub: { database: true, kv: true },
   future: {
     compatibilityVersion: 4,
   },
