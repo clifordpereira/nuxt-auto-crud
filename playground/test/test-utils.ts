@@ -33,7 +33,7 @@ export async function getAuthClient(creds = {
   
   return {
     client,
-    user: (res as any)._data?.user || (res as any).data?.user,
+    user: res._data?.user ?? res._data?.data?.user,
     creds
   }
 }
