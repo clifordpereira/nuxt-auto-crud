@@ -30,3 +30,7 @@ description: "Architecture and directory boundaries for NAC Interface, prioritiz
 ## 5. Operational Instructions
 - Inform me before expanding analysis beyond `playground/app/components/crud/` for frontend tasks.
 - Prioritize **Gemini 3 Flash** for high speed and low token consumption.
+
+
+# Instruction for Antigravity
+- When generating or refactoring test cases for the `nuxt-auto-crud` core or template, always cross-reference `.agent/docs/nuxt-testing-doc.md` and `.agent/rules/test-case-instructions.md`. Prioritize server-side logic compatibility for Agentic/MCP tools and ensure zero-config validation paths are fully exercised.
