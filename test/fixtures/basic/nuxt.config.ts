@@ -4,9 +4,8 @@ import MyModule from '../../../src/module'
 export default defineNuxtConfig({
   modules: [
     '@nuxthub/core',
-    MyModule,
+    // MyModule,
   ],
-  // hub: { db: true, kv: true },
   future: {
     compatibilityVersion: 4,
   },
