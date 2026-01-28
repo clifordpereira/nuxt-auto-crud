@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs'
 import {
   defineNuxtModule,
   createResolver,
@@ -25,9 +26,9 @@ export default defineNuxtModule<ModuleOptions>({
   },
   defaults: {
     schemaPath: 'server/db/schema',
-
     auth: false,
   },
+
   async setup(options, nuxt) {
     const resolver = createResolver(import.meta.url)
 
@@ -35,25 +36,12 @@ export default defineNuxtModule<ModuleOptions>({
       nuxt.options.rootDir,
       options.schemaPath!,
     )
-    nuxt.options.alias['#site/schema'] = schemaPath
-
-    addImportsDir(resolver.resolve(nuxt.options.rootDir, 'shared/utils'))
-
-    // Add stubs for optional modules
-    const stubsPath = resolver.resolve('./runtime/server/stubs/auth')
-    if (!hasNuxtModule('nuxt-auth-utils')) {
-      addServerImports([
-        { name: 'requireUserSession', from: stubsPath },
-        { name: 'getUserSession', from: stubsPath },
-        { name: 'hashPassword', from: stubsPath },
-      ])
-    }
-    if (!hasNuxtModule('nuxt-authorization')) {
-      addServerImports([
-        { name: 'allows', from: stubsPath },
-        { name: 'abilities', from: stubsPath },
-        { name: 'abilityLogic', from: stubsPath },
-      ])
+    if (!existsSync(schemaPath)) {
+      // If schema path does not exist, use empty schema stub
+      nuxt.options.alias['#site/schema'] = resolver.resolve('./runtime/server/stubs/empty-schema')
+      console.warn(`Schema not found at ${schemaPath}. nuxt-auto-crud will be disabled.`)
+    } else {
+      nuxt.options.alias['#site/schema'] = schemaPath
     }
 
     nuxt.options.alias['#authorization'] ||= 'nuxt-authorization/utils'
@@ -81,8 +69,42 @@ export default defineNuxtModule<ModuleOptions>({
       hashedFields: options.hashedFields ?? ['password'],
     }
 
+    addImportsDir(resolver.resolve('./runtime/composables'))
+    addImportsDir(resolver.resolve(nuxt.options.rootDir, 'shared/utils'))
+    addServerImportsDir(resolver.resolve('./runtime/server/utils'))
+
+    // Add stubs for optional modules
+    const stubsPath = resolver.resolve('./runtime/server/stubs/auth')
+    if (!hasNuxtModule('nuxt-auth-utils')) {
+      addServerImports([
+        { name: 'requireUserSession', from: stubsPath },
+        { name: 'getUserSession', from: stubsPath },
+        { name: 'hashPassword', from: stubsPath },
+      ])
+    }
+    if (!hasNuxtModule('nuxt-authorization')) {
+      addServerImports([
+        { name: 'allows', from: stubsPath },
+        { name: 'abilities', from: stubsPath },
+        { name: 'abilityLogic', from: stubsPath },
+      ])
+    }
+
     const apiDir = resolver.resolve('./runtime/server/api')
 
+    // Meta Discovery API for AI Agents
+    addServerHandler({
+      route: '/api/_meta',
+      method: 'get',
+      handler: resolver.resolve(apiDir, '_meta.get'),
+    })
+    // SSE for real time updates
+    addServerHandler({
+      route: '/api/sse',
+      method: 'get',
+      handler: resolver.resolve(apiDir, 'sse'),
+    })
+    // Helper APIs for Dynamic CRUD
     addServerHandler({
       route: '/api/_schema',
       method: 'get',
@@ -98,17 +120,7 @@ export default defineNuxtModule<ModuleOptions>({
       method: 'get',
       handler: resolver.resolve(apiDir, '_relations.get'),
     })
-    addServerHandler({
-      route: '/api/_meta',
-      method: 'get',
-      handler: resolver.resolve(apiDir, '_meta.get'),
-    })
-    addServerHandler({
-      route: '/api/sse',
-      method: 'get',
-      handler: resolver.resolve(apiDir, 'sse'),
-    })
-
+    // Dynamic CRUD APIs
     addServerHandler({
       route: '/api/:model',
       method: 'get',
@@ -134,9 +146,5 @@ export default defineNuxtModule<ModuleOptions>({
       method: 'delete',
       handler: resolver.resolve(apiDir, '[model]/[id].delete'),
     })
-
-    addServerImportsDir(resolver.resolve('./runtime/server/utils'))
-
-    addImportsDir(resolver.resolve('./runtime/composables'))
   },
 })
