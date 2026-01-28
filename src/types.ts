@@ -26,27 +26,14 @@ export interface ModuleOptions {
 }
 
 export interface AuthOptions {
-  /**
-   * Authentication type
-   * @default 'session'
-   */
-  type?: 'session' | 'jwt'
-  /**
-   * JWT Secret (required if type is 'jwt')
-   */
-  jwtSecret?: string
-  /**
-   * Enable authentication checks (requires nuxt-auth-utils for session)
-   * @default false
-   */
-  authentication: boolean
-  /**
-   * Enable authorization checks (requires nuxt-authorization)
-   * @default false
-   */
+  /** @default 'session' */
+  type?: 'session'
+  /** @default false */
+  authentication?: boolean
+  /** @default false */
   authorization?: boolean
 }
 
 export interface RuntimeModuleOptions extends Omit<ModuleOptions, 'auth'> {
-  auth: AuthOptions
+  auth: Required<AuthOptions>
 }

@@ -6,7 +6,6 @@ import { createError, getHeader, getQuery } from 'h3'
 // @ts-expect-error - #imports is a virtual alias
 import { requireUserSession, allows, getUserSession, abilities as globalAbility, abilityLogic, useRuntimeConfig } from '#imports'
 import { useAutoCrudConfig } from './config'
-import { verifyJwtToken } from './jwt'
 
 export async function checkAdminAccess(event: H3Event, model: string, action: string, context?: unknown): Promise<boolean> {
   const { auth } = useAutoCrudConfig()
@@ -25,14 +24,6 @@ export async function checkAdminAccess(event: H3Event, model: string, action: st
 
   if (token && apiToken && token === apiToken) {
     return true
-  }
-
-  if (auth.type === 'jwt') {
-    if (!auth.jwtSecret) {
-      console.warn('JWT Secret is not configured but auth type is jwt')
-      return false
-    }
-    return verifyJwtToken(event, auth.jwtSecret)
   }
 
   // Session based (default)
@@ -141,12 +132,6 @@ export async function ensureAuthenticated(event: H3Event): Promise<void> {
     return
   }
 
-  // 2. JWT Check
-  if (auth.type === 'jwt' && auth.jwtSecret) {
-    if (await verifyJwtToken(event, auth.jwtSecret)) return
-    throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
-  }
-
-  // 3. Session Check (Standard UI)
+  // 2. Session Check (Standard UI)
   await (requireUserSession as (event: H3Event) => Promise<void>)(event)
 }

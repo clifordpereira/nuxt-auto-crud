@@ -13,7 +13,7 @@ import type { ModuleOptions, AuthOptions, RuntimeModuleOptions } from './types'
 export type { ModuleOptions }
 
 declare module '@nuxt/schema' {
-  interface RuntimeConfig {
+  interface PublicRuntimeConfig {
     autoCrud: RuntimeModuleOptions
   }
 }
@@ -38,26 +38,16 @@ export default defineNuxtModule<ModuleOptions>({
     nuxt.options.alias['#site/schema'] = schemaPath
     nuxt.options.alias['#authorization'] ||= 'nuxt-authorization/utils'
 
-    const mergedAuth: AuthOptions = options.auth === false
-      ? { authentication: false, authorization: false, type: 'session' }
-      : {
-          authentication: true,
-          authorization: options.auth === true,
-          type: 'session',
+    const mergedAuth: Required<AuthOptions> = {
+      type: 'session',
+      authentication: options.auth !== false,
+      authorization: options.auth !== false,
+      ...(typeof options.auth === 'object' ? options.auth : {} as AuthOptions),
+    } as Required<AuthOptions>
 
-          ...(typeof options.auth === 'object' ? options.auth : {}),
-        }
-
-    nuxt.options.runtimeConfig.autoCrud = {
-      auth: {
-        authentication: mergedAuth.authentication ?? false,
-        authorization: mergedAuth.authorization ?? false,
-        type: mergedAuth.type ?? 'session',
-        jwtSecret: mergedAuth.jwtSecret,
-      },
-      resources: {
-        ...options.resources,
-      },
+    nuxt.options.runtimeConfig.public.autoCrud = {
+      ...options,
+      auth: mergedAuth,
       hashedFields: options.hashedFields ?? ['password'],
     }
 
