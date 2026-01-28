@@ -1,5 +1,10 @@
 {
   "private": true,
   "name": "basic",
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "drizzle-orm": "^0.45.1",
+    "drizzle-kit": "^0.31.8",
+    "@libsql/client": "^0.17.0"
+  }
 }
