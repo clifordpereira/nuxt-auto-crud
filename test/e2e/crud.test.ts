@@ -2,9 +2,9 @@ import { fileURLToPath } from 'node:url'
 import { describe, it, expect } from 'vitest'
 import { setup, $fetch } from '@nuxt/test-utils/e2e'
 
-describe('NAC Basic Fixture', async () => {
+describe('NAC CRUD Fixture', async () => {
   await setup({
-    rootDir: fileURLToPath(new URL('../fixtures/basic', import.meta.url)),
+    rootDir: fileURLToPath(new URL('../fixtures/crud', import.meta.url)),
   })
 
   it('boots without internal server errors', async () => {

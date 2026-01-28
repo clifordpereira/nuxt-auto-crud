@@ -1,4 +1,3 @@
-import { existsSync } from 'node:fs'
 import {
   defineNuxtModule,
   createResolver,
@@ -36,14 +35,7 @@ export default defineNuxtModule<ModuleOptions>({
       nuxt.options.rootDir,
       options.schemaPath!,
     )
-    if (!existsSync(schemaPath)) {
-      // If schema path does not exist, use empty schema stub
-      nuxt.options.alias['#site/schema'] = resolver.resolve('./runtime/server/stubs/empty-schema')
-      console.warn(`Schema not found at ${schemaPath}. nuxt-auto-crud will be disabled.`)
-    } else {
-      nuxt.options.alias['#site/schema'] = schemaPath
-    }
-
+    nuxt.options.alias['#site/schema'] = schemaPath
     nuxt.options.alias['#authorization'] ||= 'nuxt-authorization/utils'
 
     const mergedAuth: AuthOptions = options.auth === false

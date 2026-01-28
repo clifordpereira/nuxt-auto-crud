@@ -8,6 +8,7 @@ export default defineNuxtConfig({
   compatibilityDate: "2026-01-26",
   hub: {
     db: "sqlite",
+    kv: true
   },
   autoCrud: {},
 });
