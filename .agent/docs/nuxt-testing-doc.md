@@ -1,6 +1,11 @@
+---
+title: Nuxt Testing Documentation
+description: How to test a Nuxt application.
+---
+
 # Testing
 
-> How to test your Nuxt application.
+> How to test a Nuxt application.
 
 <tip>
 
