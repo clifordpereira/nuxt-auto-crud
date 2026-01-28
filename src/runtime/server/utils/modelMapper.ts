@@ -21,11 +21,6 @@ export const customHiddenFields: Record<string, string[]> = {}
 function buildModelTableMap(): Record<string, unknown> {
   const tableMap: Record<string, unknown> = {}
 
-  // Defensively check if schema exists and is not empty to support schema-less fixtures
-  if (!schema || Object.keys(schema).length === 0) {
-    return tableMap
-  }
-
   for (const [key, value] of Object.entries(schema)) {
     if (value && typeof value === 'object') {
       try {
@@ -56,7 +51,7 @@ export function getTableForModel(modelName: string): SQLiteTable {
     const availableModels = Object.keys(modelTableMap).join(', ')
     throw createError({
       statusCode: 404,
-      message: `Model '${modelName}' not found. ${availableModels ? `Available models: ${availableModels}` : 'No models available.'}`,
+      message: `Model '${modelName}' not found. Available models: ${availableModels}`,
     })
   }
 
@@ -119,7 +114,7 @@ export function getModelSingularName(modelName: string): string {
 }
 
 export function getModelPluralName(modelName: string): string {
-  return pluralize.plural(modelName)
+  return pluralize.plural(modelName).toLowerCase()
 }
 
 export function getAvailableModels(): string[] {
