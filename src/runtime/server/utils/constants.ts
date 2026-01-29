@@ -1,9 +1,15 @@
+// server/utils/constants.ts
+export const SYSTEM_USER_FIELDS = [
+  'createdBy', 'created_by', 
+  'updatedBy', 'updated_by', 
+  'deletedBy', 'deleted_by'
+]
+
 export const PROTECTED_FIELDS = [
   'id',
   'createdAt', 'updatedAt', 'deletedAt',
-  'createdBy', 'updatedBy', 'deletedBy',
   'created_at', 'updated_at', 'deleted_at',
-  'created_by', 'updated_by', 'deleted_by',
+  ...SYSTEM_USER_FIELDS
 ]
 
 export const HIDDEN_FIELDS = [
@@ -15,11 +21,5 @@ export const HIDDEN_FIELDS = [
   'googleId', 'google_id',
   'secret',
   'token',
-  // System Fields (Leakage prevention)
-  'deletedAt',
-  'createdBy',
-  'updatedBy',
-  'deleted_at',
-  'created_by',
-  'updated_by',
+  ...SYSTEM_USER_FIELDS
 ]

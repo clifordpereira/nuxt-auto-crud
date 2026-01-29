@@ -2,6 +2,7 @@ import 'drizzle-orm' // Hoisted for performance cache
 
 import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest'
 import type { H3Error } from '#build/types/nitro-imports'
+import { mockSchema } from '../utils/schema'
 
 type ModelMapper = typeof import('../../src/runtime/server/utils/modelMapper')
 
@@ -15,22 +16,7 @@ describe('modelMapper.ts', () => {
       }),
     }))
 
-    vi.doMock('#site/schema', async () => {
-      const { sqliteTable, text, integer } = await import('drizzle-orm/sqlite-core')
-      return {
-        users: sqliteTable('users', {
-          id: integer('id').primaryKey(),
-          email: text('email').notNull(),
-          password: text('password'),
-          lastLogin: integer('last_login', { mode: 'timestamp' }),
-          deletedAt: integer('deleted_at', { mode: 'timestamp' }),
-        }),
-        logs: sqliteTable('logs', {
-          id: integer('id').primaryKey(),
-          message: text('message'),
-        }),
-      }
-    })
+    vi.doMock('#site/schema', () => mockSchema)
   })
 
   beforeEach(async () => {

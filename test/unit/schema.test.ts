@@ -1,0 +1,97 @@
+// schema.test.ts
+import 'drizzle-orm' // Hoisted for performance cache
+
+import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest'
+import type { H3Error } from '#build/types/nitro-imports'
+import { mockSchema } from '../utils/schema'
+
+type Schema = typeof import('../../src/runtime/server/utils/schema')
+
+describe('schema.ts', () => {
+  let schemaUtils: Schema
+
+  beforeAll(async () => {
+    vi.doMock('#imports', () => ({
+      useRuntimeConfig: () => ({
+        autoCrud: { resources: { users: ['email', 'lastLogin'] } },
+      }),
+    }))
+
+    vi.doMock('#site/schema', () => mockSchema)
+  })
+
+  beforeEach(async () => {
+    schemaUtils = await import('../../src/runtime/server/utils/schema')
+  })
+
+  it('maps Drizzle types to NAC Field types', () => {
+    const { fields } = schemaUtils.drizzleTableToFields(mockSchema.users, 'users')
+
+    const bioField = fields.find((f: any) => f.name === 'bio')
+    const emailField = fields.find((f: any) => f.name === 'email')
+
+    expect(bioField?.type).toBe('textarea')
+    expect(emailField?.required).toBe(true)
+  })
+
+  it('handles foreign key detection', () => {
+    const result = schemaUtils.drizzleTableToFields(mockSchema.posts, 'posts')
+    const authorField = result.fields.find((f: any) => f.name === 'authorId')
+
+    // Maps back to the model key 'users'
+    expect(authorField?.references).toBe('users')
+  })
+
+  it('strips hidden/protected fields from UI field list', () => {
+    const { fields } = schemaUtils.drizzleTableToFields(mockSchema.users, 'users')
+    const fieldNames = fields.map((f: any) => f.name)
+
+    // Identity and sensitive fields should not be in the dynamic form fields
+    expect(fieldNames).not.toContain('password')
+    expect(fieldNames).not.toContain('createdAt')
+  })
+
+  it('maps enum values to selectOptions', () => {
+    const { fields } = schemaUtils.drizzleTableToFields(mockSchema.users, 'users')
+    const roleField = fields.find((f: any) => f.name === 'role')
+    
+    expect(roleField?.type).toBe('enum')
+    expect(roleField?.selectOptions).toContain('admin')
+  })
+
+  it('identifies timestamp/date fields via name heuristics', () => {
+    const { fields } = schemaUtils.drizzleTableToFields(mockSchema.users, 'users')
+    const lastLoginField = fields.find((f: any) => f.name === 'lastLogin')
+    
+    // Even if it is a SQLite integer, if name ends in 'At' or 'Login', it should be 'date'
+    expect(lastLoginField?.type).toBe('date')
+  })
+
+  it('validates the Clifland labelField priority (name > email)', () => {
+    const result = schemaUtils.drizzleTableToFields(mockSchema.users, 'users')
+    // 'name' exists in updated mock, so it should be picked over 'email'
+    expect(result.labelField).toBe('name')
+  })
+
+  it('verifies getRelations auto-links system fields to users', async () => {
+    const relations = await schemaUtils.getRelations()
+    expect(relations.users).toBeDefined()
+    expect(relations.users?.createdBy).toBe('users')
+  })
+
+  it('correctly identifies labelField using Clifland Heuristic', () => {
+    const result = schemaUtils.drizzleTableToFields(mockSchema.users, 'users')
+    expect(result.labelField).toBe('name')
+  })
+
+  it('falls back to "id" if no heuristic matches', () => {
+    const result = schemaUtils.drizzleTableToFields(mockSchema.logs, 'logs')
+    expect(result.labelField).toBe('id')
+  })
+
+  it('returns empty references if no foreign keys exist', () => {
+    const result = schemaUtils.drizzleTableToFields(mockSchema.logs, 'logs')
+    const messageField = result.fields.find((f: any) => f.name === 'message')
+    expect(messageField?.references).toBeUndefined()
+  })
+})

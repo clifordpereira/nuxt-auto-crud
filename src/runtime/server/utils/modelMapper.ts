@@ -154,14 +154,11 @@ export function filterPublicColumns(modelName: string, data: Record<string, unkn
 }
 
 export function filterHiddenFields(modelName: string, data: Record<string, unknown>): Record<string, unknown> {
-  const hidden = getHiddenFields(modelName)
+  const hiddenFields = getHiddenFields(modelName)
   const filtered: Record<string, unknown> = {}
 
   for (const [key, value] of Object.entries(data)) {
-    const isHidden = hidden.includes(key)
-    const isProtected = PROTECTED_FIELDS.includes(key)
-
-    if (!isHidden && !isProtected) {
+    if (!hiddenFields.includes(key)) {
       filtered[key] = value
     }
   }

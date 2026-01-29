@@ -1,6 +1,8 @@
+// server/utils/schema.ts
 import { getTableColumns } from 'drizzle-orm'
 import { getTableConfig } from 'drizzle-orm/sqlite-core'
 import { modelTableMap } from './modelMapper'
+import { HIDDEN_FIELDS, SYSTEM_USER_FIELDS } from './constants'
 
 export interface Field {
   name: string
@@ -10,93 +12,60 @@ export interface Field {
   references?: string
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+/**
+ * Extracts the target table name from a Drizzle foreign key
+ */
+function getTargetTableName(fk: any): string {
+  return fk.reference().foreignTable[Symbol.for('drizzle:Name')]
+}
+
 export function drizzleTableToFields(table: any, resourceName: string) {
   const columns = getTableColumns(table)
   const fields: Field[] = []
 
   for (const [key, col] of Object.entries(columns)) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const column = col as any
-    const isRequired = column.notNull
+    if (HIDDEN_FIELDS.includes(key)) continue
 
+    const column = col as any
     const { type, selectOptions } = mapColumnType(column)
 
     fields.push({
       name: key,
       type,
-      required: isRequired,
+      required: column.notNull,
       selectOptions,
     })
   }
 
-  // Clifland Heuristic: Auto-detect the primary label for the resource
   const fieldNames = fields.map(f => f.name)
-  const labelField = fieldNames.find(n => n === 'name')
-    || fieldNames.find(n => n === 'title')
-    || fieldNames.find(n => n === 'email')
-    || 'id'
+  const labelField = ['name', 'title', 'email'].find(n => fieldNames.includes(n)) || 'id'
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const config = getTableConfig(table as any)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const config = getTableConfig(table)
     config.foreignKeys.forEach((fk: any) => {
-      const sourceColumnName = fk.reference().columns[0].name
-
-      // Find the TS property name (key) that corresponds to this SQL column name
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const propertyName = Object.entries(columns).find(([_, col]: [string, any]) => col.name === sourceColumnName)?.[0]
-
-      if (propertyName) {
-        const field = fields.find(f => f.name === propertyName)
-        if (field) {
-          // Get target table name
-          const targetTable = fk.reference().foreignTable[Symbol.for('drizzle:Name')] as string
-          field.references = targetTable
-        }
-      }
+      const sourceCol = fk.reference().columns[0].name
+      const propertyName = Object.entries(columns).find(([_, c]: [string, any]) => c.name === sourceCol)?.[0]
+      const field = fields.find(f => f.name === propertyName)
+      if (field) field.references = getTargetTableName(fk)
     })
-  }
-  catch {
-    // Ignore error if getTableConfig fails (e.g. not a Drizzle table)
-  }
+  } catch {}
 
-  return {
-    resource: resourceName,
-    labelField, // metadata point
-    fields,
-  }
+  return { resource: resourceName, labelField, fields }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function mapColumnType(column: any): { type: string, selectOptions?: string[] } {
-  // Check for enum values (Drizzle stores them in enumValues or config.enumValues)
   const enumValues = column.enumValues || column.config?.enumValues
+  if (enumValues) return { type: 'enum', selectOptions: enumValues }
 
-  if (enumValues) {
-    return { type: 'enum', selectOptions: enumValues }
-  }
+  const { dataType, columnType, name } = column
+  const isDateName = name.endsWith('_at') || name.endsWith('At') || name.endsWith('Login')
 
-  if (column.dataType === 'boolean') {
-    return { type: 'boolean' }
+  if (dataType === 'boolean') return { type: 'boolean' }
+  if (dataType === 'date' || (dataType === 'string' && isDateName)) return { type: 'date' }
+  if (dataType === 'number' || columnType.includes('Integer') || columnType.includes('Real')) {
+    return isDateName ? { type: 'date' } : { type: 'number' }
   }
-
-  if (column.dataType === 'date' || (column.dataType === 'string' && (column.name.endsWith('_at') || column.name.endsWith('At')))) {
-    return { type: 'date' }
-  }
-
-  if (column.dataType === 'number' || column.columnType === 'SQLiteInteger' || column.columnType === 'SQLiteReal') {
-    // Check if it is a timestamp
-    if (column.name.endsWith('_at') || column.name.endsWith('At')) {
-      return { type: 'date' }
-    }
-    return { type: 'number' }
-  }
-
-  if (['content', 'description', 'bio', 'message'].includes(column.name)) {
-    return { type: 'textarea' }
-  }
+  if (['content', 'description', 'bio', 'message'].includes(name)) return { type: 'textarea' }
 
   return { type: 'string' }
 }
@@ -106,39 +75,22 @@ export async function getRelations() {
 
   for (const [tableName, table] of Object.entries(modelTableMap)) {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const config = getTableConfig(table as any)
-      const tableRelations: Record<string, string> = {}
-      relations[tableName] = tableRelations
-
-      // Map column names to property names
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const columns = getTableColumns(table as any)
-      const columnToProperty: Record<string, string> = {}
+      const tableRelations: Record<string, string> = {}
+
       for (const [key, col] of Object.entries(columns)) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const columnName = (col as any).name
-        columnToProperty[columnName] = key
-
-        // Auto-link createdBy/updatedBy to users table
-        if (['createdBy', 'created_by', 'updatedBy', 'updated_by', 'deletedBy', 'deleted_by'].includes(key)) {
-          tableRelations[key] = 'users'
-        }
+        if (SYSTEM_USER_FIELDS.includes(key)) tableRelations[key] = 'users'
       }
 
-      if (config.foreignKeys.length > 0) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        config.foreignKeys.forEach((fk: any) => {
-          const sourceColumnName = fk.reference().columns[0].name
-          const sourceProperty = columnToProperty[sourceColumnName] || sourceColumnName
-          const targetTable = fk.reference().foreignTable[Symbol.for('drizzle:Name')]
-          tableRelations[sourceProperty] = targetTable
-        })
-      }
-    }
-    catch {
-      // Ignore tables that don't have config (e.g. not Drizzle tables)
-    }
+      config.foreignKeys.forEach((fk: any) => {
+        const sourceColName = fk.reference().columns[0].name
+        const propName = Object.entries(columns).find(([_, c]: [string, any]) => (c as any).name === sourceColName)?.[0]
+        if (propName) tableRelations[propName] = getTargetTableName(fk)
+      })
+
+      relations[tableName] = tableRelations
+    } catch {}
   }
   return relations
 }
@@ -155,6 +107,5 @@ export async function getAllSchemas() {
 
 export async function getSchema(tableName: string) {
   const table = modelTableMap[tableName]
-  if (!table) return undefined
-  return drizzleTableToFields(table, tableName)
+  return table ? drizzleTableToFields(table, tableName) : undefined
 }
