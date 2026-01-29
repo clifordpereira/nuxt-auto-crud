@@ -7,8 +7,8 @@ describe('modelMapper.ts', () => {
   beforeAll(async () => {
     vi.doMock('#imports', () => ({
       useRuntimeConfig: () => ({
-        autoCrud: { resources: { users: ['email', 'lastLogin'] } }
-      })
+        autoCrud: { resources: { users: ['email', 'lastLogin'] } },
+      }),
     }))
 
     vi.doMock('#site/schema', async () => {
@@ -19,12 +19,12 @@ describe('modelMapper.ts', () => {
           email: text('email').notNull(),
           password: text('password'),
           lastLogin: integer('last_login', { mode: 'timestamp' }),
-          deletedAt: integer('deleted_at', { mode: 'timestamp' })
+          deletedAt: integer('deleted_at', { mode: 'timestamp' }),
         }),
         logs: sqliteTable('logs', {
           id: integer('id').primaryKey(),
-          message: text('message')
-        })
+          message: text('message'),
+        }),
       }
     })
   })
@@ -58,7 +58,8 @@ describe('modelMapper.ts', () => {
   it('throws 404 with hints when model is missing', () => {
     try {
       mapper.getTableForModel('non_existent')
-    } catch (e: any) {
+    }
+    catch (e: any) {
       expect(e.statusCode).toBe(404)
       expect(e.message).toContain('users, logs')
     }
@@ -77,7 +78,7 @@ describe('modelMapper.ts', () => {
 
   it('validates required fields via generated schema', () => {
     const schema = mapper.getZodSchema('users', 'insert')
-    const result = schema.safeParse({ password: '123' }) 
+    const result = schema.safeParse({ password: '123' })
 
     expect(result.success).toBe(false)
     const fieldErrors = !result.success ? result.error.flatten().fieldErrors : {}
@@ -99,7 +100,7 @@ describe('modelMapper.ts', () => {
     expect(mapper.getModelSingularName('analyses')).toBe('Analysis')
     expect(mapper.getModelSingularName('audit_logs')).toBe('AuditLog')
   })
-  
+
   it('handles empty/non-table exports in schema safely', () => {
     // Test buildModelTableMap logic against unexpected exports
     expect(mapper.getAvailableModels()).not.toContain('nonTableExport')
@@ -109,7 +110,7 @@ describe('modelMapper.ts', () => {
     expect(() => {
       mapper.getZodSchema('logs', 'insert')
     }).not.toThrow()
-    
+
     const schema = mapper.getZodSchema('logs', 'insert')
     expect((schema as any).shape.message).toBeDefined()
   })
@@ -124,14 +125,14 @@ describe('modelMapper.ts', () => {
     vi.resetModules() // Wipe the cache
     vi.doMock('#imports', () => ({
       useRuntimeConfig: () => ({
-        autoCrud: { resources: { logs: [] } } // Explicitly empty
-      })
+        autoCrud: { resources: { logs: [] } }, // Explicitly empty
+      }),
     }))
-    
+
     // Re-import to catch the new mock state
     const mapperInstance = await import('../../src/runtime/server/utils/modelMapper')
     const result = mapperInstance.filterPublicColumns('logs', { message: 'test' })
-    
+
     expect(result).toEqual({})
   })
 
@@ -143,18 +144,18 @@ describe('modelMapper.ts', () => {
 
   it('prioritizes customHiddenFields and respects constants', () => {
     mapper.customHiddenFields['users'] = ['email']
-    const result = mapper.filterHiddenFields('users', { email: 'secret', password: '123', username: 'clif' })    
-    expect(result.email).toBeUndefined()    // Custom hidden
+    const result = mapper.filterHiddenFields('users', { email: 'secret', password: '123', username: 'clif' })
+    expect(result.email).toBeUndefined() // Custom hidden
     expect(result.password).toBeUndefined() // Constant hidden
-    expect(result.username).toBe('clif')    // Safe
+    expect(result.username).toBe('clif') // Safe
   })
 
   it('ensures PROTECTED_FIELDS are never updatable even if public', () => {
     const input = { email: 'new@clifland.com', id: 999, createdAt: '2026-01-01' }
     const result = mapper.filterUpdatableFields('users', input)
-    
+
     expect(result.email).toBeDefined()
-    expect(result.id).toBeUndefined()        // Protected
+    expect(result.id).toBeUndefined() // Protected
     expect(result.createdAt).toBeUndefined() // Protected
   })
 })
