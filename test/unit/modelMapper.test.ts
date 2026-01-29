@@ -1,8 +1,12 @@
+import 'drizzle-orm' // Hoisted for performance cache
+
 import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest'
-import * as drizzleStore from 'drizzle-orm' // Hoisted for performance cache
+import type { H3Error } from '#build/types/nitro-imports'
+
+type ModelMapper = typeof import('../../src/runtime/server/utils/modelMapper')
 
 describe('modelMapper.ts', () => {
-  let mapper: any
+  let mapper: ModelMapper
 
   beforeAll(async () => {
     vi.doMock('#imports', () => ({
@@ -31,9 +35,19 @@ describe('modelMapper.ts', () => {
 
   beforeEach(async () => {
     mapper = await import('../../src/runtime/server/utils/modelMapper')
-    // Fast state reset for isolation
-    for (const key in mapper.customUpdatableFields) delete mapper.customUpdatableFields[key]
-    for (const key in mapper.customHiddenFields) delete mapper.customHiddenFields[key]
+
+    // Type-safe reset of module state to ensure isolation
+    const updatable = mapper.customUpdatableFields
+    const hidden = mapper.customHiddenFields
+
+    Object.keys(updatable).forEach((k) => {
+      // @ts-expect-error - dynamic reset
+      updatable[k] = undefined
+    })
+    Object.keys(hidden).forEach((k) => {
+      // @ts-expect-error - dynamic reset
+      hidden[k] = undefined
+    })
   })
 
   it('returns plural/singular names correctly', () => {
@@ -59,20 +73,21 @@ describe('modelMapper.ts', () => {
     try {
       mapper.getTableForModel('non_existent')
     }
-    catch (e: any) {
-      expect(e.statusCode).toBe(404)
-      expect(e.message).toContain('users, logs')
+    catch (e: unknown) {
+      const error = e as H3Error
+      expect(error.statusCode).toBe(404)
+      expect(error.message).toContain('users, logs')
     }
   })
 
   it('generates agentic-safe Zod schemas', () => {
     const schema = mapper.getZodSchema('users', 'insert')
-    expect((schema as any).shape.id).toBeUndefined()
-    expect((schema as any).shape.email).toBeDefined()
+    expect(schema.shape.id).toBeUndefined()
+    expect(schema.shape.email).toBeDefined()
   })
 
   it('generates partial schemas for patch operations', () => {
-    const schema = mapper.getZodSchema('users', 'patch') as any
+    const schema = mapper.getZodSchema('users', 'patch')
     expect(schema.shape.email.isOptional()).toBe(true)
   })
 
@@ -112,7 +127,7 @@ describe('modelMapper.ts', () => {
     }).not.toThrow()
 
     const schema = mapper.getZodSchema('logs', 'insert')
-    expect((schema as any).shape.message).toBeDefined()
+    expect(schema.shape.message).toBeDefined()
   })
 
   it('respects runtimeConfig whitelist in filterPublicColumns', () => {
