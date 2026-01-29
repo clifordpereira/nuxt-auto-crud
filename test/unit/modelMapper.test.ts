@@ -42,15 +42,9 @@ describe('modelMapper.ts', () => {
   })
 
   it('handles irregular and uncountable nouns for stable routing', () => {
-    // Irregular: Analysis -> Analyses
     expect(mapper.getModelSingularName('analyses')).toBe('Analysis')
     expect(mapper.getModelPluralName('Analysis')).toBe('analyses')
-
-    // Irregular: AuditLog -> audit_logs (Standard) vs custom plural logic
     expect(mapper.getModelSingularName('audit_logs')).toBe('AuditLog')
-    
-    // Uncountable nouns (if any were in schema) should not change
-    // Ensures endpoints remain /api/v1/data and not /api/v1/datas
     expect(mapper.getModelPluralName('data')).toBe('data')
   })
 
@@ -68,12 +62,6 @@ describe('modelMapper.ts', () => {
       expect(e.statusCode).toBe(404)
       expect(e.message).toContain('users, logs')
     }
-  })
-
-  it('respects runtimeConfig whitelist in filterPublicColumns', () => {
-    const result = mapper.filterPublicColumns('users', { email: 'clif@clifland.com', id: 1 })
-    expect(result.email).toBeDefined()
-    expect(result.id).toBeUndefined()
   })
 
   it('generates agentic-safe Zod schemas', () => {
@@ -117,6 +105,21 @@ describe('modelMapper.ts', () => {
     expect(mapper.getAvailableModels()).not.toContain('nonTableExport')
   })
 
+  it('does not throw when omitting fields that do not exist in the table', () => {
+    expect(() => {
+      mapper.getZodSchema('logs', 'insert')
+    }).not.toThrow()
+    
+    const schema = mapper.getZodSchema('logs', 'insert')
+    expect((schema as any).shape.message).toBeDefined()
+  })
+
+  it('respects runtimeConfig whitelist in filterPublicColumns', () => {
+    const result = mapper.filterPublicColumns('users', { email: 'clif@clifland.com', id: 1 })
+    expect(result.email).toBeDefined()
+    expect(result.id).toBeUndefined()
+  })
+
   it('returns empty object when filterPublicColumns has empty whitelist', async () => {
     vi.resetModules() // Wipe the cache
     vi.doMock('#imports', () => ({
@@ -132,34 +135,26 @@ describe('modelMapper.ts', () => {
     expect(result).toEqual({})
   })
 
-  it('does not throw when omitting fields that do not exist in the table', () => {
-    // 'logs' table in your mock only has 'id' and 'message'
-    // Let's pretend 'deletedAt' is in PROTECTED_FIELDS but not in the 'logs' table    
-    expect(() => {
-      mapper.getZodSchema('logs', 'insert')
-    }).not.toThrow()
-    
-    const schema = mapper.getZodSchema('logs', 'insert')
-    // Ensure it still generated a valid schema for the fields that DO exist
-    expect((schema as any).shape.message).toBeDefined()
-  })
-
   it('falls back to HIDDEN_FIELDS for non-whitelisted resources', () => {
-    const result = mapper.filterPublicColumns('logs', { id: 100, message: 'boot' })
+    const result = mapper.filterHiddenFields('logs', { id: 100, message: 'boot', googleId: '123' })
     expect(result.message).toBeDefined()
-    expect(result.id).toBeUndefined()
+    expect(result.googleId).toBeUndefined()
   })
 
   it('prioritizes customHiddenFields and respects constants', () => {
     mapper.customHiddenFields['users'] = ['email']
-    const result = mapper.filterHiddenFields('users', { 
-      email: 'secret', 
-      password: '123', 
-      username: 'clif' 
-    })
-    
+    const result = mapper.filterHiddenFields('users', { email: 'secret', password: '123', username: 'clif' })    
     expect(result.email).toBeUndefined()    // Custom hidden
     expect(result.password).toBeUndefined() // Constant hidden
     expect(result.username).toBe('clif')    // Safe
+  })
+
+  it('ensures PROTECTED_FIELDS are never updatable even if public', () => {
+    const input = { email: 'new@clifland.com', id: 999, createdAt: '2026-01-01' }
+    const result = mapper.filterUpdatableFields('users', input)
+    
+    expect(result.email).toBeDefined()
+    expect(result.id).toBeUndefined()        // Protected
+    expect(result.createdAt).toBeUndefined() // Protected
   })
 })

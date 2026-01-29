@@ -122,7 +122,8 @@ export function getAvailableModels(): string[] {
 }
 
 export function getHiddenFields(modelName: string): string[] {
-  return customHiddenFields[modelName] ?? HIDDEN_FIELDS
+  const custom = customHiddenFields[modelName] || []
+  return [...HIDDEN_FIELDS, ...custom]
 }
 
 export function getPublicColumns(modelName: string): string[] | undefined {
@@ -153,11 +154,14 @@ export function filterPublicColumns(modelName: string, data: Record<string, unkn
 }
 
 export function filterHiddenFields(modelName: string, data: Record<string, unknown>): Record<string, unknown> {
-  const hiddenFields = getHiddenFields(modelName)
+  const hidden = getHiddenFields(modelName)
   const filtered: Record<string, unknown> = {}
 
   for (const [key, value] of Object.entries(data)) {
-    if (!hiddenFields.includes(key)) {
+    const isHidden = hidden.includes(key)
+    const isProtected = PROTECTED_FIELDS.includes(key)
+
+    if (!isHidden && !isProtected) {
       filtered[key] = value
     }
   }
