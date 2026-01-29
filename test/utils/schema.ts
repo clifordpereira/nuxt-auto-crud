@@ -17,7 +17,6 @@ export const logs = sqliteTable('logs', {
   message: text('message'),
 })
 
-
 export const posts = sqliteTable('posts', {
   id: integer('id').primaryKey(),
   authorId: integer('author_id').references(() => users.id),

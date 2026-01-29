@@ -48,7 +48,8 @@ export function drizzleTableToFields(table: any, resourceName: string) {
       const field = fields.find(f => f.name === propertyName)
       if (field) field.references = getTargetTableName(fk)
     })
-  } catch {}
+  }
+  catch {}
 
   return { resource: resourceName, labelField, fields }
 }
@@ -90,7 +91,8 @@ export async function getRelations() {
       })
 
       relations[tableName] = tableRelations
-    } catch {}
+    }
+    catch {}
   }
   return relations
 }

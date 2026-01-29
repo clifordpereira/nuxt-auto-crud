@@ -2,7 +2,6 @@
 import 'drizzle-orm' // Hoisted for performance cache
 
 import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest'
-import type { H3Error } from '#build/types/nitro-imports'
 import { mockSchema } from '../utils/schema'
 
 type Schema = typeof import('../../src/runtime/server/utils/schema')
@@ -27,8 +26,8 @@ describe('schema.ts', () => {
   it('maps Drizzle types to NAC Field types', () => {
     const { fields } = schemaUtils.drizzleTableToFields(mockSchema.users, 'users')
 
-    const bioField = fields.find((f: any) => f.name === 'bio')
-    const emailField = fields.find((f: any) => f.name === 'email')
+    const bioField = fields.find(f => f.name === 'bio')
+    const emailField = fields.find(f => f.name === 'email')
 
     expect(bioField?.type).toBe('textarea')
     expect(emailField?.required).toBe(true)
@@ -36,7 +35,7 @@ describe('schema.ts', () => {
 
   it('handles foreign key detection', () => {
     const result = schemaUtils.drizzleTableToFields(mockSchema.posts, 'posts')
-    const authorField = result.fields.find((f: any) => f.name === 'authorId')
+    const authorField = result.fields.find(f => f.name === 'authorId')
 
     // Maps back to the model key 'users'
     expect(authorField?.references).toBe('users')
@@ -44,7 +43,7 @@ describe('schema.ts', () => {
 
   it('strips hidden/protected fields from UI field list', () => {
     const { fields } = schemaUtils.drizzleTableToFields(mockSchema.users, 'users')
-    const fieldNames = fields.map((f: any) => f.name)
+    const fieldNames = fields.map(f => f.name)
 
     // Identity and sensitive fields should not be in the dynamic form fields
     expect(fieldNames).not.toContain('password')
@@ -53,16 +52,16 @@ describe('schema.ts', () => {
 
   it('maps enum values to selectOptions', () => {
     const { fields } = schemaUtils.drizzleTableToFields(mockSchema.users, 'users')
-    const roleField = fields.find((f: any) => f.name === 'role')
-    
+    const roleField = fields.find(f => f.name === 'role')
+
     expect(roleField?.type).toBe('enum')
     expect(roleField?.selectOptions).toContain('admin')
   })
 
   it('identifies timestamp/date fields via name heuristics', () => {
     const { fields } = schemaUtils.drizzleTableToFields(mockSchema.users, 'users')
-    const lastLoginField = fields.find((f: any) => f.name === 'lastLogin')
-    
+    const lastLoginField = fields.find(f => f.name === 'lastLogin')
+
     // Even if it is a SQLite integer, if name ends in 'At' or 'Login', it should be 'date'
     expect(lastLoginField?.type).toBe('date')
   })
@@ -91,7 +90,7 @@ describe('schema.ts', () => {
 
   it('returns empty references if no foreign keys exist', () => {
     const result = schemaUtils.drizzleTableToFields(mockSchema.logs, 'logs')
-    const messageField = result.fields.find((f: any) => f.name === 'message')
+    const messageField = result.fields.find(f => f.name === 'message')
     expect(messageField?.references).toBeUndefined()
   })
 })
