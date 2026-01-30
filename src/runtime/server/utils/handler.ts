@@ -1,8 +1,8 @@
 import { createError } from "h3";
 import type { H3Event } from "h3";
 
-import { checkAdminAccess } from "./auth";
-import { filterHiddenFields, filterPublicColumns } from "./modelMapper";
+import { sanitizeResource } from "./modelMapper";
+
 import { useAutoCrudConfig } from "./config";
 
 export async function ensureResourceAccess(
@@ -11,15 +11,6 @@ export async function ensureResourceAccess(
   action: string,
   context?: unknown,
 ): Promise<boolean> {
-  // This throws 403 if not authorized
-  const isAuthorized = await checkAdminAccess(event, model, action, context);
-  if (!isAuthorized) {
-    throw createError({
-      statusCode: 401,
-      message: "Unauthorized",
-    });
-  }
-
   return true;
 }
 
@@ -44,22 +35,13 @@ export function formatResourceResult(
   data: Record<string, unknown> | Record<string, unknown>[] | null | undefined,
   isGuest: boolean,
 ) {
-  if (!data) {
-    return data;
-  }
+  if (!data) return data;
+
+  const sanitize = (item: Record<string, unknown>) => sanitizeResource(model, item, isGuest);
 
   if (Array.isArray(data)) {
-    return data.map((item) => {
-      if (isGuest) {
-        return filterPublicColumns(model, item);
-      }
-      return filterHiddenFields(model, item);
-    });
+    return data.map(sanitize);
   }
 
-  if (isGuest) {
-    return filterPublicColumns(model, data);
-  } else {
-    return filterHiddenFields(model, data);
-  }
+  return sanitize(data);
 }

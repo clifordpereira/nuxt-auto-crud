@@ -1,10 +1,8 @@
 import { eventHandler, createError, getRouterParam } from 'h3'
 
 import { getSchema } from '../../utils/schema'
-import { ensureAuthenticated } from '../../utils/auth'
 
 export default eventHandler(async (event) => {
-  await ensureAuthenticated(event)
   const tableName = getRouterParam(event, 'table')
 
   if (!tableName) {

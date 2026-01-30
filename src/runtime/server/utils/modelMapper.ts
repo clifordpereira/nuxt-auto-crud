@@ -132,35 +132,28 @@ export function getPublicColumns(modelName: string): string[] | undefined {
 }
 
 /**
- * Restricts payload to runtimeConfig resource whitelist and filters hidden fields.
+ * Sanitizes resource data based on guest mode and configuration.
+ * - Always filters globally excluded HIDDEN_FIELDS.
+ * - If isGuest=true AND resource has explicit public fields configured, filters to Allowlist.
  */
-export function filterPublicColumns(modelName: string, data: Record<string, unknown>): Record<string, unknown> {
-  const publicColumns = getPublicColumns(modelName)
-
-  if (!publicColumns) {
-    return filterHiddenFields(modelName, data)
-  }
-
-  const filtered: Record<string, unknown> = {}
+export function sanitizeResource(modelName: string, data: Record<string, unknown>, isGuest: boolean): Record<string, unknown> {
   const hidden = getHiddenFields(modelName)
+  const publicColumns = isGuest ? getPublicColumns(modelName) : null
 
-  for (const [key, value] of Object.entries(data)) {
-    if (publicColumns.includes(key) && !hidden.includes(key)) {
-      filtered[key] = value
-    }
-  }
-
-  return filtered
-}
-
-export function filterHiddenFields(modelName: string, data: Record<string, unknown>): Record<string, unknown> {
-  const hiddenFields = getHiddenFields(modelName)
   const filtered: Record<string, unknown> = {}
 
   for (const [key, value] of Object.entries(data)) {
-    if (!hiddenFields.includes(key)) {
-      filtered[key] = value
+    // 1. Global Denylist (Highest Priority)
+    if (hidden.includes(key)) {
+      continue
     }
+
+    // 2. Guest Allowlist (if configured)
+    if (publicColumns && !publicColumns.includes(key)) {
+      continue
+    }
+
+    filtered[key] = value
   }
 
   return filtered

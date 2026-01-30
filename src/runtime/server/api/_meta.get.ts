@@ -5,10 +5,8 @@ import { getTableConfig } from 'drizzle-orm/sqlite-core'
 import { PROTECTED_FIELDS, HIDDEN_FIELDS } from '../utils/constants'
 // @ts-expect-error - 'hub:db' is a virtual alias
 import { db } from 'hub:db'
-import { ensureAuthenticated } from '../utils/auth'
 
 export default eventHandler(async (event) => {
-  await ensureAuthenticated(event)
 
   const query = getQuery(event)
   const acceptHeader = getHeader(event, 'accept') || ''
@@ -81,9 +79,6 @@ export default eventHandler(async (event) => {
     resources,
   }
 
-  const currentToken = getQuery(event).token || (getHeader(event, 'authorization')?.split(' ')[1])
-  const tokenSuffix = currentToken ? `?token=${currentToken}` : ''
-
   // --- CONTENT NEGOTIATION FOR AGENTIC TOOLS ---
   if (query.format === 'md' || acceptHeader.includes('text/markdown')) {
     let markdown = `# ${payload.architecture} API Manifest (v${payload.version})\n\n`
@@ -91,7 +86,7 @@ export default eventHandler(async (event) => {
     payload.resources.forEach((res) => {
       if (!res) return
       markdown += `### Resource: ${res.resource}\n`
-      markdown += `- **Endpoint**: \`${res.endpoint}${tokenSuffix}\`\n`
+      markdown += `- **Endpoint**: \`${res.endpoint}\`\n`
       markdown += `- **Methods**: ${res.methods.join(', ')}\n`
       markdown += `- **Primary Label**: \`${res.labelField}\`\n\n`
       markdown += `| Field | Type | Required | Writable | Details |\n`

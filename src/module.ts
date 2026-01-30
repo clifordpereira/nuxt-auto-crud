@@ -4,11 +4,9 @@ import {
   addServerHandler,
   addServerImportsDir,
   addImportsDir,
-  hasNuxtModule,
-  addServerImports,
 } from '@nuxt/kit'
 
-import type { ModuleOptions, AuthOptions, RuntimeModuleOptions } from './types'
+import type { ModuleOptions, RuntimeModuleOptions } from './types'
 
 export type { ModuleOptions }
 
@@ -25,7 +23,6 @@ export default defineNuxtModule<ModuleOptions>({
   },
   defaults: {
     schemaPath: 'server/db/schema',
-    auth: false,
   },
 
   async setup(options, nuxt) {
@@ -36,41 +33,15 @@ export default defineNuxtModule<ModuleOptions>({
       options.schemaPath!,
     )
     nuxt.options.alias['#site/schema'] = schemaPath
-    nuxt.options.alias['#authorization'] ||= 'nuxt-authorization/utils'
-
-    const mergedAuth: Required<AuthOptions> = {
-      type: 'session',
-      authentication: options.auth !== false,
-      authorization: options.auth !== false,
-      ...(typeof options.auth === 'object' ? options.auth : {} as AuthOptions),
-    } as Required<AuthOptions>
 
     nuxt.options.runtimeConfig.public.autoCrud = {
       ...options,
-      auth: mergedAuth,
       hashedFields: options.hashedFields ?? ['password'],
     }
 
     addImportsDir(resolver.resolve('./runtime/composables'))
     addImportsDir(resolver.resolve(nuxt.options.rootDir, 'shared/utils'))
     addServerImportsDir(resolver.resolve('./runtime/server/utils'))
-
-    // Add stubs for optional modules
-    const stubsPath = resolver.resolve('./runtime/server/stubs/auth')
-    if (!hasNuxtModule('nuxt-auth-utils')) {
-      addServerImports([
-        { name: 'requireUserSession', from: stubsPath },
-        { name: 'getUserSession', from: stubsPath },
-        { name: 'hashPassword', from: stubsPath },
-      ])
-    }
-    if (!hasNuxtModule('nuxt-authorization')) {
-      addServerImports([
-        { name: 'allows', from: stubsPath },
-        { name: 'abilities', from: stubsPath },
-        { name: 'abilityLogic', from: stubsPath },
-      ])
-    }
 
     const apiDir = resolver.resolve('./runtime/server/api')
 

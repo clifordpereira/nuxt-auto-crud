@@ -25,7 +25,6 @@ src
       - _relations.get.ts
       - sse.ts
     - utils
-      - auth.ts
       - config.ts
       - constants.ts
       - handler.ts
