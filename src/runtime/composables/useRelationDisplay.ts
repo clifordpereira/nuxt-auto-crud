@@ -12,6 +12,9 @@ export const useRelationDisplay = (
   const headers = useRequestHeaders(['cookie'])
 
   const fetchRelations = async () => {
+    // Reset display values to prevent stale data
+    displayValues.value = {}
+    
     // 1. Fetch relations metadata
     const { data: relations } = await useFetch<Record<string, Record<string, string>>>('/api/_relations')
     if (relations.value) {
@@ -35,7 +38,7 @@ export const useRelationDisplay = (
           if (relatedData) {
             displayValues.value[fieldName] = relatedData.reduce<Record<string, string>>(
               (acc, item) => {
-                const id = item.id as number
+                const id = String(item.id)
                 // Try to find a good display name
                 const label = (item.name || item.title || item.email || item.username || `#${item.id}`) as string
                 acc[id] = label
@@ -54,7 +57,7 @@ export const useRelationDisplay = (
 
   const getDisplayValue = (key: string, value: unknown) => {
     if (displayValues.value[key] && (typeof value === 'number' || typeof value === 'string')) {
-      return displayValues.value[key][value as string] || value
+      return displayValues.value[key][String(value)] || value
     }
     return value
   }

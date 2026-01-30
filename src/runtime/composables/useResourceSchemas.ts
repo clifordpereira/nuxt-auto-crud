@@ -1,5 +1,6 @@
 import { useAsyncData, useRequestHeaders } from '#imports'
 import type { Ref } from 'vue'
+import type { AsyncData } from '#app'
 
 export interface ResourceField {
   name: string
@@ -19,9 +20,8 @@ export const useResourceSchemas = async (): Promise<{
   schemas: Ref<ResourceSchemas | null | undefined>
   getSchema: (resource: string) => ResourceSchema | undefined
   status: Ref<'idle' | 'pending' | 'success' | 'error'>
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  error: Ref<any>
-  refresh: () => Promise<void>
+  error: AsyncData<ResourceSchemas, Error | null>['error']
+  refresh: AsyncData<ResourceSchemas, Error | null>['refresh']
 }> => {
   const { data: schemas, status, error, refresh } = await useAsyncData<ResourceSchemas>('resource-schemas', () => $fetch('/api/_schema', {
     headers: useRequestHeaders(['cookie']),
@@ -37,6 +37,6 @@ export const useResourceSchemas = async (): Promise<{
     getSchema,
     status,
     error,
-    refresh: refresh as unknown as () => Promise<void>,
+    refresh,
   }
 }

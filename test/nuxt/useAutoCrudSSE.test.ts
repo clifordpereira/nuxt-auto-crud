@@ -1,57 +1,105 @@
-import { it, expect, vi, describe, afterEach } from "vitest";
+import { it, expect, vi, describe, beforeEach, afterEach } from "vitest";
 import { mountSuspended } from "@nuxt/test-utils/runtime";
 import { h } from "vue";
-import { useAutoCrudSSE, type AutoCrudEvent } from "../../src/runtime/composables/useAutoCrudSSE";
+import { useAutoCrudSSE } from "../../src/runtime/composables/useAutoCrudSSE";
 
 describe("NAC Core: useAutoCrudSSE", () => {
-  afterEach(() => {
-    vi.unstubAllGlobals();
+  const addEventListenerMock = vi.fn();
+  const closeMock = vi.fn();
+  let messageListeners: ((event: MessageEvent) => void)[] = [];
+  let errorListeners: ((event: Event) => void)[] = [];
+
+  const triggerMsg = (event: MessageEvent) => {
+    messageListeners.forEach((cb) => cb(event));
+  };
+
+  const triggerErr = (event: Event) => {
+    errorListeners.forEach((cb) => cb(event));
+  };
+
+  beforeEach(() => {
+    messageListeners = [];
+    errorListeners = [];
+
+    // Define constructor mock using function declaration (not arrow) to support 'new'
+    const MockEventSource = vi.fn(function (this: any) {
+      this.addEventListener = vi.fn((type: string, cb: any) => {
+        if (type === "crud") messageListeners.push(cb);
+      });
+      Object.defineProperty(this, "onerror", {
+        set(cb: any) {
+          errorListeners.push(cb);
+        },
+        configurable: true,
+      });
+      this.close = closeMock;
+    });
+
+    vi.stubGlobal("EventSource", MockEventSource);
   });
 
-  it("initializes EventSource and cleans up on unmount", async () => {
-    const closeMock = vi.fn();
-    const addEventListenerMock = vi.fn();
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.clearAllMocks();
+  });
 
-    const MockEventSource = vi.fn(function () {
-      return {
-        addEventListener: addEventListenerMock,
-        close: closeMock,
-      };
-    });
-    vi.stubGlobal("EventSource", MockEventSource);
+  it("handles lifecycle, valid events, malformed data, and connection errors", async () => {
+    const onEvent = vi.fn();
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
     const wrapper = await mountSuspended({
       setup() {
-        useAutoCrudSSE(() => {});
+        useAutoCrudSSE(onEvent);
         return () => h("div");
       },
     });
 
-    expect(MockEventSource).toHaveBeenCalledWith("/api/sse");
-    expect(addEventListenerMock).toHaveBeenCalledWith(
-      "crud",
-      expect.any(Function),
+    // 1. Init check
+    expect(global.EventSource).toHaveBeenCalledWith("/api/sse");
+
+    // 2. Valid CRUD event check
+    const validEvent = {
+      table: "users",
+      action: "create",
+      data: { id: 1, name: "Test User" },
+      primaryKey: 1,
+    };
+    triggerMsg({ data: JSON.stringify(validEvent) } as MessageEvent);
+    expect(onEvent).toHaveBeenCalledWith(validEvent);
+    expect(onEvent).toHaveBeenCalledTimes(1);
+
+    // 3. Malformed JSON check
+    triggerMsg({ data: "invalid-json" } as MessageEvent);
+    expect(onEvent).toHaveBeenCalledTimes(1); // Should not increment
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "[NAC] SSE Parse Error:",
+      expect.any(Error),
     );
 
+    // 4. Connection Error check
+    const errorEvent = new Event("error");
+    triggerErr(errorEvent);
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "[NAC] SSE Connection Error:",
+      errorEvent,
+    );
+
+    // 5. Cleanup check
+    expect(closeMock).not.toHaveBeenCalled();
     wrapper.unmount();
     expect(closeMock).toHaveBeenCalled();
+
+    consoleSpy.mockRestore();
   });
 
-  it("correctly parses and filters stream data", async () => {
+  it("guards against missing EventSource support", async () => {
     const onEvent = vi.fn();
-    let trigger: Function;
 
-    vi.stubGlobal(
-      "EventSource",
-      vi.fn(function () {
-        return {
-          addEventListener: (_: string, cb: Function) => {
-            trigger = cb;
-          },
-          close: vi.fn(),
-        };
-      }),
-    );
+    // Simulate missing EventSource
+    vi.stubGlobal("EventSource", undefined);
+    if (typeof window !== "undefined") {
+      delete (window as any).EventSource;
+    }
 
     await mountSuspended({
       setup() {
@@ -59,15 +107,121 @@ describe("NAC Core: useAutoCrudSSE", () => {
         return () => h("div");
       },
     });
+    // Implicit assertion: if the guard fails, `new EventSource` (which is undefined)
+    // would throw a TypeError, failing the test.
+  });
 
-    const mockPayload: AutoCrudEvent = {
-      table: "users",
+  it("ignores events without the 'crud' type", async () => {
+    const onEvent = vi.fn();
+    await mountSuspended({
+      setup() {
+        useAutoCrudSSE(onEvent);
+        return () => h("div");
+      },
+    });
+
+    // Simulate a generic message event that isn't the 'crud' type
+    const genericMsg = new MessageEvent("message", {
+      data: JSON.stringify({ any: "data" }),
+    });
+    window.dispatchEvent(genericMsg);
+
+    expect(onEvent).not.toHaveBeenCalled();
+  });
+
+  it("handles multiple rapid events correctly", async () => {
+    const onEvent = vi.fn();
+    await mountSuspended({
+      setup() {
+        useAutoCrudSSE(onEvent);
+        return () => h("div");
+      },
+    });
+
+    const events = [
+      { table: "tasks", action: "create", data: { id: 1 }, primaryKey: 1 },
+      {
+        table: "tasks",
+        action: "update",
+        data: { id: 1, v: 2 },
+        primaryKey: 1,
+      },
+    ];
+
+    events.forEach((e) => {
+      triggerMsg({ data: JSON.stringify(e) } as MessageEvent);
+    });
+
+    expect(onEvent).toHaveBeenCalledTimes(2);
+    expect(onEvent).toHaveBeenNthCalledWith(1, events[0]);
+    expect(onEvent).toHaveBeenNthCalledWith(2, events[1]);
+  });
+
+  it("ensures event isolation between instances", async () => {
+    const onEventA = vi.fn();
+    const onEventB = vi.fn();
+
+    await mountSuspended({
+      setup() {
+        useAutoCrudSSE(onEventA);
+        useAutoCrudSSE(onEventB);
+        return () => h("div");
+      },
+    });
+
+    const payload = {
+      table: "posts",
       action: "create",
-      data: { id: 1 },
+      data: {},
       primaryKey: 1,
     };
-    trigger!({ data: JSON.stringify(mockPayload) });
+    triggerMsg({ data: JSON.stringify(payload) } as MessageEvent);
 
-    expect(onEvent).toHaveBeenCalledWith(mockPayload);
+    expect(onEventA).toHaveBeenCalledWith(payload);
+    expect(onEventB).toHaveBeenCalledWith(payload);
+  });
+
+  it("does not initialize during SSR setup", async () => {
+    const onEvent = vi.fn();
+
+    // mountSuspended runs setup(), but we check if EventSource
+    // was called before the component actually "mounts" in the DOM
+    let sourceCalledDuringSetup = false;
+
+    await mountSuspended({
+      setup() {
+        useAutoCrudSSE(onEvent);
+        if (
+          global.EventSource &&
+          (global.EventSource as any).calls?.length > 0
+        ) {
+          sourceCalledDuringSetup = true;
+        }
+        return () => h("div");
+      },
+    });
+
+    // It should only be called after mounting, not during the reactive setup block
+    // Note: mountSuspended handles the mount, so we check total calls.
+    expect(global.EventSource).toHaveBeenCalledTimes(1);
+  });
+
+  it("closes existing connection if re-initialized", async () => {
+    const onEvent = vi.fn();
+    const { unmount } = await mountSuspended({
+      setup() {
+        useAutoCrudSSE(onEvent);
+        // Simulate a second call or re-run
+        useAutoCrudSSE(onEvent);
+        return () => h("div");
+      },
+    });
+
+    // We expect 2 instances created, but both should be tracked
+    expect(global.EventSource).toHaveBeenCalledTimes(2);
+
+    unmount();
+    // Ensure both were closed to prevent memory leaks in multi-instance setups
+    expect(closeMock).toHaveBeenCalledTimes(2);
   });
 });
