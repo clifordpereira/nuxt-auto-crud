@@ -1,3 +1,4 @@
+// server/stubs/auth.ts
 export const requireUserSession = () => {
   throw new Error('nuxt-auth-utils not installed')
 }

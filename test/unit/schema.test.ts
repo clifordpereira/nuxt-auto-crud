@@ -1,96 +1,102 @@
 // schema.test.ts
-import 'drizzle-orm' // Hoisted for performance cache
+import "drizzle-orm"; // Hoisted for performance cache
 
-import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest'
-import { mockSchema } from '../utils/schema'
+import { describe, it, expect, vi } from "vitest";
+import { mockSchema } from "../utils/schema";
+import * as schemaUtils from "../../src/runtime/server/utils/schema";
 
-type Schema = typeof import('../../src/runtime/server/utils/schema')
+vi.mock("#imports", () => ({
+  useRuntimeConfig: () => ({
+    autoCrud: { resources: { users: ["email", "lastLogin"] } },
+  }),
+}));
 
-describe('schema.ts', () => {
-  let schemaUtils: Schema
+vi.mock("#site/schema", async () => {
+  const utils = await import("../utils/schema");
+  return utils.mockSchema;
+});
 
-  beforeAll(async () => {
-    vi.doMock('#imports', () => ({
-      useRuntimeConfig: () => ({
-        autoCrud: { resources: { users: ['email', 'lastLogin'] } },
-      }),
-    }))
+describe("schema.ts", () => {
+  it("maps Drizzle types to NAC Field types", () => {
+    const { fields } = schemaUtils.drizzleTableToFields(
+      mockSchema.users,
+      "users",
+    );
 
-    vi.doMock('#site/schema', () => mockSchema)
-  })
+    const bioField = fields.find((f) => f.name === "bio");
+    const emailField = fields.find((f) => f.name === "email");
 
-  beforeEach(async () => {
-    schemaUtils = await import('../../src/runtime/server/utils/schema')
-  })
+    expect(bioField?.type).toBe("textarea");
+    expect(emailField?.required).toBe(true);
+  });
 
-  it('maps Drizzle types to NAC Field types', () => {
-    const { fields } = schemaUtils.drizzleTableToFields(mockSchema.users, 'users')
-
-    const bioField = fields.find(f => f.name === 'bio')
-    const emailField = fields.find(f => f.name === 'email')
-
-    expect(bioField?.type).toBe('textarea')
-    expect(emailField?.required).toBe(true)
-  })
-
-  it('handles foreign key detection', () => {
-    const result = schemaUtils.drizzleTableToFields(mockSchema.posts, 'posts')
-    const authorField = result.fields.find(f => f.name === 'authorId')
+  it("handles foreign key detection", () => {
+    const result = schemaUtils.drizzleTableToFields(mockSchema.posts, "posts");
+    const authorField = result.fields.find((f) => f.name === "authorId");
 
     // Maps back to the model key 'users'
-    expect(authorField?.references).toBe('users')
-  })
+    expect(authorField?.references).toBe("users");
+  });
 
-  it('strips hidden/protected fields from UI field list', () => {
-    const { fields } = schemaUtils.drizzleTableToFields(mockSchema.users, 'users')
-    const fieldNames = fields.map(f => f.name)
+  it("strips hidden/protected fields from UI field list", () => {
+    const { fields } = schemaUtils.drizzleTableToFields(
+      mockSchema.users,
+      "users",
+    );
+    const fieldNames = fields.map((f) => f.name);
 
     // Identity and sensitive fields should not be in the dynamic form fields
-    expect(fieldNames).not.toContain('password')
-    expect(fieldNames).not.toContain('createdAt')
-  })
+    expect(fieldNames).not.toContain("password");
+    expect(fieldNames).not.toContain("createdAt");
+  });
 
-  it('maps enum values to selectOptions', () => {
-    const { fields } = schemaUtils.drizzleTableToFields(mockSchema.users, 'users')
-    const roleField = fields.find(f => f.name === 'role')
+  it("maps enum values to selectOptions", () => {
+    const { fields } = schemaUtils.drizzleTableToFields(
+      mockSchema.users,
+      "users",
+    );
+    const roleField = fields.find((f) => f.name === "role");
 
-    expect(roleField?.type).toBe('enum')
-    expect(roleField?.selectOptions).toContain('admin')
-  })
+    expect(roleField?.type).toBe("enum");
+    expect(roleField?.selectOptions).toContain("admin");
+  });
 
-  it('identifies timestamp/date fields via name heuristics', () => {
-    const { fields } = schemaUtils.drizzleTableToFields(mockSchema.users, 'users')
-    const lastLoginField = fields.find(f => f.name === 'lastLogin')
+  it("identifies timestamp/date fields via name heuristics", () => {
+    const { fields } = schemaUtils.drizzleTableToFields(
+      mockSchema.users,
+      "users",
+    );
+    const lastLoginField = fields.find((f) => f.name === "lastLogin");
 
     // Even if it is a SQLite integer, if name ends in 'At' or 'Login', it should be 'date'
-    expect(lastLoginField?.type).toBe('date')
-  })
+    expect(lastLoginField?.type).toBe("date");
+  });
 
-  it('validates the Clifland labelField priority (name > email)', () => {
-    const result = schemaUtils.drizzleTableToFields(mockSchema.users, 'users')
+  it("validates the Clifland labelField priority (name > email)", () => {
+    const result = schemaUtils.drizzleTableToFields(mockSchema.users, "users");
     // 'name' exists in updated mock, so it should be picked over 'email'
-    expect(result.labelField).toBe('name')
-  })
+    expect(result.labelField).toBe("name");
+  });
 
-  it('verifies getRelations auto-links system fields to users', async () => {
-    const relations = await schemaUtils.getRelations()
-    expect(relations.users).toBeDefined()
-    expect(relations.users?.createdBy).toBe('users')
-  })
+  it("verifies getRelations auto-links system fields to users", async () => {
+    const relations = await schemaUtils.getRelations();
+    expect(relations.users).toBeDefined();
+    expect(relations.users?.createdBy).toBe("users");
+  });
 
-  it('correctly identifies labelField using Clifland Heuristic', () => {
-    const result = schemaUtils.drizzleTableToFields(mockSchema.users, 'users')
-    expect(result.labelField).toBe('name')
-  })
+  it("correctly identifies labelField using Clifland Heuristic", () => {
+    const result = schemaUtils.drizzleTableToFields(mockSchema.users, "users");
+    expect(result.labelField).toBe("name");
+  });
 
   it('falls back to "id" if no heuristic matches', () => {
-    const result = schemaUtils.drizzleTableToFields(mockSchema.logs, 'logs')
-    expect(result.labelField).toBe('id')
-  })
+    const result = schemaUtils.drizzleTableToFields(mockSchema.logs, "logs");
+    expect(result.labelField).toBe("id");
+  });
 
-  it('returns empty references if no foreign keys exist', () => {
-    const result = schemaUtils.drizzleTableToFields(mockSchema.logs, 'logs')
-    const messageField = result.fields.find(f => f.name === 'message')
-    expect(messageField?.references).toBeUndefined()
-  })
-})
+  it("returns empty references if no foreign keys exist", () => {
+    const result = schemaUtils.drizzleTableToFields(mockSchema.logs, "logs");
+    const messageField = result.fields.find((f) => f.name === "message");
+    expect(messageField?.references).toBeUndefined();
+  });
+});
