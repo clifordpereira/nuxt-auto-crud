@@ -7,26 +7,17 @@ import * as handler from "../../src/runtime/server/utils/handler";
 
 // Mock dependencies
 const {
-  mockCheckAdminAccess,
-  mockFilterHiddenFields,
-  mockFilterPublicColumns,
+  mockSanitizeResource,
   mockUseAutoCrudConfig,
   mockHashPassword,
 } = vi.hoisted(() => ({
-  mockCheckAdminAccess: vi.fn(),
-  mockFilterHiddenFields: vi.fn(),
-  mockFilterPublicColumns: vi.fn(),
+  mockSanitizeResource: vi.fn(),
   mockUseAutoCrudConfig: vi.fn(),
   mockHashPassword: vi.fn(),
 }));
 
-vi.mock("../../src/runtime/server/utils/auth", () => ({
-  checkAdminAccess: mockCheckAdminAccess,
-}));
-
 vi.mock("../../src/runtime/server/utils/modelMapper", () => ({
-  filterHiddenFields: mockFilterHiddenFields,
-  filterPublicColumns: mockFilterPublicColumns,
+  sanitizeResource: mockSanitizeResource,
 }));
 
 vi.mock("../../src/runtime/server/utils/config", () => ({
@@ -51,45 +42,13 @@ describe("handler.ts", () => {
   });
 
   describe("ensureResourceAccess", () => {
-    it("returns true if authorized", async () => {
-      mockCheckAdminAccess.mockResolvedValue(true);
+    it("always returns true (Auth decoupled from Core)", async () => {
       const result = await handler.ensureResourceAccess(
         {} as any,
         "users",
         "read",
       );
       expect(result).toBe(true);
-    });
-
-    it("throws 401 if unauthorized", async () => {
-      mockCheckAdminAccess.mockResolvedValue(false);
-      await expect(
-        handler.ensureResourceAccess({} as any, "users", "read"),
-      ).rejects.toThrow("Unauthorized");
-    });
-
-    it("passes context to checkAdminAccess", async () => {
-      mockCheckAdminAccess.mockResolvedValue(true);
-      const context = { id: 1 };
-      await handler.ensureResourceAccess({} as any, "users", "read", context);
-      expect(mockCheckAdminAccess).toHaveBeenCalledWith(
-        expect.anything(),
-        "users",
-        "read",
-        context,
-      );
-    });
-
-    it("throws 401 specifically (Identity vs Permission)", async () => {
-      mockCheckAdminAccess.mockResolvedValue(false);
-      
-      try {
-        await handler.ensureResourceAccess({} as any, "users", "read");
-      } catch (e: any) {
-        // Critical for multi-instance routing logic
-        expect(e.statusCode).toBe(401); 
-        expect(e.message).toBe("Unauthorized");
-      }
     });
   });
 
@@ -155,68 +114,68 @@ describe("handler.ts", () => {
 
   describe("formatResourceResult", () => {
     it("filters public columns for guests", () => {
-      mockFilterPublicColumns.mockReturnValue({ public: 1 });
+      mockSanitizeResource.mockReturnValue({ public: 1 });
       const result = handler.formatResourceResult(
         "users",
         { public: 1, private: 2 },
         true,
       );
-      expect(mockFilterPublicColumns).toHaveBeenCalledWith("users", {
+      expect(mockSanitizeResource).toHaveBeenCalledWith("users", {
         public: 1,
         private: 2,
-      });
+      }, true);
       expect(result).toEqual({ public: 1 });
     });
 
     it("filters hidden fields for authenticated users", () => {
-      mockFilterHiddenFields.mockReturnValue({ public: 1, private: 2 });
+      mockSanitizeResource.mockReturnValue({ public: 1, private: 2 });
       const result = handler.formatResourceResult(
         "users",
         { public: 1, private: 2, hidden: 3 },
         false,
       );
-      expect(mockFilterHiddenFields).toHaveBeenCalledWith("users", {
+      expect(mockSanitizeResource).toHaveBeenCalledWith("users", {
         public: 1,
         private: 2,
         hidden: 3,
-      });
+      }, false);
       expect(result).toEqual({ public: 1, private: 2 });
     });
 
     it("handles null or undefined data gracefully", () => {
       const resultNull = handler.formatResourceResult("users", null, true);
       expect(resultNull).toBeNull();
-      expect(mockFilterPublicColumns).not.toHaveBeenCalled();
+      expect(mockSanitizeResource).not.toHaveBeenCalled();
 
       const resultUndefined = handler.formatResourceResult("users", undefined, true);
       expect(resultUndefined).toBeUndefined();
-      expect(mockFilterPublicColumns).not.toHaveBeenCalled();
+      expect(mockSanitizeResource).not.toHaveBeenCalled();
     });
 
     it("handles arrays of records (List Endpoints)", () => {
       const data = [{ id: 1 }, { id: 2 }];
-      mockFilterPublicColumns.mockReturnValue({ public: 1 });
+      mockSanitizeResource.mockReturnValue({ public: 1 });
 
       const result = handler.formatResourceResult("users", data, true);
 
       expect(result).toHaveLength(2);
-      expect(mockFilterPublicColumns).toHaveBeenCalledTimes(2);
-      expect(mockFilterPublicColumns).toHaveBeenCalledWith("users", data[0]);
-      expect(mockFilterPublicColumns).toHaveBeenCalledWith("users", data[1]);
+      expect(mockSanitizeResource).toHaveBeenCalledTimes(2);
+      expect(mockSanitizeResource).toHaveBeenCalledWith("users", data[0], true);
+      expect(mockSanitizeResource).toHaveBeenCalledWith("users", data[1], true);
     });
 
     it("returns empty array when input is empty array", () => {
       const result = handler.formatResourceResult("users", [], true);
       expect(result).toEqual([]);
-      expect(mockFilterPublicColumns).not.toHaveBeenCalled();
+      expect(mockSanitizeResource).not.toHaveBeenCalled();
     });
 
     it("strips extra properties not handled by mappers", () => {
       // Scenario: Database returns a field not defined in public/hidden configs
       const dirtyData = { id: 1, unexpected_field: "malicious_leak" };
       
-      mockFilterPublicColumns.mockImplementation((_, item) => {
-        const { unexpected_field, ...rest } = item;
+      mockSanitizeResource.mockImplementation((_, item) => {
+        const { unexpected_field, ...rest } = item as any;
         return rest;
       });
 
@@ -229,7 +188,7 @@ describe("handler.ts", () => {
     it("returns empty array immediately if data is []", () => {
       const result = handler.formatResourceResult("users", [], true);
       expect(result).toEqual([]);
-      expect(mockFilterPublicColumns).not.toHaveBeenCalled();
+      expect(mockSanitizeResource).not.toHaveBeenCalled();
     });
   });
 

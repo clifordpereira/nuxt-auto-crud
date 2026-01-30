@@ -96,10 +96,10 @@ describe("modelMapper.ts", () => {
   });
 
   it("strips soft-delete fields from public output", () => {
-    const result = mapper.filterPublicColumns("users", {
+    const result = mapper.sanitizeResource("users", {
       email: "a@b.com",
       deletedAt: new Date(),
-    });
+    }, true);
     expect(result.deletedAt).toBeUndefined();
   });
 
@@ -122,41 +122,41 @@ describe("modelMapper.ts", () => {
     expect(schema.shape.message).toBeDefined();
   });
 
-  it("respects runtimeConfig whitelist in filterPublicColumns", () => {
-    const result = mapper.filterPublicColumns("users", {
+  it("respects runtimeConfig whitelist in sanitizeResource (Guest Mode)", () => {
+    const result = mapper.sanitizeResource("users", {
       email: "clif@clifland.com",
       id: 1,
-    });
+    }, true);
     expect(result.email).toBeDefined();
     expect(result.id).toBeUndefined();
   });
 
-  it("returns empty object when filterPublicColumns has empty whitelist", async () => {
+  it("returns empty object when sanitizeResource has empty whitelist (Guest Mode)", async () => {
     mockUseRuntimeConfig.mockReturnValue({
       autoCrud: { resources: { logs: [] } }, // Explicitly empty
     });
-    const result = mapper.filterPublicColumns("logs", { message: "test" });
+    const result = mapper.sanitizeResource("logs", { message: "test" }, true);
 
     expect(result).toEqual({});
   });
 
-  it("falls back to HIDDEN_FIELDS for non-whitelisted resources", () => {
-    const result = mapper.filterHiddenFields("logs", {
+  it("falls back to HIDDEN_FIELDS for non-whitelisted resources (Admin Mode)", () => {
+    const result = mapper.sanitizeResource("logs", {
       id: 100,
       message: "boot",
       googleId: "123",
-    });
+    }, false);
     expect(result.message).toBeDefined();
     expect(result.googleId).toBeUndefined();
   });
 
-  it("prioritizes customHiddenFields and respects constants", () => {
+  it("prioritizes customHiddenFields and respects constants (Admin Mode)", () => {
     mapper.customHiddenFields["users"] = ["email"];
-    const result = mapper.filterHiddenFields("users", {
+    const result = mapper.sanitizeResource("users", {
       email: "secret",
       password: "123",
       username: "clif",
-    });
+    }, false);
     expect(result.email).toBeUndefined(); // Custom hidden
     expect(result.password).toBeUndefined(); // Constant hidden
     expect(result.username).toBe("clif"); // Safe
