@@ -8,20 +8,8 @@ describe("API: _meta", async () => {
     browser: false, // API only test
   });
 
-  const authHeader = { Authorization: "Bearer valid-token" };
-
-  it("rejects unauthenticated requests", async () => {
-    try {
-      await $fetch("/api/_meta");
-    } catch (err: any) {
-      expect(err.statusCode).toBe(401);
-    }
-  });
-
   it("returns valid Clifland-NAC JSON manifest", async () => {
-    const data = await $fetch<any>("/api/_meta", {
-      headers: authHeader,
-    });
+    const data = await $fetch<any>("/api/_meta");
 
     expect(data.architecture).toBe("Clifland-NAC");
     expect(data.version).toContain("agentic");
@@ -40,7 +28,6 @@ describe("API: _meta", async () => {
   it("renders Markdown for Agentic Tooling via Accept header", async () => {
     const response = await $fetch<string>("/api/_meta", {
       headers: {
-        ...authHeader,
         Accept: "text/markdown",
       },
     });
@@ -51,11 +38,8 @@ describe("API: _meta", async () => {
   });
 
   it("renders Markdown via query parameter", async () => {
-    const response = await $fetch<string>("/api/_meta?format=md", {
-      headers: authHeader,
-    });
+    const response = await $fetch<string>("/api/_meta?format=md");
 
     expect(response).toContain("### Resource:");
-    expect(response).toContain("?token=valid-token"); // Verify token suffix logic
   });
 });

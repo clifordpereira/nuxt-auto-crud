@@ -11,8 +11,6 @@ export const useRelationDisplay = (
   const displayValues = ref<Record<string, Record<string, string>>>({})
   const headers = useRequestHeaders(['cookie'])
 
-  const forbiddenRelations = ref<Set<string>>(new Set())
-
   const fetchRelations = async () => {
     // 1. Fetch relations metadata
     const { data: relations } = await useFetch<Record<string, Record<string, string>>>('/api/_relations')
@@ -49,10 +47,6 @@ export const useRelationDisplay = (
         }
         catch (error: unknown) {
           console.error(`Failed to fetch relation data for ${targetTable}:`, error)
-          const err = error as { statusCode?: number }
-          if (err?.statusCode === 403) {
-            forbiddenRelations.value.add(fieldName)
-          }
         }
       }),
     )
@@ -69,6 +63,5 @@ export const useRelationDisplay = (
     fetchRelations,
     getDisplayValue,
     relationsMap,
-    forbiddenRelations,
   }
 }
