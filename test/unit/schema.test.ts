@@ -47,7 +47,10 @@ describe("schema.ts", () => {
 
     // Identity and sensitive fields should not be in the dynamic form fields
     expect(fieldNames).not.toContain("password");
-    expect(fieldNames).not.toContain("createdAt");
+
+    // Protected fields should be present but read-only
+    expect(fieldNames).toContain("createdAt");
+    expect(fields.find((f) => f.name === "createdAt")?.isReadOnly).toBe(true);
   });
 
   it("maps enum values to selectOptions", () => {
@@ -78,7 +81,7 @@ describe("schema.ts", () => {
   });
 
   it("verifies getRelations auto-links system fields to users", async () => {
-    const relations = await schemaUtils.getRelations();
+    const relations = await schemaUtils.getSchemaRelations();
     expect(relations.users).toBeDefined();
     expect(relations.users?.createdBy).toBe("users");
   });
@@ -96,9 +99,12 @@ describe("schema.ts", () => {
 
   it("identifies semantic types from Zod", () => {
     // This test ensures the bridge between Zod metadata and NAC Field types works
-    const { fields } = schemaUtils.drizzleTableToFields(mockSchema.users, "users");
-    
-    const emailField = fields.find(f => f.name === "email");
+    const { fields } = schemaUtils.drizzleTableToFields(
+      mockSchema.users,
+      "users",
+    );
+
+    const emailField = fields.find((f) => f.name === "email");
     expect(emailField?.type).toBeDefined();
   });
 });
