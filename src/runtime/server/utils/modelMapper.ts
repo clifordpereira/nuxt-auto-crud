@@ -7,7 +7,7 @@ import {
   getTableColumns as getDrizzleTableColumns,
   getTableName,
 } from "drizzle-orm";
-import type { SQLiteTable } from "drizzle-orm/sqlite-core";
+import { getTableConfig, type SQLiteTable } from "drizzle-orm/sqlite-core";
 import { createError } from "h3";
 import { useRuntimeConfig } from "#imports";
 import { createInsertSchema } from "drizzle-zod";
@@ -83,7 +83,7 @@ export function getTargetTableName(fk: any): string {
  * Resolves the property name for a foreign key's source column.
  * @returns The property name or undefined if not found
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 export function getForeignKeyPropertyName(
   fk: any,
   columns: Record<string, any>,
@@ -195,7 +195,7 @@ export function sanitizeResource(
 /**
  * Derives Zod schema via drizzle-zod, omitting server-managed and protected fields.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 export function getZodSchema(
   modelName: string,
   type: "insert" | "patch" = "insert",
@@ -238,4 +238,34 @@ export function formatResourceResult(
   }
 
   return sanitize(data);
+}
+
+export function getRelations(): Record<string, Record<string, unknown>[]> {
+  const relations: Record<string, Record<string, unknown>[]> = {};
+  const models = getAvailableModels();
+
+  for (const model of models) {
+    const table = getTableForModel(model);
+    const config = getTableConfig(table);
+    const modelRelations: Record<string, unknown>[] = [];
+
+    // @ts-expect-error - Drizzle internals
+    const foreignKeys = config.foreignKeys || [];
+
+    // @ts-expect-error - Drizzle internals
+    for (const fk of foreignKeys) {
+      const targetTable = fk.reference().foreignTable;
+      const targetTableName = getTableName(targetTable);
+
+      modelRelations.push({
+        name: targetTableName,
+        type: "one",
+        target: targetTableName,
+      });
+    }
+
+    relations[model] = modelRelations;
+  }
+
+  return relations;
 }
