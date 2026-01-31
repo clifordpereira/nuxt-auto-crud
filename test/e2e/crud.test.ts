@@ -59,6 +59,31 @@ describe("NAC CRUD Fixture", async () => {
     expect(updated.name).toBe("Updated Name");
   });
 
+  it("PATCH /api/${model}/:id ignores protected system fields", async () => {
+    const original = await $fetch<any>(`/api/${model}/${createdId}`);
+
+    await $fetch(`/api/${model}/${createdId}`, {
+      method: "PATCH",
+      body: {
+        id: "hacked-id", // Should be ignored
+        name: "Hacker",
+        createdAt: new Date("2000-01-01"), // Should be ignored
+      },
+    });
+
+    const verification = await $fetch<any>(`/api/${model}/${createdId}`);
+    expect(verification.id).toBe(original.id);
+    expect(verification.name).toBe("Hacker");
+  });
+
+  it(`GET /api/${model}/:id excludes fields defined in HIDDEN_FIELDS`, async () => {
+    const user = await $fetch<any>(`/api/${model}/${createdId}`);
+
+    // 'password' should be in HIDDEN_FIELDS in your NAC constants
+    expect(user).not.toHaveProperty("password");
+    expect(user).toHaveProperty("email");
+  });
+
   // Tests [model]/[id].delete.ts
   it(`DELETE /api/${model}/:id deletes the user`, async () => {
     await $fetch(`/api/${model}/${createdId}`, {

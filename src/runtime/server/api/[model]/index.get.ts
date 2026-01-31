@@ -1,12 +1,11 @@
 // server/api/[model]/index.get.ts
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { eventHandler, getRouterParams } from 'h3'
-import { getTableForModel } from '../../utils/modelMapper'
+import { getTableForModel, formatResourceResult } from '../../utils/modelMapper'
 // @ts-expect-error - hub:db is a virtual alias
 import { db } from 'hub:db'
-import { desc, getTableColumns } from 'drizzle-orm'
+import { desc } from 'drizzle-orm'
 import type { TableWithId } from '../../types'
-import { formatResourceResult } from '../../utils/handler'
 
 export default eventHandler(async (event) => {
   const { model } = getRouterParams(event) as { model: string }

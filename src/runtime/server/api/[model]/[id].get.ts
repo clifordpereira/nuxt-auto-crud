@@ -1,11 +1,11 @@
 // server/api/[model]/[id].get.ts
 import { eventHandler, getRouterParams } from 'h3'
 import { eq } from 'drizzle-orm'
-import { getTableForModel } from '../../utils/modelMapper'
+import { getTableForModel, formatResourceResult } from '../../utils/modelMapper'
 import type { TableWithId } from '../../types'
 // @ts-expect-error - hub:db is a virtual alias
 import { db } from 'hub:db'
-import { ensureResourceAccess, formatResourceResult } from '../../utils/handler'
+import { ensureResourceAccess } from '../../utils/guard'
 import { RecordNotFoundError } from '../../exceptions'
 
 export default eventHandler(async (event) => {
