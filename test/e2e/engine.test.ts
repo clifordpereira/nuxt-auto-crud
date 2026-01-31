@@ -113,6 +113,15 @@ describe("NAC Core Engine", async () => {
       expect(data.users).toHaveProperty("fields");
     });
 
+    it("GET /api/_schema/:table returns 404 for non-existent table", async () => {
+      try {
+        await $fetch("/api/_schema/non_existent_table");
+        expect.fail("Should have thrown 404");
+      } catch (e: any) {
+        expect(e.response?.status).toBe(404);
+      }
+    });
+
     it("GET /api/_schema/:table returns specific table metadata", async () => {
       const tableName = "users";
       const schema = await $fetch<any>(`/api/_schema/${tableName}`);
@@ -133,15 +142,6 @@ describe("NAC Core Engine", async () => {
         (f: any) => f.name === "id" || f.dbName === "id",
       );
       expect(hasId).toBe(true);
-    });
-
-    it("GET /api/_schema/:table returns 404 for non-existent table", async () => {
-      try {
-        await $fetch("/api/_schema/non_existent_table");
-        expect.fail("Should have thrown 404");
-      } catch (e: any) {
-        expect(e.response?.status).toBe(404);
-      }
     });
   });
 });

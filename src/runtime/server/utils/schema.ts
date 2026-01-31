@@ -29,7 +29,7 @@ export function drizzleTableToFields(table: any, resourceName: string) {
   const zodSchema = getZodSchema(resourceName, "insert");
 
   for (const [key, col] of Object.entries(columns)) {
-    if (HIDDEN_FIELDS.includes(key) || PROTECTED_FIELDS.includes(key)) continue;
+    if (HIDDEN_FIELDS.includes(key)) continue;
 
     const column = col as any;
     const zodField = (zodSchema.shape as any)[key];
@@ -41,7 +41,7 @@ export function drizzleTableToFields(table: any, resourceName: string) {
       type,
       required: column.notNull,
       selectOptions,
-      isReadOnly: false,
+      isReadOnly: PROTECTED_FIELDS.includes(key),
     });
   }
 
