@@ -1,8 +1,8 @@
 // server/utils/schema.ts
 import { getTableColumns } from 'drizzle-orm'
 import { getTableConfig } from 'drizzle-orm/sqlite-core'
-import { modelTableMap } from './modelMapper'
-import { HIDDEN_FIELDS, SYSTEM_USER_FIELDS } from './constants'
+import { getZodSchema, modelTableMap, getTargetTableName, getForeignKeyPropertyName } from './modelMapper'
+import { HIDDEN_FIELDS, SYSTEM_USER_FIELDS, PROTECTED_FIELDS } from './constants'
 
 export interface Field {
   name: string
@@ -10,30 +10,29 @@ export interface Field {
   required: boolean
   selectOptions?: string[]
   references?: string
-}
-
-/**
- * Extracts the target table name from a Drizzle foreign key
- */
-function getTargetTableName(fk: any): string {
-  return fk.reference().foreignTable[Symbol.for('drizzle:Name')]
+  isReadOnly?: boolean
 }
 
 export function drizzleTableToFields(table: any, resourceName: string) {
   const columns = getTableColumns(table)
   const fields: Field[] = []
 
-  for (const [key, col] of Object.entries(columns)) {
-    if (HIDDEN_FIELDS.includes(key)) continue
+  const zodSchema = getZodSchema(resourceName, 'insert')
 
+  for (const [key, col] of Object.entries(columns)) {
+    if (HIDDEN_FIELDS.includes(key) || PROTECTED_FIELDS.includes(key)) continue
+    
     const column = col as any
-    const { type, selectOptions } = mapColumnType(column)
+    const zodField = (zodSchema.shape as any)[key]
+    
+    const { type, selectOptions } = mapColumnType(column, zodField)
 
     fields.push({
       name: key,
       type,
       required: column.notNull,
       selectOptions,
+      isReadOnly: false
     })
   }
 
@@ -43,8 +42,7 @@ export function drizzleTableToFields(table: any, resourceName: string) {
   try {
     const config = getTableConfig(table)
     config.foreignKeys.forEach((fk: any) => {
-      const sourceCol = fk.reference().columns[0].name
-      const propertyName = Object.entries(columns).find(([_, c]: [string, any]) => c.name === sourceCol)?.[0]
+      const propertyName = getForeignKeyPropertyName(fk, columns)
       const field = fields.find(f => f.name === propertyName)
       if (field) field.references = getTargetTableName(fk)
     })
@@ -54,9 +52,18 @@ export function drizzleTableToFields(table: any, resourceName: string) {
   return { resource: resourceName, labelField, fields }
 }
 
-function mapColumnType(column: any): { type: string, selectOptions?: string[] } {
+function mapColumnType(column: any, zodField?: any): { type: string, selectOptions?: string[] } {
+  // 1. Drizzle Enums
   const enumValues = column.enumValues || column.config?.enumValues
   if (enumValues) return { type: 'enum', selectOptions: enumValues }
+
+  // 2. Zod Semantic Hints (The "Agentic" advantage)
+  if (zodField?._def?.checks) {
+    const checks = zodField._def.checks
+    if (checks.some((c: any) => c.kind === 'email')) return { type: 'email' }
+    if (checks.some((c: any) => c.kind === 'uuid')) return { type: 'uuid' }
+    if (checks.some((c: any) => c.kind === 'url')) return { type: 'url' }
+  }
 
   const { dataType, columnType, name } = column
   const isDateName = name.endsWith('_at') || name.endsWith('At') || name.endsWith('Login')
@@ -85,8 +92,7 @@ export async function getRelations() {
       }
 
       config.foreignKeys.forEach((fk: any) => {
-        const sourceColName = fk.reference().columns[0].name
-        const propName = Object.entries(columns).find(([_, c]: [string, any]) => (c as any).name === sourceColName)?.[0]
+        const propName = getForeignKeyPropertyName(fk, columns)
         if (propName) tableRelations[propName] = getTargetTableName(fk)
       })
 

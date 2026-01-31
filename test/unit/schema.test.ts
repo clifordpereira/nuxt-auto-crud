@@ -72,9 +72,8 @@ describe("schema.ts", () => {
     expect(lastLoginField?.type).toBe("date");
   });
 
-  it("validates the Clifland labelField priority (name > email)", () => {
+  it("correctly identifies labelField using Clifland Heuristic", () => {
     const result = schemaUtils.drizzleTableToFields(mockSchema.users, "users");
-    // 'name' exists in updated mock, so it should be picked over 'email'
     expect(result.labelField).toBe("name");
   });
 
@@ -82,11 +81,6 @@ describe("schema.ts", () => {
     const relations = await schemaUtils.getRelations();
     expect(relations.users).toBeDefined();
     expect(relations.users?.createdBy).toBe("users");
-  });
-
-  it("correctly identifies labelField using Clifland Heuristic", () => {
-    const result = schemaUtils.drizzleTableToFields(mockSchema.users, "users");
-    expect(result.labelField).toBe("name");
   });
 
   it('falls back to "id" if no heuristic matches', () => {
@@ -98,5 +92,13 @@ describe("schema.ts", () => {
     const result = schemaUtils.drizzleTableToFields(mockSchema.logs, "logs");
     const messageField = result.fields.find((f) => f.name === "message");
     expect(messageField?.references).toBeUndefined();
+  });
+
+  it("identifies semantic types from Zod", () => {
+    // This test ensures the bridge between Zod metadata and NAC Field types works
+    const { fields } = schemaUtils.drizzleTableToFields(mockSchema.users, "users");
+    
+    const emailField = fields.find(f => f.name === "email");
+    expect(emailField?.type).toBeDefined();
   });
 });

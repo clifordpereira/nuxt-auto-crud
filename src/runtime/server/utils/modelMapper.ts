@@ -70,6 +70,24 @@ function getTableColumns(table: any): string[] {
   }
 }
 
+/**
+ * Extracts the target table name from a Drizzle foreign key.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function getTargetTableName(fk: any): string {
+  return fk.reference().foreignTable[Symbol.for('drizzle:Name')]
+}
+
+/**
+ * Resolves the property name for a foreign key's source column.
+ * @returns The property name or undefined if not found
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function getForeignKeyPropertyName(fk: any, columns: Record<string, any>): string | undefined {
+  const sourceColName = fk.reference().columns[0].name
+  return Object.entries(columns).find(([_, c]: [string, any]) => c.name === sourceColName)?.[0]
+}
+
 export function getUpdatableFields(modelName: string): string[] {
   if (customUpdatableFields[modelName]) {
     return customUpdatableFields[modelName]

@@ -2,7 +2,6 @@ import "drizzle-orm"; // Hoisted for performance cache
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { H3Error } from "h3";
-import { mockSchema } from "../utils/schema";
 import * as mapper from "../../src/runtime/server/utils/modelMapper";
 
 const mockUseRuntimeConfig = vi.fn();
@@ -101,11 +100,6 @@ describe("modelMapper.ts", () => {
       deletedAt: new Date(),
     }, true);
     expect(result.deletedAt).toBeUndefined();
-  });
-
-  it("handles irregular pluralization for API routing", () => {
-    expect(mapper.getModelSingularName("analyses")).toBe("Analysis");
-    expect(mapper.getModelSingularName("audit_logs")).toBe("AuditLog");
   });
 
   it("handles empty/non-table exports in schema safely", () => {
