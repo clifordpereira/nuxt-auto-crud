@@ -1,3 +1,4 @@
+// src/types.ts
 export interface ModuleOptions {
   /**
    * Path to the database schema file
@@ -10,7 +11,14 @@ export interface ModuleOptions {
    * @default ['password']
    */
   hashedFields?: string[]
+
+  /**
+   * Authentication and Authorization settings
+   */
+  auth?: {
+    authentication?: boolean
+    authorization?: boolean
+  }
 }
 
-export interface RuntimeModuleOptions extends ModuleOptions {
-}
+export interface RuntimeModuleOptions extends ModuleOptions {}
