@@ -1,4 +1,5 @@
 // server/utils/sse-bus.ts
+// @ts-expect-error - virtual import resolved by Nuxt/Nitro
 import { kv } from '@nuxthub/kv'
 
 type SSEClient = { id: string, res: WritableStreamDefaultWriter }

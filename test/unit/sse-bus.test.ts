@@ -4,6 +4,7 @@ import {
   addClient,
   removeClient,
 } from "../../src/runtime/server/utils/sse-bus";
+// @ts-expect-error - virtual import resolved by Nuxt/Nitro
 import { kv } from "@nuxthub/kv";
 
 vi.mock("@nuxthub/kv", () => ({ kv: { set: vi.fn() } }));
