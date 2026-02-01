@@ -23,25 +23,45 @@ export default defineNuxtModule<ModuleOptions>({
   },
   defaults: {
     schemaPath: 'server/db/schema',
+    hashedFields: ['password'],
+    auth: {
+      authentication: true,
+      authorization: true
+    }
   },
 
   async setup(options, nuxt) {
     const resolver = createResolver(import.meta.url)
 
-    const schemaPath = resolver.resolve(
-      nuxt.options.rootDir,
-      options.schemaPath!,
-    )
+    // 1. Schema Alias (The Interface)
+    const schemaPath = resolver.resolve(nuxt.options.rootDir, options.schemaPath!)
     nuxt.options.alias['#site/schema'] = schemaPath
 
-    nuxt.options.runtimeConfig.public.autoCrud = {
-      ...options,
-      hashedFields: options.hashedFields ?? ['password'],
-    }
+    // 2. Runtime Config (The Concrete State)
+    nuxt.options.runtimeConfig.public.autoCrud = options as RuntimeModuleOptions
 
+    // 3. Auto-imports (The Engine)
     addImportsDir(resolver.resolve('./runtime/composables'))
     addImportsDir(resolver.resolve(nuxt.options.rootDir, 'shared/utils'))
     addServerImportsDir(resolver.resolve('./runtime/server/utils'))
+
+    // 4. Register the IoC Contract Types
+    // This ensures event.context.$authorization is typed in the core module logic
+    nuxt.hook('nitro:config', (nitroConfig) => {
+      nitroConfig.typescript ||= {}
+      nitroConfig.typescript.tsConfig ||= {}
+      
+      nitroConfig.typescript.tsConfig.include = [
+        ...(nitroConfig.typescript.tsConfig.include || []),
+        resolver.resolve('./runtime/types/index.d.ts')
+      ]
+    })
+
+    // 5. Global Type Support (For the Playground/App)
+    // This makes the types visible to the IDE in the playground
+    nuxt.hook('prepare:types', ({ references }) => {
+      references.push({ path: resolver.resolve('./runtime/types/index.d.ts') })
+    })
 
     const apiDir = resolver.resolve('./runtime/server/api')
 
