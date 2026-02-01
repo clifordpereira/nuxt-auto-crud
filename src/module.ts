@@ -27,7 +27,7 @@ export default defineNuxtModule<ModuleOptions>({
     auth: {
       authentication: true,
       authorization: true,
-      abilityPath: 'server/utils/abilities',
+      abilityPath: 'shared/utils/abilities',
     }
   },
 
