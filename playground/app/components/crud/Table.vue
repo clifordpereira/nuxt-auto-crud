@@ -19,7 +19,7 @@ const { data } = await useFetch(`${crudBaseUrl}/${props.resource}`, {
 })
 
 // Fetch relations
-const { fetchRelations, getDisplayValue, forbiddenRelations } = useRelationDisplay(props.schema)
+const { fetchRelations, getDisplayValue } = useRelationDisplay(props.schema)
 await fetchRelations()
 
 async function onDelete(id: number) {
@@ -37,9 +37,9 @@ const crudConfig = appConfig.crud
 const visibleColumns = computed(() => {
   if (!data.value?.length) return []
   const hideList = crudConfig?.globalHide || ['updatedAt', 'deletedAt', 'createdBy', 'updatedBy']
-  return Object.keys(data.value[0]).filter(key =>
-    !forbiddenRelations.value.has(String(key))
-    && !hideList.includes(String(key)),
+  
+  return Object.keys(data.value[0]).filter(key => 
+    !hideList.includes(String(key))
   )
 })
 
