@@ -56,8 +56,6 @@ describe("auth.ts", () => {
       getUserSession: mockGetUserSession,
       requireUserSession: mockRequireUserSession,
       allows: mockAllows,
-      abilities: null,
-      abilityLogic: null,
     }));
 
     vi.doMock("hub:db", () => ({
