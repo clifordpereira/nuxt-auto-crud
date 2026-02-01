@@ -24,6 +24,7 @@ vi.mock("drizzle-orm", async (importOriginal) => {
   return {
     ...actual,
     eq: vi.fn(),
+    getTableColumns: vi.fn((t) => t),
   };
 });
 
@@ -36,8 +37,20 @@ describe("auth.ts", () => {
   const mockUseRuntimeConfig = vi.fn();
   const mockDbGet = vi.fn();
   const mockGetTableForModel = vi.fn();
+  const mockSiteAbility = vi.fn();
+  const mockGetHiddenFields = vi.fn().mockReturnValue([]);
 
   beforeAll(async () => {
+    vi.doMock("#site/ability", () => ({
+      default: mockSiteAbility,
+    }));
+
+    vi.doMock("../../src/runtime/server/utils/modelMapper", () => ({
+      getTableForModel: mockGetTableForModel,
+      getTableColumns: (table: any) => Object.keys(table), // Mock implementation
+      getHiddenFields: mockGetHiddenFields,
+    }));
+
     vi.doMock("#imports", () => ({
       useRuntimeConfig: mockUseRuntimeConfig,
       getUserSession: mockGetUserSession,
@@ -55,14 +68,11 @@ describe("auth.ts", () => {
         get: mockDbGet,
       },
     }));
-
-    vi.doMock("../../src/runtime/server/utils/modelMapper", () => ({
-      getTableForModel: mockGetTableForModel,
-    }));
   });
 
   beforeEach(async () => {
     vi.clearAllMocks();
+    vi.resetModules();
     // Default config: auth enabled
     mockUseRuntimeConfig.mockReturnValue({
       public: { autoCrud: { auth: { authentication: true } } },
@@ -161,8 +171,11 @@ describe("auth.ts", () => {
       });
       mockAllows.mockResolvedValue(false);
 
-      mockGetTableForModel.mockReturnValue({ id: {}, createdBy: {} });
-      mockDbGet.mockResolvedValue({ createdBy: 1 });
+      mockGetTableForModel.mockReturnValue({
+        id: { primary: true },
+        createdBy: {},
+      });
+      mockDbGet.mockResolvedValue({ owner: 1 });
 
       const result = await auth.checkAdminAccess({} as any, "posts", "read", {
         id: 100,
@@ -181,8 +194,11 @@ describe("auth.ts", () => {
       });
       mockAllows.mockResolvedValue(false);
 
-      mockGetTableForModel.mockReturnValue({ id: {}, userId: {} });
-      mockDbGet.mockResolvedValue({ userId: 1 });
+      mockGetTableForModel.mockReturnValue({
+        id: { primary: true },
+        userId: {},
+      });
+      mockDbGet.mockResolvedValue({ owner: 1 });
 
       const result = await auth.checkAdminAccess({} as any, "posts", "read", {
         id: 100,
@@ -201,8 +217,11 @@ describe("auth.ts", () => {
       });
       mockAllows.mockResolvedValue(false);
 
-      mockGetTableForModel.mockReturnValue({ id: {}, createdBy: {} });
-      mockDbGet.mockResolvedValue({ createdBy: 1 });
+      mockGetTableForModel.mockReturnValue({
+        id: { primary: true },
+        createdBy: {},
+      });
+      mockDbGet.mockResolvedValue({ owner: 1 });
 
       const uuid = "550e8400-e29b-41d4-a716-446655440000";
       const result = await auth.checkAdminAccess({} as any, "posts", "read", {
@@ -222,7 +241,7 @@ describe("auth.ts", () => {
         user: { id: 1, permissions: { users: ["update_own"] } },
       });
       mockAllows.mockResolvedValue(false);
-      mockGetTableForModel.mockReturnValue({ id: {} });
+      mockGetTableForModel.mockReturnValue({ id: { primary: true } });
 
       const result = await auth.checkAdminAccess({} as any, "users", "update", {
         id: 1,
@@ -240,7 +259,10 @@ describe("auth.ts", () => {
         user: { id: 1, permissions: { posts: ["read_own"] } },
       });
       mockAllows.mockResolvedValue(false);
-      mockGetTableForModel.mockReturnValue({ id: {}, createdBy: {} });
+      mockGetTableForModel.mockReturnValue({
+        id: { primary: true },
+        createdBy: {},
+      });
       mockDbGet.mockResolvedValue({ createdBy: 999 }); // Mismatch
 
       await expect(
@@ -258,7 +280,10 @@ describe("auth.ts", () => {
         user: { id: 1, permissions: { posts: ["read_own"] } },
       });
       mockAllows.mockResolvedValue(false);
-      mockGetTableForModel.mockReturnValue({ id: {}, createdBy: {} });
+      mockGetTableForModel.mockReturnValue({
+        id: { primary: true },
+        createdBy: {},
+      });
       mockDbGet.mockResolvedValue(null); // Record not found
 
       await expect(
@@ -293,12 +318,58 @@ describe("auth.ts", () => {
         user: { id: 1, permissions: { posts: ["read_own"] } },
       });
       mockAllows.mockResolvedValue(false);
-      mockGetTableForModel.mockReturnValue({ id: {}, createdBy: {} });
+      mockGetTableForModel.mockReturnValue({
+        id: { primary: true },
+        createdBy: {},
+      });
       mockDbGet.mockRejectedValue(new Error("DB_DOWN"));
 
       await expect(
         auth.checkAdminAccess({} as any, "posts", "read", { id: 100 }),
       ).rejects.toThrow("DB_DOWN");
+    });
+
+    it("denies access if user attempts to update hidden fields on own record", async () => {
+      mockUseRuntimeConfig.mockReturnValue({
+        public: {
+          autoCrud: { auth: { authentication: true, authorization: true } },
+        },
+      });
+      mockGetUserSession.mockResolvedValue({
+        user: { id: 1, permissions: { posts: ["update_own"] } },
+      });
+      mockAllows.mockResolvedValue(false);
+      mockGetTableForModel.mockReturnValue({
+        id: { primary: true },
+        createdBy: {},
+      });
+      mockDbGet.mockResolvedValue({ owner: 1 });
+      mockGetHiddenFields.mockReturnValue(["is_verified"]); // Field is hidden
+
+      const payload = { id: 100, is_verified: true };
+
+      await expect(
+        auth.checkAdminAccess({} as any, "posts", "update", payload),
+      ).rejects.toThrow("Forbidden");
+    });
+
+    it("delegates to siteAbility for unauthenticated guests", async () => {
+      mockUseRuntimeConfig.mockReturnValue({
+        public: {
+          autoCrud: { auth: { authentication: true, authorization: true } },
+        },
+      });
+      mockGetUserSession.mockResolvedValue({ user: null });
+      mockSiteAbility.mockResolvedValue(true);
+
+      const result = await auth.checkAdminAccess({} as any, "posts", "read");
+      expect(result).toBe(true);
+      expect(mockSiteAbility).toHaveBeenCalledWith(
+        null,
+        "posts",
+        "read",
+        undefined,
+      );
     });
   });
 
