@@ -10,5 +10,4 @@ export default defineNuxtConfig({
     db: 'sqlite',
     kv: true,
   },
-  autoCrud: {},
 })

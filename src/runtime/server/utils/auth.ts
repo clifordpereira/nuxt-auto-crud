@@ -4,8 +4,6 @@ import { createError, getHeader, getQuery } from "h3";
 
 // @ts-expect-error - virtual alias
 import siteAbility from "#site/ability";
-// @ts-expect-error - virtual alias
-import { requireUserSession, allows, getUserSession, useRuntimeConfig } from "#imports";
 import { useAutoCrudConfig } from "./config";
 
 export async function checkAdminAccess(
@@ -16,6 +14,10 @@ export async function checkAdminAccess(
 ): Promise<boolean> {
   const { auth } = useAutoCrudConfig();
   if (!auth?.authentication) return true;
+
+  // Lazy load Nuxt/Auth helpers only if authentication is enabled
+  // @ts-expect-error - virtual alias
+  const { allows, getUserSession, useRuntimeConfig } = await import("#imports");
 
   // 1. Token Check (Agentic/MCP)
   const authHeader = getHeader(event, "authorization");
@@ -93,6 +95,9 @@ export async function checkAdminAccess(
 export async function ensureAuthenticated(event: H3Event): Promise<void> {
   const { auth } = useAutoCrudConfig();
   if (!auth?.authentication) return;
+
+  // @ts-expect-error - virtual alias
+  const { requireUserSession, useRuntimeConfig } = await import("#imports");
 
   const authHeader = getHeader(event, "authorization");
   const token = (authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : null) || getQuery(event).token;

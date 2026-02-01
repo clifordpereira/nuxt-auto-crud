@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs'
+
 import {
   defineNuxtModule,
   createResolver,
@@ -25,8 +27,8 @@ export default defineNuxtModule<ModuleOptions>({
     schemaPath: 'server/db/schema',
     hashedFields: ['password'],
     auth: {
-      authentication: true,
-      authorization: true,
+      authentication: false,
+      authorization: false,
       abilityPath: 'shared/utils/abilities',
     }
   },
@@ -42,10 +44,14 @@ export default defineNuxtModule<ModuleOptions>({
     )
 
     // Bridge: Ability Alias (Uses merged default if not provided)
-    nuxt.options.alias['#site/ability'] = resolver.resolve(
+    const userAbilityPath = resolver.resolve(
       nuxt.options.rootDir, 
       options.auth!.abilityPath!
     )
+    // Check existence; fallback to an internal "always true" bridge if missing
+    nuxt.options.alias['#site/ability'] = existsSync(userAbilityPath)
+      ? userAbilityPath
+      : resolver.resolve('./runtime/server/stubs/defaultAbility')
 
     // 2. Runtime Config (The Concrete State)
     nuxt.options.runtimeConfig.public.autoCrud = options as RuntimeModuleOptions
