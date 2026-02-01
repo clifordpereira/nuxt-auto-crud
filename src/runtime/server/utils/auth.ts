@@ -1,18 +1,18 @@
 // server/utils/auth.ts
-// eslint-disable-next-line @typescript-eslint/triple-slash-reference
-/// <reference path="../../auth.d.ts" />
 import type { H3Event } from "h3";
 import { createError, getHeader, getQuery } from "h3";
 
+// @ts-expect-error - virtual alias
+import siteAbility from "#site/ability";
 // @ts-expect-error - #imports is a virtual alias
 import {
   requireUserSession,
   allows,
   getUserSession,
-  abilities as globalAbility,
   abilityLogic,
   useRuntimeConfig,
 } from "#imports";
+
 import { useAutoCrudConfig } from "./config";
 
 export async function checkAdminAccess(
@@ -59,38 +59,17 @@ export async function checkAdminAccess(
 
   // Check authorization if enabled
   if (auth.authorization) {
-    const guestCheck =
-      !user &&
-      (typeof abilityLogic === "function"
-        ? abilityLogic
-        : typeof globalAbility === "function"
-          ? globalAbility
-          : null);
-
-    const allowed = guestCheck
-      ? await (
-          guestCheck as (
-            user: unknown,
-            model: string,
-            action: string,
-            context?: unknown,
-          ) => Promise<boolean>
-        )(null, model, action, context)
-      : await (
-          allows as (
-            event: H3Event,
-            ability: unknown,
-            model: string,
-            action: string,
-            context?: unknown,
-          ) => Promise<boolean>
-        )(event, globalAbility, model, action, context);
-
+    // If no user, fallback to the raw ability logic for guest checks
+    // If user exists, use the standard 'allows' helper with our injected siteAbility
+    const allowed = !user 
+      ? await siteAbility(null, model, action, context) // Guest: Direct call to Bridge
+      : await allows(event, siteAbility, model, action, context); // Auth: Standard Helper
+      
     if (!allowed) {
       // Fallback: Check for "Own Record" permission (e.g. update_own, delete_own)
       if (
         user &&
-        (action === "read" || action === "update" || action === "delete") &&
+        ["read", "update", "delete"].includes(action) &&
         context &&
         typeof context === "object" &&
         "id" in context
@@ -100,12 +79,9 @@ export async function checkAdminAccess(
           | string[]
           | undefined;
 
-        if (userPermissions && userPermissions.includes(ownAction)) {
+        if (userPermissions?.includes(ownAction)) {
           // Verify ownership via DB
-          // @ts-expect-error - hub:db virtual alias
-          const { db } = await import("hub:db");
-          const { getTableForModel } = await import("./modelMapper");
-          const { eq } = await import("drizzle-orm");
+          const { getTableForModel, getTableColumns, getHiddenFields } = await import("./modelMapper");
 
           const table = getTableForModel(model);
 
@@ -117,29 +93,33 @@ export async function checkAdminAccess(
             return true;
           }
 
-          // Standard case: Check 'createdBy' or 'userId' column for ownership
+          // 2. Dynamic Ownership Check (Polymorphic)
+          const columns = getTableColumns(table);
+          const ownershipColumn = columns.find(col => ["createdBy", "userId", "ownerId"].includes(col));
 
-          const hasCreatedBy = "createdBy" in table;
-          const hasUserId = "userId" in table;
+          if (ownershipColumn) {
+            // @ts-expect-error - hub:db virtual alias
+            const { db } = await import("hub:db");
+            const { eq } = await import("drizzle-orm");
+            
+            const primaryKey = (table as any).id || Object.values(columns).find(c => (c as any).primary);
+            if (!primaryKey) return false;
 
-          if (hasCreatedBy || hasUserId) {
             const rawId = (context as { id: string | number }).id;
-            // Handle both integer and string (UUID) IDs
             const id = isNaN(Number(rawId)) ? rawId : Number(rawId);
 
-            // @ts-expect-error - table is dynamic
-            const query = db.select().from(table).where(eq(table.id, id));
-            const record = await query.get();
-
-            if (record) {
-              // Check createdBy
-              if (hasCreatedBy) {
-                if (String(record.createdBy) === String(user.id)) return true;
-              }
-              // Check userId (legacy)
-              if (hasUserId) {
-                if (String(record.userId) === String(user.id)) return true;
-              }
+            // @ts-expect-error - dynamic table
+            const record = await db.select({ [ownershipColumn]: table[ownershipColumn] })
+              .from(table)
+              .where(eq(primaryKey, id))
+              .get();
+            
+            if (record && String(record[ownershipColumn]) === String(user.id)) {
+              // 3. Field-Level Guard
+              const hidden = getHiddenFields(model);
+              const accessingHidden = Object.keys(context || {}).some(f => hidden.includes(f));
+              
+              return !accessingHidden;
             }
           }
         }

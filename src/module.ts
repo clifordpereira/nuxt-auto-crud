@@ -26,16 +26,26 @@ export default defineNuxtModule<ModuleOptions>({
     hashedFields: ['password'],
     auth: {
       authentication: true,
-      authorization: true
+      authorization: true,
+      abilityPath: 'server/utils/abilities',
     }
   },
 
   async setup(options, nuxt) {
     const resolver = createResolver(import.meta.url)
 
-    // 1. Schema Alias (The Interface)
-    const schemaPath = resolver.resolve(nuxt.options.rootDir, options.schemaPath!)
-    nuxt.options.alias['#site/schema'] = schemaPath
+    // 1. Aliases (The Interface)
+    // Bridge: Schema Alias
+    nuxt.options.alias['#site/schema'] = resolver.resolve(
+      nuxt.options.rootDir, 
+      options.schemaPath!
+    )
+
+    // Bridge: Ability Alias (Uses merged default if not provided)
+    nuxt.options.alias['#site/ability'] = resolver.resolve(
+      nuxt.options.rootDir, 
+      options.auth!.abilityPath!
+    )
 
     // 2. Runtime Config (The Concrete State)
     nuxt.options.runtimeConfig.public.autoCrud = options as RuntimeModuleOptions

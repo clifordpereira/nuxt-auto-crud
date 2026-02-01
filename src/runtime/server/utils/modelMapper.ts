@@ -61,7 +61,7 @@ export function getTableForModel(modelName: string): SQLiteTable {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getTableColumns(table: any): string[] {
+export function getTableColumns(table: any): string[] {
   try {
     const columns = getDrizzleTableColumns(table);
     return Object.keys(columns);

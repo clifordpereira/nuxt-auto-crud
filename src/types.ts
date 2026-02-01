@@ -18,6 +18,8 @@ export interface ModuleOptions {
   auth?: {
     authentication?: boolean
     authorization?: boolean
+    /** Path to the ability definition file */
+    abilityPath?: string
   }
 }
 
