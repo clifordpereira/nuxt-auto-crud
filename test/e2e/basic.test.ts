@@ -9,6 +9,8 @@ describe("NAC Core Engine", async () => {
     browser: false,
   });
 
+  const endpointPrefix = `/api/nac`;
+
   // Basic Boot
   it("boots without internal server errors", async () => {
     const html = await $fetch("/");
@@ -19,7 +21,7 @@ describe("NAC Core Engine", async () => {
   // Meta & Agentic Manifests
   describe("API: _meta", async () => {
     it("returns valid Clifland-NAC JSON manifest", async () => {
-      const data = await $fetch<any>("/api/_meta");
+      const data = await $fetch<any>(`${endpointPrefix}/_meta`);
 
       expect(data.architecture).toBe("Clifland-NAC");
       expect(data.version).toContain("agentic");
@@ -46,7 +48,7 @@ describe("NAC Core Engine", async () => {
     });
 
     it("renders Markdown for Agentic Tooling via Accept header", async () => {
-      const response = await $fetch<string>("/api/_meta", {
+      const response = await $fetch<string>(`${endpointPrefix}/_meta`, {
         headers: { Accept: "text/markdown" },
       });
 
@@ -58,14 +60,14 @@ describe("NAC Core Engine", async () => {
     });
 
     it("renders Markdown via query parameter", async () => {
-      const response = await $fetch<string>("/api/_meta?format=md");
+      const response = await $fetch<string>(`${endpointPrefix}/_meta?format=md`);
       expect(response).toContain("### Resource:");
     });
   });
 
   describe("API: _relations", async () => {
     it("returns a valid relation map for Agentic pathfinding", async () => {
-      const response = await $fetch<Record<string, any>>("/api/_relations");
+      const response = await $fetch<Record<string, any>>(`${endpointPrefix}/_relations`);
 
       expect(response).toBeDefined();
       expect(typeof response).toBe("object");
@@ -90,7 +92,7 @@ describe("NAC Core Engine", async () => {
     });
 
     it("identifies foreign key constraints accurately", async () => {
-      const response = await $fetch<any>("/api/_relations");
+      const response = await $fetch<any>(`${endpointPrefix}/_relations`);
 
       // Example: If a 'post' belongs to a 'user'
       if (response.posts) {
@@ -104,7 +106,7 @@ describe("NAC Core Engine", async () => {
   // Schema Reflection
   describe("Schema Reflection E2E", async () => {
     it("GET /api/_schema returns all registered schemas", async () => {
-      const data = await $fetch<Record<string, any>>("/api/_schema");
+      const data = await $fetch<Record<string, any>>(`${endpointPrefix}/_schema`);
 
       expect(data).toBeDefined();
       expect(Object.keys(data).length).toBeGreaterThan(0);
@@ -115,7 +117,7 @@ describe("NAC Core Engine", async () => {
 
     it("GET /api/_schema/:table returns 404 for non-existent table", async () => {
       try {
-        await $fetch("/api/_schema/non_existent_table");
+        await $fetch(`${endpointPrefix}/_schema/non_existent_table`);
         expect.fail("Should have thrown 404");
       } catch (e: any) {
         expect(e.response?.status).toBe(404);
@@ -124,7 +126,7 @@ describe("NAC Core Engine", async () => {
 
     it("GET /api/_schema/:table returns specific table metadata", async () => {
       const tableName = "users";
-      const schema = await $fetch<any>(`/api/_schema/${tableName}`);
+      const schema = await $fetch<any>(`${endpointPrefix}/_schema/${tableName}`);
 
       expect(schema).toBeDefined();
 
@@ -148,7 +150,7 @@ describe("NAC Core Engine", async () => {
   describe("NAC SSE Feature", async () => {
     it("establishes SSE connection and receives a heartbeat", async () => {
       let response: any;
-      const stream = await $fetch<ReadableStream>("/api/sse", {
+      const stream = await $fetch<ReadableStream>(`${endpointPrefix}/sse`, {
         responseType: "stream",
         onResponse(ctx) {
           response = ctx.response;

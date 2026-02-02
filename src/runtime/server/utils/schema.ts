@@ -6,12 +6,10 @@ import {
   modelTableMap,
   getTargetTableName,
   getForeignKeyPropertyName,
+  getHiddenFields,
+  getProtectedFields,
+  getSystemUserFields,
 } from "./modelMapper";
-import {
-  HIDDEN_FIELDS,
-  SYSTEM_USER_FIELDS,
-  PROTECTED_FIELDS,
-} from "./constants";
 
 export interface Field {
   name: string;
@@ -29,7 +27,7 @@ export function drizzleTableToFields(table: any, resourceName: string) {
   const zodSchema = getZodSchema(resourceName, "insert");
 
   for (const [key, col] of Object.entries(columns)) {
-    if (HIDDEN_FIELDS.includes(key)) continue;
+    if (getHiddenFields(resourceName).includes(key)) continue;
 
     const column = col as any;
     const zodField = (zodSchema.shape as any)[key];
@@ -41,7 +39,7 @@ export function drizzleTableToFields(table: any, resourceName: string) {
       type,
       required: column.notNull,
       selectOptions,
-      isReadOnly: PROTECTED_FIELDS.includes(key),
+      isReadOnly: getProtectedFields().includes(key),
     });
   }
 
@@ -107,7 +105,7 @@ export async function getSchemaRelations() {
       const tableRelations: Record<string, string> = {};
 
       for (const [key, col] of Object.entries(columns)) {
-        if (SYSTEM_USER_FIELDS.includes(key)) tableRelations[key] = "users";
+        if (getSystemUserFields().includes(key)) tableRelations[key] = "users";
       }
 
       config.foreignKeys.forEach((fk: any) => {

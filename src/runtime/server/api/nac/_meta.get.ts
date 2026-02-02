@@ -1,8 +1,8 @@
 import { eventHandler, getQuery, getHeader } from 'h3'
-import { getTableForModel, getAvailableModels } from '../utils/modelMapper'
+import { getTableForModel, getAvailableModels } from '../../utils/modelMapper'
 import { getTableColumns as getDrizzleTableColumns } from 'drizzle-orm'
 import { getTableConfig } from 'drizzle-orm/sqlite-core'
-import { PROTECTED_FIELDS, HIDDEN_FIELDS } from '../utils/constants'
+import { getProtectedFields, getHiddenFields } from '../../utils/modelMapper'
 // @ts-expect-error - 'hub:db' is a virtual alias
 import { db } from 'hub:db'
 
@@ -22,7 +22,7 @@ export default eventHandler(async (event) => {
       const config = getTableConfig(table)
 
       const fields = Object.entries(columns)
-        .filter(([name]) => !HIDDEN_FIELDS.includes(name))
+        .filter(([name]) => !getHiddenFields(model).includes(name))
         .map(([name, col]) => {
           let references = null
           // @ts-expect-error - Drizzle foreign key internals
@@ -50,7 +50,7 @@ export default eventHandler(async (event) => {
             references,
             isRelation: !!references,
             // Agentic Hint: Is this field writable by the user/agent?
-            isReadOnly: PROTECTED_FIELDS.includes(name),
+            isReadOnly: getProtectedFields().includes(name),
           }
         })
 

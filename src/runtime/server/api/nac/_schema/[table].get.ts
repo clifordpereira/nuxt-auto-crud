@@ -1,6 +1,6 @@
 import { eventHandler, createError, getRouterParam } from 'h3'
 
-import { getSchema } from '../../utils/schema'
+import { getSchema } from '../../../utils/schema'
 
 export default eventHandler(async (event) => {
   const tableName = getRouterParam(event, 'table')

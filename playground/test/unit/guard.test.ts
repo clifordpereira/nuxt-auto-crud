@@ -2,7 +2,7 @@
 import "drizzle-orm";
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import * as guard from "../../src/runtime/server/utils/guard";
+import * as guard from "../../server/utils/guard";
 
 const { mockUseAutoCrudConfig, mockCheckAdminAccess } = vi.hoisted(() => ({
   mockUseAutoCrudConfig: vi.fn(),

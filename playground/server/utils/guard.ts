@@ -1,5 +1,5 @@
 import type { H3Event } from "h3";
-import { useAutoCrudConfig } from "./config";
+import { useAutoCrudConfig } from "../../../src/runtime/server/utils/config";
 // @ts-expect-error - virtual alias
 import { checkAdminAccess } from "#imports";
 

@@ -1,5 +1,3 @@
-import { existsSync } from 'node:fs'
-
 import {
   defineNuxtModule,
   createResolver,
@@ -8,15 +6,10 @@ import {
   addImportsDir,
 } from '@nuxt/kit'
 
-import type { ModuleOptions, RuntimeModuleOptions } from './types'
+import { SYSTEM_USER_FIELDS, PROTECTED_FIELDS, HIDDEN_FIELDS } from './runtime/server/utils/constants'
+import type { ModuleOptions } from './types'
 
 export type { ModuleOptions }
-
-declare module '@nuxt/schema' {
-  interface PublicRuntimeConfig {
-    autoCrud: RuntimeModuleOptions
-  }
-}
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
@@ -24,114 +17,91 @@ export default defineNuxtModule<ModuleOptions>({
     configKey: 'autoCrud',
   },
   defaults: {
+    endpointPrefix: '/api/nac',
     schemaPath: 'server/db/schema',
     hashedFields: ['password'],
+    systemUserFields: SYSTEM_USER_FIELDS,
+    protectedFields: PROTECTED_FIELDS,
+    hiddenFields: HIDDEN_FIELDS,
     auth: {
       authentication: false,
       authorization: false,
-      abilityPath: 'shared/utils/abilities',
-    }
+    },
+    resources: {}
   },
 
   async setup(options, nuxt) {
+    const prefix = options.endpointPrefix || '/api/nac'
     const resolver = createResolver(import.meta.url)
 
-    // 1. Aliases (The Interface)
-    // Bridge: Schema Alias
+    // 1. Schema Alias
     nuxt.options.alias['#site/schema'] = resolver.resolve(
       nuxt.options.rootDir, 
       options.schemaPath!
     )
 
-    // Bridge: Ability Alias (Uses merged default if not provided)
-    const userAbilityPath = resolver.resolve(
-      nuxt.options.rootDir, 
-      options.auth!.abilityPath!
-    )
-    // Check existence; fallback to an internal "always true" bridge if missing
-    nuxt.options.alias['#site/ability'] = existsSync(userAbilityPath)
-      ? userAbilityPath
-      : resolver.resolve('./runtime/server/stubs/defaultAbility')
-
     // 2. Runtime Config (The Concrete State)
-    nuxt.options.runtimeConfig.public.autoCrud = options as RuntimeModuleOptions
+    const { schemaPath, hashedFields, auth, ...publicOptions } = options
+    // Assign to private runtime
+    nuxt.options.runtimeConfig.autoCrud = {
+      schemaPath,
+      hashedFields,
+      auth
+    }
+    // Assign to public runtime
+    nuxt.options.runtimeConfig.public.autoCrud = publicOptions
 
     // 3. Auto-imports (The Engine)
     addImportsDir(resolver.resolve('./runtime/composables'))
-    addImportsDir(resolver.resolve(nuxt.options.rootDir, 'shared/utils'))
     addServerImportsDir(resolver.resolve('./runtime/server/utils'))
 
-    // 4. Register the IoC Contract Types
-    // This ensures event.context.$authorization is typed in the core module logic
-    nuxt.hook('nitro:config', (nitroConfig) => {
-      nitroConfig.typescript ||= {}
-      nitroConfig.typescript.tsConfig ||= {}
-      
-      nitroConfig.typescript.tsConfig.include = [
-        ...(nitroConfig.typescript.tsConfig.include || []),
-        resolver.resolve('./runtime/types/index.d.ts')
-      ]
-    })
-
-    // 5. Global Type Support (For the Playground/App)
-    // This makes the types visible to the IDE in the playground
+    // 4. Global Type Support (For the Playground/App)
     nuxt.hook('prepare:types', ({ references }) => {
       references.push({ path: resolver.resolve('./runtime/types/index.d.ts') })
     })
 
     const apiDir = resolver.resolve('./runtime/server/api')
 
-    // Meta Discovery API for AI Agents
-    addServerHandler({
-      route: '/api/_meta',
-      method: 'get',
-      handler: resolver.resolve(apiDir, '_meta.get'),
-    })
-    // SSE for real time updates
-    addServerHandler({
-      route: '/api/sse',
-      method: 'get',
-      handler: resolver.resolve(apiDir, 'sse'),
-    })
-    // Helper APIs for Dynamic CRUD
-    addServerHandler({
-      route: '/api/_schema',
-      method: 'get',
-      handler: resolver.resolve(apiDir, '_schema/index.get'),
-    })
-    addServerHandler({
-      route: '/api/_schema/:table',
-      method: 'get',
-      handler: resolver.resolve(apiDir, '_schema/[table].get'),
-    })
-    addServerHandler({
-      route: '/api/_relations',
-      method: 'get',
-      handler: resolver.resolve(apiDir, '_relations.get'),
-    })
+    // Standardized System Endpoints
+    const systemRoutes = [
+      { path: '/_meta', handler: '_meta.get' },
+      { path: '/sse', handler: 'sse.get' },
+      { path: '/_relations', handler: '_relations.get' },
+      { path: '/_schema', handler: '_schema/index.get' },
+      { path: '/_schema/:table', handler: '_schema/[table].get' }
+    ]
+
+    for (const route of systemRoutes) {
+      addServerHandler({
+        route: `${prefix}${route.path}`,
+        method: 'get',
+        handler: resolver.resolve(apiDir, route.handler),
+      })
+    }
+
     // Dynamic CRUD APIs
     addServerHandler({
-      route: '/api/:model',
+      route: `${prefix}/:model`,
       method: 'get',
       handler: resolver.resolve(apiDir, '[model]/index.get'),
     })
     addServerHandler({
-      route: '/api/:model',
+      route: `${prefix}/:model`,
       method: 'post',
       handler: resolver.resolve(apiDir, '[model]/index.post'),
     })
     addServerHandler({
-      route: '/api/:model/:id',
+      route: `${prefix}/:model/:id`,
       method: 'get',
       handler: resolver.resolve(apiDir, '[model]/[id].get'),
     })
     addServerHandler({
-      route: '/api/:model/:id',
+      route: `${prefix}/:model/:id`,
       method: 'patch',
       handler: resolver.resolve(apiDir, '[model]/[id].patch'),
     })
     addServerHandler({
-      route: '/api/:model/:id',
+      route: `${prefix}/:model/:id`,
       method: 'delete',
       handler: resolver.resolve(apiDir, '[model]/[id].delete'),
     })

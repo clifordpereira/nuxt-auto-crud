@@ -4,7 +4,7 @@ import { createError, getHeader, getQuery } from "h3";
 
 // @ts-expect-error - virtual alias
 import siteAbility from "#site/ability";
-import { useAutoCrudConfig } from "./config";
+import { useAutoCrudConfig } from "../../../src/runtime/server/utils/config";
 
 export async function checkAdminAccess(
   event: H3Event,
@@ -51,7 +51,7 @@ export async function checkAdminAccess(
 
     if (userPermissions?.includes(`${action}_own`)) {
       const { getTableForModel, getTableColumns, getHiddenFields } =
-        await import("./modelMapper");
+        await import("../../../src/runtime/server/utils/modelMapper");
       // @ts-expect-error - vitual alias
       const { db } = await import("hub:db");
       const { eq, getTableColumns: getDrizzleColumns } =

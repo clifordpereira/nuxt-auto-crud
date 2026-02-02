@@ -103,7 +103,6 @@ export default defineNuxtConfig({
   autoCrud: {
     schemaPath: 'server/db/schema',
     auth: {
-      type: 'session',
       authentication: true,
       authorization: true,
     },

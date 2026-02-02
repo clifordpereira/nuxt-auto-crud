@@ -1,26 +1,23 @@
-// src/types.ts
 export interface ModuleOptions {
-  /**
-   * Path to the database schema file
-   * @default 'server/database/schema'
-   */
-  schemaPath?: string
-
-  /**
-   * Fields that should be automatically hashed before storage
-   * @default ['password']
-   */
-  hashedFields?: string[]
-
-  /**
-   * Authentication and Authorization settings
-   */
-  auth?: {
-    authentication?: boolean
-    authorization?: boolean
-    /** Path to the ability definition file */
-    abilityPath?: string
+  endpointPrefix: string
+  schemaPath: string
+  hashedFields: string[]
+  protectedFields: string[]
+  hiddenFields: string[]
+  systemUserFields: string[]
+  auth: {
+    authentication: boolean
+    authorization: boolean
   }
+  resources: Record<string, string[]>
 }
 
-export interface RuntimeModuleOptions extends ModuleOptions {}
+declare module '@nuxt/schema' {
+  interface RuntimeConfig {
+    // Internal code sees these as required because of defaults
+    autoCrud: Required<Pick<ModuleOptions, 'schemaPath' | 'hashedFields' | 'auth'>>
+  }
+  interface PublicRuntimeConfig {
+    autoCrud: Required<Omit<ModuleOptions, 'schemaPath' | 'hashedFields' | 'auth'>>
+  }
+}

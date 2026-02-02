@@ -13,8 +13,6 @@ import { useRuntimeConfig } from "#imports";
 import { createInsertSchema } from "drizzle-zod";
 import type { z } from "zod";
 
-import { PROTECTED_FIELDS, HIDDEN_FIELDS } from "./constants";
-
 export const customUpdatableFields: Record<string, string[]> = {};
 export const customHiddenFields: Record<string, string[]> = {};
 
@@ -104,7 +102,7 @@ export function getUpdatableFields(modelName: string): string[] {
 
   const allColumns = getTableColumns(table);
   return allColumns.filter(
-    (col) => !PROTECTED_FIELDS.includes(col) && !HIDDEN_FIELDS.includes(col),
+    (col) => !getProtectedFields().includes(col) && !getHiddenFields(modelName).includes(col),
   );
 }
 
@@ -151,12 +149,25 @@ export function getAvailableModels(): string[] {
 }
 
 export function getHiddenFields(modelName: string): string[] {
+  const { autoCrud } = useRuntimeConfig().public;
+  const globalHidden = autoCrud.hiddenFields || [];
   const custom = customHiddenFields[modelName] || [];
-  return [...HIDDEN_FIELDS, ...custom];
+  
+  return [...globalHidden, ...custom];
+}
+
+export function getProtectedFields(): string[] {
+  const { autoCrud } = useRuntimeConfig().public;
+  return autoCrud.protectedFields || [];
+}
+
+export function getSystemUserFields(): string[] {
+  const { autoCrud } = useRuntimeConfig().public;
+  return autoCrud.systemUserFields || [];
 }
 
 export function getPublicColumns(modelName: string): string[] | undefined {
-  const { resources } = useRuntimeConfig().autoCrud;
+  const { resources } = useRuntimeConfig().public.autoCrud;
   return resources?.[modelName];
 }
 
@@ -167,25 +178,16 @@ export function getPublicColumns(modelName: string): string[] | undefined {
  */
 export function sanitizeResource(
   modelName: string,
-  data: Record<string, unknown>,
-  isGuest: boolean,
+  data: Record<string, unknown>
 ): Record<string, unknown> {
   const hidden = getHiddenFields(modelName);
-  const publicColumns = isGuest ? getPublicColumns(modelName) : null;
-
   const filtered: Record<string, unknown> = {};
 
   for (const [key, value] of Object.entries(data)) {
-    // 1. Global Denylist (Highest Priority)
-    if (hidden.includes(key)) {
+    // Drop fields in global HIDDEN_FIELDS or system-level exclusions
+    if (hidden.includes(key) || key === 'deletedAt') {
       continue;
     }
-
-    // 2. Guest Allowlist (if configured)
-    if (publicColumns && !publicColumns.includes(key)) {
-      continue;
-    }
-
     filtered[key] = value;
   }
 
@@ -208,7 +210,7 @@ export function getZodSchema(
     return schema.partial() as z.ZodObject<any, any>;
   }
 
-  const OMIT_ON_CREATE = [...PROTECTED_FIELDS, ...HIDDEN_FIELDS];
+  const OMIT_ON_CREATE = [...getProtectedFields(), ...getHiddenFields(modelName)];
 
   const columns = getDrizzleTableColumns(table);
   const fieldsToOmit: Record<string, true> = {};
@@ -225,19 +227,13 @@ export function getZodSchema(
 
 export function formatResourceResult(
   model: string,
-  data: Record<string, unknown> | Record<string, unknown>[] | null | undefined,
-  isGuest: boolean,
-) {
+  data: Record<string, unknown> | Record<string, unknown>[] | null | undefined
+): Record<string, unknown> | Record<string, unknown>[] | null | undefined {
   if (!data) return data;
 
-  const sanitize = (item: Record<string, unknown>) =>
-    sanitizeResource(model, item, isGuest);
+  const sanitize = (item: Record<string, unknown>) => sanitizeResource(model, item);
 
-  if (Array.isArray(data)) {
-    return data.map(sanitize);
-  }
-
-  return sanitize(data);
+  return Array.isArray(data) ? data.map(sanitize) : sanitize(data);
 }
 
 export function getRelations(): Record<string, Record<string, unknown>[]> {

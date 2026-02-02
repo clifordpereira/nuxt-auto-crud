@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeAll, beforeEach } from "vitest";
 import { getHeader, getQuery } from "h3";
 import { eq } from "drizzle-orm";
 
-type Auth = typeof import("../../src/runtime/server/utils/auth");
+type Auth = typeof import("../../server/utils/auth");
 
 // Mock h3 module
 vi.mock("h3", async (importOriginal) => {
@@ -78,7 +78,7 @@ describe("auth.ts", () => {
     });
     (getHeader as any).mockReturnValue(undefined);
     (getQuery as any).mockReturnValue({});
-    auth = await import("../../src/runtime/server/utils/auth");
+    auth = await import("../../server/utils/auth");
   });
 
   describe("checkAdminAccess", () => {

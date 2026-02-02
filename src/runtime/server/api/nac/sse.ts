@@ -1,5 +1,5 @@
 import { eventHandler, setResponseHeaders } from 'h3'
-import { addClient, removeClient } from '../utils/sse-bus'
+import { addClient, removeClient } from '../../utils/sse-bus'
 // @ts-expect-error - virtual import resolved by Nuxt/Nitro
 import { kv } from '@nuxthub/kv'
 
