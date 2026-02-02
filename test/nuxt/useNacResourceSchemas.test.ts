@@ -3,6 +3,17 @@ import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime";
 import { useNacResourceSchemas } from "../../src/runtime/composables/useNacResourceSchemas";
 import { createError } from "h3";
 import { clearNuxtData } from "#app";
+import { mockNuxtImport } from "@nuxt/test-utils/runtime";
+
+mockNuxtImport("useRuntimeConfig", () => {
+  return () => ({
+    public: {
+      autoCrud: {
+        endpointPrefix: "/api/_nac",
+      },
+    },
+  });
+});
 
 describe("useNacResourceSchemas", () => {
   afterEach(() => {

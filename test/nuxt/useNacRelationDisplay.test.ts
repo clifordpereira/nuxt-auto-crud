@@ -3,8 +3,21 @@ import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime";
 import { useNacRelationDisplay } from "../../src/runtime/composables/useNacRelationDisplay";
 import { createError } from "h3";
 import { clearNuxtData } from "#app";
+import { mockNuxtImport } from "@nuxt/test-utils/runtime";
+
+mockNuxtImport("useRuntimeConfig", () => {
+  return () => ({
+    public: {
+      autoCrud: {
+        endpointPrefix: "/api/_nac",
+      },
+    },
+  });
+});
 
 describe("useNacRelationDisplay", () => {
+  const endpointPrefix = "/api/_nac";
+
   const schema = {
     resource: "posts",
     fields: [
@@ -20,13 +33,13 @@ describe("useNacRelationDisplay", () => {
   });
 
   it("fetches relations and populates display values", async () => {
-    registerEndpoint("/api/_relations", () => ({
+    registerEndpoint(`${endpointPrefix}/_relations`, () => ({
       posts: {
         authorId: "users",
       },
     }));
 
-    registerEndpoint("/api/users", () => [
+    registerEndpoint(`${endpointPrefix}/users`, () => [
       { id: 1, username: "alice" },
       { id: 2, username: "bob" },
     ]);
@@ -40,8 +53,7 @@ describe("useNacRelationDisplay", () => {
       },
     });
 
-    const { fetchRelations, getDisplayValue, relationsMap } =
-      composableResult;
+    const { fetchRelations, getDisplayValue, relationsMap } = composableResult;
 
     await fetchRelations();
 
@@ -58,13 +70,13 @@ describe("useNacRelationDisplay", () => {
   });
 
   it("handles missing relations gracefully", async () => {
-    registerEndpoint("/api/_relations", () => ({
+    registerEndpoint(`${endpointPrefix}/_relations`, () => ({
       posts: {
         categoryId: "categories",
       },
     }));
 
-    registerEndpoint("/api/categories", () => {
+    registerEndpoint(`${endpointPrefix}/categories`, () => {
       throw createError({ statusCode: 500, statusMessage: "Internal Error" });
     });
 
@@ -88,52 +100,82 @@ describe("useNacRelationDisplay", () => {
   });
 
   it("falls back to ID string if no standard display keys exist", async () => {
-    registerEndpoint("/api/_relations", () => ({ posts: { authorId: "users" } }));
-    registerEndpoint("/api/users", () => [{ id: 99 }]); // No name/title/username
+    registerEndpoint(`${endpointPrefix}/_relations`, () => ({
+      posts: { authorId: "users" },
+    }));
+    registerEndpoint(`${endpointPrefix}/users`, () => [{ id: 99 }]); // No name/title/username
 
     let result: any;
-    await mountSuspended({ setup() { result = useNacRelationDisplay(schema); return () => {} } });
-    
+    await mountSuspended({
+      setup() {
+        result = useNacRelationDisplay(schema);
+        return () => {};
+      },
+    });
+
     await result.fetchRelations();
     expect(result.getDisplayValue("authorId", 99)).toBe("#99");
   });
 
   it("handles non-existent resource in relations map", async () => {
-    registerEndpoint("/api/_relations", () => ({ non_existent: {} }));
-    
+    registerEndpoint(`${endpointPrefix}/_relations`, () => ({
+      non_existent: {},
+    }));
+
     let result: any;
-    await mountSuspended({ setup() { result = useNacRelationDisplay(schema); return () => {} } });
-    
+    await mountSuspended({
+      setup() {
+        result = useNacRelationDisplay(schema);
+        return () => {};
+      },
+    });
+
     await expect(result.fetchRelations()).resolves.not.toThrow();
     expect(result.getDisplayValue("authorId", 1)).toBe(1);
   });
 
   it("respects custom headers for SSR/Auth parity", async () => {
     let capturedHeaders: Record<string, string> = {};
-    
-    registerEndpoint("/api/_relations", () => ({ posts: { authorId: "users" } }));
-    registerEndpoint("/api/users", (req) => {
+
+    registerEndpoint(`${endpointPrefix}/_relations`, () => ({
+      posts: { authorId: "users" },
+    }));
+    registerEndpoint(`${endpointPrefix}/users`, (req) => {
       capturedHeaders = Object.fromEntries(req.headers.entries());
       return [{ id: 1, name: "Admin" }];
     });
 
     let res: any;
-    await mountSuspended({ setup() { res = useNacRelationDisplay(schema); return () => {} } });
+    await mountSuspended({
+      setup() {
+        res = useNacRelationDisplay(schema);
+        return () => {};
+      },
+    });
     await res.fetchRelations();
 
     expect(capturedHeaders).toHaveProperty("host", "localhost");
   });
 
   it("handles multiple relation fields for the same resource", async () => {
-    registerEndpoint("/api/_relations", () => ({
+    registerEndpoint(`${endpointPrefix}/_relations`, () => ({
       posts: { authorId: "users", categoryId: "tags" },
     }));
-    registerEndpoint("/api/users", () => [{ id: 1, username: "cliford" }]);
-    registerEndpoint("/api/tags", () => [{ id: 10, name: "typescript" }]);
+    registerEndpoint(`${endpointPrefix}/users`, () => [
+      { id: 1, username: "cliford" },
+    ]);
+    registerEndpoint(`${endpointPrefix}/tags`, () => [
+      { id: 10, name: "typescript" },
+    ]);
 
     let res: any;
-    await mountSuspended({ setup() { res = useNacRelationDisplay(schema); return () => {} } });
-    
+    await mountSuspended({
+      setup() {
+        res = useNacRelationDisplay(schema);
+        return () => {};
+      },
+    });
+
     await res.fetchRelations();
 
     expect(res.getDisplayValue("authorId", 1)).toBe("cliford");
@@ -142,27 +184,47 @@ describe("useNacRelationDisplay", () => {
 
   it("overwrites existing display values on subsequent fetches", async () => {
     let res: any;
-    await mountSuspended({ setup() { res = useNacRelationDisplay(schema); return () => {} } });
+    await mountSuspended({
+      setup() {
+        res = useNacRelationDisplay(schema);
+        return () => {};
+      },
+    });
 
     // First fetch
-    registerEndpoint("/api/_relations", () => ({ posts: { authorId: "users" } }));
-    registerEndpoint("/api/users", () => [{ id: 1, username: "v1" }]);
+    registerEndpoint(`${endpointPrefix}/_relations`, () => ({
+      posts: { authorId: "users" },
+    }));
+    registerEndpoint(`${endpointPrefix}/users`, () => [
+      { id: 1, username: "v1" },
+    ]);
     await res.fetchRelations();
     expect(res.getDisplayValue("authorId", 1)).toBe("v1");
 
     // Second fetch (Simulating data update)
-    registerEndpoint("/api/users", () => [{ id: 1, username: "v2" }]);
+    registerEndpoint(`${endpointPrefix}/users`, () => [
+      { id: 1, username: "v2" },
+    ]);
     await res.fetchRelations();
     expect(res.getDisplayValue("authorId", 1)).toBe("v2");
   });
 
   it("supports string-based keys for relations", async () => {
-    registerEndpoint("/api/_relations", () => ({ posts: { typeId: "types" } }));
-    registerEndpoint("/api/types", () => [{ id: "slug-1", name: "Article" }]);
+    registerEndpoint(`${endpointPrefix}/_relations`, () => ({
+      posts: { typeId: "types" },
+    }));
+    registerEndpoint(`${endpointPrefix}/types`, () => [
+      { id: "slug-1", name: "Article" },
+    ]);
 
     let res: any;
-    await mountSuspended({ setup() { res = useNacRelationDisplay(schema); return () => {} } });
-    
+    await mountSuspended({
+      setup() {
+        res = useNacRelationDisplay(schema);
+        return () => {};
+      },
+    });
+
     await res.fetchRelations();
 
     expect(res.getDisplayValue("typeId", "slug-1")).toBe("Article");
@@ -170,20 +232,32 @@ describe("useNacRelationDisplay", () => {
 
   it("handles null or undefined values safely", async () => {
     let res: any;
-    await mountSuspended({ setup() { res = useNacRelationDisplay(schema); return () => {} } });
-    
+    await mountSuspended({
+      setup() {
+        res = useNacRelationDisplay(schema);
+        return () => {};
+      },
+    });
+
     // Should return the input directly without error
     expect(res.getDisplayValue("authorId", null)).toBe(null);
     expect(res.getDisplayValue("authorId", undefined)).toBe(undefined);
   });
 
   it("handles empty API responses without breaking map", async () => {
-    registerEndpoint("/api/_relations", () => ({ posts: { authorId: "users" } }));
-    registerEndpoint("/api/users", () => []); // Empty table
+    registerEndpoint(`${endpointPrefix}/_relations`, () => ({
+      posts: { authorId: "users" },
+    }));
+    registerEndpoint(`${endpointPrefix}/users`, () => []); // Empty table
 
     let res: any;
-    await mountSuspended({ setup() { res = useNacRelationDisplay(schema); return () => {} } });
-    
+    await mountSuspended({
+      setup() {
+        res = useNacRelationDisplay(schema);
+        return () => {};
+      },
+    });
+
     await res.fetchRelations();
     expect(res.getDisplayValue("authorId", 1)).toBe(1); // Fallback to raw ID
   });

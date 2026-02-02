@@ -2,6 +2,17 @@ import { it, expect, vi, describe, beforeEach, afterEach } from "vitest";
 import { mountSuspended } from "@nuxt/test-utils/runtime";
 import { h } from "vue";
 import { useNacAutoCrudSSE } from "../../src/runtime/composables/useNacAutoCrudSSE";
+import { mockNuxtImport } from "@nuxt/test-utils/runtime";
+
+mockNuxtImport("useRuntimeConfig", () => {
+  return () => ({
+    public: {
+      autoCrud: {
+        endpointPrefix: "/api/_nac",
+      },
+    },
+  });
+});
 
 describe("NAC Core: useNacAutoCrudSSE", () => {
   const endpointPrefix = `/api/_nac`;
@@ -112,7 +123,7 @@ describe("NAC Core: useNacAutoCrudSSE", () => {
     // would throw a TypeError, failing the test.
   });
 
-  it("ignores events without the 'crud' type", async () => {
+  it("only listens for 'crud' type events", async () => {
     const onEvent = vi.fn();
     await mountSuspended({
       setup() {
@@ -120,14 +131,16 @@ describe("NAC Core: useNacAutoCrudSSE", () => {
         return () => h("div");
       },
     });
-
-    // Simulate a generic message event that isn't the 'crud' type
-    const genericMsg = new MessageEvent("message", {
-      data: JSON.stringify({ any: "data" }),
-    });
-    window.dispatchEvent(genericMsg);
-
-    expect(onEvent).not.toHaveBeenCalled();
+    const eventSourceInstance = (global.EventSource as any).mock.instances[0];
+    const addEventListenerSpy = eventSourceInstance.addEventListener;
+    expect(addEventListenerSpy).toHaveBeenCalledWith(
+      "crud",
+      expect.any(Function),
+    );
+    expect(addEventListenerSpy).not.toHaveBeenCalledWith(
+      "message",
+      expect.any(Function),
+    );
   });
 
   it("handles multiple rapid events correctly", async () => {
