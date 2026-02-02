@@ -61,49 +61,27 @@ export default defineNuxtModule<ModuleOptions>({
     })
 
     const apiDir = resolver.resolve('./runtime/server/api')
+    const routes = [
+      // System Endpoints
+      { path: '/_meta', method: 'get', handler: '_meta.get' },
+      { path: '/sse', method: 'get', handler: 'sse.get' },
+      { path: '/_relations', method: 'get', handler: '_relations.get' },
+      { path: '/_schema', method: 'get', handler: '_schema/index.get' },
+      { path: '/_schema/:table', method: 'get', handler: '_schema/[table].get' },
+      // Dynamic CRUD Endpoints
+      { path: '/:model', method: 'get', handler: '[model]/index.get' },
+      { path: '/:model', method: 'post', handler: '[model]/index.post' },
+      { path: '/:model/:id', method: 'get', handler: '[model]/[id].get' },
+      { path: '/:model/:id', method: 'patch', handler: '[model]/[id].patch' },
+      { path: '/:model/:id', method: 'delete', handler: '[model]/[id].delete' }
+    ] as const;
 
-    // Standardized System Endpoints
-    const systemRoutes = [
-      { path: '/_meta', handler: '_meta.get' },
-      { path: '/sse', handler: 'sse.get' },
-      { path: '/_relations', handler: '_relations.get' },
-      { path: '/_schema', handler: '_schema/index.get' },
-      { path: '/_schema/:table', handler: '_schema/[table].get' }
-    ]
-
-    for (const route of systemRoutes) {
+    for (const route of routes) {
       addServerHandler({
         route: `${prefix}${route.path}`,
-        method: 'get',
+        method: route.method,
         handler: resolver.resolve(apiDir, route.handler),
       })
     }
-
-    // Dynamic CRUD APIs
-    addServerHandler({
-      route: `${prefix}/:model`,
-      method: 'get',
-      handler: resolver.resolve(apiDir, '[model]/index.get'),
-    })
-    addServerHandler({
-      route: `${prefix}/:model`,
-      method: 'post',
-      handler: resolver.resolve(apiDir, '[model]/index.post'),
-    })
-    addServerHandler({
-      route: `${prefix}/:model/:id`,
-      method: 'get',
-      handler: resolver.resolve(apiDir, '[model]/[id].get'),
-    })
-    addServerHandler({
-      route: `${prefix}/:model/:id`,
-      method: 'patch',
-      handler: resolver.resolve(apiDir, '[model]/[id].patch'),
-    })
-    addServerHandler({
-      route: `${prefix}/:model/:id`,
-      method: 'delete',
-      handler: resolver.resolve(apiDir, '[model]/[id].delete'),
-    })
   },
 })
