@@ -4,6 +4,7 @@ import { h } from "vue";
 import { useAutoCrudSSE } from "../../src/runtime/composables/useAutoCrudSSE";
 
 describe("NAC Core: useAutoCrudSSE", () => {
+  const endpointPrefix = `/api/nac`;
   const addEventListenerMock = vi.fn();
   const closeMock = vi.fn();
   let messageListeners: ((event: MessageEvent) => void)[] = [];
@@ -55,7 +56,7 @@ describe("NAC Core: useAutoCrudSSE", () => {
     });
 
     // 1. Init check
-    expect(global.EventSource).toHaveBeenCalledWith("/api/sse");
+    expect(global.EventSource).toHaveBeenCalledWith(`${endpointPrefix}/sse`);
 
     // 2. Valid CRUD event check
     const validEvent = {

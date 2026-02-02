@@ -18,15 +18,19 @@ vi.mock("#site/schema", async () => {
 describe("modelMapper.ts", () => {
   beforeEach(() => {
     mockUseRuntimeConfig.mockReturnValue({
-      autoCrud: { resources: { users: ["email", "lastLogin"] } },
+      // Private/Server Config
+      autoCrud: {},
+      // Public Config
+      public: {
+        autoCrud: {
+          resources: { users: ["email", "lastLogin"] },
+          hiddenFields: ["password", "token"],
+          // Moved to public to match modelMapper.ts implementation
+          protectedFields: ["id", "createdAt"],
+          systemUserFields: ["createdBy"],
+        },
+      },
     });
-
-    // Type-safe reset of module state to ensure isolation
-    const updatable = mapper.customUpdatableFields;
-    const hidden = mapper.customHiddenFields;
-
-    for (const key in updatable) delete updatable[key];
-    for (const key in hidden) delete hidden[key];
   });
 
   it("returns plural/singular names correctly", () => {
@@ -98,7 +102,7 @@ describe("modelMapper.ts", () => {
     const result = mapper.sanitizeResource("users", {
       email: "a@b.com",
       deletedAt: new Date(),
-    }, true);
+    });
     expect(result.deletedAt).toBeUndefined();
   });
 
@@ -116,32 +120,14 @@ describe("modelMapper.ts", () => {
     expect(schema.shape.message).toBeDefined();
   });
 
-  it("respects runtimeConfig whitelist in sanitizeResource (Guest Mode)", () => {
-    const result = mapper.sanitizeResource("users", {
-      email: "clif@clifland.com",
-      id: 1,
-    }, true);
-    expect(result.email).toBeDefined();
-    expect(result.id).toBeUndefined();
-  });
-
-  it("returns empty object when sanitizeResource has empty whitelist (Guest Mode)", async () => {
-    mockUseRuntimeConfig.mockReturnValue({
-      autoCrud: { resources: { logs: [] } }, // Explicitly empty
-    });
-    const result = mapper.sanitizeResource("logs", { message: "test" }, true);
-
-    expect(result).toEqual({});
-  });
-
-  it("falls back to HIDDEN_FIELDS for non-whitelisted resources (Admin Mode)", () => {
+  it("filters HIDDEN_FIELDS from resource output", () => {
     const result = mapper.sanitizeResource("logs", {
       id: 100,
       message: "boot",
-      googleId: "123",
-    }, false);
+      password: "123",
+    });
     expect(result.message).toBeDefined();
-    expect(result.googleId).toBeUndefined();
+    expect(result.password).toBeUndefined();
   });
 
   it("prioritizes customHiddenFields and respects constants (Admin Mode)", () => {
@@ -150,7 +136,7 @@ describe("modelMapper.ts", () => {
       email: "secret",
       password: "123",
       username: "clif",
-    }, false);
+    });
     expect(result.email).toBeUndefined(); // Custom hidden
     expect(result.password).toBeUndefined(); // Constant hidden
     expect(result.username).toBe("clif"); // Safe
@@ -167,5 +153,49 @@ describe("modelMapper.ts", () => {
     expect(result.email).toBeDefined();
     expect(result.id).toBeUndefined(); // Protected
     expect(result.createdAt).toBeUndefined(); // Protected
+  });
+
+  it("formats resource results (single and array)", () => {
+    mapper.customHiddenFields["users"] = ["password"];
+    const single = { email: "a@b.com", password: "123" };
+    const array = [{ email: "a@b.com", password: "123" }];
+
+    const resSingle = mapper.formatResourceResult("users", single);
+    expect(resSingle).not.toHaveProperty("password");
+    expect(resSingle).toHaveProperty("email");
+
+    const resArray = mapper.formatResourceResult("users", array);
+    expect(Array.isArray(resArray)).toBe(true);
+    expect((resArray as any[])[0]).not.toHaveProperty("password");
+  });
+
+  it("extracts relations from table config", () => {
+    const relations = mapper.getRelations();
+    expect(relations.posts).toBeDefined();
+    const userRel = relations.posts.find((r) => r.target === "users");
+    expect(userRel).toBeDefined();
+    expect(userRel?.type).toBe("one");
+  });
+
+  it("reads system and protected fields from config", () => {
+    mockUseRuntimeConfig.mockReturnValue({
+      public: {
+        autoCrud: {
+          protectedFields: ["createdAt"],
+          systemUserFields: ["createdBy"],
+        },
+      },
+    });
+    expect(mapper.getProtectedFields()).toContain("createdAt");
+    expect(mapper.getSystemUserFields()).toContain("createdBy");
+  });
+
+  it("retrieves public columns from config", () => {
+    mockUseRuntimeConfig.mockReturnValue({
+      public: {
+        autoCrud: { resources: { users: ["email"] } },
+      },
+    });
+    expect(mapper.getPublicColumns("users")).toEqual(["email"]);
   });
 });

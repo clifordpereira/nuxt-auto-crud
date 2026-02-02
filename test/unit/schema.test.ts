@@ -7,7 +7,14 @@ import * as schemaUtils from "../../src/runtime/server/utils/schema";
 
 vi.mock("#imports", () => ({
   useRuntimeConfig: () => ({
-    autoCrud: { resources: { users: ["email", "lastLogin"] } },
+    public: {
+      autoCrud: {
+        resources: { users: ["email", "lastLogin"] },
+        protectedFields: ["id", "createdAt", "updatedAt", "deletedAt"],
+        hiddenFields: ["password"],
+        systemUserFields: ["createdBy", "updatedBy"],
+      },
+    },
   }),
 }));
 
@@ -106,5 +113,20 @@ describe("schema.ts", () => {
 
     const emailField = fields.find((f) => f.name === "email");
     expect(emailField?.type).toBeDefined();
+  });
+
+  it("retrieves all schemas", async () => {
+    const schemas = await schemaUtils.getAllSchemas();
+    expect(schemas.users).toBeDefined();
+    expect(schemas.users.fields).toBeInstanceOf(Array);
+  });
+
+  it("retrieves a specific schema", async () => {
+    const schema = await schemaUtils.getSchema("users");
+    expect(schema).toBeDefined();
+    expect(schema?.resource).toBe("users");
+
+    const missing = await schemaUtils.getSchema("missing");
+    expect(missing).toBeUndefined();
   });
 });

@@ -13,7 +13,8 @@ export function useAutoCrudSSE(onEvent: (e: AutoCrudEvent) => void) {
   onMounted(() => {
     if (typeof window === 'undefined' || !('EventSource' in window)) return
 
-    source = new EventSource('/api/sse')
+    const endpointPrefix = `/api/nac`;
+    source = new EventSource(`${endpointPrefix}/sse`)
 
     // 1. Connection Error Handler
     source.onerror = (err) => {
