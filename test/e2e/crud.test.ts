@@ -65,11 +65,16 @@ describe("NAC CRUD Fixture", async () => {
     const original = await $fetch<any>(`${endpointPrefix}/${model}/${createdId}`);
     await $fetch(`${endpointPrefix}/${model}/${createdId}`, {
       method: "PATCH",
-      body: { id: 9999, createdAt: new Date() },
+      body: { 
+        name: "Verified Name", // Valid field
+        id: 9999,              // Protected
+        createdAt: new Date()  // Protected
+      },
     });
 
     const verification = await $fetch<any>(`${endpointPrefix}/${model}/${createdId}`);
-    expect(verification.id).toBe(original.id); // Core protection logic verification
+    expect(verification.id).toBe(original.id);
+    expect(verification.name).toBe("Verified Name");
   });
 
   it(`GET /api/${model}/:id excludes fields defined in HIDDEN_FIELDS`, async () => {

@@ -60,20 +60,20 @@ export default defineNuxtModule<ModuleOptions>({
       references.push({ path: resolver.resolve('./runtime/types/index.d.ts') })
     })
 
-    const apiDir = resolver.resolve('./runtime/server/api')
+    const apiDir = resolver.resolve('./runtime/server/api/nac')
     const routes = [
       // System Endpoints
-      { path: '/_meta', method: 'get', handler: '_meta.get' },
-      { path: '/sse', method: 'get', handler: 'sse.get' },
-      { path: '/_relations', method: 'get', handler: '_relations.get' },
-      { path: '/_schema', method: 'get', handler: '_schema/index.get' },
-      { path: '/_schema/:table', method: 'get', handler: '_schema/[table].get' },
+      { path: '/_meta', method: 'get', handler: '_meta.get.ts' },
+      { path: '/sse', method: 'get', handler: 'sse.get.ts' },
+      { path: '/_relations', method: 'get', handler: '_relations.get.ts' },
+      { path: '/_schema', method: 'get', handler: '_schema/index.get.ts' },
+      { path: '/_schema/:table', method: 'get', handler: '_schema/[table].get.ts' },
       // Dynamic CRUD Endpoints
-      { path: '/:model', method: 'get', handler: '[model]/index.get' },
-      { path: '/:model', method: 'post', handler: '[model]/index.post' },
-      { path: '/:model/:id', method: 'get', handler: '[model]/[id].get' },
-      { path: '/:model/:id', method: 'patch', handler: '[model]/[id].patch' },
-      { path: '/:model/:id', method: 'delete', handler: '[model]/[id].delete' }
+      { path: '/:model', method: 'get', handler: '[model]/index.get.ts' },
+      { path: '/:model', method: 'post', handler: '[model]/index.post.ts' },
+      { path: '/:model/:id', method: 'get', handler: '[model]/[id].get.ts' },
+      { path: '/:model/:id', method: 'patch', handler: '[model]/[id].patch.ts' },
+      { path: '/:model/:id', method: 'delete', handler: '[model]/[id].delete.ts' }
     ] as const;
 
     for (const route of routes) {

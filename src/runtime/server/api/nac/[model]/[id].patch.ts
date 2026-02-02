@@ -21,7 +21,7 @@ export default eventHandler(async (event) => {
   // Automatically update updatedAt if it exists
   const updatePayload = {
     ...payload,
-    ...( 'updatedAt' in table ? { updatedAt: new Date() } : {})
+    ...('updatedAt' in table ? { updatedAt: new Date() } : {})
   };
 
   const updatedRecord = (await db

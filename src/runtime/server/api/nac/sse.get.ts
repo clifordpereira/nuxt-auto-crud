@@ -15,7 +15,7 @@ export default eventHandler(async (event) => {
   const signalCheck = setInterval(async () => {
     try {
       // Replaced 'any' with 'unknown' for type safety
-      const signal = await kv.get<{ ts: number, payload: unknown }>('nac_signal')
+      const signal = await kv.get<{ ts: number, payload: Record<string, unknown> }>('nac_signal')
 
       if (signal && signal.ts > lastSeenTs) {
         lastSeenTs = signal.ts
