@@ -10,6 +10,8 @@ describe("useResourceSchemas", () => {
     clearNuxtData();
   });
 
+  const endpointPrefix = `/api/nac`;
+
   it("fetches schemas and provides accessors", async () => {
     const mockSchemas = {
       posts: { resource: "posts", fields: [{ name: "title", type: "string" }] },
@@ -19,7 +21,7 @@ describe("useResourceSchemas", () => {
       },
     };
 
-    registerEndpoint("/api/_schema", {
+    registerEndpoint(`${endpointPrefix}/_schema`, {
       method: "GET",
       handler: () => mockSchemas,
     });
@@ -40,7 +42,7 @@ describe("useResourceSchemas", () => {
   });
 
   it("handles fetch errors gracefully", async () => {
-    registerEndpoint("/api/_schema", {
+    registerEndpoint(`${endpointPrefix}/_schema`, {
       method: "GET",
       handler: () => {
         throw createError({
@@ -63,7 +65,7 @@ describe("useResourceSchemas", () => {
 
   it("triggers refresh and updates data", async () => {
     let count = 0;
-    registerEndpoint("/api/_schema", () => {
+    registerEndpoint(`${endpointPrefix}/_schema`, () => {
       count++;
       return { count };
     });
@@ -83,7 +85,7 @@ describe("useResourceSchemas", () => {
   });
 
   it("returns undefined for getSchema when schemas are null", async () => {
-    registerEndpoint("/api/_schema", {
+    registerEndpoint(`${endpointPrefix}/_schema`, {
       method: "GET",
       handler: () => null,
     });
@@ -100,7 +102,7 @@ describe("useResourceSchemas", () => {
 
   it("prevents redundant fetches using useAsyncData key", async () => {
     let callCount = 0;
-    registerEndpoint("/api/_schema", () => {
+    registerEndpoint(`${endpointPrefix}/_schema`, () => {
       callCount++;
       return { success: true };
     });
@@ -126,7 +128,7 @@ describe("useResourceSchemas", () => {
 
   it("maintains reactivity in getSchema after refresh", async () => {
     let schemaData = { version: 1 };
-    registerEndpoint("/api/_schema", () => schemaData);
+    registerEndpoint(`${endpointPrefix}/_schema`, () => schemaData);
 
     const component = await mountSuspended({
       template: "<div></div>",

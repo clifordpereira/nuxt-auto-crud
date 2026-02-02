@@ -1,7 +1,7 @@
 import MyModule from '../../../src/module'
 
 export default defineNuxtConfig({
-  modules: ['@nuxthub/core', 'nuxt-auth-utils', 'nuxt-authorization', MyModule],
+  modules: ['@nuxthub/core', MyModule],
   future: {
     compatibilityVersion: 4,
   },

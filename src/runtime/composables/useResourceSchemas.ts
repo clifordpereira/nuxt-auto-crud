@@ -1,4 +1,4 @@
-import { useAsyncData, useRequestHeaders } from '#imports'
+import { useAsyncData, useRequestHeaders, useRuntimeConfig } from '#imports'
 import type { Ref } from 'vue'
 import type { AsyncData } from '#app'
 
@@ -23,7 +23,8 @@ export const useResourceSchemas = async (): Promise<{
   error: AsyncData<ResourceSchemas, Error | null>['error']
   refresh: AsyncData<ResourceSchemas, Error | null>['refresh']
 }> => {
-  const { data: schemas, status, error, refresh } = await useAsyncData<ResourceSchemas>('resource-schemas', () => $fetch('/api/_schema', {
+  const endpointPrefix = useRuntimeConfig().public.autoCrud?.endpointPrefix || '/api/nac'
+  const { data: schemas, status, error, refresh } = await useAsyncData<ResourceSchemas>('resource-schemas', () => $fetch(`${endpointPrefix}/_schema`, {
     headers: useRequestHeaders(['cookie']),
   }))
 
