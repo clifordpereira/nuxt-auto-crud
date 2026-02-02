@@ -40,12 +40,12 @@ Default users initialized during the first-run seed (Password: `$1Password`):
 This project is optimized for Agentic Workflows using the **Model Context Protocol (MCP)**. It provides structured intelligence to AI agents, allowing them to build, explore, and interact with the application seamlessly.
 
 ### Core MCP Servers (Standard)
-1.  **`nac-schema-inspector` (Discovery)**: Performs introspection on the runtime engine. Use it to fetch the `/api/_meta` manifest and understand the dynamic schema without reading source files.
+1.  **`nac-schema-inspector` (Discovery)**: Performs introspection on the runtime engine. Use it to fetch the `/api/_nac/_meta` manifest and understand the dynamic schema without reading source files.
 2.  **`nuxt` (Framework Intelligence)**: Provides deep context on Nuxt 4 patterns, auto-imports, and directory structures. Essential for framework-native refactoring.
 3.  **`nuxt-ui` (Design Logic)**: Real-time documentation for Nuxt UI 4 components. Used by agents to generate premium, `U-` prefixed interfaces consistent with this template.
 
 ### Protocol for Agents:
-1. **Introspection**: Use `nac-schema-inspector` on `/api/_meta?format=md` to map available pluralized endpoints and data structures.
+1. **Introspection**: Use `nac-schema-inspector` on `/api/_nac/_meta?format=md` to map available pluralized endpoints and data structures.
 2. **Standard Implementation**: Leverage `nuxt` and `nuxt-ui` servers to ensure code matches the Nuxt 4 + Tailwind 4 architectural standards.
 
 

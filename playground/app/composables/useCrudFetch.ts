@@ -5,8 +5,7 @@ export async function useCrudFetch(
   id: number | null = null,
   data: Record<string, unknown> | null = null,
 ) {
-  const config = useRuntimeConfig().public
-  const crudBaseUrl = config.crudBaseUrl || '/api'
+  const { endpointPrefix } = useRuntimeConfig().public.autoCrud
 
   const toastMessage: Record<
     'POST' | 'PATCH' | 'DELETE',
@@ -32,8 +31,8 @@ export async function useCrudFetch(
   try {
     const url
       = method === 'PATCH' || method === 'DELETE'
-        ? `${crudBaseUrl}/${resource}/${id}`
-        : `${crudBaseUrl}/${resource}`.replace('//', '/')
+        ? `${endpointPrefix}/${resource}/${id}`
+        : `${endpointPrefix}/${resource}`.replace('//', '/')
 
     console.log(url)
 

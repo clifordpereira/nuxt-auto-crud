@@ -12,10 +12,9 @@ const props = defineProps<{
   }
 }>()
 
-const config = useRuntimeConfig().public
-const crudBaseUrl = config.crudBaseUrl || '/api'
+const { endpointPrefix } = useRuntimeConfig().public.autoCrud
 
-const { data } = await useFetch(`${crudBaseUrl}/${props.resource}`, {
+const { data } = await useFetch(`${endpointPrefix}/${props.resource}`, {
   headers: crudHeaders(),
 })
 

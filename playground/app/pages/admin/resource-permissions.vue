@@ -29,24 +29,23 @@ definePageMeta({
   middleware: 'auth',
 })
 
-const config = useRuntimeConfig().public
-const crudBaseUrl = config.crudBaseUrl || '/api'
+const { endpointPrefix } = useRuntimeConfig().public.autoCrud
 const toast = useToast()
 
 // Fetch all necessary data
-const { data: roles } = await useFetch<Role[]>(`${crudBaseUrl}/roles`, {
+const { data: roles } = await useFetch<Role[]>(`${endpointPrefix}/roles`, {
   headers: crudHeaders(),
 })
 
-const { data: resources } = await useFetch<Resource[]>(`${crudBaseUrl}/resources`, {
+const { data: resources } = await useFetch<Resource[]>(`${endpointPrefix}/resources`, {
   headers: crudHeaders(),
 })
 
-const { data: permissions } = await useFetch<Permission[]>(`${crudBaseUrl}/permissions`, {
+const { data: permissions } = await useFetch<Permission[]>(`${endpointPrefix}/permissions`, {
   headers: crudHeaders(),
 })
 
-const { data: roleResourcePermissions, refresh } = await useFetch<RoleResourcePermission[]>(`${crudBaseUrl}/roleResourcePermissions`, {
+const { data: roleResourcePermissions, refresh } = await useFetch<RoleResourcePermission[]>(`${endpointPrefix}/roleResourcePermissions`, {
   headers: crudHeaders(),
 })
 
@@ -139,7 +138,7 @@ const saveChanges = async () => {
 
     // Batch create
     for (const item of toCreate) {
-      promises.push($fetch(`${crudBaseUrl}/roleResourcePermissions`, {
+      promises.push($fetch(`${endpointPrefix}/roleResourcePermissions`, {
         method: 'POST',
         headers: crudHeaders(),
         body: item,
@@ -148,7 +147,7 @@ const saveChanges = async () => {
 
     // Batch delete
     for (const id of toDelete) {
-      promises.push($fetch(`${crudBaseUrl}/roleResourcePermissions/${id}`, {
+      promises.push($fetch(`${endpointPrefix}/roleResourcePermissions/${id}`, {
         method: 'DELETE',
         headers: crudHeaders(),
         body: undefined, // Explicitly undefined for DELETE generally, though not strictly needed

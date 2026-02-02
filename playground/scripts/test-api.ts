@@ -40,7 +40,7 @@ async function testScenario(role: string, email: string) {
   // 2. List Users
   let users: Record<string, unknown>[] = []
   try {
-    const response = await client('/api/users')
+    const response = await client('/api/_nac/users')
     users = response.data || response
     console.log(`✅ List Users: Allowed (${users.length} users found)`)
   }
@@ -57,7 +57,7 @@ async function testScenario(role: string, email: string) {
   // 3. Create User
   let createdUserId: number | null = null
   try {
-    const newUser = await client('/api/users', {
+    const newUser = await client('/api/_nac/users', {
       method: 'POST',
       body: {
         email: `test-${role}-${Date.now()}@example.com`,
@@ -97,7 +97,7 @@ async function testScenario(role: string, email: string) {
 
   if (targetId) {
     try {
-      await client(`/api/users/${targetId}`, {
+      await client(`/api/_nac/users/${targetId}`, {
         method: 'DELETE',
       })
       console.log(`⚠️ Delete User: Allowed (Unexpected for ${role} based on config)`)

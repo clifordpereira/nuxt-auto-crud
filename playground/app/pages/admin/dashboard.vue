@@ -8,10 +8,9 @@ definePageMeta({
   middleware: 'auth',
 })
 
-const config = useRuntimeConfig().public
-const crudBaseUrl = config.crudBaseUrl || '/api'
+const { endpointPrefix } = useRuntimeConfig().public.autoCrud
 
-const { data: users } = useFetch<unknown[]>(`${crudBaseUrl}/users`, {
+const { data: users } = useFetch<unknown[]>(`${endpointPrefix}/users`, {
   headers: crudHeaders(),
   lazy: true,
 })

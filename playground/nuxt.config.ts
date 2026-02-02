@@ -44,7 +44,6 @@ export default defineNuxtConfig({
 
     // Public keys (Available on Server and Client)
     public: {
-      crudBaseUrl: '/api',
       scripts: {
         googleTagManager: {
           id: '', // Overridden by NUXT_PUBLIC_SCRIPTS_GOOGLE_TAG_MANAGER_ID
@@ -101,6 +100,7 @@ export default defineNuxtConfig({
   },
 
   autoCrud: {
+    endpointPrefix: '/api/_nac',
     schemaPath: 'server/db/schema',
     auth: {
       authentication: true,

@@ -9,7 +9,8 @@ interface Testimonial {
   status: string
 }
 
-const { data: testimonials } = await useFetch<Testimonial[]>('/api/testimonials', {
+const { endpointPrefix } = useRuntimeConfig().public.autoCrud
+const { data: testimonials } = await useFetch<Testimonial[]>(`${endpointPrefix}/testimonials`, {
   default: () => [],
 })
 </script>
