@@ -11,7 +11,7 @@ const props = defineProps<{
 
 const isOpen = ref(false)
 
-const { fetchRelations, getDisplayValue } = useRelationDisplay(props.schema || { resource: '', fields: [] })
+const { fetchRelations, getDisplayValue } = useNacRelationDisplay(props.schema || { resource: '', fields: [] })
 
 watch(isOpen, async (val) => {
   if (val && props.schema) {

@@ -59,7 +59,7 @@ export default defineNuxtConfig({
   routeRules: {
     '/': { isr: 3600 },
     '/docs/**': { isr: 86400 },
-    '/api/sse': {
+    '/api/_nac/sse': {
       cache: false,
       headers: {
         'Content-Type': 'text/event-stream',

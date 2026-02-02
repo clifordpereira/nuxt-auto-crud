@@ -11,7 +11,7 @@ const resource = computed(() => {
   return Array.isArray(slug) ? slug[0] : slug
 })
 
-const { getSchema } = await useResourceSchemas()
+const { getSchema } = await useNacResourceSchemas()
 const schema = computed(() => (resource.value ? getSchema(resource.value) : undefined))
 </script>
 

@@ -1,5 +1,6 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
+import { useNacAutoCrudSSE } from '#imports';
 import { useChangeCase } from '@vueuse/integrations/useChangeCase'
 import resourceAbility from '~~/shared/utils/abilities'
 
@@ -19,7 +20,7 @@ const { data } = await useFetch(`${crudBaseUrl}/${props.resource}`, {
 })
 
 // Fetch relations
-const { fetchRelations, getDisplayValue } = useRelationDisplay(props.schema)
+const { fetchRelations, getDisplayValue } = useNacRelationDisplay(props.schema)
 await fetchRelations()
 
 async function onDelete(id: number) {
@@ -33,7 +34,7 @@ const appConfig = useAppConfig()
 const crudConfig = appConfig.crud
 
 // Agent Hint: Field visibility is controlled by app.config.ts (crud.globalHide)
-// and relationship constraints in useRelationDisplay.
+// and relationship constraints in useNacRelationDisplay.
 const visibleColumns = computed(() => {
   if (!data.value?.length) return []
   const hideList = crudConfig?.globalHide || ['updatedAt', 'deletedAt', 'createdBy', 'updatedBy']
@@ -104,7 +105,7 @@ const store = {
   },
 }
 
-useAutoCrudSSE(({ table, action, data: sseData, primaryKey }) => {
+useNacAutoCrudSSE(({ table, action, data: sseData, primaryKey }) => {
   if (table !== currentTable.value) return
 
   if (action === 'update') {

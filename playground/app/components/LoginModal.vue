@@ -34,7 +34,7 @@ async function onSubmit() {
     await refreshSession()
 
     // Refresh schemas to ensure sidebar is updated with correct permissions
-    const { refresh } = await useResourceSchemas()
+    const { refresh } = await useNacResourceSchemas()
     await refresh()
 
     isOpen.value = false

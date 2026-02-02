@@ -6,7 +6,7 @@ const props = defineProps<{
   collapsed?: boolean
 }>()
 
-const { schemas } = await useResourceSchemas()
+const { schemas } = await useNacResourceSchemas()
 const { hasPermission } = usePermissions()
 
 const resourceNames = computed(() =>
