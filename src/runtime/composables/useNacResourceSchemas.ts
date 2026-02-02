@@ -16,14 +16,14 @@ export interface ResourceSchema {
 
 export type ResourceSchemas = Record<string, ResourceSchema>
 
-export const useResourceSchemas = async (): Promise<{
+export const useNacResourceSchemas = async (): Promise<{
   schemas: Ref<ResourceSchemas | null | undefined>
   getSchema: (resource: string) => ResourceSchema | undefined
   status: Ref<'idle' | 'pending' | 'success' | 'error'>
   error: AsyncData<ResourceSchemas, Error | null>['error']
   refresh: AsyncData<ResourceSchemas, Error | null>['refresh']
 }> => {
-  const endpointPrefix = useRuntimeConfig().public.autoCrud?.endpointPrefix || '/api/nac'
+  const { endpointPrefix } = useRuntimeConfig().public.autoCrud
   const { data: schemas, status, error, refresh } = await useAsyncData<ResourceSchemas>('resource-schemas', () => $fetch(`${endpointPrefix}/_schema`, {
     headers: useRequestHeaders(['cookie']),
   }))

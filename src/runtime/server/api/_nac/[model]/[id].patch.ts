@@ -1,4 +1,4 @@
-// server/api/[model]/[id].patch.ts
+// server/api/_nac/[model]/[id].patch.ts
 import { eventHandler, getRouterParams, readBody } from "h3";
 import { eq } from "drizzle-orm";
 // @ts-expect-error - hub:db is a virtual alias

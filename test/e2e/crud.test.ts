@@ -8,7 +8,7 @@ describe("NAC CRUD Fixture", async () => {
     browser: false,
   });
 
-  const endpointPrefix = `/api/nac`;
+  const endpointPrefix = `/api/_nac`;
   const model = "users";
   let createdId: number | string;
 

@@ -1,4 +1,4 @@
-import { onMounted, onBeforeUnmount } from "#imports";
+import { onMounted, onBeforeUnmount, useRuntimeConfig } from "#imports";
 
 export interface AutoCrudEvent {
   table: string;
@@ -7,13 +7,13 @@ export interface AutoCrudEvent {
   primaryKey: string | number;
 }
 
-export function useAutoCrudSSE(onEvent: (e: AutoCrudEvent) => void) {
+export function useNacAutoCrudSSE(onEvent: (e: AutoCrudEvent) => void) {
   let source: EventSource | null = null
 
   onMounted(() => {
     if (typeof window === 'undefined' || !('EventSource' in window)) return
 
-    const endpointPrefix = `/api/nac`;
+    const { endpointPrefix } = useRuntimeConfig().public.autoCrud
     source = new EventSource(`${endpointPrefix}/sse`)
 
     // 1. Connection Error Handler

@@ -1,16 +1,16 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime";
-import { useResourceSchemas } from "../../src/runtime/composables/useResourceSchemas";
+import { useNacResourceSchemas } from "../../src/runtime/composables/useNacResourceSchemas";
 import { createError } from "h3";
 import { clearNuxtData } from "#app";
 
-describe("useResourceSchemas", () => {
+describe("useNacResourceSchemas", () => {
   afterEach(() => {
     vi.clearAllMocks();
     clearNuxtData();
   });
 
-  const endpointPrefix = `/api/nac`;
+  const endpointPrefix = `/api/_nac`;
 
   it("fetches schemas and provides accessors", async () => {
     const mockSchemas = {
@@ -29,7 +29,7 @@ describe("useResourceSchemas", () => {
     const component = await mountSuspended({
       template: "<div></div>",
       async setup() {
-        return await useResourceSchemas();
+        return await useNacResourceSchemas();
       },
     });
 
@@ -55,7 +55,7 @@ describe("useResourceSchemas", () => {
     const component = await mountSuspended({
       template: "<div></div>",
       async setup() {
-        return await useResourceSchemas();
+        return await useNacResourceSchemas();
       },
     });
 
@@ -73,7 +73,7 @@ describe("useResourceSchemas", () => {
     const component = await mountSuspended({
       template: "<div></div>",
       async setup() {
-        return await useResourceSchemas();
+        return await useNacResourceSchemas();
       },
     });
 
@@ -93,7 +93,7 @@ describe("useResourceSchemas", () => {
     const component = await mountSuspended({
       template: "<div></div>",
       async setup() {
-        return await useResourceSchemas();
+        return await useNacResourceSchemas();
       },
     });
 
@@ -111,14 +111,14 @@ describe("useResourceSchemas", () => {
     await mountSuspended({
       template: "<div></div>",
       async setup() {
-        await useResourceSchemas();
+        await useNacResourceSchemas();
       },
     });
     // Mount second instance
     await mountSuspended({
       template: "<div></div>",
       async setup() {
-        await useResourceSchemas();
+        await useNacResourceSchemas();
       },
     });
 
@@ -133,7 +133,7 @@ describe("useResourceSchemas", () => {
     const component = await mountSuspended({
       template: "<div></div>",
       async setup() {
-        return await useResourceSchemas();
+        return await useNacResourceSchemas();
       },
     });
 

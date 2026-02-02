@@ -1,10 +1,10 @@
 import { it, expect, vi, describe, beforeEach, afterEach } from "vitest";
 import { mountSuspended } from "@nuxt/test-utils/runtime";
 import { h } from "vue";
-import { useAutoCrudSSE } from "../../src/runtime/composables/useAutoCrudSSE";
+import { useNacAutoCrudSSE } from "../../src/runtime/composables/useNacAutoCrudSSE";
 
-describe("NAC Core: useAutoCrudSSE", () => {
-  const endpointPrefix = `/api/nac`;
+describe("NAC Core: useNacAutoCrudSSE", () => {
+  const endpointPrefix = `/api/_nac`;
   const addEventListenerMock = vi.fn();
   const closeMock = vi.fn();
   let messageListeners: ((event: MessageEvent) => void)[] = [];
@@ -50,7 +50,7 @@ describe("NAC Core: useAutoCrudSSE", () => {
 
     const wrapper = await mountSuspended({
       setup() {
-        useAutoCrudSSE(onEvent);
+        useNacAutoCrudSSE(onEvent);
         return () => h("div");
       },
     });
@@ -104,7 +104,7 @@ describe("NAC Core: useAutoCrudSSE", () => {
 
     await mountSuspended({
       setup() {
-        useAutoCrudSSE(onEvent);
+        useNacAutoCrudSSE(onEvent);
         return () => h("div");
       },
     });
@@ -116,7 +116,7 @@ describe("NAC Core: useAutoCrudSSE", () => {
     const onEvent = vi.fn();
     await mountSuspended({
       setup() {
-        useAutoCrudSSE(onEvent);
+        useNacAutoCrudSSE(onEvent);
         return () => h("div");
       },
     });
@@ -134,7 +134,7 @@ describe("NAC Core: useAutoCrudSSE", () => {
     const onEvent = vi.fn();
     await mountSuspended({
       setup() {
-        useAutoCrudSSE(onEvent);
+        useNacAutoCrudSSE(onEvent);
         return () => h("div");
       },
     });
@@ -164,8 +164,8 @@ describe("NAC Core: useAutoCrudSSE", () => {
 
     await mountSuspended({
       setup() {
-        useAutoCrudSSE(onEventA);
-        useAutoCrudSSE(onEventB);
+        useNacAutoCrudSSE(onEventA);
+        useNacAutoCrudSSE(onEventB);
         return () => h("div");
       },
     });
@@ -191,7 +191,7 @@ describe("NAC Core: useAutoCrudSSE", () => {
 
     await mountSuspended({
       setup() {
-        useAutoCrudSSE(onEvent);
+        useNacAutoCrudSSE(onEvent);
         if (
           global.EventSource &&
           (global.EventSource as any).calls?.length > 0
@@ -211,9 +211,9 @@ describe("NAC Core: useAutoCrudSSE", () => {
     const onEvent = vi.fn();
     const { unmount } = await mountSuspended({
       setup() {
-        useAutoCrudSSE(onEvent);
+        useNacAutoCrudSSE(onEvent);
         // Simulate a second call or re-run
-        useAutoCrudSSE(onEvent);
+        useNacAutoCrudSSE(onEvent);
         return () => h("div");
       },
     });

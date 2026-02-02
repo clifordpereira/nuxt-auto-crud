@@ -1,4 +1,4 @@
-// server/api/[model]/index.get.ts
+// server/api/_nac/[model]/index.get.ts
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { eventHandler, getRouterParams } from 'h3'
 import { getTableForModel, formatResourceResult } from '../../../utils/modelMapper'

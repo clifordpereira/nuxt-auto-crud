@@ -1,4 +1,4 @@
-// server/api/[model]/[id].delete.ts
+// server/api/_nac/[model]/[id].delete.ts
 import { eventHandler, getRouterParams } from 'h3'
 import { eq } from 'drizzle-orm'
 import { getTableForModel, formatResourceResult } from '../../../utils/modelMapper'

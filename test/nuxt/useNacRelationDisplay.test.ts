@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { mountSuspended, registerEndpoint } from "@nuxt/test-utils/runtime";
-import { useRelationDisplay } from "../../src/runtime/composables/useRelationDisplay";
+import { useNacRelationDisplay } from "../../src/runtime/composables/useNacRelationDisplay";
 import { createError } from "h3";
 import { clearNuxtData } from "#app";
 
-describe("useRelationDisplay", () => {
+describe("useNacRelationDisplay", () => {
   const schema = {
     resource: "posts",
     fields: [
@@ -35,7 +35,7 @@ describe("useRelationDisplay", () => {
 
     await mountSuspended({
       setup() {
-        composableResult = useRelationDisplay(schema);
+        composableResult = useNacRelationDisplay(schema);
         return () => {};
       },
     });
@@ -73,7 +73,7 @@ describe("useRelationDisplay", () => {
 
     await mountSuspended({
       setup() {
-        composableResult = useRelationDisplay(schema);
+        composableResult = useNacRelationDisplay(schema);
         return () => {};
       },
     });
@@ -92,7 +92,7 @@ describe("useRelationDisplay", () => {
     registerEndpoint("/api/users", () => [{ id: 99 }]); // No name/title/username
 
     let result: any;
-    await mountSuspended({ setup() { result = useRelationDisplay(schema); return () => {} } });
+    await mountSuspended({ setup() { result = useNacRelationDisplay(schema); return () => {} } });
     
     await result.fetchRelations();
     expect(result.getDisplayValue("authorId", 99)).toBe("#99");
@@ -102,7 +102,7 @@ describe("useRelationDisplay", () => {
     registerEndpoint("/api/_relations", () => ({ non_existent: {} }));
     
     let result: any;
-    await mountSuspended({ setup() { result = useRelationDisplay(schema); return () => {} } });
+    await mountSuspended({ setup() { result = useNacRelationDisplay(schema); return () => {} } });
     
     await expect(result.fetchRelations()).resolves.not.toThrow();
     expect(result.getDisplayValue("authorId", 1)).toBe(1);
@@ -118,7 +118,7 @@ describe("useRelationDisplay", () => {
     });
 
     let res: any;
-    await mountSuspended({ setup() { res = useRelationDisplay(schema); return () => {} } });
+    await mountSuspended({ setup() { res = useNacRelationDisplay(schema); return () => {} } });
     await res.fetchRelations();
 
     expect(capturedHeaders).toHaveProperty("host", "localhost");
@@ -132,7 +132,7 @@ describe("useRelationDisplay", () => {
     registerEndpoint("/api/tags", () => [{ id: 10, name: "typescript" }]);
 
     let res: any;
-    await mountSuspended({ setup() { res = useRelationDisplay(schema); return () => {} } });
+    await mountSuspended({ setup() { res = useNacRelationDisplay(schema); return () => {} } });
     
     await res.fetchRelations();
 
@@ -142,7 +142,7 @@ describe("useRelationDisplay", () => {
 
   it("overwrites existing display values on subsequent fetches", async () => {
     let res: any;
-    await mountSuspended({ setup() { res = useRelationDisplay(schema); return () => {} } });
+    await mountSuspended({ setup() { res = useNacRelationDisplay(schema); return () => {} } });
 
     // First fetch
     registerEndpoint("/api/_relations", () => ({ posts: { authorId: "users" } }));
@@ -161,7 +161,7 @@ describe("useRelationDisplay", () => {
     registerEndpoint("/api/types", () => [{ id: "slug-1", name: "Article" }]);
 
     let res: any;
-    await mountSuspended({ setup() { res = useRelationDisplay(schema); return () => {} } });
+    await mountSuspended({ setup() { res = useNacRelationDisplay(schema); return () => {} } });
     
     await res.fetchRelations();
 
@@ -170,7 +170,7 @@ describe("useRelationDisplay", () => {
 
   it("handles null or undefined values safely", async () => {
     let res: any;
-    await mountSuspended({ setup() { res = useRelationDisplay(schema); return () => {} } });
+    await mountSuspended({ setup() { res = useNacRelationDisplay(schema); return () => {} } });
     
     // Should return the input directly without error
     expect(res.getDisplayValue("authorId", null)).toBe(null);
@@ -182,7 +182,7 @@ describe("useRelationDisplay", () => {
     registerEndpoint("/api/users", () => []); // Empty table
 
     let res: any;
-    await mountSuspended({ setup() { res = useRelationDisplay(schema); return () => {} } });
+    await mountSuspended({ setup() { res = useNacRelationDisplay(schema); return () => {} } });
     
     await res.fetchRelations();
     expect(res.getDisplayValue("authorId", 1)).toBe(1); // Fallback to raw ID

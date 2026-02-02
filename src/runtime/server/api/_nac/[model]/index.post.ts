@@ -1,4 +1,4 @@
-// server/api/[model]/index.post.ts
+// server/api/_nac/[model]/index.post.ts
 import { eventHandler, getRouterParams, readBody } from "h3";
 import { getTableForModel, getZodSchema, formatResourceResult } from "../../../utils/modelMapper";
 // @ts-expect-error - 'hub:db' is a virtual alias

@@ -17,7 +17,7 @@ export default defineNuxtModule<ModuleOptions>({
     configKey: 'autoCrud',
   },
   defaults: {
-    endpointPrefix: '/api/nac',
+    endpointPrefix: '/api/_nac',
     schemaPath: 'server/db/schema',
     hashedFields: ['password'],
     systemUserFields: SYSTEM_USER_FIELDS,
@@ -31,7 +31,7 @@ export default defineNuxtModule<ModuleOptions>({
   },
 
   async setup(options, nuxt) {
-    const prefix = options.endpointPrefix || '/api/nac'
+    const prefix = options.endpointPrefix || '/api/_nac'
     const resolver = createResolver(import.meta.url)
 
     // 1. Schema Alias
@@ -60,7 +60,7 @@ export default defineNuxtModule<ModuleOptions>({
       references.push({ path: resolver.resolve('./runtime/types/index.d.ts') })
     })
 
-    const apiDir = resolver.resolve('./runtime/server/api/nac')
+    const apiDir = resolver.resolve('./runtime/server/api/_nac')
     const routes = [
       // System Endpoints
       { path: '/_meta', method: 'get', handler: '_meta.get.ts' },

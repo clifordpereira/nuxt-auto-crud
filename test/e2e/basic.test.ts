@@ -9,7 +9,7 @@ describe("NAC Core Engine", async () => {
     browser: false,
   });
 
-  const endpointPrefix = `/api/nac`;
+  const endpointPrefix = `/api/_nac`;
 
   // Basic Boot
   it("boots without internal server errors", async () => {

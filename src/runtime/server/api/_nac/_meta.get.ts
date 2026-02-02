@@ -6,7 +6,11 @@ import { getProtectedFields, getHiddenFields } from '../../utils/modelMapper'
 // @ts-expect-error - 'hub:db' is a virtual alias
 import { db } from 'hub:db'
 
+import { useRuntimeConfig } from "#imports";
+
 export default eventHandler(async (event) => {
+  const config = useRuntimeConfig();
+  const endpointPrefix = config.public.autoCrud.endpointPrefix;
 
   const query = getQuery(event)
   const acceptHeader = getHeader(event, 'accept') || ''
@@ -62,7 +66,7 @@ export default eventHandler(async (event) => {
 
       return {
         resource: model,
-        endpoint: `/api/${model}`,
+        endpoint: `${endpointPrefix}/${model}`,
         labelField,
         methods: ['GET', 'POST', 'PATCH', 'DELETE'],
         fields,

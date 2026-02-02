@@ -89,9 +89,10 @@ const email = ref('')
 const loading = ref(false)
 
 async function onSubmit() {
+  const { endpointPrefix } = useRuntimeConfig().public.autoCrud
   loading.value = true
   try {
-    await $fetch('/api/subscribers', {
+    await $fetch(`${endpointPrefix}/subscribers`, {
       method: 'POST',
       body: {
         email: email.value,
