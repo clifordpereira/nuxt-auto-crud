@@ -10,10 +10,17 @@ const props = defineProps<{
 }>()
 
 const open = ref(false)
+const loading = ref(false)
 
 async function onSubmit(data: Record<string, unknown>) {
-  await useCrudFetch('POST', props.resource, null, data)
-  open.value = false
+  loading.value = true
+  try {
+    await useCrudFetch('POST', props.resource, null, data)
+    open.value = false
+  }
+  finally {
+    loading.value = false
+  }
 }
 </script>
 
@@ -38,6 +45,7 @@ async function onSubmit(data: Record<string, unknown>) {
           <div v-if="schema">
             <CrudForm
               :schema="schema"
+              :loading="loading"
               @submit="onSubmit"
             />
           </div>

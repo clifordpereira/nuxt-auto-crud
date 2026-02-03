@@ -16,6 +16,7 @@ const props = defineProps<{
     }[]
   }
   initialState?: Record<string, unknown>
+  loading?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -172,7 +173,10 @@ function handleSubmit(event: FormSubmitEvent<Record<string, unknown>>) {
         </UFormField>
       </template>
 
-      <UButton type="submit">
+      <UButton
+        type="submit"
+        :loading="loading"
+      >
         Submit
       </UButton>
     </UForm>

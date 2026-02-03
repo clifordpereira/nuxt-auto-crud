@@ -19,10 +19,17 @@ const state = computed(() => {
 })
 
 const open = ref(false)
+const loading = ref(false)
 
 async function onSubmit(data: Record<string, unknown>) {
-  await useCrudFetch('PATCH', props.resource, props.row.id as number, data)
-  open.value = false
+  loading.value = true
+  try {
+    await useCrudFetch('PATCH', props.resource, props.row.id as number, data)
+    open.value = false
+  }
+  finally {
+    loading.value = false
+  }
 }
 </script>
 
@@ -48,6 +55,7 @@ async function onSubmit(data: Record<string, unknown>) {
           v-if="schema"
           :schema="schema"
           :initial-state="state"
+          :loading="loading"
           @submit="onSubmit"
         />
 
