@@ -24,11 +24,11 @@ Integrates with `nuxt-authorization` for database-driven Role-Based Access Contr
 ## 🌐 Endpoints
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `GET` | `/api/:model` | List with filtering/paging |
-| `POST` | `/api/:model` | Validated creation |
-| `GET` | `/api/:model/:id` | Single record retrieval |
-| `PATCH` | `/api/:model/:id` | Partial validated update |
-| `DELETE` | `/api/:model/:id` | Soft/Hard deletion |
+| `GET` | `/api/_nac/:model` | List with filtering/paging |
+| `POST` | `/api/_nac/:model` | Validated creation |
+| `GET` | `/api/_nac/:model/:id` | Single record retrieval |
+| `PATCH` | `/api/_nac/:model/:id` | Partial validated update |
+| `DELETE` | `/api/_nac/:model/:id` | Soft/Hard deletion |
 
 ---
 

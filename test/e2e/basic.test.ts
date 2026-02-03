@@ -105,7 +105,7 @@ describe("NAC Core Engine", async () => {
 
   // Schema Reflection
   describe("Schema Reflection E2E", async () => {
-    it("GET /api/_schema returns all registered schemas", async () => {
+    it("GET /api/_nac/_schema returns all registered schemas", async () => {
       const data = await $fetch<Record<string, any>>(`${endpointPrefix}/_schema`);
 
       expect(data).toBeDefined();
@@ -115,7 +115,7 @@ describe("NAC Core Engine", async () => {
       expect(data.users).toHaveProperty("fields");
     });
 
-    it("GET /api/_schema/:table returns 404 for non-existent table", async () => {
+    it("GET /api/_nac/_schema/:table returns 404 for non-existent table", async () => {
       try {
         await $fetch(`${endpointPrefix}/_schema/non_existent_table`);
         expect.fail("Should have thrown 404");
@@ -124,7 +124,7 @@ describe("NAC Core Engine", async () => {
       }
     });
 
-    it("GET /api/_schema/:table returns specific table metadata", async () => {
+    it("GET /api/_nac/_schema/:table returns specific table metadata", async () => {
       const tableName = "users";
       const schema = await $fetch<any>(`${endpointPrefix}/_schema/${tableName}`);
 

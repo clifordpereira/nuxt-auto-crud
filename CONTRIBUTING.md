@@ -2,9 +2,9 @@
 Headless reflection engine for the **Clifland Architectural Model**.
 
 ## 🤖 Agentic Protocol
-- **Routing:** Uses `pluralize` (v8.0.0). Table `user` -> `/api/users`.
+- **Routing:** Uses `pluralize` (v8.0.0). Table `user` -> `/api/_nac/users`.
 - **Reflection:** Runtime introspection of `schemaPath` (default: `server/db/schema`).
-- **Validation:** Dynamic `drizzle-zod` guards in `src/runtime/server/api/[model]`.
+- **Validation:** Dynamic `drizzle-zod` guards in `src/runtime/server/api/_nac/[model]`.
 - **Protection:** Strips `id`, `createdAt`, `updatedAt`, `deletedAt` from `POST/PATCH`.
 
 ## 👨‍💻 Contributor Workflow

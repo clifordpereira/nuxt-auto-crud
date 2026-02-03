@@ -43,7 +43,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     // PATCH to auto-crud API
     const userId = (user.value as { id: number | string }).id
 
-    await $fetch(`/api/users/${userId}`, {
+    await $fetch(`/api/_nac/users/${userId}`, {
       method: 'PATCH',
       body: payload,
     })

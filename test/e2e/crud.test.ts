@@ -26,7 +26,7 @@ describe("NAC CRUD Fixture", async () => {
 
 
   // Tests [model].post.ts
-  it(`POST /api/${model} creates a new user`, async () => {
+  it(`POST /api/_nac/${model} creates a new user`, async () => {
     const created = await $fetch<any>(`${endpointPrefix}/${model}`, {
       method: "POST",
       body: newUser,
@@ -39,21 +39,21 @@ describe("NAC CRUD Fixture", async () => {
   });
 
   // Tests [model].get.ts
-  it(`GET /api/${model} lists the created user`, async () => {
+  it(`GET /api/_nac/${model} lists the created user`, async () => {
     const list = await $fetch<any[]>(`${endpointPrefix}/${model}`);
     expect(Array.isArray(list)).toBe(true);
     expect(list.find((u) => u.id === createdId)).toBeDefined();
   });
 
   // Tests [model]/[id].get.ts
-  it(`GET /api/${model}/:id retrieves the user`, async () => {
+  it(`GET /api/_nac/${model}/:id retrieves the user`, async () => {
     const item = await $fetch<any>(`${endpointPrefix}/${model}/${createdId}`);
     expect(item.id).toBe(createdId);
     expect(item.email).toBe(newUser.email);
   });
 
   // Tests [model]/[id].patch.ts
-  it(`PATCH /api/${model}/:id updates the user`, async () => {
+  it(`PATCH /api/_nac/${model}/:id updates the user`, async () => {
     const updated = await $fetch<any>(`${endpointPrefix}/${model}/${createdId}`, {
       method: "PATCH",
       body: { name: "Updated Name" },
@@ -61,7 +61,7 @@ describe("NAC CRUD Fixture", async () => {
     expect(updated.name).toBe("Updated Name");
   });
 
-  it("PATCH /api/${model}/:id strictly ignores protected system fields", async () => {
+  it("PATCH /api/_nac/${model}/:id strictly ignores protected system fields", async () => {
     const original = await $fetch<any>(`${endpointPrefix}/${model}/${createdId}`);
     await $fetch(`${endpointPrefix}/${model}/${createdId}`, {
       method: "PATCH",
@@ -77,7 +77,7 @@ describe("NAC CRUD Fixture", async () => {
     expect(verification.name).toBe("Verified Name");
   });
 
-  it(`GET /api/${model}/:id excludes fields defined in HIDDEN_FIELDS`, async () => {
+  it(`GET /api/_nac/${model}/:id excludes fields defined in HIDDEN_FIELDS`, async () => {
     const user = await $fetch<any>(`${endpointPrefix}/${model}/${createdId}`);
 
     // 'password' should be in HIDDEN_FIELDS in your NAC constants
@@ -86,7 +86,7 @@ describe("NAC CRUD Fixture", async () => {
   });
 
   // Tests [model]/[id].delete.ts
-  it(`DELETE /api/${model}/:id deletes the user`, async () => {
+  it(`DELETE /api/_nac/${model}/:id deletes the user`, async () => {
     await $fetch(`${endpointPrefix}/${model}/${createdId}`, {
       method: "DELETE",
     });
