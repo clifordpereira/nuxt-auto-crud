@@ -1,131 +1,141 @@
 // server/utils/auth.ts
-import { type H3Event, createError, getHeader, getQuery } from "h3";
+import { type H3Event, createError, getHeader, getQuery, readBody } from "h3";
+import { canAccess } from "../../shared/utils/abilities";
 
-export async function checkAdminAccess(
-  event: H3Event,
-  model: string,
-  action: string,
-  context?: any,
-): Promise<boolean> {
+/**
+ * Resolves authentication context (User session or Agentic/MCP token)
+ */
+export async function resolveAuthContext(event: H3Event) {
   const { auth } = useAutoCrudConfig();
-  if (!auth?.authentication) return true;
-
-  // Lazy load Nuxt/Auth helpers only if authentication is enabled
+  const runtimeConfig = useRuntimeConfig(event);
+  
   // 1. Token Check (Agentic/MCP)
   const authHeader = getHeader(event, "authorization");
   const query = getQuery(event);
-  const apiToken = useRuntimeConfig(event).apiSecretToken;
-  const token =
-    (authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : null) ||
-    query.token;
+  const apiToken = runtimeConfig.apiSecretToken;
+  const token = (authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : null) || (query.token as string);
 
-  if (token && apiToken && token === apiToken) return true;
-
-  // 2. Session Resolve
-  let user = null;
-  try {
-    const session = await (getUserSession as any)(event);
-    user = session?.user;
-  } catch {}
-
-  if (!auth.authorization) return !!user;
-
-  // 3. Primary Authorization (Bridge)
-  const allowed = !user
-    ? await abilityLogic(null, model, action, context)
-    : await allows(event, abilityLogic, model, action, context);
-
-  if (allowed) return true;
-
-  // 4. Ownership Fallback Logic
-  if (user && ["read", "update", "delete"].includes(action) && context?.id) {
-    const userPermissions = user.permissions?.[model] as string[] | undefined;
-
-    if (userPermissions?.includes(`${action}_own`)) {
-      const { getTableForModel, getTableColumns, getHiddenFields } =
-        await import("../../../src/runtime/server/utils/modelMapper");
-      const { db } = await import("hub:db");
-      const { eq, getTableColumns: getDrizzleColumns } =
-        await import("drizzle-orm");
-
-      const table = getTableForModel(model);
-
-      // Self-update optimization
-      if (model === "users" && String(context.id) === String(user.id))
-        return true;
-
-      const columns = getTableColumns(table);
-      const ownershipColumn = columns.find((c) =>
-        ["createdBy", "userId", "ownerId"].includes(c),
-      );
-
-      if (ownershipColumn) {
-        const tableColumns = getDrizzleColumns(table as any);
-        const primaryKey = Object.values(tableColumns).find(
-          (c) => (c as any).primary,
-        );
-
-        if (primaryKey) {
-          const rawId = context.id;
-          const id = isNaN(Number(rawId)) ? rawId : Number(rawId);
-
-          const record = await db
-            .select({ owner: tableColumns[ownershipColumn] })
-            .from(table)
-            .where(eq(primaryKey as any, id))
-            .get();
-
-          if (record && String(record.owner) === String(user.id)) {
-            const hidden = getHiddenFields(model);
-            if (["update", "create"].includes(action)) {
-              const hasHidden = Object.keys(context).some((f) =>
-                hidden.includes(f),
-              );
-              if (hasHidden)
-                throw createError({
-                  statusCode: 403,
-                  message: "Forbidden: Hidden fields",
-                });
-            }
-            return true;
-          }
-        }
-      }
-    }
+  if (apiToken && token === apiToken) {
+    return { user: null, isAgent: true, token };
   }
 
-  if (user) throw createError({ statusCode: 403, message: "Forbidden" });
+  if (!auth?.authentication) {
+    return { user: null, isAgent: true, token: null };
+  }
+
+  // 2. Session Resolve
+  try {
+    const session = await getUserSession(event);
+    return { user: session?.user || null, isAgent: false, token: null };
+  } catch {
+    return { user: null, isAgent: false, token: null };
+  }
+}
+
+/**
+ * Checks if the user owns the record based on schema conventions
+ */
+export async function checkOwnership(user: any, model: string, action: string, context: any) {
+  if (!user || !["read", "update", "delete"].includes(action) || !context?.id) return false;
+
+  const userPermissions = user.permissions?.[model] as string[] | undefined;
+  if (!userPermissions?.includes(`${action}_own`)) return false;
+
+  // Self-update optimization for users table
+  if (model === "users" && String(context.id) === String(user.id)) return true;
+
+  const { db } = await import("hub:db");
+  const { eq, getTableColumns: getDrizzleTableColumns } = await import("drizzle-orm");
+
+  const table = getTableForModel(model);
+  const columns = getTableColumns(table);
+  const ownershipColumn = columns.find((c) => ["createdBy", "userId", "ownerId"].includes(c));
+
+  if (!ownershipColumn) return false;
+
+  const tableColumns = getDrizzleTableColumns(table as any);
+  const primaryKey = Object.values(tableColumns).find((c) => (c as any).primary);
+
+  if (!primaryKey) return false;
+
+  const rawId = context.id;
+  const id = isNaN(Number(rawId)) ? rawId : Number(rawId);
+
+  const record = (await db
+    .select({ owner: tableColumns[ownershipColumn] })
+    .from(table as any)
+    .where(eq(primaryKey as any, id))
+    .get()) as { owner: any } | undefined;
+
+  if (record && String(record.owner) === String(user.id)) {
+    // Prevent updating hidden fields even if owned
+    if (["update", "create"].includes(action)) {
+      const hidden = getHiddenFields(model);
+      const hasHidden = Object.keys(context).some((f) => hidden.includes(f));
+      if (hasHidden) {
+        throw createError({ statusCode: 403, message: "Forbidden: Hidden fields" });
+      }
+    }
+    return true;
+  }
+  
   return false;
 }
 
-export async function ensureAuthenticated(event: H3Event): Promise<void> {
-  const { auth } = useAutoCrudConfig();
-  if (!auth?.authentication) return;
+/**
+ * Consolidated guard for NAC routes - used in server middleware
+ */
+export async function guardEventAccess(event: H3Event) {
+  const { user, isAgent } = await resolveAuthContext(event);
+  if (isAgent) return; // Full access for agents/MCP
 
-  const authHeader = getHeader(event, "authorization");
-  const token =
-    (authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : null) ||
-    getQuery(event).token;
-  const apiToken = useRuntimeConfig(event).apiSecretToken;
+  const { auth, endpointPrefix = "/api/_nac" } = useAutoCrudConfig();
+  if (auth?.authentication === false) return; // Explicitly disabled
 
-  if (token && apiToken && token === apiToken) return;
-
-  await (requireUserSession as any)(event);
-}
-
-export async function ensureResourceAccess(
-  event: H3Event,
-  model: string,
-  action: string,
-  context?: unknown,
-): Promise<boolean> {
-  const { auth } = useAutoCrudConfig();
-  
-  // Explicitly bypass ONLY if authentication is strictly set to false
-  if (auth?.authentication === false) {
-    return true;
+  // 1. Mandatory Session check
+  if (!user) {
+    await requireUserSession(event);
   }
 
-  // Otherwise, delegate to the engine (Security by Default)
-  return await checkAdminAccess(event, model, action, context);
+  // 2. Authorization check
+  if (!auth?.authorization) return;
+
+  // Extract context from path using endpointPrefix
+  const path = (event.path || '').split('?')[0];
+  if (!path || !path.startsWith(endpointPrefix)) return;
+
+  const relativePath = path.slice(endpointPrefix.length).replace(/^\//, '');
+  const segments = relativePath.split('/');
+
+  // If first segment starts with _, it's a system endpoint (e.g. _meta, _schema)
+  if (!segments[0] || segments[0].startsWith('_') || segments[0] === 'sse') return;
+
+  const model = segments[0];
+  const id = segments[1];
+  
+  if (!model) return;
+
+  const actionMap: Record<string, string> = {
+    GET: "read",
+    POST: "create",
+    PATCH: "update",
+    PUT: "update",
+    DELETE: "delete",
+  };
+  const action = actionMap[event.method] || "read";
+
+  const context: any = id ? { id } : {};
+  if (["POST", "PATCH", "PUT"].includes(event.method)) {
+    const body = await readBody(event).catch(() => ({}));
+    Object.assign(context, body);
+  }
+
+  // Check permissions via bridge
+  const allowed = await allows(event, canAccess, model, action, context);
+  if (allowed) return;
+
+  // Ownership Fallback
+  if (await checkOwnership(user, model, action, context)) return;
+
+  throw createError({ statusCode: 403, message: "Forbidden" });
 }

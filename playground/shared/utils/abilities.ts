@@ -78,4 +78,5 @@ export const abilityLogic = async (user: unknown, model: string, action: string,
   return false
 }
 
-export default defineAbility(abilityLogic)
+export const canAccess = defineAbility(abilityLogic)
+export default canAccess
