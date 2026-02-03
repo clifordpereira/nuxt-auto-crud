@@ -1,5 +1,5 @@
 import { eventHandler, setResponseHeaders } from 'h3'
-import { addClient, removeClient } from '../../utils/sse-bus'
+import { addClient, removeClient, instanceId } from '../../utils/sse-bus'
 // @ts-expect-error - virtual import resolved by Nuxt/Nitro
 import { kv } from '@nuxthub/kv'
 
@@ -14,10 +14,9 @@ export default eventHandler(async (event) => {
 
   const signalCheck = setInterval(async () => {
     try {
-      // Replaced 'any' with 'unknown' for type safety
-      const signal = await kv.get<{ ts: number, payload: Record<string, unknown> }>('nac_signal')
+      const signal = await kv.get<{ ts: number, payload: Record<string, unknown>, instanceId: string }>('nac_signal')
 
-      if (signal && signal.ts > lastSeenTs) {
+      if (signal && signal.ts > lastSeenTs && signal.instanceId !== instanceId) {
         lastSeenTs = signal.ts
         const msg = `event: crud\ndata: ${JSON.stringify(signal.payload)}\n\n`
         await writer.write(encoder.encode(msg))

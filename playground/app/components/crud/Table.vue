@@ -95,7 +95,10 @@ const store = {
     }
   },
   addRow: (rowData: Record<string, unknown>) => {
-    data.value = [rowData, ...(data.value || [])]
+    if (!data.value) data.value = []
+    const exists = data.value.some((r: any) => r.id === rowData.id)
+    if (exists) return
+    data.value = [rowData, ...data.value]
   },
   removeRow: (id: string | number) => {
     if (!data.value) return
@@ -207,8 +210,8 @@ useNacAutoCrudSSE(({ table, action, data: sseData, primaryKey }) => {
 
         <tbody class="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900">
           <tr
-            v-for="(row, i) in paginatedItems"
-            :key="i"
+            v-for="row in paginatedItems"
+            :key="String(row.id)"
             class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
           >
             <template

@@ -2,6 +2,8 @@
 // @ts-expect-error - virtual import resolved by Nuxt/Nitro
 import { kv } from '@nuxthub/kv'
 
+export const instanceId = crypto.randomUUID()
+
 type SSEClient = { id: string, res: WritableStreamDefaultWriter }
 const clients = new Map<string, SSEClient>()
 const encoder = new TextEncoder()
@@ -23,13 +25,14 @@ export function removeClient(id: string) {
 }
 
 export async function broadcast(payload: unknown) {
-  // 1. Local Isolate Delivery
+  // 1. Local Isolate Delivery (Immediate)
   localBroadcast(payload)
 
   // 2. Global Instance Signal (Cross-Isolate)
-  // Each isolated instance has its own KV namespace via Nuxt Hub
+  // We include instanceId so other instances (or this one) can filter out echoes
   await kv.set('nac_signal', {
     ts: Date.now(),
     payload,
+    instanceId,
   }, { ttl: 60 })
 }
