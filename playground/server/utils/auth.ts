@@ -1,10 +1,5 @@
 // server/utils/auth.ts
-import type { H3Event } from "h3";
-import { createError, getHeader, getQuery } from "h3";
-
-// @ts-expect-error - virtual alias
-import siteAbility from "#site/ability";
-import { useAutoCrudConfig } from "../../../src/runtime/server/utils/config";
+import { type H3Event, createError, getHeader, getQuery } from "h3";
 
 export async function checkAdminAccess(
   event: H3Event,
@@ -16,9 +11,6 @@ export async function checkAdminAccess(
   if (!auth?.authentication) return true;
 
   // Lazy load Nuxt/Auth helpers only if authentication is enabled
-  // @ts-expect-error - virtual alias
-  const { allows, getUserSession, useRuntimeConfig } = await import("#imports");
-
   // 1. Token Check (Agentic/MCP)
   const authHeader = getHeader(event, "authorization");
   const query = getQuery(event);
@@ -40,8 +32,8 @@ export async function checkAdminAccess(
 
   // 3. Primary Authorization (Bridge)
   const allowed = !user
-    ? await (siteAbility as any)(null, model, action, context)
-    : await allows(event, siteAbility, model, action, context);
+    ? await abilityLogic(null, model, action, context)
+    : await allows(event, abilityLogic, model, action, context);
 
   if (allowed) return true;
 
@@ -52,7 +44,6 @@ export async function checkAdminAccess(
     if (userPermissions?.includes(`${action}_own`)) {
       const { getTableForModel, getTableColumns, getHiddenFields } =
         await import("../../../src/runtime/server/utils/modelMapper");
-      // @ts-expect-error - vitual alias
       const { db } = await import("hub:db");
       const { eq, getTableColumns: getDrizzleColumns } =
         await import("drizzle-orm");
@@ -69,7 +60,7 @@ export async function checkAdminAccess(
       );
 
       if (ownershipColumn) {
-        const tableColumns = getDrizzleColumns(table);
+        const tableColumns = getDrizzleColumns(table as any);
         const primaryKey = Object.values(tableColumns).find(
           (c) => (c as any).primary,
         );
@@ -78,7 +69,6 @@ export async function checkAdminAccess(
           const rawId = context.id;
           const id = isNaN(Number(rawId)) ? rawId : Number(rawId);
 
-          // @ts-expect-error - dynamic table
           const record = await db
             .select({ owner: tableColumns[ownershipColumn] })
             .from(table)
@@ -112,9 +102,6 @@ export async function ensureAuthenticated(event: H3Event): Promise<void> {
   const { auth } = useAutoCrudConfig();
   if (!auth?.authentication) return;
 
-  // @ts-expect-error - virtual alias
-  const { requireUserSession, useRuntimeConfig } = await import("#imports");
-
   const authHeader = getHeader(event, "authorization");
   const token =
     (authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : null) ||
@@ -124,4 +111,21 @@ export async function ensureAuthenticated(event: H3Event): Promise<void> {
   if (token && apiToken && token === apiToken) return;
 
   await (requireUserSession as any)(event);
+}
+
+export async function ensureResourceAccess(
+  event: H3Event,
+  model: string,
+  action: string,
+  context?: unknown,
+): Promise<boolean> {
+  const { auth } = useAutoCrudConfig();
+  
+  // Explicitly bypass ONLY if authentication is strictly set to false
+  if (auth?.authentication === false) {
+    return true;
+  }
+
+  // Otherwise, delegate to the engine (Security by Default)
+  return await checkAdminAccess(event, model, action, context);
 }

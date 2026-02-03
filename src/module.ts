@@ -19,7 +19,6 @@ export default defineNuxtModule<ModuleOptions>({
   defaults: {
     endpointPrefix: '/api/_nac',
     schemaPath: 'server/db/schema',
-    hashedFields: ['password'],
     systemUserFields: SYSTEM_USER_FIELDS,
     protectedFields: PROTECTED_FIELDS,
     hiddenFields: HIDDEN_FIELDS,
@@ -35,21 +34,12 @@ export default defineNuxtModule<ModuleOptions>({
     const resolver = createResolver(import.meta.url)
 
     // 1. Schema Alias
-    nuxt.options.alias['#site/schema'] = resolver.resolve(
-      nuxt.options.rootDir, 
-      options.schemaPath!
-    )
+    nuxt.options.alias['#site/schema'] = resolver.resolve(nuxt.options.rootDir, options.schemaPath!)
 
     // 2. Runtime Config (The Concrete State)
-    const { schemaPath, hashedFields, auth, ...publicOptions } = options
-    // Assign to private runtime
-    nuxt.options.runtimeConfig.autoCrud = {
-      schemaPath,
-      hashedFields,
-      auth
-    }
-    // Assign to public runtime
-    nuxt.options.runtimeConfig.public.autoCrud = publicOptions
+    const { schemaPath, auth, ...publicOptions } = options
+    nuxt.options.runtimeConfig.autoCrud = { schemaPath, auth } // private runtime
+    nuxt.options.runtimeConfig.public.autoCrud = publicOptions // public runtime
 
     // 3. Auto-imports (The Engine)
     addImportsDir(resolver.resolve('./runtime/composables'))
