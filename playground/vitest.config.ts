@@ -9,7 +9,15 @@ export default defineConfig({
           name: 'unit',
           include: ['test/unit/*.{test,spec}.ts'],
           environment: 'node',
-        },
+          setupFiles: ['./test/unit/setup.ts'],
+          alias: {
+            'h3': './test/mocks/h3.ts',
+            'drizzle-orm': './test/mocks/drizzle-orm.ts',
+            'hub:db': './test/mocks/db.ts',
+            '#imports': './test/mocks/imports.ts',
+            '../../shared/utils/abilities': './test/mocks/abilities.ts',
+          },
+        },  
       },
       {
         test: {
