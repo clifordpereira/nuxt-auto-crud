@@ -11,7 +11,7 @@ import { getTableConfig, type SQLiteTable } from "drizzle-orm/sqlite-core";
 import { createError } from "h3";
 import { useRuntimeConfig } from "#imports";
 import { createInsertSchema } from "drizzle-zod";
-import type { z } from "zod";
+import { z } from "zod";
 
 export const customUpdatableFields: Record<string, string[]> = {};
 export const customHiddenFields: Record<string, string[]> = {};
@@ -107,6 +107,27 @@ export function getUpdatableFields(modelName: string): string[] {
 }
 
 /**
+ * Detects if a column represents a date or timestamp.
+ */
+export function isDateColumn(column: any, key: string): boolean {
+  const col = column as any;
+  const name = col.name || key;
+  const isDateName =
+    name.endsWith("_at") ||
+    name.endsWith("At") ||
+    name.endsWith("Login") ||
+    name.endsWith("Date") ||
+    name.endsWith("_date");
+
+  return (
+    col.dataType === "date" ||
+    col.mode === "timestamp" ||
+    col.columnType?.toLowerCase().includes("timestamp") ||
+    ((col.dataType === "string" || col.dataType === "number" || col.columnType?.includes("Integer")) && isDateName)
+  );
+}
+
+/**
  * Filters and coerces data for updates, handling timestamp conversion.
  */
 export function filterUpdatableFields(
@@ -124,7 +145,7 @@ export function filterUpdatableFields(
       let value = data[field];
       const column = columns[field];
 
-      if (column && column.mode === "timestamp" && typeof value === "string") {
+      if (column && isDateColumn(column, field) && typeof value === "string") {
         value = new Date(value);
       }
 
@@ -203,7 +224,21 @@ export function getZodSchema(
   type: "insert" | "patch" = "insert",
 ): z.ZodObject<any, any> {
   const table = getTableForModel(modelName);
-  const schema = createInsertSchema(table);
+  const columns = getDrizzleTableColumns(table);
+  
+  // Custom schema overrides for date coercion
+  const customSchema: Record<string, z.ZodTypeAny> = {};
+  
+  for (const [key, column] of Object.entries(columns)) {
+    if (isDateColumn(column, key)) {
+      customSchema[key] = z.coerce.date();
+      if (!(column as any).notNull) {
+        customSchema[key] = customSchema[key].nullable().optional();
+      }
+    }
+  }
+
+  const schema = createInsertSchema(table, customSchema);
 
   if (type === "patch") {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -211,8 +246,6 @@ export function getZodSchema(
   }
 
   const OMIT_ON_CREATE = [...getProtectedFields(), ...getHiddenFields(modelName)];
-
-  const columns = getDrizzleTableColumns(table);
   const fieldsToOmit: Record<string, true> = {};
 
   OMIT_ON_CREATE.forEach((field) => {
@@ -245,10 +278,8 @@ export function getRelations(): Record<string, Record<string, unknown>[]> {
     const config = getTableConfig(table);
     const modelRelations: Record<string, unknown>[] = [];
 
-    // @ts-expect-error - Drizzle internals
     const foreignKeys = config.foreignKeys || [];
 
-    // @ts-expect-error - Drizzle internals
     for (const fk of foreignKeys) {
       const targetTable = fk.reference().foreignTable;
       const targetTableName = getTableName(targetTable);

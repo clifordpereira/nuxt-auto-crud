@@ -9,6 +9,7 @@ import {
   getHiddenFields,
   getProtectedFields,
   getSystemUserFields,
+  isDateColumn,
 } from "./modelMapper";
 
 export interface Field {
@@ -76,18 +77,15 @@ function mapColumnType(
   }
 
   const { dataType, columnType, name } = column;
-  const isDateName =
-    name.endsWith("_at") || name.endsWith("At") || name.endsWith("Login");
 
   if (dataType === "boolean") return { type: "boolean" };
-  if (dataType === "date" || (dataType === "string" && isDateName))
-    return { type: "date" };
+  if (isDateColumn(column, name)) return { type: "date" };
   if (
     dataType === "number" ||
     columnType.includes("Integer") ||
     columnType.includes("Real")
   ) {
-    return isDateName ? { type: "date" } : { type: "number" };
+    return { type: "number" };
   }
   if (["content", "description", "bio", "message"].includes(name))
     return { type: "textarea" };

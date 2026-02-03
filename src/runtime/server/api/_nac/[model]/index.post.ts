@@ -1,6 +1,6 @@
 // server/api/_nac/[model]/index.post.ts
 import { eventHandler, getRouterParams, readBody } from "h3";
-import { getTableForModel, getZodSchema, formatResourceResult } from "../../../utils/modelMapper";
+import { getTableForModel, getZodSchema, formatResourceResult, filterUpdatableFields } from "../../../utils/modelMapper";
 // @ts-expect-error - 'hub:db' is a virtual alias
 import { db } from "hub:db";
 import { broadcast } from "../../../utils/sse-bus";
@@ -11,8 +11,9 @@ export default eventHandler(async (event) => {
   const table = getTableForModel(model);
 
   const body = await readBody(event);
+  const sanitizedBody = filterUpdatableFields(model, body);
   const schema = getZodSchema(model, "insert");
-  const payload = await schema.parseAsync(body);
+  const payload = await schema.parseAsync(sanitizedBody);
 
   const newRecord = (await db
     .insert(table)
