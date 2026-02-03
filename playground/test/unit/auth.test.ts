@@ -4,7 +4,6 @@ import { eq } from "drizzle-orm";
 
 type Auth = typeof import("../../server/utils/auth");
 
-// Mock h3 module
 vi.mock("h3", async (importOriginal) => {
   const actual = await importOriginal<typeof import("h3")>();
   return {
@@ -39,6 +38,8 @@ describe("auth.ts", () => {
   const mockGetTableForModel = vi.fn();
   const mockSiteAbility = vi.fn();
   const mockGetHiddenFields = vi.fn().mockReturnValue([]);
+  const mockUseAutoCrudConfig = vi.fn();
+  const mockCheckAdminAccess = vi.fn();
 
   beforeAll(async () => {
     vi.doMock("#site/ability", () => ({
@@ -51,11 +52,16 @@ describe("auth.ts", () => {
       getHiddenFields: mockGetHiddenFields,
     }));
 
+    vi.mock("../../src/runtime/server/utils/config", () => ({
+      useAutoCrudConfig: mockUseAutoCrudConfig,
+    }));
+
     vi.doMock("#imports", () => ({
       useRuntimeConfig: mockUseRuntimeConfig,
       getUserSession: mockGetUserSession,
       requireUserSession: mockRequireUserSession,
       allows: mockAllows,
+      checkAdminAccess: mockCheckAdminAccess,
     }));
 
     vi.doMock("hub:db", () => ({
@@ -398,6 +404,47 @@ describe("auth.ts", () => {
       (getHeader as any).mockReturnValue(undefined);
       await auth.ensureAuthenticated({} as any);
       expect(mockRequireUserSession).toHaveBeenCalled();
+    });
+  });
+
+  describe("ensureResourceAccess", () => {  
+    it("returns true ONLY when authentication is explicitly false", async () => {
+      mockUseAutoCrudConfig.mockReturnValue({ auth: { authentication: false } });
+      const result = await auth.ensureResourceAccess({} as any, "posts", "delete");
+      expect(result).toBe(true);
+      expect(mockCheckAdminAccess).not.toHaveBeenCalled();
+    });
+  
+    it("delegates to engine when auth config is missing (Secure by Default)", async () => {
+      mockUseAutoCrudConfig.mockReturnValue({}); // Empty config
+      mockCheckAdminAccess.mockResolvedValue(false);
+      
+      const result = await auth.ensureResourceAccess({} as any, "posts", "delete");
+      
+      expect(result).toBe(false);
+      expect(mockCheckAdminAccess).toHaveBeenCalled();
+    });
+  
+    it("passes all parameters and respects the H3Event context", async () => {
+      mockUseAutoCrudConfig.mockReturnValue({ auth: { authentication: true } });
+      
+      // Create a mock event that resembles a real Nitro event with a user resolver
+      const mockEvent = {
+        context: {
+          $authorization: { resolveServerUser: vi.fn() }
+        }
+      } as any;
+  
+      const mockContext = { additionalData: true };
+      
+      await auth.ensureResourceAccess(mockEvent, "orders", "update", mockContext);
+      
+      expect(mockCheckAdminAccess).toHaveBeenCalledWith(
+        mockEvent, // Verify the exact event object is passed
+        "orders",
+        "update",
+        mockContext
+      );
     });
   });
 });
