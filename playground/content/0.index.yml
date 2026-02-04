@@ -106,15 +106,15 @@ features:
     - title: Zero Code Generation
       description: Unlike other CRUD tools, no code bloat. One set of code handles unlimited tables through smart routing.
       icon: i-lucide-zap
+    - title: Real-time Updates
+      description: Zero-config SSE broadcasting. UI and data stay instantly synchronized across all connected clients.
+      icon: i-lucide-refresh-cw
     - title: Built-in Authentication
       description: Social login (GitHub, Google) and traditional email/password with registration and password reset flows.
       icon: i-lucide-shield-check
     - title: Robust RBAC System
       description: Manage roles and permissions directly in the admin panel. Control resource access with ease.
       icon: i-lucide-users
-    - title: Real-time Updates
-      description: Zero-config SSE broadcasting. UI and data stay instantly synchronized across all connected clients.
-      icon: i-lucide-refresh-cw
     - title: Admin Dashboard
       description: Ready-to-use admin panel with dynamic tables for all your schemas. Includes search, pagination, and export to PDF/Excel.
       icon: i-lucide-layout-dashboard

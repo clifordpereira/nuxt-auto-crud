@@ -100,8 +100,8 @@ useSeoMeta({
     >
       <MDC
         v-if="section.code"
-        :value="'```typescript\n' + section.code + '\n```'"
-        class="prose prose-primary dark:prose-invert max-w-none"
+        :value="`\n\`\`\`typescript\n${section.code}\n\`\`\``"
+        class="prose prose-primary dark:prose-invert"
       />
       <NuxtImg
         v-else-if="(section as any).image"
