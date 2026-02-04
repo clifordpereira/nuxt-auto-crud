@@ -150,7 +150,7 @@ describe("NAC Core Engine", async () => {
   describe("NAC SSE Feature", async () => {
     it("establishes SSE connection and receives a heartbeat", async () => {
       let response: any;
-      const stream = await $fetch<ReadableStream>(`${endpointPrefix}/sse`, {
+      const stream = await $fetch<ReadableStream>(`${endpointPrefix}/_sse`, {
         responseType: "stream",
         onResponse(ctx) {
           response = ctx.response;

@@ -54,7 +54,7 @@ export default defineNuxtModule<ModuleOptions>({
     const routes = [
       // System Endpoints
       { path: '/_meta', method: 'get', handler: '_meta.get.ts' },
-      { path: '/sse', method: 'get', handler: 'sse.get.ts' },
+      { path: '/_sse', method: 'get', handler: '_sse.get.ts' },
       { path: '/_relations', method: 'get', handler: '_relations.get.ts' },
       { path: '/_schema', method: 'get', handler: '_schema/index.get.ts' },
       { path: '/_schema/:table', method: 'get', handler: '_schema/[table].get.ts' },
