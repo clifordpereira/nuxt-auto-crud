@@ -20,7 +20,7 @@ export async function resolveAuthContext(event: H3Event) {
   }
 
   if (!auth?.authentication) {
-    return { user: null, isAgent: true, token: null };
+    return { user: null, isAgent: false, token: null };
   }
 
   // 2. Session Resolve
@@ -42,20 +42,17 @@ export async function checkOwnership(user: any, model: string, action: string, c
   if (!userPermissions?.includes(`${action}_own`)) return false;
 
   // Self-update optimization for users table
-  if (model === "users" && String(context.id) === String(user.id)) return true;
+  const table = getTableForModel(model);
+  const { eq, getTableColumns: getDrizzleTableColumns, getTableName } = await import("drizzle-orm");  
+  if (getTableName(table as any) === "users" && String(context.id) === String(user.id)) return true;
 
   const { db } = await import("hub:db");
-  const { eq, getTableColumns: getDrizzleTableColumns } = await import("drizzle-orm");
-
-  const table = getTableForModel(model);
-  const columns = getTableColumns(table);
-  const ownershipColumn = columns.find((c) => ["createdBy", "userId", "ownerId"].includes(c));
-
+  const tableColumns = getDrizzleTableColumns(table as any);
+  const keys = Object.keys(tableColumns);
+  const ownershipColumn = ["ownerId", "createdBy"].find(k => keys.includes(k));
   if (!ownershipColumn) return false;
 
-  const tableColumns = getDrizzleTableColumns(table as any);
   const primaryKey = Object.values(tableColumns).find((c) => (c as any).primary);
-
   if (!primaryKey) return false;
 
   const rawId = context.id;

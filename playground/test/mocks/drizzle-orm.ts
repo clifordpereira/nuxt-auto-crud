@@ -7,3 +7,5 @@ export const getTableColumns = vi.fn(() => ({
   ownerId: { name: "ownerId" },
   createdBy: { name: "createdBy" },
 }));
+
+export const getTableName = vi.fn((table) => table?._?.name || 'mock_table');

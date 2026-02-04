@@ -11,7 +11,6 @@ export const useRuntimeConfig = vi.fn(() => ({
 
 export const getUserSession = vi.fn()
 export const requireUserSession = vi.fn()
-export const getTableColumns = vi.fn(() => [])
 export const getTableForModel = vi.fn()
 export const getHiddenFields = vi.fn(() => [])
 export const allows = vi.fn()

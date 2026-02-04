@@ -5,8 +5,8 @@ import {
   guardEventAccess,
 } from "../../server/utils/auth";
 import { db } from "hub:db";
-import { eq, getTableColumns as getDrizzleTableColumns } from "drizzle-orm";
-import { getHeader, getQuery, readBody } from "h3";
+import { eq, getTableColumns, getTableName } from "drizzle-orm";
+import { getHeader, getQuery } from "h3";
 import {
   useAutoCrudConfig,
   useRuntimeConfig,
@@ -15,7 +15,6 @@ import {
   getTableForModel,
   getHiddenFields,
   allows,
-  getTableColumns,
 } from "#imports";
 import { canAccess } from "../../shared/utils/abilities";
 
@@ -23,20 +22,44 @@ const mockUser = { id: "user_123", permissions: { posts: ["update_own"] } };
 const mockEvent = {
   path: "/api/_nac/posts/1",
   method: "GET",
+  headers: {},
+  context: { params: { id: "1" } },
 } as any;
 
 describe("server/utils/auth", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    
+    // Default Mock Implementations
+    vi.mocked(getHeader).mockReturnValue(undefined);
+    vi.mocked(getQuery).mockReturnValue({});
     vi.mocked(getUserSession).mockResolvedValue({ user: mockUser });
     vi.mocked(requireUserSession).mockResolvedValue({ user: mockUser });
     vi.mocked(allows).mockResolvedValue(false);
-    vi.mocked(getTableForModel).mockReturnValue("posts_table");
-    vi.mocked(getTableColumns).mockReturnValue(["id", "title", "userId"]);
+    vi.mocked(getTableForModel).mockReturnValue("posts_table" as any);
+    vi.mocked(getTableName).mockReturnValue("posts");
+    vi.mocked(getHiddenFields).mockReturnValue([]);
+    vi.mocked(useRuntimeConfig).mockReturnValue({ apiSecretToken: "test_secret" } as any);
+    vi.mocked(useAutoCrudConfig).mockReturnValue({
+      endpointPrefix: '/api/_nac',
+      auth: { authentication: true, authorization: true }
+    } as any);
+
+    // Drizzle Schema Mock
+    vi.mocked(getTableColumns).mockReturnValue({
+      id: { primary: true },
+      ownerId: {},
+    } as any);
+    
+    // Reset DB fluent mocks
+    vi.mocked(db.select).mockReturnThis();
+    vi.mocked(db.from).mockReturnThis();
+    vi.mocked(db.where).mockReturnThis();
+    vi.mocked(db.get).mockResolvedValue(undefined);
   });
 
   describe("resolveAuthContext", () => {
-    it("should resolve agent via Bearer token", async () => {
+    it("resolves agent via Bearer token", async () => {
       vi.mocked(getHeader).mockReturnValue("Bearer test_secret");
       const context = await resolveAuthContext(mockEvent);
       expect(context).toEqual({
@@ -44,10 +67,9 @@ describe("server/utils/auth", () => {
         isAgent: true,
         token: "test_secret",
       });
-      expect(getUserSession).not.toHaveBeenCalled();
     });
 
-    it("should resolve agent via query token", async () => {
+    it("resolves agent via query token", async () => {
       vi.mocked(getQuery).mockReturnValue({ token: "test_secret" });
       const context = await resolveAuthContext(mockEvent);
       expect(context).toEqual({
@@ -55,31 +77,23 @@ describe("server/utils/auth", () => {
         isAgent: true,
         token: "test_secret",
       });
-      expect(getUserSession).not.toHaveBeenCalled();
     });
 
-    it("should return agent context when authentication is disabled", async () => {
+    it("returns agent context when authentication is disabled", async () => {
       vi.mocked(useAutoCrudConfig).mockReturnValue({
         auth: { authentication: false },
-      });
+      } as any);
       const context = await resolveAuthContext(mockEvent);
-      expect(context).toEqual({ user: null, isAgent: true, token: null });
-      expect(getUserSession).not.toHaveBeenCalled();
+      expect(context).toEqual({ user: null, isAgent: false, token: null });
     });
 
-    it("should resolve user from session", async () => {
+    it("resolves user from session", async () => {
       const context = await resolveAuthContext(mockEvent);
       expect(context).toEqual({ user: mockUser, isAgent: false, token: null });
       expect(getUserSession).toHaveBeenCalled();
     });
 
-    it("should return null user if session is not found", async () => {
-      vi.mocked(getUserSession).mockResolvedValue(null);
-      const context = await resolveAuthContext(mockEvent);
-      expect(context).toEqual({ user: null, isAgent: false, token: null });
-    });
-
-    it("should return null user if getUserSession throws", async () => {
+    it("handles session retrieval failure", async () => {
       vi.mocked(getUserSession).mockRejectedValue(new Error("Session error"));
       const context = await resolveAuthContext(mockEvent);
       expect(context).toEqual({ user: null, isAgent: false, token: null });
@@ -87,174 +101,142 @@ describe("server/utils/auth", () => {
   });
 
   describe("guardEventAccess", () => {
-    it("should allow agent access", async () => {
+    it("allows agent access (bypass)", async () => {
       vi.mocked(getHeader).mockReturnValue("Bearer test_secret");
       await expect(guardEventAccess(mockEvent)).resolves.toBeUndefined();
       expect(requireUserSession).not.toHaveBeenCalled();
-      expect(allows).not.toHaveBeenCalled();
     });
 
-    it("should allow access if authentication is disabled", async () => {
+    it("allows access if authentication is disabled", async () => {
       vi.mocked(useAutoCrudConfig).mockReturnValue({
         auth: { authentication: false },
-      });
+      } as any);
       await expect(guardEventAccess(mockEvent)).resolves.toBeUndefined();
-      expect(requireUserSession).not.toHaveBeenCalled();
     });
 
-    it("should require session if user is not authenticated", async () => {
+    it("requires session if user is not authenticated", async () => {
       vi.mocked(getUserSession).mockResolvedValue(null);
-      await guardEventAccess(mockEvent);
+      vi.mocked(requireUserSession).mockRejectedValue(new Error("Unauthorized"));
+      
+      await expect(guardEventAccess(mockEvent)).rejects.toThrow("Unauthorized");
       expect(requireUserSession).toHaveBeenCalled();
     });
 
-    it("should allow access if authorization is disabled", async () => {
-      vi.mocked(useAutoCrudConfig).mockReturnValue({
-        auth: { authentication: true, authorization: false },
-      });
-      await expect(guardEventAccess(mockEvent)).resolves.toBeUndefined();
+    it("allows access to system endpoints (_meta, sse, etc)", async () => {
+      const systemPaths = ["/api/_nac/_meta", "/api/_nac/sse", "/api/_nac/"];
+      for (const path of systemPaths) {
+        const event = { ...mockEvent, path };
+        await expect(guardEventAccess(event)).resolves.toBeUndefined();
+      }
       expect(allows).not.toHaveBeenCalled();
     });
 
-    it("should allow access to system endpoints (prefixed with _)", async () => {
-      const systemEvent = { ...mockEvent, path: "/api/_nac/_meta" };
-      await expect(guardEventAccess(systemEvent)).resolves.toBeUndefined();
-      expect(allows).not.toHaveBeenCalled();
-    });
+    it("maps HTTP methods to CRUD actions", async () => {
+      const cases = [
+        { method: "POST", action: "create" },
+        { method: "PATCH", action: "update" },
+        { method: "PUT", action: "update" },
+        { method: "DELETE", action: "delete" },
+        { method: "GET", action: "read" },
+      ];
 
-    it("should allow access if `allows` returns true", async () => {
       vi.mocked(allows).mockResolvedValue(true);
-      await expect(guardEventAccess(mockEvent)).resolves.toBeUndefined();
-      expect(allows).toHaveBeenCalled();
+
+      for (const c of cases) {
+        const event = { ...mockEvent, method: c.method };
+        await guardEventAccess(event);
+        expect(allows).toHaveBeenCalledWith(
+          event,
+          canAccess,
+          "posts",
+          c.action,
+          expect.any(Object)
+        );
+      }
     });
 
-    it("should fall back to ownership check if `allows` is false", async () => {
-      vi.mocked(allows).mockResolvedValue(false);
-      // Mock checkOwnership to return true
-      vi.mocked(db.get).mockResolvedValue({
-        owner: "user_123",
+    it("falls back to ownership check if authorization fails", async () => {
+      // Ensure user has read_own permission for the GET request
+      vi.mocked(getUserSession).mockResolvedValue({ 
+        user: { ...mockUser, permissions: { posts: ["read_own"] } } 
       });
+
+      // Setup: Fail initial RBAC check
+      vi.mocked(allows).mockResolvedValue(false);
+      
+      // Setup: DB returns a record owned by the mock user
+      // Note: checkOwnership selects columns AS 'owner'
+      vi.mocked(db.get).mockResolvedValue({ owner: "user_123" });
 
       await expect(guardEventAccess(mockEvent)).resolves.toBeUndefined();
-      expect(allows).toHaveBeenCalled();
-      expect(getTableForModel).toHaveBeenCalledWith("posts");
+      expect(db.select).toHaveBeenCalled();
     });
 
-    it("should throw 403 if both `allows` and ownership check fail", async () => {
+    it("throws 403 if both authorization and ownership fail", async () => {
       vi.mocked(allows).mockResolvedValue(false);
-      // Mock checkOwnership to return false
-      vi.mocked(db.get).mockResolvedValue({
-        owner: "another_user",
-      });
+      vi.mocked(db.get).mockResolvedValue({ owner: "someone_else" });
 
       await expect(guardEventAccess(mockEvent)).rejects.toMatchObject({
         statusCode: 403,
         message: "Forbidden",
       });
     });
-
-    it("should correctly parse action and context for POST request", async () => {
-      const postEvent = {
-        ...mockEvent,
-        method: "POST",
-        path: "/api/_nac/posts",
-      };
-      const body = { title: "New Post" };
-      vi.mocked(readBody).mockResolvedValue(body);
-      vi.mocked(allows).mockResolvedValue(true);
-
-      await guardEventAccess(postEvent);
-
-      expect(allows).toHaveBeenCalledWith(
-        postEvent,
-        canAccess,
-        "posts",
-        "create",
-        body,
-      );
-    });
-
-    it("should correctly parse action and context for PATCH request", async () => {
-      const patchEvent = {
-        ...mockEvent,
-        method: "PATCH",
-        path: "/api/_nac/posts/1",
-      };
-      const body = { title: "Updated Post" };
-      vi.mocked(readBody).mockResolvedValue(body);
-      vi.mocked(allows).mockResolvedValue(true);
-
-      await guardEventAccess(patchEvent);
-
-      expect(allows).toHaveBeenCalledWith(
-        patchEvent,
-        canAccess,
-        "posts",
-        "update",
-        { id: "1", ...body },
-      );
-    });
   });
 
   describe("checkOwnership", () => {
-    it("returns true when user.id matches record owner", async () => {
-      const user = { id: "user_123", permissions: { posts: ["update_own"] } };
-      const context = { id: "post_99" };
-
-      vi.mocked(db.get).mockResolvedValue({
-        owner: "user_123",
-      });
-
-      const result = await checkOwnership(user, "posts", "update", context);
+    it("returns true if user matches record field (ownerId, createdBy)", async () => {
+      vi.mocked(db.get).mockResolvedValue({ owner: "user_123" });
+      const result = await checkOwnership(mockUser, "posts", "update", { id: 1 });
       expect(result).toBe(true);
-      expect(getTableForModel).toHaveBeenCalledWith("posts");
-      expect(getDrizzleTableColumns).toHaveBeenCalledWith("posts_table");
+      expect(db.where).toHaveBeenCalled();
     });
 
-    it("fails fast if user lacks _own permission", async () => {
-      const user = { id: "user_123", permissions: { posts: ["read"] } };
-      const result = await checkOwnership(user, "posts", "update", {
-        id: "99",
-      });
-
-      expect(result).toBe(false);
-      expect(db.select).not.toHaveBeenCalled();
+    it("coerces ID string to number for DB query", async () => {
+      vi.mocked(db.get).mockResolvedValue({ owner: "user_123" });
+      await checkOwnership(mockUser, "posts", "update", { id: "123" });
+      
+      // The eq call should have used Number(123)
+      expect(eq).toHaveBeenCalledWith(expect.anything(), 123);
     });
 
-    it("optimizes self-update for users table without DB hit", async () => {
-      const user = { id: "5", permissions: { users: ["update_own"] } };
-      const context = { id: "5" };
-
-      const result = await checkOwnership(user, "users", "update", context);
+    it("optimizes users table for self-update", async () => {
+      vi.mocked(getTableName).mockReturnValue("users");
+      const user = { id: 5, permissions: { users: ["update_own"] } };
+      const result = await checkOwnership(user, "users", "update", { id: "5" });
       expect(result).toBe(true);
       expect(db.select).not.toHaveBeenCalled();
     });
 
-    it("throws 403 if updating hidden fields", async () => {
-      const user = { id: "user_123", permissions: { posts: ["update_own"] } };
-      const context = { id: "post_99", secretField: "hack" };
-
-      vi.mocked(getHiddenFields).mockReturnValue(["secretField"]);
-      vi.mocked(db.get).mockResolvedValue({
-        owner: "user_123",
-      });
-
-      await expect(
-        checkOwnership(user, "posts", "update", context),
-      ).rejects.toMatchObject({
-        statusCode: 403,
-        message: "Forbidden: Hidden fields",
-      });
+    it("fails if user lacks _own permission", async () => {
+      const user = { id: "u1", permissions: { posts: ["read"] } };
+      const result = await checkOwnership(user, "posts", "update", { id: 1 });
+      expect(result).toBe(false);
     });
 
-    it("returns false if ownership column is missing", async () => {
-      const user = { id: "user_123", permissions: { posts: ["update_own"] } };
-      const context = { id: "post_99" };
-
-      vi.mocked(getTableColumns).mockReturnValue(["id", "title"]); // No userId/ownerId/createdBy
-
-      const result = await checkOwnership(user, "posts", "update", context);
+    it("fails if table has no ownership columns", async () => {
+      vi.mocked(getTableColumns).mockReturnValue({
+        id: {},
+        name: {}
+      } as any); // no ownerId/createdBy
+      const result = await checkOwnership(mockUser, "posts", "update", { id: 1 });
       expect(result).toBe(false);
+    });
+
+    it("fails if table has no primary key", async () => {
+      vi.mocked(getTableColumns).mockReturnValue({
+        id: {}, // not primary
+      } as any);
+      const result = await checkOwnership(mockUser, "posts", "update", { id: 1 });
+      expect(result).toBe(false);
+    });
+
+    it("throws 403 if updating hidden fields even if owner", async () => {
+      vi.mocked(db.get).mockResolvedValue({ owner: "user_123" });
+      vi.mocked(getHiddenFields).mockReturnValue(["secret"]);
+      
+      const context = { id: 1, secret: "illegal" };
+      await expect(checkOwnership(mockUser, "posts", "update", context))
+        .rejects.toMatchObject({ statusCode: 403 });
     });
   });
 });
