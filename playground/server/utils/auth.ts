@@ -5,7 +5,7 @@ import { canAccess } from "../../shared/utils/abilities";
 /**
  * Resolves authentication context (User session or Agentic/MCP token)
  */
-export async function resolveAuthContext(event: H3Event) {
+async function resolveAuthContext(event: H3Event) {
   const { auth } = useAutoCrudConfig();
   const runtimeConfig = useRuntimeConfig(event);
   
@@ -35,7 +35,7 @@ export async function resolveAuthContext(event: H3Event) {
 /**
  * Checks if the user owns the record based on schema conventions
  */
-export async function checkOwnership(user: any, model: string, action: string, context: any) {
+async function checkOwnership(user: any, model: string, action: string, context: any) {
   if (!user || !["read", "update", "delete"].includes(action) || !context?.id) return false;
 
   const userPermissions = user.permissions?.[model] as string[] | undefined;
