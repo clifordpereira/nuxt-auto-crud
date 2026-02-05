@@ -1,8 +1,8 @@
-title: Instant CRUD APIs for [Nuxt]{class="text-primary"}
-description: No more need to write or generate CRUD code. nuxt-auto-crud dynamically exposes CRUD APIs directly from your Drizzle schemas. You can control resource and column visibility through app.config.ts or the admin panel.
+title: Instant CRUD APIs for [Nuxt 4]{class="text-primary"}
+description: The official full-stack starter powered by NAC 2.0. It dynamically transforms Drizzle schemas into RESTful (CRUD) endpoints via runtime reflection—no manual CRUD coding required.
 seo:
-  title: Nuxt Auto CRUD - Instant APIs from Drizzle Schema
-  description: Automatically expose RESTful CRUD APIs from your Drizzle ORM schema. Focus on your business logic, not boilerplate code.
+  title: NAC Template | Dynamic CRUD Starter for Nuxt 4
+  description: Deploy production-ready apps using the Clifland Architectural Model. Zero-config dynamic CRUD APIs, Nuxt UI 4, and Agentic-ready tooling.
 navigation: false
 command: npx nuxi init -t gh:clifordpereira/nuxt-auto-crud_template <project-name>
 commandNote: 'Add env var NUXT_SESSION_PASSWORD="a-random-string-of-at-least-32-characters-long"'

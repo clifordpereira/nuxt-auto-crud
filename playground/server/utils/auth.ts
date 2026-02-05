@@ -36,6 +36,9 @@ async function resolveAuthContext(event: H3Event) {
 /**
  * Checks if the user owns the record based on schema conventions
  */
+/**
+ * Checks if the user owns the record based on schema conventions
+ */
 async function checkOwnership(user: any, model: string, action: string, context: any) {
   if (!user || !OWNERSHIP_ACTIONS.includes(action as any) || !context?.id) return false;
   if (!hasOwnershipPermission(user, model, action)) return false;
@@ -43,44 +46,46 @@ async function checkOwnership(user: any, model: string, action: string, context:
   // 1. Context-based check (fast)
   if (isOwner(user, model, context)) return true;
 
-  // 2. DB Fallback (slow)
-  const table = getTableForModel(model);
-  const { eq, getTableColumns: getDrizzleTableColumns } = await import("drizzle-orm");  
-  const { db } = await import("hub:db");
+  // 2. DB Fallback (optimized)
+  try {
+    const { eq, getTableColumns } = await import("drizzle-orm");
+    const { db } = await import("hub:db");
+    const table = getTableForModel(model);
 
-  const tableColumns = getDrizzleTableColumns(table as any);
-  const keys = Object.keys(tableColumns);
-  
-  // Expanded ownership convention
-  const ownershipColumn = ["ownerId", "createdBy", "userId"].find(k => keys.includes(k));
-  if (!ownershipColumn) return false;
+    if (!table) return false;
 
-  const pkEntry = Object.entries(tableColumns).find(([_, c]) => (c as any).primary);
-  if (!pkEntry) return false;
-  const [pkName, pkColumn] = pkEntry;
+    const tableColumns = getTableColumns(table as any);
+    const keys = Object.keys(tableColumns);
+    
+    // Ownership convention lookup
+    const ownershipColumn = ["ownerId", "createdBy", "userId"].find(k => keys.includes(k));
+    if (!ownershipColumn) return false;
 
-  // Smarter ID handling: only cast to Number if the PK column is an integer type
-  const rawId = context.id;
-  const id = (pkColumn as any).columnType?.includes('integer') && !isNaN(Number(rawId)) 
-    ? Number(rawId) 
-    : rawId;
+    const pkEntry = Object.entries(tableColumns).find(([_, c]) => (c as any).primary);
+    if (!pkEntry) return false;
+    const [_, pkColumn] = pkEntry;
 
-  const record = (await db
-    .select({ owner: tableColumns[ownershipColumn] })
-    .from(table as any)
-    .where(eq(pkColumn as any, id))
-    .get()) as { owner: any } | undefined;
+    // Type-safe ID casting
+    const isInt = (pkColumn as any).columnType?.includes('integer');
+    const id = isInt && !isNaN(Number(context.id)) ? Number(context.id) : context.id;
 
-  if (record && String(record.owner) === String(user.id)) {
-    if (["update", "create"].includes(action)) {
-      const hidden = getHiddenFields(model);
-      // Only check keys that actually exist in the schema to avoid false 403s from UI state
-      const hasHidden = Object.keys(context).some((f) => keys.includes(f) && hidden.includes(f));
-      if (hasHidden) {
-        throw createError({ statusCode: 403, message: "Forbidden: Hidden fields" });
+    const record = await db
+      .select({ owner: tableColumns[ownershipColumn] })
+      .from(table as any)
+      .where(eq(pkColumn as any, id))
+      .get() as { owner: any } | undefined;
+
+    if (record && String(record.owner) === String(user.id)) {
+      if (["update", "create"].includes(action)) {
+        const hidden = getHiddenFields(model);
+        const hasHidden = Object.keys(context).some((f) => keys.includes(f) && hidden.includes(f));
+        if (hasHidden) throw createError({ statusCode: 403, message: "Forbidden: Hidden fields" });
       }
+      return true;
     }
-    return true;
+  } catch (e: any) {
+    if (e.statusCode === 403) throw e;
+    return false;
   }
   
   return false;
@@ -101,8 +106,10 @@ export async function guardEventAccess(event: H3Event) {
 
   // Assert user existence for subsequent logic
   if (!user) {
-    await requireUserSession(event);
-    return; // Safety exit (requireUserSession usually redirects/throws)
+    throw createError({ 
+      statusCode: 401, 
+      statusMessage: "Unauthorized: Session required" 
+    });
   }
 
   const relativePath = path.slice(endpointPrefix.length).replace(/^\//, '');

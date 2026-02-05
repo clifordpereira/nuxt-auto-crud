@@ -25,7 +25,15 @@ const items = computed(() => [{
   <UHeader>
     <template #left>
       <NuxtLink to="/">
-        <h1>Nuxt Auto CRUD Template</h1>
+        <h1 class="font-semibold text-lg">
+          NAC Template
+          <UBadge
+            label="v2.0 Core"
+            color="primary"
+            variant="soft"
+            size="xs"
+          />
+        </h1>
       </NuxtLink>
     </template>
 

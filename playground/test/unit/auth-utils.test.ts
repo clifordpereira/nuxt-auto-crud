@@ -24,8 +24,9 @@ const mockUser = { id: "user_123", permissions: { posts: ["update_own"] } };
 const mockEvent = {
   path: "/api/_nac/posts/1",
   method: "PATCH",
-  headers: {},
+  headers: new Map(), // use Map or Object depending on your H3 version
   context: { params: { id: "1" } },
+  _body: { title: "Updated Post" }, 
 } as any;
 
 vi.mock("../../shared/utils/auth-logic", () => ({
@@ -102,14 +103,17 @@ describe("server/utils/auth", () => {
       expect(getUserSession).not.toHaveBeenCalled();
     });
 
-    it("requires session if user is not authenticated", async () => {
+    it("throws 401 when user session is missing", async () => {
+      // Setup: Mock resolveAuthContext to return no user/agent
       vi.mocked(getUserSession).mockResolvedValue(null);
-      vi.mocked(requireUserSession).mockRejectedValue(
-        new Error("Unauthorized"),
-      );
 
-      await expect(guardEventAccess(mockEvent)).rejects.toThrow("Unauthorized");
-      expect(requireUserSession).toHaveBeenCalled();
+      await expect(guardEventAccess(mockEvent)).rejects.toMatchObject({
+        statusCode: 401,
+        statusMessage: "Unauthorized: Session required",
+      });
+
+      // Ensure we are no longer relying on the risky requireUserSession
+      expect(requireUserSession).not.toHaveBeenCalled();
     });
   });
 
