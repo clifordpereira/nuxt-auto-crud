@@ -1,6 +1,7 @@
 // server/utils/auth.ts
 import { type H3Event, createError, getHeader, getQuery, readBody } from "h3";
 import { canAccess } from "../../shared/utils/abilities";
+import { hasOwnershipPermission, isOwner, OWNERSHIP_ACTIONS } from "../../shared/utils/auth-logic";
 
 /**
  * Resolves authentication context (User session or Agentic/MCP token)
@@ -36,39 +37,45 @@ async function resolveAuthContext(event: H3Event) {
  * Checks if the user owns the record based on schema conventions
  */
 async function checkOwnership(user: any, model: string, action: string, context: any) {
-  if (!user || !["read", "update", "delete"].includes(action) || !context?.id) return false;
+  if (!user || !OWNERSHIP_ACTIONS.includes(action as any) || !context?.id) return false;
+  if (!hasOwnershipPermission(user, model, action)) return false;
 
-  const userPermissions = user.permissions?.[model] as string[] | undefined;
-  if (!userPermissions?.includes(`${action}_own`)) return false;
+  // 1. Context-based check (fast)
+  if (isOwner(user, model, context)) return true;
 
-  // Self-update optimization for users table
+  // 2. DB Fallback (slow)
   const table = getTableForModel(model);
-  const { eq, getTableColumns: getDrizzleTableColumns, getTableName } = await import("drizzle-orm");  
-  if (getTableName(table as any) === "users" && String(context.id) === String(user.id)) return true;
-
+  const { eq, getTableColumns: getDrizzleTableColumns } = await import("drizzle-orm");  
   const { db } = await import("hub:db");
+
   const tableColumns = getDrizzleTableColumns(table as any);
   const keys = Object.keys(tableColumns);
-  const ownershipColumn = ["ownerId", "createdBy"].find(k => keys.includes(k));
+  
+  // Expanded ownership convention
+  const ownershipColumn = ["ownerId", "createdBy", "userId"].find(k => keys.includes(k));
   if (!ownershipColumn) return false;
 
-  const primaryKey = Object.values(tableColumns).find((c) => (c as any).primary);
-  if (!primaryKey) return false;
+  const pkEntry = Object.entries(tableColumns).find(([_, c]) => (c as any).primary);
+  if (!pkEntry) return false;
+  const [pkName, pkColumn] = pkEntry;
 
+  // Smarter ID handling: only cast to Number if the PK column is an integer type
   const rawId = context.id;
-  const id = isNaN(Number(rawId)) ? rawId : Number(rawId);
+  const id = (pkColumn as any).columnType?.includes('integer') && !isNaN(Number(rawId)) 
+    ? Number(rawId) 
+    : rawId;
 
   const record = (await db
     .select({ owner: tableColumns[ownershipColumn] })
     .from(table as any)
-    .where(eq(primaryKey as any, id))
+    .where(eq(pkColumn as any, id))
     .get()) as { owner: any } | undefined;
 
   if (record && String(record.owner) === String(user.id)) {
-    // Prevent updating hidden fields even if owned
     if (["update", "create"].includes(action)) {
       const hidden = getHiddenFields(model);
-      const hasHidden = Object.keys(context).some((f) => hidden.includes(f));
+      // Only check keys that actually exist in the schema to avoid false 403s from UI state
+      const hasHidden = Object.keys(context).some((f) => keys.includes(f) && hidden.includes(f));
       if (hasHidden) {
         throw createError({ statusCode: 403, message: "Forbidden: Hidden fields" });
       }
@@ -82,57 +89,49 @@ async function checkOwnership(user: any, model: string, action: string, context:
 /**
  * Consolidated guard for NAC routes - used in server middleware
  */
+// server/utils/auth.ts
 export async function guardEventAccess(event: H3Event) {
   const { user, isAgent } = await resolveAuthContext(event);
-  if (isAgent) return; // Full access for agents/MCP
+  if (isAgent) return;
 
   const { auth, endpointPrefix = "/api/_nac" } = useAutoCrudConfig();
-  if (auth?.authentication === false) return; // Explicitly disabled
+  const path = event.path ?? '';
 
-  // 1. Mandatory Session check
+  if (auth?.authentication === false || !path.startsWith(endpointPrefix)) return;
+
+  // Assert user existence for subsequent logic
   if (!user) {
     await requireUserSession(event);
+    return; // Safety exit (requireUserSession usually redirects/throws)
   }
-
-  // 2. Authorization check
-  if (!auth?.authorization) return;
-
-  // Extract context from path using endpointPrefix
-  const path = (event.path || '').split('?')[0];
-  if (!path || !path.startsWith(endpointPrefix)) return;
 
   const relativePath = path.slice(endpointPrefix.length).replace(/^\//, '');
   const segments = relativePath.split('/');
-
-  // If first segment starts with _, it's a system endpoint (e.g. _meta, _schema)
-  if (!segments[0] || segments[0].startsWith('_') || segments[0] === 'sse') return;
-
   const model = segments[0];
   const id = segments[1];
-  
-  if (!model) return;
+
+  if (!model || model.startsWith('_')) return;
 
   const actionMap: Record<string, string> = {
-    GET: "read",
-    POST: "create",
-    PATCH: "update",
-    PUT: "update",
-    DELETE: "delete",
+    GET: "read", POST: "create", PATCH: "update", PUT: "update", DELETE: "delete",
   };
   const action = actionMap[event.method] || "read";
 
-  const context: any = id ? { id } : {};
-  if (["POST", "PATCH", "PUT"].includes(event.method)) {
-    const body = await readBody(event).catch(() => ({}));
-    Object.assign(context, body);
+  const allowed = await allows(event, canAccess, model, action);
+  if (!allowed) throw createError({ statusCode: 403 });
+
+  // Use non-null assertion 'user!' since we've passed requireUserSession
+  const permissions = user.permissions?.[model] || [];
+  const hasGlobal = permissions.includes(action);
+  const hasOwn = permissions.includes(`${action}_own`);
+
+  if (user.role !== 'admin' && !hasGlobal && hasOwn) {
+    const body = ["POST", "PATCH", "PUT"].includes(event.method) 
+      ? await readBody(event).catch(() => ({})) 
+      : {};
+    
+    if (!(await checkOwnership(user, model, action, { id, ...body }))) {
+      throw createError({ statusCode: 403, message: "Ownership required" });
+    }
   }
-
-  // Check permissions via bridge
-  const allowed = await allows(event, canAccess, model, action, context);
-  if (allowed) return;
-
-  // Ownership Fallback
-  if (await checkOwnership(user, model, action, context)) return;
-
-  throw createError({ statusCode: 403, message: "Forbidden" });
 }
