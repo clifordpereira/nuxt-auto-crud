@@ -104,6 +104,14 @@ export async function guardEventAccess(event: H3Event) {
 
   if (auth?.authentication === false || !path.startsWith(endpointPrefix)) return;
 
+  const relativePath = path.slice(endpointPrefix.length).replace(/^\//, '');
+  const segments = relativePath.split('/');
+  const model = segments[0];
+  const id = segments[1];
+
+  // Allow system routes (starting with _) to pass through without session check
+  if (!model || model.startsWith('_')) return;
+
   // Assert user existence for subsequent logic
   if (!user) {
     throw createError({ 
@@ -111,13 +119,6 @@ export async function guardEventAccess(event: H3Event) {
       statusMessage: "Unauthorized: Session required" 
     });
   }
-
-  const relativePath = path.slice(endpointPrefix.length).replace(/^\//, '');
-  const segments = relativePath.split('/');
-  const model = segments[0];
-  const id = segments[1];
-
-  if (!model || model.startsWith('_')) return;
 
   const actionMap: Record<string, string> = {
     GET: "read", POST: "create", PATCH: "update", PUT: "update", DELETE: "delete",
