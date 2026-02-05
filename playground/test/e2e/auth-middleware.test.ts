@@ -6,6 +6,8 @@ describe("NAC Auth Middleware", async () => {
   const apiSecretToken = "test-secret-token";
 
   await setup({
+    host: "http://localhost:3000",
+    server: false,
     nuxtConfig: {
       runtimeConfig: {
         apiSecretToken,
