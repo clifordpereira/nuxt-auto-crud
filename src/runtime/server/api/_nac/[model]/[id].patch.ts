@@ -36,7 +36,7 @@ export default eventHandler(async (event) => {
 
   const sanitizedData = formatResourceResult(model, updatedRecord)
 
-  broadcast({
+  await broadcast({
     table: model,
     action: "update",
     primaryKey: updatedRecord.id,

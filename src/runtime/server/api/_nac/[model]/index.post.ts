@@ -23,7 +23,7 @@ export default eventHandler(async (event) => {
 
   const sanitizedData = formatResourceResult(model, newRecord)
 
-  broadcast({
+  await broadcast({
     table: model,
     action: "create",
     primaryKey: newRecord.id,

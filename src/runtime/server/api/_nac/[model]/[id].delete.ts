@@ -24,7 +24,7 @@ export default eventHandler(async (event) => {
 
   const sanitizedData = formatResourceResult(model, deletedRecord)
 
-  broadcast({
+  await broadcast({
     table: model,
     action: 'delete',
     primaryKey: deletedRecord.id,

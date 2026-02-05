@@ -8,12 +8,18 @@ type SSEClient = { id: string, res: WritableStreamDefaultWriter }
 const clients = new Map<string, SSEClient>()
 const encoder = new TextEncoder()
 
-function localBroadcast(payload: unknown) {
+async function localBroadcast(payload: unknown) {
   const msg = `event: crud\ndata: ${JSON.stringify(payload)}\n\n`
   const encoded = encoder.encode(msg)
+  const deliveries = []
   for (const [id, client] of clients) {
-    client.res.write(encoded).catch(() => clients.delete(id))
+    deliveries.push(
+      client.res.write(encoded).catch(() => {
+        clients.delete(id)
+      })
+    )
   }
+  await Promise.all(deliveries)
 }
 
 export function addClient(id: string, res: WritableStreamDefaultWriter) {
@@ -26,7 +32,7 @@ export function removeClient(id: string) {
 
 export async function broadcast(payload: unknown) {
   // 1. Local Isolate Delivery (Immediate)
-  localBroadcast(payload)
+  await localBroadcast(payload)
 
   // 2. Global Instance Signal (Cross-Isolate)
   // We include instanceId so other instances (or this one) can filter out echoes
