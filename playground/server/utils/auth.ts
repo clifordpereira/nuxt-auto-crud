@@ -7,26 +7,27 @@ import { hasOwnershipPermission, isOwner, OWNERSHIP_ACTIONS } from "../../shared
  * Resolves authentication context (User session or Agentic/MCP token)
  */
 async function resolveAuthContext(event: H3Event) {
-  const { auth } = useAutoCrudConfig();
   const runtimeConfig = useRuntimeConfig(event);
-  
-  // 1. Token Check (Agentic/MCP)
-  const authHeader = getHeader(event, "authorization");
-  const query = getQuery(event);
-  const apiToken = runtimeConfig.apiSecretToken;
-  const token = (authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : null) || (query.token as string);
 
+  // 0. Authentication disabled
+  const authenticationNeeded = useAutoCrudConfig().auth?.authentication;
+  if (!authenticationNeeded) {
+    return { user: null, isAgent: false, token: null };
+  }
+
+  // 1. Token Check (Agentic/MCP)
+  const authHeader = getHeader(event, 'authorization');
+  const query = getQuery(event);
+  const token = authHeader?.replace(/^Bearer\s+/i, '') || query.token as string;
+  const apiToken = runtimeConfig.apiSecretToken;
   if (apiToken && token === apiToken) {
     return { user: null, isAgent: true, token };
   }
 
-  if (!auth?.authentication) {
-    return { user: null, isAgent: false, token: null };
-  }
-
   // 2. Session Resolve
+  await requireUserSession(event)
   try {
-    const session = await getUserSession(event);
+    const session = await getUserSession(event).catch(() => null);
     return { user: session?.user || null, isAgent: false, token: null };
   } catch {
     return { user: null, isAgent: false, token: null };

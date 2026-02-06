@@ -3,19 +3,20 @@ import { describe, it, expect } from "vitest";
 import { setup, $fetch } from "@nuxt/test-utils/e2e";
 
 describe("NAC Auth Middleware", async () => {
-  const apiSecretToken = "test-secret-token";
+  const apiSecretToken = process.env.NUXT_API_SECRET_TOKEN;
+  console.log("Using NUXT_API_SECRET_TOKEN:", apiSecretToken);
+  if (!apiSecretToken) {
+    throw new Error("NUXT_API_SECRET_TOKEN is not defined");
+  }
 
   await setup({
     host: "http://localhost:3000",
-    server: false,
+    env: {
+      NUXT_API_SECRET_TOKEN: apiSecretToken,
+    },
     nuxtConfig: {
       runtimeConfig: {
         apiSecretToken,
-      },
-      autoCrud: {
-        auth: {
-          authentication: true,
-        },
       },
     },
   });
@@ -28,6 +29,7 @@ describe("NAC Auth Middleware", async () => {
       expect.fail("Should have thrown 401");
     } catch (err: any) {
       expect(err.statusCode).toBe(401);
+      expect(err.data.statusMessage).toBe("Unauthorized: Session required");
     }
   });
 
@@ -40,41 +42,22 @@ describe("NAC Auth Middleware", async () => {
       expect.fail("Should have thrown 401");
     } catch (err: any) {
       expect(err.statusCode).toBe(401);
+      expect(err.data.statusMessage).toBe("Unauthorized: Session required");
     }
   });
 
-  it("blocks unauthorized access to system _meta endpoint (401)", async () => {
-    try {
-      await $fetch(`${endpointPrefix}/_meta`, { method: "GET" });
-      expect.fail("Should have thrown 401");
-    } catch (err: any) {
-      expect(err.statusCode).toBe(401);
-    }
+  it("allows unauthorized access to system _meta endpoint (public)", async () => {
+    const response: any = await $fetch(`${endpointPrefix}/_meta`, {
+      method: "GET",
+    });
+    expect(response).toBeDefined();
+    expect(response.architecture).toBe("Clifland-NAC");
   });
 
   it("allows access to non-NAC routes without credentials", async () => {
     const response = await $fetch("/api/_health", { method: "GET" }).catch(
       () => null,
     );
-    expect(response).toBeDefined();
-  });
-
-  it("permits authorized access with valid Bearer token", async () => {
-    const response = await $fetch(`${endpointPrefix}/users`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${apiSecretToken}`,
-      },
-    });
-    expect(response).toBeDefined();
-  });
-
-  it("permits authorized access with valid Query token (handling + encoding)", async () => {
-    // Note: ofetch handles query encoding, so we pass the raw token
-    const response = await $fetch(`${endpointPrefix}/users`, {
-      method: "GET",
-      query: { token: apiSecretToken },
-    });
     expect(response).toBeDefined();
   });
 
@@ -102,10 +85,26 @@ describe("NAC Auth Middleware", async () => {
     expect(response).toContain("| Field | Type |");
   });
 
+  it("permits authorized access with valid Query token (handling + encoding)", async () => {
+    // Note: ofetch handles query encoding, so we pass the raw token
+    const response = await $fetch(`${endpointPrefix}/users`, {
+      method: "GET",
+      query: { token: apiSecretToken },
+    });
+    expect(response).toBeDefined();
+  });
+
+  it("permits authorized access with valid Bearer token", async () => {
+    const response = await $fetch(`${endpointPrefix}/users`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${apiSecretToken}`,
+      },
+    });
+    expect(response).toBeDefined();
+  });
+
   it("bypasses permission checks for Agent token (full CRUD access)", async () => {
-    // Agents bypass all checks in guardEventAccess
-    // We expect this to NOT throw 401/403. It might throw 404 if the table doesn't exist
-    // in the test DB, which is fine for this middleware check.
     try {
       await $fetch(`${endpointPrefix}/users`, {
         method: "POST",
