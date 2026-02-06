@@ -1,7 +1,7 @@
 // src/runtime/server/types.ts
-import type { BaseSQLiteDatabase, SQLiteTableWithColumns } from 'drizzle-orm/sqlite-core'
+import type { BaseSQLiteDatabase, SQLiteTableWithColumns, SQLiteColumn } from 'drizzle-orm/sqlite-core'
 
-export type ModuleDatabase = BaseSQLiteDatabase<any, any, any>
+export type ModuleDatabase = BaseSQLiteDatabase<'async', Record<string, unknown>, Record<string, unknown>>
 
 /**
  * Specifically targets tables with an 'id' column.
@@ -11,7 +11,7 @@ export type TableWithId = SQLiteTableWithColumns<{
   name: string
   schema: undefined
   columns: {
-    id: any // We use any here only because the column type varies (Integer/Text)
+    id: SQLiteColumn
   }
   dialect: 'sqlite'
 }>

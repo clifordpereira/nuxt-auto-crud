@@ -11,6 +11,9 @@ import {
   getSystemUserFields,
   isDateColumn,
 } from './modelMapper'
+import type { ZodType } from 'zod'
+import type { Column, Table } from 'drizzle-orm'
+import type { SQLiteTable } from 'drizzle-orm/sqlite-core'
 
 export interface Field {
   name: string
@@ -21,7 +24,13 @@ export interface Field {
   isReadOnly?: boolean
 }
 
-export function drizzleTableToFields(table: any, resourceName: string) {
+export interface SchemaDefinition {
+  resource: string
+  labelField: string
+  fields: Field[]
+}
+
+export function drizzleTableToFields(table: SQLiteTable, resourceName: string): SchemaDefinition {
   const columns = getTableColumns(table)
   const fields: Field[] = []
 
@@ -30,8 +39,8 @@ export function drizzleTableToFields(table: any, resourceName: string) {
   for (const [key, col] of Object.entries(columns)) {
     if (getHiddenFields(resourceName).includes(key)) continue
 
-    const column = col as any
-    const zodField = (zodSchema.shape as any)[key]
+    const column = col as Column
+    const zodField = (zodSchema.shape as Record<string, ZodType>)[key]
 
     const { type, selectOptions } = mapColumnType(column, zodField)
 
@@ -50,31 +59,35 @@ export function drizzleTableToFields(table: any, resourceName: string) {
 
   try {
     const config = getTableConfig(table)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     config.foreignKeys.forEach((fk: any) => {
       const propertyName = getForeignKeyPropertyName(fk, columns)
       const field = fields.find(f => f.name === propertyName)
       if (field) field.references = getTargetTableName(fk)
     })
   }
-  catch {}
+  catch {
+    // Ignore error
+  }
 
   return { resource: resourceName, labelField, fields }
 }
 
 function mapColumnType(
-  column: any,
-  zodField?: any,
+  column: Column,
+  zodField?: ZodType,
 ): { type: string, selectOptions?: string[] } {
   // 1. Drizzle Enums
-  const enumValues = column.enumValues || column.config?.enumValues
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const enumValues = (column as any).enumValues || (column as any).config?.enumValues
   if (enumValues) return { type: 'enum', selectOptions: enumValues }
 
   // 2. Zod Semantic Hints (The "Agentic" advantage)
   if (zodField?._def?.checks) {
-    const checks = zodField._def.checks
-    if (checks.some((c: any) => c.kind === 'email')) return { type: 'email' }
-    if (checks.some((c: any) => c.kind === 'uuid')) return { type: 'uuid' }
-    if (checks.some((c: any) => c.kind === 'url')) return { type: 'url' }
+    const checks = zodField._def.checks as unknown as { kind: string }[]
+    if (checks.some(c => c.kind === 'email')) return { type: 'email' }
+    if (checks.some(c => c.kind === 'uuid')) return { type: 'uuid' }
+    if (checks.some(c => c.kind === 'url')) return { type: 'url' }
   }
 
   const { dataType, columnType, name } = column
@@ -99,14 +112,15 @@ export async function getSchemaRelations() {
 
   for (const [tableName, table] of Object.entries(modelTableMap)) {
     try {
-      const config = getTableConfig(table as any)
-      const columns = getTableColumns(table as any)
+      const config = getTableConfig(table as SQLiteTable)
+      const columns = getTableColumns(table as Table)
       const tableRelations: Record<string, string> = {}
 
-      for (const [key, col] of Object.entries(columns)) {
+      for (const [key, _] of Object.entries(columns)) {
         if (getSystemUserFields().includes(key)) tableRelations[key] = 'users'
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       config.foreignKeys.forEach((fk: any) => {
         const propName = getForeignKeyPropertyName(fk, columns)
         if (propName) tableRelations[propName] = getTargetTableName(fk)
@@ -114,22 +128,23 @@ export async function getSchemaRelations() {
 
       relations[tableName] = tableRelations
     }
-    catch {}
+    catch {
+      // Ignore error
+    }
   }
   return relations
 }
 
 export async function getAllSchemas() {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const schemas: Record<string, any> = {}
+  const schemas: Record<string, SchemaDefinition> = {}
 
   for (const [tableName, table] of Object.entries(modelTableMap)) {
-    schemas[tableName] = drizzleTableToFields(table, tableName)
+    schemas[tableName] = drizzleTableToFields(table as SQLiteTable, tableName)
   }
   return schemas
 }
 
 export async function getSchema(tableName: string) {
   const table = modelTableMap[tableName]
-  return table ? drizzleTableToFields(table, tableName) : undefined
+  return table ? drizzleTableToFields(table as SQLiteTable, tableName) : undefined
 }

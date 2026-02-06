@@ -2,6 +2,6 @@ import { eventHandler } from 'h3'
 
 import { getRelations } from '../../utils/modelMapper'
 
-export default eventHandler(async (event) => {
+export default eventHandler(async () => {
   return getRelations()
 })

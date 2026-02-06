@@ -1,4 +1,3 @@
-// @ts-ignore - provided by nuxt-authorization in consumer app
 import { ref, useFetch, useRequestHeaders, useRuntimeConfig } from '#imports'
 
 export const useNacRelationDisplay = (
@@ -50,9 +49,9 @@ export const useNacRelationDisplay = (
             )
           }
         }
-        catch (error: any) {
+        catch (error: unknown) {
           // Ignore 403 Forbidden (User not allowed to list this relation)
-          if (error.statusCode === 403) return
+          if ((error as { statusCode: number })?.statusCode === 403) return
           console.error(`Failed to fetch relation data for ${targetTable}:`, error)
         }
       }),

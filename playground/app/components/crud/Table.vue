@@ -95,7 +95,7 @@ const store = {
   },
   addRow: (rowData: Record<string, unknown>) => {
     if (!data.value) data.value = []
-    const exists = data.value.some((r: any) => r.id === rowData.id)
+    const exists = data.value.some((r: Record<string, unknown>) => r.id === rowData.id)
     if (exists) return
     data.value = [rowData, ...data.value]
   },

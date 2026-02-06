@@ -20,32 +20,36 @@ export const deleteRecord = defineAbility((user: User, model: string) => {
   return hasPermission(user, model, 'delete') || hasPermission(user, model, 'delete_own')
 })
 
-export const updateOwnRecord = defineAbility((user: User, model: any) => {
+export const updateOwnRecord = defineAbility((user: User, model: Record<string, unknown>) => {
   // If user has full update permission, they can update anything
-  if (hasPermission(user, model?.resourceName || model?.collection, 'update')) return true
+  const resource = String(model?.resourceName || model?.collection || '')
+  if (hasPermission(user, resource, 'update')) return true
 
   // If user only has update_own, check ownership
-  if (hasPermission(user, model?.resourceName || model?.collection, 'update_own')) {
+  if (hasPermission(user, resource, 'update_own')) {
     return user.id === model.authorId || user.id === model.userId || user.id === model.createdBy
   }
 
   return false
 })
 
-export const deleteOwnRecord = defineAbility((user: User, model: any) => {
+export const deleteOwnRecord = defineAbility((user: User, model: Record<string, unknown>) => {
   // If user has full delete permission, they can delete anything
-  if (hasPermission(user, model?.resourceName || model?.collection, 'delete')) return true
+  const resource = String(model?.resourceName || model?.collection || '')
+  if (hasPermission(user, resource, 'delete')) return true
 
   // If user only has delete_own, check ownership
-  if (hasPermission(user, model?.resourceName || model?.collection, 'delete_own')) {
+  if (hasPermission(user, resource, 'delete_own')) {
     return user.id === model.authorId || user.id === model.userId || user.id === model.createdBy
   }
 
   return false
 })
 
-function hasPermission(user: any, model: string, action: string) {
+function hasPermission(user: User, model: string, action: string) {
   if (user?.role === 'admin') return true
+  // @ts-expect-error - permissions is extended
   if (!user?.permissions || !user.permissions[model]) return false
+  // @ts-expect-error - permissions is extended
   return user.permissions[model].includes(action)
 }

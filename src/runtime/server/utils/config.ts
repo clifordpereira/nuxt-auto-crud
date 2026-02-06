@@ -13,6 +13,6 @@ export const useAutoCrudConfig = (): ModuleOptions => {
   // Note: On client-side, the private keys will naturally be undefined
   return {
     ...config.public.autoCrud,
-    ...((config as any).autoCrud || {}),
+    ...(config['autoCrud'] as ModuleOptions || {}),
   } as ModuleOptions
 }

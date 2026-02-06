@@ -24,12 +24,6 @@ export default defineEventHandler(async (event) => {
 
   // Check permissions
   if (!hasPermission(user, model, action)) {
-    // If we have an ID and the action is update/delete/read, checking ownership might be needed
-    // But coarse guard usually just checks if "update" is allowed API-wise.
-    // Fine-grained ownership checks happen in the service layer or distinct endpoint logic.
-    // However, if the user has 'update_own' but not 'update', we should allow them to proceed
-    // to the endpoint where the ownership check will happen.
-
     const ownAction = `${action}_own`
     if (hasPermission(user, model, ownAction)) {
       // Allowed to proceed to endpoint for ownership verification
@@ -47,7 +41,8 @@ export default defineEventHandler(async (event) => {
  * Helper functions
  */
 
-function hasPermission(user: any, model: string, action: string) {
+// @ts-expect-error - permissions is extended on user session
+function hasPermission(user: { permissions?: Record<string, string[]> }, model: string, action: string) {
   if (!user.permissions || !user.permissions[model]) return false
   return user.permissions[model].includes(action)
 }
