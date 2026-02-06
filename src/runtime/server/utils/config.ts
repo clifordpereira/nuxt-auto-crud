@@ -8,11 +8,11 @@ import type { ModuleOptions } from '../../../types'
  */
 export const useAutoCrudConfig = (): ModuleOptions => {
   const config = useRuntimeConfig()
-  
+
   // Return the merged configuration
   // Note: On client-side, the private keys will naturally be undefined
   return {
     ...config.public.autoCrud,
-    ...((config as any).autoCrud || {}) 
+    ...((config as any).autoCrud || {}),
   } as ModuleOptions
 }

@@ -15,7 +15,7 @@ export default defineConfig({
             'hub:db': './test/mocks/db.ts',
             '#imports': './test/mocks/imports.ts',
           },
-        },  
+        },
       },
       {
         test: {

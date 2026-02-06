@@ -1,6 +1,6 @@
 export interface ModuleOptions {
   endpointPrefix: string
-  schemaPath: string  
+  schemaPath: string
   protectedFields: string[]
   hiddenFields: string[]
   systemUserFields: string[]

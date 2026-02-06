@@ -17,19 +17,19 @@ describe('Public Permissions', () => {
   it('transforms joined join results into grouped resource/action record', async () => {
     // 1. Mock Role lookup
     vi.mocked(db.get).mockResolvedValueOnce({ id: 1, name: 'public' })
-    
+
     // 2. Mock Permissions join result
     vi.mocked(db.all).mockResolvedValueOnce([
       { resource: 'posts', action: 'read' },
       { resource: 'posts', action: 'create' },
-      { resource: 'users', action: 'read' }
+      { resource: 'users', action: 'read' },
     ])
 
     const result = await getPublicPermissions()
 
     expect(result).toEqual({
       posts: ['read', 'create'],
-      users: ['read']
+      users: ['read'],
     })
   })
 
@@ -57,10 +57,10 @@ describe('Public Permissions', () => {
     vi.mocked(db.all).mockResolvedValue([])
 
     await getPublicPermissions()
-    
+
     // Advance time by 61 seconds
     vi.advanceTimersByTime(61 * 1000)
-    
+
     await getPublicPermissions()
     expect(db.select).toHaveBeenCalledTimes(4) // Re-queried
   })

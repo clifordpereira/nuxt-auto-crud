@@ -3,13 +3,13 @@ import { describe, it, expect } from 'vitest'
 import { hasPermission, hasOwnershipPermission, isOwner, type AuthUser } from '../../shared/utils/auth-logic'
 
 describe('NAC Auth Logic', () => {
-  const mockUser: AuthUser = { 
-    id: 123, 
+  const mockUser: AuthUser = {
+    id: 123,
     role: 'user',
-    permissions: { 
+    permissions: {
       posts: ['read', 'update_own'],
-      tasks: ['delete_own']
-    } 
+      tasks: ['delete_own'],
+    },
   }
 
   describe('Permission Discovery', () => {

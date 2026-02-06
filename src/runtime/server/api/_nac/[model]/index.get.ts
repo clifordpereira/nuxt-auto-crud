@@ -1,5 +1,5 @@
 // server/api/_nac/[model]/index.get.ts
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { eventHandler, getRouterParams } from 'h3'
 import { getTableForModel, formatResourceResult } from '../../../utils/modelMapper'
 // @ts-expect-error - hub:db is a virtual alias

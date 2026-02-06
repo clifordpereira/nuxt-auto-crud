@@ -14,7 +14,7 @@ interface HealthReport {
 
 export default defineEventHandler((event): HealthReport => {
   const config = useRuntimeConfig(event)
-  
+
   const isAuthReady = !!(config.oauth.github.clientId && config.oauth.google.clientId)
   const isEmailReady = !!(config.emailFrom && config.resendApiKey)
 
@@ -24,7 +24,7 @@ export default defineEventHandler((event): HealthReport => {
     ready: {
       auth: isAuthReady,
       email: isEmailReady,
-      storage: true // Add Drizzle ping here later
-    }
+      storage: true, // Add Drizzle ping here later
+    },
   }
 })

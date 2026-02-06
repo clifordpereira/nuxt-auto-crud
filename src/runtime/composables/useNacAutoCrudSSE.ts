@@ -1,10 +1,10 @@
-import { onMounted, onBeforeUnmount, useRuntimeConfig } from "#imports";
+import { onMounted, onBeforeUnmount, useRuntimeConfig } from '#imports'
 
 export interface AutoCrudEvent {
-  table: string;
-  action: "create" | "update" | "delete";
-  data: Record<string, unknown>;
-  primaryKey: string | number;
+  table: string
+  action: 'create' | 'update' | 'delete'
+  data: Record<string, unknown>
+  primaryKey: string | number
 }
 
 export function useNacAutoCrudSSE(onEvent: (e: AutoCrudEvent) => void) {
@@ -28,7 +28,8 @@ export function useNacAutoCrudSSE(onEvent: (e: AutoCrudEvent) => void) {
       try {
         const payload = JSON.parse(e.data)
         onEvent(payload)
-      } catch (err) {
+      }
+      catch (err) {
         console.error('[NAC] SSE Parse Error:', err)
       }
     })

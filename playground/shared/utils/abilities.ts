@@ -20,7 +20,6 @@ export const deleteRecord = defineAbility((user: User, model: string) => {
   return hasPermission(user, model, 'delete') || hasPermission(user, model, 'delete_own')
 })
 
-
 export const updateOwnRecord = defineAbility((user: User, model: any) => {
   // If user has full update permission, they can update anything
   if (hasPermission(user, model?.resourceName || model?.collection, 'update')) return true
@@ -29,7 +28,7 @@ export const updateOwnRecord = defineAbility((user: User, model: any) => {
   if (hasPermission(user, model?.resourceName || model?.collection, 'update_own')) {
     return user.id === model.authorId || user.id === model.userId || user.id === model.createdBy
   }
-  
+
   return false
 })
 
@@ -44,7 +43,6 @@ export const deleteOwnRecord = defineAbility((user: User, model: any) => {
 
   return false
 })
-
 
 function hasPermission(user: any, model: string, action: string) {
   if (user?.role === 'admin') return true

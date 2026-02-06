@@ -13,7 +13,7 @@ const { endpointPrefix } = useRuntimeConfig().public.autoCrud
 const { data: users } = useFetch<unknown[]>(`${endpointPrefix}/users`, {
   headers: crudHeaders(),
   lazy: true,
-  immediate: allow('listRecords', 'users')
+  immediate: allow('listRecords', 'users'),
 })
 
 const userCount = computed(() => users.value?.length || 0)

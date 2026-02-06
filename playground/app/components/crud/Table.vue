@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
-import { useNacAutoCrudSSE } from '#imports';
+import { useNacAutoCrudSSE } from '#imports'
 import { useChangeCase } from '@vueuse/integrations/useChangeCase'
 
 const props = defineProps<{
@@ -36,9 +36,9 @@ const crudConfig = appConfig.crud
 const visibleColumns = computed(() => {
   if (!data.value?.length) return []
   const hideList = crudConfig?.globalHide || ['updatedAt', 'deletedAt', 'createdBy', 'updatedBy']
-  
-  return Object.keys(data.value[0]).filter(key => 
-    !hideList.includes(String(key))
+
+  return Object.keys(data.value[0]).filter(key =>
+    !hideList.includes(String(key)),
   )
 })
 

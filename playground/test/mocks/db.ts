@@ -25,10 +25,10 @@ export const schema = {
   roles: { id: 'roles.id', name: 'roles.name' },
   resources: { id: 'resources.id', name: 'resources.name' },
   permissions: { id: 'permissions.id', code: 'permissions.code' },
-  roleResourcePermissions: { 
-    roleId: 'rrp.roleId', 
-    resourceId: 'rrp.resourceId', 
-    permissionId: 'rrp.permissionId' 
+  roleResourcePermissions: {
+    roleId: 'rrp.roleId',
+    resourceId: 'rrp.resourceId',
+    permissionId: 'rrp.permissionId',
   },
-  users: { id: 'users.id', email: 'users.email' }
+  users: { id: 'users.id', email: 'users.email' },
 }

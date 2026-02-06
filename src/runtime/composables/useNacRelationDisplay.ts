@@ -16,7 +16,7 @@ export const useNacRelationDisplay = (
     const { endpointPrefix } = useRuntimeConfig().public.autoCrud
     // Reset display values to prevent stale data
     displayValues.value = {}
-    
+
     // 1. Fetch relations metadata
     const { data: relations } = await useFetch<Record<string, Record<string, string>>>(`${endpointPrefix}/_relations`)
     if (relations.value) {
@@ -33,7 +33,7 @@ export const useNacRelationDisplay = (
     await Promise.all(
       relationFields.map(async (fieldName) => {
         const targetTable = resourceRelations[fieldName]
-        
+
         try {
           const relatedData = await $fetch<Record<string, unknown>[]>(`${endpointPrefix}/${targetTable}`, { headers })
 

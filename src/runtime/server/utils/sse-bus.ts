@@ -4,8 +4,8 @@ import { kv } from '@nuxthub/kv'
 
 // Use global state to persist clients across HMR/module reloads
 const globalState = globalThis as unknown as {
-  _nac_sse_clients: Map<string, { id: string, res: WritableStreamDefaultWriter }>;
-  _nac_instance_id: string;
+  _nac_sse_clients: Map<string, { id: string, res: WritableStreamDefaultWriter }>
+  _nac_instance_id: string
 }
 
 globalState._nac_sse_clients = globalState._nac_sse_clients || new Map()
@@ -24,7 +24,7 @@ async function localBroadcast(payload: unknown) {
     deliveries.push(
       client.res.write(encoded).catch(() => {
         clients.delete(id)
-      })
+      }),
     )
   }
   await Promise.all(deliveries)

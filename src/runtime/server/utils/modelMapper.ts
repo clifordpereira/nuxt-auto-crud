@@ -1,71 +1,73 @@
 // runtime/server/utils/modelMapper.ts
 // @ts-expect-error - #site/schema is an alias defined by the module
-import * as schema from "#site/schema";
-import pluralize from "pluralize";
-import { pascalCase } from "scule";
+import * as schema from '#site/schema'
+import pluralize from 'pluralize'
+import { pascalCase } from 'scule'
 import {
   getTableColumns as getDrizzleTableColumns,
   getTableName,
-} from "drizzle-orm";
-import { getTableConfig, type SQLiteTable } from "drizzle-orm/sqlite-core";
-import { createError } from "h3";
-import { useRuntimeConfig } from "#imports";
-import { createInsertSchema } from "drizzle-zod";
-import { z } from "zod";
+} from 'drizzle-orm'
+import { getTableConfig, type SQLiteTable } from 'drizzle-orm/sqlite-core'
+import { createError } from 'h3'
+import { useRuntimeConfig } from '#imports'
+import { createInsertSchema } from 'drizzle-zod'
+import { z } from 'zod'
 
-export const customUpdatableFields: Record<string, string[]> = {};
-export const customHiddenFields: Record<string, string[]> = {};
+export const customUpdatableFields: Record<string, string[]> = {}
+export const customHiddenFields: Record<string, string[]> = {}
 
 /**
  * Builds a map of all exported Drizzle tables from the schema.
  */
 function buildModelTableMap(): Record<string, unknown> {
-  const tableMap: Record<string, unknown> = {};
+  const tableMap: Record<string, unknown> = {}
 
   for (const [key, value] of Object.entries(schema)) {
-    if (value && typeof value === "object") {
+    if (value && typeof value === 'object') {
       try {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const tableName = getTableName(value as any);
+        const tableName = getTableName(value as any)
         if (tableName) {
-          tableMap[key] = value;
+          tableMap[key] = value
         }
-      } catch {
+      }
+      catch {
         // Not a table
       }
     }
   }
 
-  return tableMap;
+  return tableMap
 }
 
-export const modelTableMap = buildModelTableMap();
+export const modelTableMap = buildModelTableMap()
 
 /**
  * @throws 404 if modelName is not found in tableMap.
  */
 export function getTableForModel(modelName: string): SQLiteTable {
-  const table = modelTableMap[modelName];
+  const table = modelTableMap[modelName]
 
   if (!table) {
-    const availableModels = Object.keys(modelTableMap).join(", ");
+    const availableModels = Object.keys(modelTableMap).join(', ')
     throw createError({
       statusCode: 404,
       message: `Model '${modelName}' not found. Available models: ${availableModels}`,
-    });
+    })
   }
 
-  return table as SQLiteTable;
+  return table as SQLiteTable
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getTableColumns(table: any): string[] {
   try {
-    const columns = getDrizzleTableColumns(table);
-    return Object.keys(columns);
-  } catch (e) {
-    console.error("[getTableColumns] Error getting columns:", e);
-    return [];
+    const columns = getDrizzleTableColumns(table)
+    return Object.keys(columns)
+  }
+  catch (e) {
+    console.error('[getTableColumns] Error getting columns:', e)
+    return []
   }
 }
 
@@ -74,7 +76,7 @@ export function getTableColumns(table: any): string[] {
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getTargetTableName(fk: any): string {
-  return fk.reference().foreignTable[Symbol.for("drizzle:Name")];
+  return fk.reference().foreignTable[Symbol.for('drizzle:Name')]
 }
 
 /**
@@ -86,45 +88,45 @@ export function getForeignKeyPropertyName(
   fk: any,
   columns: Record<string, any>,
 ): string | undefined {
-  const sourceColName = fk.reference().columns[0].name;
+  const sourceColName = fk.reference().columns[0].name
   return Object.entries(columns).find(
     ([_, c]: [string, any]) => c.name === sourceColName,
-  )?.[0];
+  )?.[0]
 }
 
 export function getUpdatableFields(modelName: string): string[] {
   if (customUpdatableFields[modelName]) {
-    return customUpdatableFields[modelName];
+    return customUpdatableFields[modelName]
   }
 
-  const table = modelTableMap[modelName];
-  if (!table) return [];
+  const table = modelTableMap[modelName]
+  if (!table) return []
 
-  const allColumns = getTableColumns(table);
+  const allColumns = getTableColumns(table)
   return allColumns.filter(
-    (col) => !getProtectedFields().includes(col) && !getHiddenFields(modelName).includes(col),
-  );
+    col => !getProtectedFields().includes(col) && !getHiddenFields(modelName).includes(col),
+  )
 }
 
 /**
  * Detects if a column represents a date or timestamp.
  */
 export function isDateColumn(column: any, key: string): boolean {
-  const col = column as any;
-  const name = col.name || key;
-  const isDateName =
-    name.endsWith("_at") ||
-    name.endsWith("At") ||
-    name.endsWith("Login") ||
-    name.endsWith("Date") ||
-    name.endsWith("_date");
+  const col = column as any
+  const name = col.name || key
+  const isDateName
+    = name.endsWith('_at')
+      || name.endsWith('At')
+      || name.endsWith('Login')
+      || name.endsWith('Date')
+      || name.endsWith('_date')
 
   return (
-    col.dataType === "date" ||
-    col.mode === "timestamp" ||
-    col.columnType?.toLowerCase().includes("timestamp") ||
-    ((col.dataType === "string" || col.dataType === "number" || col.columnType?.includes("Integer")) && isDateName)
-  );
+    col.dataType === 'date'
+    || col.mode === 'timestamp'
+    || col.columnType?.toLowerCase().includes('timestamp')
+    || ((col.dataType === 'string' || col.dataType === 'number' || col.columnType?.includes('Integer')) && isDateName)
+  )
 }
 
 /**
@@ -134,62 +136,62 @@ export function filterUpdatableFields(
   modelName: string,
   data: Record<string, unknown>,
 ): Record<string, unknown> {
-  const allowedFields = getUpdatableFields(modelName);
-  const filtered: Record<string, unknown> = {};
-  const table = modelTableMap[modelName];
+  const allowedFields = getUpdatableFields(modelName)
+  const filtered: Record<string, unknown> = {}
+  const table = modelTableMap[modelName]
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const columns = table ? getDrizzleTableColumns(table as any) : {};
+  const columns = table ? getDrizzleTableColumns(table as any) : {}
 
   for (const field of allowedFields) {
     if (data[field] !== undefined) {
-      let value = data[field];
-      const column = columns[field];
+      let value = data[field]
+      const column = columns[field]
 
-      if (column && isDateColumn(column, field) && typeof value === "string") {
-        value = new Date(value);
+      if (column && isDateColumn(column, field) && typeof value === 'string') {
+        value = new Date(value)
       }
 
-      filtered[field] = value;
+      filtered[field] = value
     }
   }
 
-  return filtered;
+  return filtered
 }
 
 export function getModelSingularName(modelName: string): string {
-  const singular = pluralize.singular(modelName);
-  return pascalCase(singular);
+  const singular = pluralize.singular(modelName)
+  return pascalCase(singular)
 }
 
 export function getModelPluralName(modelName: string): string {
-  return pluralize.plural(modelName).toLowerCase();
+  return pluralize.plural(modelName).toLowerCase()
 }
 
 export function getAvailableModels(): string[] {
-  return Object.keys(modelTableMap);
+  return Object.keys(modelTableMap)
 }
 
 export function getHiddenFields(modelName: string): string[] {
-  const { autoCrud } = useRuntimeConfig().public;
-  const globalHidden = autoCrud.hiddenFields || [];
-  const custom = customHiddenFields[modelName] || [];
-  
-  return [...globalHidden, ...custom];
+  const { autoCrud } = useRuntimeConfig().public
+  const globalHidden = autoCrud.hiddenFields || []
+  const custom = customHiddenFields[modelName] || []
+
+  return [...globalHidden, ...custom]
 }
 
 export function getProtectedFields(): string[] {
-  const { autoCrud } = useRuntimeConfig().public;
-  return autoCrud.protectedFields || [];
+  const { autoCrud } = useRuntimeConfig().public
+  return autoCrud.protectedFields || []
 }
 
 export function getSystemUserFields(): string[] {
-  const { autoCrud } = useRuntimeConfig().public;
-  return autoCrud.systemUserFields || [];
+  const { autoCrud } = useRuntimeConfig().public
+  return autoCrud.systemUserFields || []
 }
 
 export function getPublicColumns(modelName: string): string[] | undefined {
-  const { resources } = useRuntimeConfig().public.autoCrud;
-  return resources?.[modelName];
+  const { resources } = useRuntimeConfig().public.autoCrud
+  return resources?.[modelName]
 }
 
 /**
@@ -199,20 +201,20 @@ export function getPublicColumns(modelName: string): string[] | undefined {
  */
 export function sanitizeResource(
   modelName: string,
-  data: Record<string, unknown>
+  data: Record<string, unknown>,
 ): Record<string, unknown> {
-  const hidden = getHiddenFields(modelName);
-  const filtered: Record<string, unknown> = {};
+  const hidden = getHiddenFields(modelName)
+  const filtered: Record<string, unknown> = {}
 
   for (const [key, value] of Object.entries(data)) {
     // Drop fields in global HIDDEN_FIELDS or system-level exclusions
     if (hidden.includes(key) || key === 'deletedAt') {
-      continue;
+      continue
     }
-    filtered[key] = value;
+    filtered[key] = value
   }
 
-  return filtered;
+  return filtered
 }
 
 /**
@@ -221,88 +223,88 @@ export function sanitizeResource(
 
 export function getZodSchema(
   modelName: string,
-  type: "insert" | "patch" = "insert",
+  type: 'insert' | 'patch' = 'insert',
 ): z.ZodObject<any, any> {
-  const table = getTableForModel(modelName);
-  const columns = getDrizzleTableColumns(table);
-  
+  const table = getTableForModel(modelName)
+  const columns = getDrizzleTableColumns(table)
+
   // Custom schema overrides for date coercion
-  const customSchema: Record<string, z.ZodTypeAny> = {};
-  
+  const customSchema: Record<string, z.ZodTypeAny> = {}
+
   for (const [key, column] of Object.entries(columns)) {
     if (isDateColumn(column, key)) {
-      customSchema[key] = z.coerce.date();
+      customSchema[key] = z.coerce.date()
       if (!(column as any).notNull) {
-        customSchema[key] = customSchema[key].nullable().optional();
+        customSchema[key] = customSchema[key].nullable().optional()
       }
     }
   }
 
-  const schema = createInsertSchema(table, customSchema);
+  const schema = createInsertSchema(table, customSchema)
 
-  if (type === "patch") {
+  if (type === 'patch') {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return schema.partial() as z.ZodObject<any, any>;
+    return schema.partial() as z.ZodObject<any, any>
   }
 
-  const OMIT_ON_CREATE = [...getProtectedFields(), ...getHiddenFields(modelName)];
-  const fieldsToOmit: Record<string, true> = {};
+  const OMIT_ON_CREATE = [...getProtectedFields(), ...getHiddenFields(modelName)]
+  const fieldsToOmit: Record<string, true> = {}
 
   OMIT_ON_CREATE.forEach((field) => {
     if (columns[field]) {
-      fieldsToOmit[field] = true;
+      fieldsToOmit[field] = true
     }
-  });
+  })
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (schema as any).omit(fieldsToOmit);
+  return (schema as any).omit(fieldsToOmit)
 }
 
 export function formatResourceResult(
   model: string,
-  data: Record<string, unknown> | Record<string, unknown>[] | null | undefined
+  data: Record<string, unknown> | Record<string, unknown>[] | null | undefined,
 ): Record<string, unknown> | Record<string, unknown>[] | null | undefined {
-  if (!data) return data;
+  if (!data) return data
 
-  const sanitize = (item: Record<string, unknown>) => sanitizeResource(model, item);
+  const sanitize = (item: Record<string, unknown>) => sanitizeResource(model, item)
 
-  return Array.isArray(data) ? data.map(sanitize) : sanitize(data);
+  return Array.isArray(data) ? data.map(sanitize) : sanitize(data)
 }
 
 export function getRelations(): Record<string, Record<string, string>> {
-  const relations: Record<string, Record<string, string>> = {};
-  const models = getAvailableModels();
+  const relations: Record<string, Record<string, string>> = {}
+  const models = getAvailableModels()
 
   for (const model of models) {
-    const table = getTableForModel(model);
-    const config = getTableConfig(table);
-    const modelRelations: Record<string, string> = {};
+    const table = getTableForModel(model)
+    const config = getTableConfig(table)
+    const modelRelations: Record<string, string> = {}
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const columns = getDrizzleTableColumns(table as any);
+    const columns = getDrizzleTableColumns(table as any)
 
-    const foreignKeys = config.foreignKeys || [];
+    const foreignKeys = config.foreignKeys || []
 
     for (const fk of foreignKeys) {
-      const targetTable = fk.reference().foreignTable;
-      const targetTableName = getTableName(targetTable);
-      
+      const targetTable = fk.reference().foreignTable
+      const targetTableName = getTableName(targetTable)
+
       // Get source column name (DB name)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const sourceColDbName = fk.reference().columns[0]?.name;
+
+      const sourceColDbName = fk.reference().columns[0]?.name
 
       // Find property key for this column
       const propertyKey = Object.entries(columns).find(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ([_, col]) => (col as any).name === sourceColDbName
-      )?.[0];
+        ([_, col]) => (col as any).name === sourceColDbName,
+      )?.[0]
 
       if (propertyKey) {
-        modelRelations[propertyKey] = targetTableName;
+        modelRelations[propertyKey] = targetTableName
       }
     }
 
-    relations[model] = modelRelations;
+    relations[model] = modelRelations
   }
 
-  return relations;
+  return relations
 }

@@ -17,7 +17,7 @@ export async function fetchUserWithPermissions(userId: number) {
 
   const user = result.user
   const role = result.role || 'user'
-  
+
   const permissions = await fetchPermissionsForRole(user.roleId)
 
   return {
@@ -54,7 +54,7 @@ export async function fetchPermissionsForRole(roleId: number | null) {
 
 export async function refreshUserSession(event: H3Event, userId: number) {
   const userData = await fetchUserWithPermissions(userId)
-  
+
   if (!userData) {
     await clearUserSession(event)
     throw createError({ statusCode: 401, message: 'User not found' })
@@ -73,4 +73,3 @@ export async function refreshUserSession(event: H3Event, userId: number) {
 
   return userData
 }
-

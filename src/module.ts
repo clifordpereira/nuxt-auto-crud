@@ -26,7 +26,7 @@ export default defineNuxtModule<ModuleOptions>({
       authentication: false,
       authorization: false,
     },
-    resources: {}
+    resources: {},
   },
 
   async setup(options, nuxt) {
@@ -53,7 +53,7 @@ export default defineNuxtModule<ModuleOptions>({
     // 5. Register the Security Guard (Intercepter)
     addServerHandler({
       middleware: true,
-      handler: resolver.resolve('./runtime/server/middleware/nac-guard.ts')
+      handler: resolver.resolve('./runtime/server/middleware/nac-guard.ts'),
     })
 
     // 6. Register Specific System Endpoints (Targets)
@@ -70,8 +70,8 @@ export default defineNuxtModule<ModuleOptions>({
       { path: '/:model', method: 'post', handler: '[model]/index.post.ts' },
       { path: '/:model/:id', method: 'get', handler: '[model]/[id].get.ts' },
       { path: '/:model/:id', method: 'patch', handler: '[model]/[id].patch.ts' },
-      { path: '/:model/:id', method: 'delete', handler: '[model]/[id].delete.ts' }
-    ] as const;
+      { path: '/:model/:id', method: 'delete', handler: '[model]/[id].delete.ts' },
+    ] as const
 
     for (const route of routes) {
       addServerHandler({

@@ -1,16 +1,15 @@
 import { eventHandler, getQuery, getHeader } from 'h3'
-import { getTableForModel, getAvailableModels } from '../../utils/modelMapper'
+import { getTableForModel, getAvailableModels, getProtectedFields, getHiddenFields } from '../../utils/modelMapper'
 import { getTableColumns as getDrizzleTableColumns } from 'drizzle-orm'
 import { getTableConfig } from 'drizzle-orm/sqlite-core'
-import { getProtectedFields, getHiddenFields } from '../../utils/modelMapper'
 // @ts-expect-error - 'hub:db' is a virtual alias
 import { db } from 'hub:db'
 
-import { useRuntimeConfig } from "#imports";
+import { useRuntimeConfig } from '#imports'
 
 export default eventHandler(async (event) => {
-  const config = useRuntimeConfig();
-  const endpointPrefix = config.public.autoCrud.endpointPrefix;
+  const config = useRuntimeConfig()
+  const endpointPrefix = config.public.autoCrud.endpointPrefix
 
   const query = getQuery(event)
   const acceptHeader = getHeader(event, 'accept') || ''
