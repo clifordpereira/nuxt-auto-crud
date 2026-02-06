@@ -24,6 +24,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     // Private keys (Server-side only)
+    apiSecretToken: '',
     sessionPassword: '',
     adminEmail: 'admin@example.com',
     adminPassword: '$1Password', // Overridden by NUXT_ADMIN_PASSWORD
