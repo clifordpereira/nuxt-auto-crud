@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
  * Helper functions
  */
 function isAgenticPath(pathname: string) { 
-  const agenticPaths = ['/api/_nac/_meta', '/api/_nac/_sse'];  
+  const agenticPaths = ['/api/_nac/_meta'];  
   return agenticPaths.includes(pathname);
 }
 

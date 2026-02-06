@@ -2,10 +2,18 @@
 // @ts-expect-error - virtual import resolved by Nuxt/Nitro
 import { kv } from '@nuxthub/kv'
 
-export const instanceId = crypto.randomUUID()
+// Use global state to persist clients across HMR/module reloads
+const globalState = globalThis as unknown as {
+  _nac_sse_clients: Map<string, { id: string, res: WritableStreamDefaultWriter }>;
+  _nac_instance_id: string;
+}
 
-type SSEClient = { id: string, res: WritableStreamDefaultWriter }
-const clients = new Map<string, SSEClient>()
+globalState._nac_sse_clients = globalState._nac_sse_clients || new Map()
+globalState._nac_instance_id = globalState._nac_instance_id || crypto.randomUUID()
+
+export const instanceId = globalState._nac_instance_id
+const clients = globalState._nac_sse_clients
+
 const encoder = new TextEncoder()
 
 async function localBroadcast(payload: unknown) {
@@ -36,9 +44,14 @@ export async function broadcast(payload: unknown) {
 
   // 2. Global Instance Signal (Cross-Isolate)
   // We include instanceId so other instances (or this one) can filter out echoes
-  await kv.set('nac_signal', {
-    ts: Date.now(),
-    payload,
-    instanceId,
-  }, { ttl: 60 })
+  try {
+    await kv.set('nac_signal', {
+      ts: Date.now(),
+      payload,
+      instanceId,
+    }, { ttl: 60 })
+  }
+  catch (e) {
+    console.error('[nac:sse] KV Signal Broadcast Error:', e)
+  }
 }
