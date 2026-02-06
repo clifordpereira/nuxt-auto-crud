@@ -58,7 +58,7 @@ function isPathToGuard(pathname: string) {
 }
 
 function isAgenticPath(pathname: string) {
-  const agenticPaths = ['/api/_nac/_meta', '/api/_nac/_sse']
+  const agenticPaths = ['/api/_nac/_meta']
   return agenticPaths.includes(pathname)
 }
 
