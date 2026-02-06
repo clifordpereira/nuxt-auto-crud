@@ -1,8 +1,9 @@
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 import { db, schema } from 'hub:db'
-import { hashUserPassword } from '../../utils/hashing'
-import { UserAlreadyExistsError } from '../../utils/errors'
+import { hashUserPassword } from '#server/utils/hashing'
+import { UserAlreadyExistsError } from '#server/utils/errors'
+import { refreshUserSession } from '#server/utils/auth'
 
 const signupSchema = z.object({
   name: z.string().min(2),
@@ -44,39 +45,8 @@ export default eventHandler(async (event) => {
     roleId: roleToAssign?.id,
   }).returning().get()
 
-  // Fetch permissions
-  const permissions: Record<string, string[]> = {}
+  // Use shared logic to set session and get full permissions
+  const fullUser = await refreshUserSession(event, user.id)
 
-  if (user.roleId) {
-    const permissionsData = await db.select({
-      resource: schema.resources.name,
-      action: schema.permissions.code,
-    })
-      .from(schema.roleResourcePermissions)
-      .innerJoin(schema.resources, eq(schema.roleResourcePermissions.resourceId, schema.resources.id))
-      .innerJoin(schema.permissions, eq(schema.roleResourcePermissions.permissionId, schema.permissions.id))
-      .where(eq(schema.roleResourcePermissions.roleId, user.roleId))
-      .all()
-
-    for (const p of permissionsData) {
-      if (!permissions[p.resource]) {
-        permissions[p.resource] = []
-      }
-      permissions[p.resource]!.push(p.action)
-    }
-  }
-
-  // Set session
-  await setUserSession(event, {
-    user: {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      avatar: user.avatar,
-      role: roleToAssign?.name || 'user',
-      permissions,
-    },
-  })
-
-  return { user }
+  return { user: fullUser }
 })

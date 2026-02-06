@@ -8,7 +8,6 @@ const collapsed = ref(false)
 
 // Map menus to add onSelect handler
 const { user } = useUserSession()
-const { hasPermission } = usePermissions()
 
 const mainLinks = computed(() => {
   const links = mainMenu.map((item) => {
@@ -22,10 +21,10 @@ const mainLinks = computed(() => {
     if (link.children) {
       link.children = link.children.filter((child) => {
         if (child.label === 'Testimonials') {
-          return hasPermission('testimonials', 'list')
+          return allow('listRecords', 'testimonials')
         }
         if (child.label === 'Subscribers') {
-          return hasPermission('subscribers', 'list')
+          return allow('listRecords', 'subscribers')
         }
         return true
       })
@@ -36,9 +35,10 @@ const mainLinks = computed(() => {
 
   return links.filter((link) => {
     if (link.label === 'Users') {
-      return hasPermission('users', 'list')
+      return allow('listRecords', 'users')
     }
     if (link.label === 'Roles & Permissions') {
+      // Keep admin check or use a specific capability if one existed
       return (user.value as { role?: string })?.role === 'admin'
     }
     if (link.label === 'Template Models') {

@@ -13,8 +13,10 @@ export function useNacAutoCrudSSE(onEvent: (e: AutoCrudEvent) => void) {
   onMounted(() => {
     if (typeof window === 'undefined' || !('EventSource' in window)) return
 
-    const { endpointPrefix } = useRuntimeConfig().public.autoCrud
-    source = new EventSource(`${endpointPrefix}/_sse`)
+    const config = useRuntimeConfig()
+    const { endpointPrefix } = config.public.autoCrud
+    const { apiSecretToken } = config
+    source = new EventSource(`${endpointPrefix}/_sse?token=${encodeURIComponent(apiSecretToken as string)}`)
 
     // 1. Connection Error Handler
     source.onerror = (err) => {

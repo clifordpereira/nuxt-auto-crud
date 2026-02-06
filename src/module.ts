@@ -50,6 +50,13 @@ export default defineNuxtModule<ModuleOptions>({
       references.push({ path: resolver.resolve('./runtime/types/index.d.ts') })
     })
 
+    // 5. Register the Security Guard (Intercepter)
+    addServerHandler({
+      middleware: true,
+      handler: resolver.resolve('./runtime/server/middleware/nac-guard.ts')
+    })
+
+    // 6. Register Specific System Endpoints (Targets)
     const apiDir = resolver.resolve('./runtime/server/api/_nac')
     const routes = [
       // System Endpoints

@@ -1,61 +1,53 @@
-// playground/shared/utils/abilities.ts
-import { defineAbility } from "nuxt-authorization/utils";
-import {
-  hasPermission,
-  hasOwnershipPermission,
-  type AuthUser,
-} from "./auth-logic";
+import type { User } from '#auth-utils'
 
-// Global state to persist across renders/requests
-let publicPermissionsCache: Record<string, string[]> | null = null;
-let isFetching = false;
-let lastFetchTime = 0;
-const TTL = 60000;
+export const listRecords = defineAbility((user: User, model: string) => {
+  return hasPermission(user, model, 'list') || hasPermission(user, model, 'list_all') || hasPermission(user, model, 'list_own')
+})
 
-export async function abilityLogic(
-  user: unknown,
-  model: string,
-  action: string,
-) {
-  const userRecord = user as AuthUser;
+export const readRecord = defineAbility((user: User, model: string) => {
+  return hasPermission(user, model, 'read') || hasPermission(user, model, 'read_own')
+})
 
-  // 1. Priority Check: Static Roles
-  if (userRecord?.role === "admin") return true;
+export const createRecord = defineAbility((user: User, model: string) => {
+  return hasPermission(user, model, 'create')
+})
 
-  // 2. Permission Check: Explicit or Ownership tokens
-  if (userRecord) {
-    if (
-      hasPermission(userRecord, model, action) ||
-      hasOwnershipPermission(userRecord, model, action)
-    ) {
-      return true;
-    }
+export const updateRecord = defineAbility((user: User, model: string) => {
+  return hasPermission(user, model, 'update') || hasPermission(user, model, 'update_own')
+})
+
+export const deleteRecord = defineAbility((user: User, model: string) => {
+  return hasPermission(user, model, 'delete') || hasPermission(user, model, 'delete_own')
+})
+
+
+export const updateOwnRecord = defineAbility((user: User, model: any) => {
+  // If user has full update permission, they can update anything
+  if (hasPermission(user, model?.resourceName || model?.collection, 'update')) return true
+
+  // If user only has update_own, check ownership
+  if (hasPermission(user, model?.resourceName || model?.collection, 'update_own')) {
+    return user.id === model.authorId || user.id === model.userId || user.id === model.createdBy
+  }
+  
+  return false
+})
+
+export const deleteOwnRecord = defineAbility((user: User, model: any) => {
+  // If user has full delete permission, they can delete anything
+  if (hasPermission(user, model?.resourceName || model?.collection, 'delete')) return true
+
+  // If user only has delete_own, check ownership
+  if (hasPermission(user, model?.resourceName || model?.collection, 'delete_own')) {
+    return user.id === model.authorId || user.id === model.userId || user.id === model.createdBy
   }
 
-  // 3. Public Permissions: Gated Fetch
-  const now = Date.now();
-  const isExpired = now - lastFetchTime > TTL;
+  return false
+})
 
-  if ((!publicPermissionsCache && !isFetching) || (isExpired && !isFetching)) {
-    isFetching = true;
-    try {
-      publicPermissionsCache = await $fetch<Record<string, string[]>>(
-        "/api/public-permissions",
-      );
-      lastFetchTime = now;
-    } catch (e) {
-      console.error("NAC_AUTH_ERROR: Public permissions fetch failed", e);
-      publicPermissionsCache = publicPermissionsCache || {};
-    } finally {
-      isFetching = false;
-    }
-  }
 
-  const resourcePublicPermissions = publicPermissionsCache?.[model];
-  return (
-    Array.isArray(resourcePublicPermissions) &&
-    resourcePublicPermissions.includes(action)
-  );
+function hasPermission(user: any, model: string, action: string) {
+  if (user?.role === 'admin') return true
+  if (!user?.permissions || !user.permissions[model]) return false
+  return user.permissions[model].includes(action)
 }
-
-export const canAccess = defineAbility(abilityLogic);

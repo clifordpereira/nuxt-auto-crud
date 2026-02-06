@@ -1,6 +1,7 @@
 import { eq } from 'drizzle-orm'
 import { db, schema } from 'hub:db'
 import type { H3Event } from 'h3'
+import { refreshUserSession } from '#server/utils/auth'
 
 interface OAuthUser {
   email?: string | null
@@ -56,40 +57,8 @@ export async function handleOAuthSuccess(event: H3Event, oauthUser: OAuthUser) {
     return sendRedirect(event, '/login?auth_error=user_creation_failed')
   }
 
-  // Fetch permissions
-  const permissions: Record<string, string[]> = {}
-  if (user.roleId) {
-    const permissionsData = await db.select({
-      resource: schema.resources.name,
-      action: schema.permissions.code,
-    })
-      .from(schema.roleResourcePermissions)
-      .innerJoin(schema.resources, eq(schema.roleResourcePermissions.resourceId, schema.resources.id))
-      .innerJoin(schema.permissions, eq(schema.roleResourcePermissions.permissionId, schema.permissions.id))
-      .where(eq(schema.roleResourcePermissions.roleId, user.roleId))
-      .all()
-
-    for (const p of permissionsData) {
-      if (!permissions[p.resource]) {
-        permissions[p.resource] = []
-      }
-      permissions[p.resource]!.push(p.action)
-    }
-  }
-
-  const roleData = user.roleId ? (await db.select({ name: schema.roles.name }).from(schema.roles).where(eq(schema.roles.id, user.roleId)).get()) : null
-  const roleName = roleData?.name || 'user'
-
-  await setUserSession(event, {
-    user: {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      avatar: user.avatar,
-      role: roleName,
-      permissions,
-    },
-  })
+  // Use shared logic to set session and get full permissions
+  await refreshUserSession(event, user.id)
 
   return sendRedirect(event, '/admin/dashboard')
 }

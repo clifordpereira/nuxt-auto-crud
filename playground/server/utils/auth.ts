@@ -1,146 +1,77 @@
-// server/utils/auth.ts
-import { type H3Event, createError, getHeader, getQuery, readBody } from "h3";
-import { canAccess } from "../../shared/utils/abilities";
-import { hasOwnershipPermission, isOwner, OWNERSHIP_ACTIONS } from "../../shared/utils/auth-logic";
+import { users } from '#server/db/schema/users'
+import { eq } from 'drizzle-orm'
+import { db, schema } from 'hub:db'
+import type { H3Event } from 'h3'
+import { createError } from 'h3'
 
-/**
- * Resolves authentication context (User session or Agentic/MCP token)
- */
-async function resolveAuthContext(event: H3Event) {
-  const runtimeConfig = useRuntimeConfig(event);
+export async function fetchUserWithPermissions(userId: number) {
+  const result = await db.select({
+    user: schema.users,
+    role: schema.roles.name,
+  })
+    .from(schema.users)
+    .leftJoin(schema.roles, eq(schema.users.roleId, schema.roles.id))
+    .where(eq(schema.users.id, userId))
+    .get()
 
-  // 0. Authentication disabled
-  const authenticationNeeded = useAutoCrudConfig().auth?.authentication;
-  if (!authenticationNeeded) {
-    return { user: null, isAgent: false, token: null };
-  }
+  if (!result || !result.user) return null
 
-  // 1. Token Check (Agentic/MCP)
-  const authHeader = getHeader(event, 'authorization');
-  const query = getQuery(event);
-  const token = authHeader?.replace(/^Bearer\s+/i, '') || query.token as string;
-  const apiToken = runtimeConfig.apiSecretToken;
-  if (apiToken && token === apiToken) {
-    return { user: null, isAgent: true, token };
-  }
-
-  // 2. Session Resolve
-  await requireUserSession(event)
-  try {
-    const session = await getUserSession(event).catch(() => null);
-    return { user: session?.user || null, isAgent: false, token: null };
-  } catch {
-    return { user: null, isAgent: false, token: null };
-  }
-}
-
-/**
- * Checks if the user owns the record based on schema conventions
- */
-/**
- * Checks if the user owns the record based on schema conventions
- */
-async function checkOwnership(user: any, model: string, action: string, context: any) {
-  if (!user || !OWNERSHIP_ACTIONS.includes(action as any) || !context?.id) return false;
-  if (!hasOwnershipPermission(user, model, action)) return false;
-
-  // 1. Context-based check (fast)
-  if (isOwner(user, model, context)) return true;
-
-  // 2. DB Fallback (optimized)
-  try {
-    const { eq, getTableColumns } = await import("drizzle-orm");
-    const { db } = await import("hub:db");
-    const table = getTableForModel(model);
-
-    if (!table) return false;
-
-    const tableColumns = getTableColumns(table as any);
-    const keys = Object.keys(tableColumns);
-    
-    // Ownership convention lookup
-    const ownershipColumn = ["ownerId", "createdBy", "userId"].find(k => keys.includes(k));
-    if (!ownershipColumn) return false;
-
-    const pkEntry = Object.entries(tableColumns).find(([_, c]) => (c as any).primary);
-    if (!pkEntry) return false;
-    const [_, pkColumn] = pkEntry;
-
-    // Type-safe ID casting
-    const isInt = (pkColumn as any).columnType?.includes('integer');
-    const id = isInt && !isNaN(Number(context.id)) ? Number(context.id) : context.id;
-
-    const record = await db
-      .select({ owner: tableColumns[ownershipColumn] })
-      .from(table as any)
-      .where(eq(pkColumn as any, id))
-      .get() as { owner: any } | undefined;
-
-    if (record && String(record.owner) === String(user.id)) {
-      if (["update", "create"].includes(action)) {
-        const hidden = getHiddenFields(model);
-        const hasHidden = Object.keys(context).some((f) => keys.includes(f) && hidden.includes(f));
-        if (hasHidden) throw createError({ statusCode: 403, message: "Forbidden: Hidden fields" });
-      }
-      return true;
-    }
-  } catch (e: any) {
-    if (e.statusCode === 403) throw e;
-    return false;
-  }
+  const user = result.user
+  const role = result.role || 'user'
   
-  return false;
+  const permissions = await fetchPermissionsForRole(user.roleId)
+
+  return {
+    ...user,
+    role,
+    permissions,
+  }
 }
 
-/**
- * Consolidated guard for NAC routes - used in server middleware
- */
-// server/utils/auth.ts
-export async function guardEventAccess(event: H3Event) {
-  const { user, isAgent } = await resolveAuthContext(event);
-  if (isAgent) return;
+export async function fetchPermissionsForRole(roleId: number | null) {
+  const permissions: Record<string, string[]> = {}
 
-  const { auth, endpointPrefix = "/api/_nac" } = useAutoCrudConfig();
-  const path = event.path ?? '';
+  if (!roleId) return permissions
 
-  if (auth?.authentication === false || !path.startsWith(endpointPrefix)) return;
+  const permissionsData = await db.select({
+    resource: schema.resources.name,
+    action: schema.permissions.code,
+  })
+    .from(schema.roleResourcePermissions)
+    .innerJoin(schema.resources, eq(schema.roleResourcePermissions.resourceId, schema.resources.id))
+    .innerJoin(schema.permissions, eq(schema.roleResourcePermissions.permissionId, schema.permissions.id))
+    .where(eq(schema.roleResourcePermissions.roleId, roleId))
+    .all()
 
-  const relativePath = path.slice(endpointPrefix.length).replace(/^\//, '');
-  const segments = relativePath.split('/');
-  const model = segments[0];
-  const id = segments[1];
-
-  // Allow system routes (starting with _) to pass through without session check
-  if (!model || model.startsWith('_')) return;
-
-  // Assert user existence for subsequent logic
-  if (!user) {
-    throw createError({ 
-      statusCode: 401, 
-      statusMessage: "Unauthorized: Session required" 
-    });
-  }
-
-  const actionMap: Record<string, string> = {
-    GET: "read", POST: "create", PATCH: "update", PUT: "update", DELETE: "delete",
-  };
-  const action = actionMap[event.method] || "read";
-
-  const allowed = await allows(event, canAccess, model, action);
-  if (!allowed) throw createError({ statusCode: 403 });
-
-  // Use non-null assertion 'user!' since we've passed requireUserSession
-  const permissions = user.permissions?.[model] || [];
-  const hasGlobal = permissions.includes(action);
-  const hasOwn = permissions.includes(`${action}_own`);
-
-  if (user.role !== 'admin' && !hasGlobal && hasOwn) {
-    const body = ["POST", "PATCH", "PUT"].includes(event.method) 
-      ? await readBody(event).catch(() => ({})) 
-      : {};
-    
-    if (!(await checkOwnership(user, model, action, { id, ...body }))) {
-      throw createError({ statusCode: 403, message: "Ownership required" });
+  for (const p of permissionsData) {
+    if (!permissions[p.resource]) {
+      permissions[p.resource] = []
     }
+    permissions[p.resource]!.push(p.action)
   }
+
+  return permissions
 }
+
+export async function refreshUserSession(event: H3Event, userId: number) {
+  const userData = await fetchUserWithPermissions(userId)
+  
+  if (!userData) {
+    await clearUserSession(event)
+    throw createError({ statusCode: 401, message: 'User not found' })
+  }
+
+  await setUserSession(event, {
+    user: {
+      id: userData.id,
+      email: userData.email,
+      name: userData.name,
+      avatar: userData.avatar,
+      role: userData.role,
+      permissions: userData.permissions,
+    },
+  })
+
+  return userData
+}
+
