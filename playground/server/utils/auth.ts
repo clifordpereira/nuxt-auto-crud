@@ -1,4 +1,3 @@
-import { users } from '#server/db/schema/users'
 import { eq } from 'drizzle-orm'
 import { db, schema } from 'hub:db'
 import type { H3Event } from 'h3'

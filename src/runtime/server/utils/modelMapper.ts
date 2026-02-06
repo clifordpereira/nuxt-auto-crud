@@ -269,26 +269,36 @@ export function formatResourceResult(
   return Array.isArray(data) ? data.map(sanitize) : sanitize(data);
 }
 
-export function getRelations(): Record<string, Record<string, unknown>[]> {
-  const relations: Record<string, Record<string, unknown>[]> = {};
+export function getRelations(): Record<string, Record<string, string>> {
+  const relations: Record<string, Record<string, string>> = {};
   const models = getAvailableModels();
 
   for (const model of models) {
     const table = getTableForModel(model);
     const config = getTableConfig(table);
-    const modelRelations: Record<string, unknown>[] = [];
+    const modelRelations: Record<string, string> = {};
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const columns = getDrizzleTableColumns(table as any);
 
     const foreignKeys = config.foreignKeys || [];
 
     for (const fk of foreignKeys) {
       const targetTable = fk.reference().foreignTable;
       const targetTableName = getTableName(targetTable);
+      
+      // Get source column name (DB name)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const sourceColDbName = fk.reference().columns[0]?.name;
 
-      modelRelations.push({
-        name: targetTableName,
-        type: "one",
-        target: targetTableName,
-      });
+      // Find property key for this column
+      const propertyKey = Object.entries(columns).find(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ([_, col]) => (col as any).name === sourceColDbName
+      )?.[0];
+
+      if (propertyKey) {
+        modelRelations[propertyKey] = targetTableName;
+      }
     }
 
     relations[model] = modelRelations;

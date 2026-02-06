@@ -1,3 +1,4 @@
+// @ts-ignore - provided by nuxt-authorization in consumer app
 import { ref, useFetch, useRequestHeaders, useRuntimeConfig } from '#imports'
 
 export const useNacRelationDisplay = (
@@ -32,7 +33,7 @@ export const useNacRelationDisplay = (
     await Promise.all(
       relationFields.map(async (fieldName) => {
         const targetTable = resourceRelations[fieldName]
-        // We assume the API for targetTable is /api/_nac/[targetTable]
+        
         try {
           const relatedData = await $fetch<Record<string, unknown>[]>(`${endpointPrefix}/${targetTable}`, { headers })
 
@@ -49,7 +50,9 @@ export const useNacRelationDisplay = (
             )
           }
         }
-        catch (error: unknown) {
+        catch (error: any) {
+          // Ignore 403 Forbidden (User not allowed to list this relation)
+          if (error.statusCode === 403) return
           console.error(`Failed to fetch relation data for ${targetTable}:`, error)
         }
       }),

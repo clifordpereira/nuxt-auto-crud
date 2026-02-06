@@ -2,7 +2,6 @@
 <script setup lang="ts">
 import { useNacAutoCrudSSE } from '#imports';
 import { useChangeCase } from '@vueuse/integrations/useChangeCase'
-import { canAccess as resourceAbility } from '~~/shared/utils/abilities'
 
 const props = defineProps<{
   resource: string
@@ -158,15 +157,11 @@ useNacAutoCrudSSE(({ table, action, data: sseData, primaryKey }) => {
             variant="outline"
           />
         </UDropdownMenu>
-        <Can
-          :ability="resourceAbility"
-          :args="[resource, 'create']"
-        >
-          <CrudCreateRow
-            :resource="resource"
-            :schema="schema"
-          />
-        </Can>
+        <CrudCreateRow
+          v-if="allow('createRecord', resource)"
+          :resource="resource"
+          :schema="schema"
+        />
       </div>
     </div>
 
@@ -238,39 +233,27 @@ useNacAutoCrudSSE(({ table, action, data: sseData, primaryKey }) => {
 
                 <template #content>
                   <div class="p-1 flex flex-col gap-1 min-w-[120px]">
-                    <Can
-                      :ability="resourceAbility"
-                      :args="[resource, 'read']"
-                    >
-                      <CrudViewRow
-                        :row="row"
-                        :schema="schema"
-                      />
-                    </Can>
-                    <Can
-                      :ability="resourceAbility"
-                      :args="[resource, 'update', row]"
-                    >
-                      <CrudEditRow
-                        :resource="resource"
-                        :row="row"
-                        :schema="schema"
-                      />
-                    </Can>
-                    <Can
-                      :ability="resourceAbility"
-                      :args="[resource, 'delete', row]"
-                    >
-                      <UButton
-                        label="Delete"
-                        color="error"
-                        variant="ghost"
-                        size="xs"
-                        icon="i-lucide-trash"
-                        class="justify-start"
-                        @click="onDelete(row.id as number)"
-                      />
-                    </Can>
+                    <CrudViewRow
+                      v-if="allow('readRecord', resource)"
+                      :row="row"
+                      :schema="schema"
+                    />
+                    <CrudEditRow
+                      v-if="allow('updateOwnRecord', { ...row, resourceName: resource })"
+                      :resource="resource"
+                      :row="row"
+                      :schema="schema"
+                    />
+                    <UButton
+                      v-if="allow('deleteOwnRecord', { ...row, resourceName: resource })"
+                      label="Delete"
+                      color="error"
+                      variant="ghost"
+                      size="xs"
+                      icon="i-lucide-trash"
+                      class="justify-start"
+                      @click="onDelete(row.id as number)"
+                    />
                   </div>
                 </template>
               </UPopover>
