@@ -2,6 +2,8 @@
 
 **Nuxt Auto CRUD is a headless, zero-codegen CRUD engine that transforms Drizzle ORM schemas into fully functional RESTful APIs for Nuxt 4.** 
 
+> The current version contains a bug where duplicate rows appear when creating a new record. This has been fixed locally. However, due to a major refactor, I am currently implementing automated tests. Version 2.0 will be released within a week.
+
 | Specification | Details |
 | :--- | :--- |
 | **Runtime** | Nuxt 4 (`app/` directory), Nitro |
