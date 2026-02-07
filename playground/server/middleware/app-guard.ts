@@ -4,37 +4,23 @@ export default defineEventHandler(async (event) => {
   const pathname = new URL(event.path, 'http://internal').pathname
   if (isAuthenticationDisabled() || !isPathToGuard(pathname)) return
 
-  const session = await getUserSession(event)
-  const user = session.user
+  const { user } = await requireUserSession(event)
 
-  if (!user) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Unauthorized',
-    })
-  }
+  if (isNacSystemPath(pathname)) return // No need to authorize system paths
+  
+  if (user.role === 'admin') return // Admins can do everything
 
-  const { model, id } = extractModelAndId(pathname)
+  const { model, id } =   extractModelAndIdFromPath(pathname)
 
   const action = resolveAction(event.method, Boolean(id))
-  if (!action) return
+  if (!action) throw createError({ statusCode: 403, statusMessage: 'Forbidden'})
 
-  // Admin bypass
-  if (user.role === 'admin') return
+  if (hasPermission(user, model, action)) return
 
-  // Check permissions
-  if (!hasPermission(user, model, action)) {
-    const ownAction = `${action}_own`
-    if (hasPermission(user, model, ownAction)) {
-      // Allowed to proceed to endpoint for ownership verification
-      return
-    }
+  const ownAction = `${action}_own`
+  if (hasPermission(user, model, ownAction)) return
 
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'Forbidden',
-    })
-  }
+  throw createError({ statusCode: 403, statusMessage: 'Forbidden'})
 })
 
 function isAuthenticationDisabled() {
@@ -43,8 +29,12 @@ function isAuthenticationDisabled() {
 }
 
 function isPathToGuard(pathname: string) {
+  return isNacPath(pathname) && !isAgenticPath(pathname)
+}
+
+function isNacPath(pathname: string) {
   const { endpointPrefix = '/api/_nac' } = useAutoCrudConfig()
-  return pathname.startsWith(endpointPrefix) && !isAgenticPath(pathname)
+  return pathname.startsWith(endpointPrefix)
 }
 
 function isAgenticPath(pathname: string) {
@@ -52,7 +42,12 @@ function isAgenticPath(pathname: string) {
   return agenticPaths.includes(pathname)
 }
 
-function extractModelAndId(pathname: string) {
+function isNacSystemPath(pathname: string) {
+  const { endpointPrefix = '/api/_nac' } = useAutoCrudConfig()
+  return pathname.startsWith(endpointPrefix + '/_')
+}
+
+function extractModelAndIdFromPath(pathname: string) {
   const { endpointPrefix = '/api/_nac' } = useAutoCrudConfig()
   const relativePath = pathname.slice(endpointPrefix.length).replace(/^\//, '')
   const segments = relativePath.split('/')
