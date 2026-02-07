@@ -1,18 +1,17 @@
 // server/utils/schema.ts
 import { getTableColumns } from 'drizzle-orm'
-import { getTableConfig } from 'drizzle-orm/sqlite-core'
 import {
   getZodSchema,
   modelTableMap,
-  getTargetTableName,
-  getForeignKeyPropertyName,
   getHiddenFields,
   getProtectedFields,
   resolveTableRelations,
   isDateColumn,
+  getLabelField,
+  forEachModel,
 } from './modelMapper'
 import type { ZodType } from 'zod'
-import type { Column, Table } from 'drizzle-orm'
+import type { Column } from 'drizzle-orm'
 import type { SQLiteTable } from 'drizzle-orm/sqlite-core'
 
 export interface Field {
@@ -35,6 +34,7 @@ export function drizzleTableToFields(table: SQLiteTable, resourceName: string): 
   const fields: Field[] = []
 
   const zodSchema = getZodSchema(resourceName, 'insert')
+  const relations = resolveTableRelations(table, true) // Get all relations including system ones
 
   for (const [key, col] of Object.entries(columns)) {
     if (getHiddenFields(resourceName).includes(key)) continue
@@ -50,25 +50,12 @@ export function drizzleTableToFields(table: SQLiteTable, resourceName: string): 
       required: column.notNull,
       selectOptions,
       isReadOnly: getProtectedFields().includes(key),
+      references: relations[key], // Use the resolved relations map
     })
   }
 
   const fieldNames = fields.map(f => f.name)
-  const labelField
-    = ['name', 'title', 'email'].find(n => fieldNames.includes(n)) || 'id'
-
-  try {
-    const config = getTableConfig(table)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    config.foreignKeys.forEach((fk: any) => {
-      const propertyName = getForeignKeyPropertyName(fk, columns)
-      const field = fields.find(f => f.name === propertyName)
-      if (field) field.references = getTargetTableName(fk)
-    })
-  }
-  catch {
-    // Ignore error
-  }
+  const labelField = getLabelField(fieldNames)
 
   return { resource: resourceName, labelField, fields }
 }
@@ -110,23 +97,18 @@ function mapColumnType(
 export async function getSchemaRelations() {
   const relations: Record<string, Record<string, string>> = {}
 
-  for (const [tableName, table] of Object.entries(modelTableMap)) {
-    try {
-      relations[tableName] = resolveTableRelations(table as SQLiteTable, true)
-    }
-    catch {
-      // Ignore error
-    }
-  }
+  forEachModel((tableName, table) => {
+    relations[tableName] = resolveTableRelations(table, true)
+  })
   return relations
 }
 
 export async function getAllSchemas() {
   const schemas: Record<string, SchemaDefinition> = {}
 
-  for (const [tableName, table] of Object.entries(modelTableMap)) {
-    schemas[tableName] = drizzleTableToFields(table as SQLiteTable, tableName)
-  }
+  forEachModel((tableName, table) => {
+    schemas[tableName] = drizzleTableToFields(table, tableName)
+  })
   return schemas
 }
 

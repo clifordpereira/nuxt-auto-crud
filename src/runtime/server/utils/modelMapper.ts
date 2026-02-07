@@ -270,7 +270,6 @@ export function formatResourceResult(
   return Array.isArray(data) ? data.map(sanitize) : sanitize(data)
 }
 
-
 /**
  * Shared utility to extract relations from a Drizzle table
  */
@@ -311,4 +310,20 @@ export function getRelations(): Record<string, Record<string, string>> {
   }
 
   return relations
+}
+
+export function getLabelField(columnNames: string[]): string {
+  const candidates = ['name', 'title', 'email', 'label', 'subject']
+  return candidates.find(n => columnNames.includes(n)) || 'id'
+}
+
+export function forEachModel(callback: (name: string, table: SQLiteTable) => void) {
+  for (const [name, table] of Object.entries(modelTableMap)) {
+    try {
+      callback(name, table as SQLiteTable)
+    }
+    catch {
+      // Ignored for now. Could be logged later
+    }
+  }
 }
