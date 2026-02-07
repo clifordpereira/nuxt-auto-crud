@@ -1,70 +1,31 @@
-/**
- * Constructs a Zod validation schema from a list of field definitions.
- *
- * Example:
- *  const fields = [
- *    { name: "name", type: "string", required: true },
- *    { name: "age", type: "number" }
- *  ];
- *  const schema = useDynamicZodSchema(fields);
- */
+// src/runtime/composables/useDynamicZodSchema.ts
 import { z } from 'zod'
+import { ValidationRules, type Field, type FieldType } from '#nac/shared/utils/types'
 
-export function useDynamicZodSchema(
-  fields: { name: string, type: string, required?: boolean }[],
-  isEdit = false,
-) {
-  const validators: Record<string, z.ZodType> = {}
+export function useDynamicZodSchema(fields: Field[], isEdit = false) {
+  const validators: Record<string, z.ZodTypeAny> = {}
 
-  fields.forEach((field) => {
-    if (field.name === 'password') {
-      if (isEdit) {
-        // optional on edit
-        validators.password = z.string().optional()
-      }
-      else {
-        // required on create
-        validators.password = z
-          .string()
-          .min(8, 'At least 8 characters')
-          .regex(/\d/, 'At least 1 number')
-          .regex(/[a-z]/, 'At least 1 lowercase letter')
-          .regex(/[A-Z]/, 'At least 1 uppercase letter')
-      }
-      return
+  for (const field of fields) {
+    const type = field.type as FieldType
+    let schema: z.ZodTypeAny
+
+    // Explicitly handle functions with arguments
+    if (type === 'password') {
+      schema = ValidationRules.password(isEdit)
+    } else if (type === 'enum') {
+      schema = ValidationRules.enum(field.selectOptions)
+    } else {
+      // Handle 0-argument functions safely
+      const rule = (ValidationRules[type] || ValidationRules.string) as () => z.ZodTypeAny
+      schema = rule()
     }
 
-    if (['string', 'text', 'textarea', 'email'].includes(field.type)) {
-      if (field.type === 'email') {
-        validators[field.name] = field.required
-          ? z.string().email()
-          : z.string().email().optional()
-      }
-      else {
-        validators[field.name] = field.required
-          ? z.string().min(1, `${field.name} is required`)
-          : z.string().optional()
-      }
+    if (!field.required || isEdit) {
+      schema = schema.optional().nullable()
     }
-    else if (field.type === 'number') {
-      validators[field.name] = field.required
-        ? z.coerce.number()
-        : z.coerce.number().optional()
-    }
-    else if (field.type === 'date') {
-      validators[field.name] = field.required
-        ? z.coerce.date()
-        : z.coerce.date().optional()
-    }
-    else if (field.type === 'boolean') {
-      validators[field.name] = z.boolean().optional()
-    }
-    else if (field.type === 'enum') {
-      validators[field.name] = field.required
-        ? z.string().min(1, `${field.name} is required`)
-        : z.string().optional()
-    }
-  })
+
+    validators[field.name] = schema
+  }
 
   return z.object(validators)
 }

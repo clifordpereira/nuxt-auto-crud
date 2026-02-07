@@ -33,8 +33,9 @@ export default defineNuxtModule<ModuleOptions>({
     const prefix = options.endpointPrefix || '/api/_nac'
     const resolver = createResolver(import.meta.url)
 
-    // 1. Schema Alias
+    // 1. Aliases
     nuxt.options.alias['#site/schema'] = resolver.resolve(nuxt.options.rootDir, options.schemaPath!)
+    nuxt.options.alias['#nac/shared'] = resolver.resolve('./runtime/shared')
 
     // 2. Runtime Config (The Concrete State)
     const { schemaPath, auth, ...publicOptions } = options

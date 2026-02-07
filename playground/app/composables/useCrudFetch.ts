@@ -34,8 +34,6 @@ export async function useCrudFetch(
         ? `${endpointPrefix}/${resource}/${id}`
         : `${endpointPrefix}/${resource}`.replace('//', '/')
 
-    console.log(url)
-
     await $fetch(url, {
       method,
       ...(data && { body: data }),
@@ -51,7 +49,6 @@ export async function useCrudFetch(
     await refreshNuxtData()
   }
   catch (err) {
-    console.log('Server Error: ', err)
     useToast().add({
       title: 'Error',
       description: toastMessage[method].errorMessage,

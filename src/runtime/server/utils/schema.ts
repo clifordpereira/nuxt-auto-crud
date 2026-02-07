@@ -14,20 +14,7 @@ import type { ZodType } from 'zod'
 import type { Column } from 'drizzle-orm'
 import type { SQLiteTable } from 'drizzle-orm/sqlite-core'
 
-export interface Field {
-  name: string
-  type: string
-  required: boolean
-  selectOptions?: string[]
-  references?: string
-  isReadOnly?: boolean
-}
-
-export interface SchemaDefinition {
-  resource: string
-  labelField: string
-  fields: Field[]
-}
+import type { Field, SchemaDefinition } from '#nac/shared/utils/types'
 
 export function drizzleTableToFields(table: SQLiteTable, resourceName: string): SchemaDefinition {
   const columns = getTableColumns(table)
