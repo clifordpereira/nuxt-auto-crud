@@ -1,4 +1,4 @@
-import { it, expect, vi, describe, beforeEach, afterEach } from 'vitest'
+import { it, expect, vi, describe, beforeEach, afterEach, type Mock } from 'vitest'
 import { mountSuspended, mockNuxtImport } from '@nuxt/test-utils/runtime'
 import { h } from 'vue'
 import { useNacAutoCrudSSE } from '../../src/runtime/composables/useNacAutoCrudSSE'
@@ -15,7 +15,6 @@ mockNuxtImport('useRuntimeConfig', () => {
 
 describe('NAC Core: useNacAutoCrudSSE', () => {
   const endpointPrefix = `/api/_nac`
-  const addEventListenerMock = vi.fn()
   const closeMock = vi.fn()
   let messageListeners: ((event: MessageEvent) => void)[] = []
   let errorListeners: ((event: Event) => void)[] = []
@@ -130,7 +129,7 @@ describe('NAC Core: useNacAutoCrudSSE', () => {
         return () => h('div')
       },
     })
-    const eventSourceInstance = (global.EventSource as unknown as { mock: { instances: any[] } }).mock.instances[0]
+    const eventSourceInstance = (global.EventSource as unknown as { mock: { instances: { addEventListener: Mock }[] } }).mock.instances[0]!
     const addEventListenerSpy = eventSourceInstance.addEventListener
     expect(addEventListenerSpy).toHaveBeenCalledWith(
       'crud',
@@ -199,17 +198,10 @@ describe('NAC Core: useNacAutoCrudSSE', () => {
 
     // mountSuspended runs setup(), but we check if EventSource
     // was called before the component actually "mounts" in the DOM
-    let sourceCalledDuringSetup = false
 
     await mountSuspended({
       setup() {
         useNacAutoCrudSSE(onEvent)
-        if (
-          global.EventSource
-          && (global.EventSource as unknown as { calls?: unknown[] }).calls?.length! > 0
-        ) {
-          sourceCalledDuringSetup = true
-        }
         return () => h('div')
       },
     })

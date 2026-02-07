@@ -33,13 +33,14 @@ describe('NAC Core Engine', async () => {
       expect(data.version).toContain('agentic')
       expect(Array.isArray(data.resources)).toBe(true)
 
-      const userResource = (data.resources as any[]).find(
-        (r: { resource: string, fields: any[] }) => r.resource === 'users',
+      const userResource = (data.resources as Array<{ resource: string, fields: Array<{ name: string, isReadOnly: boolean }>, methods: string[], labelField?: string }>).find(
+        r => r.resource === 'users',
       )
       if (userResource) {
         // 1. Verify Protection Logic
         const idField = userResource.fields.find((f: { name: string, isReadOnly: boolean }) => f.name === 'id')
-        expect(idField.isReadOnly).toBe(true)
+        expect(idField).toBeDefined()
+        expect(idField!.isReadOnly).toBe(true)
 
         // 2. Verify Visibility Logic (Security)
         const hasPassword = userResource.fields.some(
@@ -78,7 +79,7 @@ describe('NAC Core Engine', async () => {
 
   describe('API: _relations', async () => {
     it('returns a valid relation map for Agentic pathfinding', async () => {
-      const response = await $fetch<Record<string, any>>(
+      const response = await $fetch<Record<string, Record<string, string>>>(
         `${endpointPrefix}/_relations`,
       )
 
@@ -103,7 +104,7 @@ describe('NAC Core Engine', async () => {
     })
 
     it('identifies foreign key constraints accurately', async () => {
-      const response = await $fetch<any>(`${endpointPrefix}/_relations`)
+      const response = await $fetch<Record<string, Record<string, unknown>>>(`${endpointPrefix}/_relations`)
 
       // Example: If a 'post' belongs to a 'user'
       if (response.posts) {
@@ -118,7 +119,7 @@ describe('NAC Core Engine', async () => {
   // Schema Reflection
   describe('Schema Reflection E2E', async () => {
     it('GET /api/_nac/_schema returns all registered schemas', async () => {
-      const data = await $fetch<Record<string, any>>(
+      const data = await $fetch<Record<string, { fields: unknown }>>(
         `${endpointPrefix}/_schema`,
       )
 
@@ -134,28 +135,27 @@ describe('NAC Core Engine', async () => {
         await $fetch(`${endpointPrefix}/_schema/non_existent_table`)
         expect.fail('Should have thrown 404')
       }
-      catch (e: any) {
+      catch (error: unknown) {
+        const e = error as { response?: { status: number } }
         expect(e.response?.status).toBe(404)
       }
     })
 
     it('GET /api/_nac/_schema/:table returns specific table metadata', async () => {
       const tableName = 'users'
-      const schema = await $fetch<any>(
+      const schema = await $fetch<{ fields: Array<unknown> | Record<string, unknown> }>(
         `${endpointPrefix}/_schema/${tableName}`,
       )
 
       expect(schema).toBeDefined()
 
       // Standardize fields to an array regardless of NAC's internal reflection format
-      const fields = Array.isArray(schema.fields)
-        ? schema.fields
-        : Object.entries(schema.fields).map(
-            ([name, config]: [string, any]) => ({
-              name,
-              ...config,
-            }),
-          )
+      const fields: Array<{ name: string, dbName?: string, [key: string]: unknown }> = Array.isArray(schema.fields)
+        ? (schema.fields as Array<{ name: string, dbName?: string }>)
+        : Object.entries(schema.fields).map(([name, config]) => ({
+            name,
+            ...(config as Record<string, unknown>),
+          }))
 
       const hasId = fields.some(
         (f: { name: string, dbName?: string }) => f.name === 'id' || f.dbName === 'id',
@@ -166,7 +166,7 @@ describe('NAC Core Engine', async () => {
 
   describe('NAC SSE Feature', async () => {
     it('establishes SSE connection and receives a heartbeat', async () => {
-      let response: any
+      let response: { status: number, headers: Headers } | undefined
       const stream = await $fetch<ReadableStream>(`${endpointPrefix}/_sse`, {
         responseType: 'stream',
         onResponse(ctx) {
@@ -175,9 +175,10 @@ describe('NAC Core Engine', async () => {
       })
 
       // 1. Protocol Validation
-      expect(response.status).toBe(200)
-      expect(response.headers.get('content-type')).toBe('text/event-stream')
-      expect(response.headers.get('x-accel-buffering')).toBe('no')
+      expect(response).toBeDefined()
+      expect(response!.status).toBe(200)
+      expect(response!.headers.get('content-type')).toBe('text/event-stream')
+      expect(response!.headers.get('x-accel-buffering')).toBe('no')
 
       // 2. Data Validation (Heartbeat)
       const reader = stream.getReader()
