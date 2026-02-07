@@ -1,28 +1,32 @@
 import { createError } from 'h3'
 
+/**
+ * Middleware to guard all NAC API routes
+ */
 export default defineEventHandler(async (event) => {
   const pathname = new URL(event.path, 'http://internal').pathname
   if (isAuthenticationDisabled() || !isPathToGuard(pathname)) return
 
+  // Authenticate /api/_nac/* endpoints
   const { user } = await requireUserSession(event)
 
   if (isNacSystemPath(pathname)) return // No need to authorize system paths
   
   if (user.role === 'admin') return // Admins can do everything
 
+  // Authorize CRUD endpoints
   const { model, id } =   extractModelAndIdFromPath(pathname)
-
   const action = resolveAction(event.method, Boolean(id))
   if (!action) throw createError({ statusCode: 403, statusMessage: 'Forbidden'})
-
   if (hasPermission(user, model, action)) return
-
-  const ownAction = `${action}_own`
-  if (hasPermission(user, model, ownAction)) return
+  if (hasPermission(user, model, `${action}_own`)) return
 
   throw createError({ statusCode: 403, statusMessage: 'Forbidden'})
 })
 
+/**
+ * Helper functions
+ */
 function isAuthenticationDisabled() {
   const { auth } = useAutoCrudConfig()
   return auth?.authentication === false
