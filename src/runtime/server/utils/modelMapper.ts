@@ -270,37 +270,44 @@ export function formatResourceResult(
   return Array.isArray(data) ? data.map(sanitize) : sanitize(data)
 }
 
+
+/**
+ * Shared utility to extract relations from a Drizzle table
+ */
+export function resolveTableRelations(table: SQLiteTable, includeSystemFields = false): Record<string, string> {
+  const config = getTableConfig(table)
+  const columns = getDrizzleTableColumns(table as Table)
+  const relations: Record<string, string> = {}
+
+  // Resolve implicit user relations
+  if (includeSystemFields) {
+    const systemFields = getSystemUserFields()
+    for (const key of Object.keys(columns)) {
+      if (systemFields.includes(key)) relations[key] = 'users'
+    }
+  }
+
+  // Resolve explicit Foreign Keys
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  config.foreignKeys.forEach((fk: any) => {
+    const targetTableName = getTargetTableName(fk)
+    const propertyKey = getForeignKeyPropertyName(fk, columns)
+
+    if (propertyKey) {
+      relations[propertyKey] = targetTableName
+    }
+  })
+
+  return relations
+}
+
 export function getRelations(): Record<string, Record<string, string>> {
   const relations: Record<string, Record<string, string>> = {}
   const models = getAvailableModels()
 
   for (const model of models) {
     const table = getTableForModel(model)
-    const config = getTableConfig(table)
-    const modelRelations: Record<string, string> = {}
-    const columns = getDrizzleTableColumns(table as Table)
-
-    const foreignKeys = config.foreignKeys || []
-
-    for (const fk of foreignKeys) {
-      const targetTable = fk.reference().foreignTable
-      const targetTableName = getTableName(targetTable)
-
-      // Get source column name (DB name)
-
-      const sourceColDbName = fk.reference().columns[0]?.name
-
-      // Find property key for this column
-      const propertyKey = Object.entries(columns).find(
-        ([_, col]) => col.name === sourceColDbName,
-      )?.[0]
-
-      if (propertyKey) {
-        modelRelations[propertyKey] = targetTableName
-      }
-    }
-
-    relations[model] = modelRelations
+    relations[model] = resolveTableRelations(table, false)
   }
 
   return relations

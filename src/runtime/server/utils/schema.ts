@@ -8,7 +8,7 @@ import {
   getForeignKeyPropertyName,
   getHiddenFields,
   getProtectedFields,
-  getSystemUserFields,
+  resolveTableRelations,
   isDateColumn,
 } from './modelMapper'
 import type { ZodType } from 'zod'
@@ -112,21 +112,7 @@ export async function getSchemaRelations() {
 
   for (const [tableName, table] of Object.entries(modelTableMap)) {
     try {
-      const config = getTableConfig(table as SQLiteTable)
-      const columns = getTableColumns(table as Table)
-      const tableRelations: Record<string, string> = {}
-
-      for (const [key, _] of Object.entries(columns)) {
-        if (getSystemUserFields().includes(key)) tableRelations[key] = 'users'
-      }
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      config.foreignKeys.forEach((fk: any) => {
-        const propName = getForeignKeyPropertyName(fk, columns)
-        if (propName) tableRelations[propName] = getTargetTableName(fk)
-      })
-
-      relations[tableName] = tableRelations
+      relations[tableName] = resolveTableRelations(table as SQLiteTable, true)
     }
     catch {
       // Ignore error
