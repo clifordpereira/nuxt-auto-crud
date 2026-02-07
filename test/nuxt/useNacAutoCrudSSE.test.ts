@@ -66,7 +66,7 @@ describe('NAC Core: useNacAutoCrudSSE', () => {
     })
 
     // 1. Init check
-    expect(global.EventSource).toHaveBeenCalledWith(`${endpointPrefix}/sse`)
+    expect(global.EventSource).toHaveBeenCalledWith(`${endpointPrefix}/_sse`)
 
     // 2. Valid CRUD event check
     const validEvent = {
