@@ -15,6 +15,8 @@ import { useRuntimeConfig } from '#imports'
 import { createInsertSchema } from 'drizzle-zod'
 import { z } from 'zod'
 
+import type { Field, SchemaDefinition } from '#nac/shared/utils/types'
+
 export const customUpdatableFields: Record<string, string[]> = {}
 export const customHiddenFields: Record<string, string[]> = {}
 
@@ -326,4 +328,48 @@ export function forEachModel(callback: (name: string, table: SQLiteTable) => voi
       // Ignored for now. Could be logged later
     }
   }
+}
+
+/**
+ * Builds a complete SchemaDefinition for a model.
+ * - Filters out hidden fields
+ * - Marks protected fields as read-only
+ * - Infers types from Drizzle columns
+ * - Resolves foreign key relations
+ */
+export function getSchemaDefinition(modelName: string): SchemaDefinition {
+  const table = getTableForModel(modelName)
+  const columnNames = getTableColumns(table)
+  const labelField = getLabelField(columnNames)
+  const relations = resolveTableRelations(table, true) // Include system user fields
+  const drizzleColumns = getDrizzleTableColumns(table as Table)
+  const hiddenFields = getHiddenFields(modelName)
+  const protectedFields = getProtectedFields()
+  
+  const fields: Field[] = columnNames
+    .filter(name => !hiddenFields.includes(name)) // Filter hidden fields
+    .map((name) => {
+      const column = drizzleColumns[name]
+      const col = column as unknown as { dataType?: string, notNull?: boolean, columnType?: string }
+      
+      // Infer field type
+      let type = 'string'
+      if (column && isDateColumn(column, name)) {
+        type = 'date'
+      } else if (col?.dataType === 'number' || col?.columnType?.includes('Integer')) {
+        type = 'number'
+      } else if (col?.dataType === 'boolean') {
+        type = 'boolean'
+      }
+      
+      return {
+        name,
+        type,
+        required: col?.notNull ?? false,
+        references: relations[name],
+        isReadOnly: protectedFields.includes(name), // Mark protected fields
+      }
+    })
+  
+  return { resource: modelName, labelField, fields }
 }

@@ -1,7 +1,5 @@
 import { eventHandler, getQuery, getHeader } from 'h3'
-import { getTableForModel, getAvailableModels, getProtectedFields, getHiddenFields } from '../../utils/modelMapper'
-import { getTableColumns as getDrizzleTableColumns } from 'drizzle-orm'
-import { getTableConfig } from 'drizzle-orm/sqlite-core'
+import { getAvailableModels, getSchemaDefinition } from '../../utils/modelMapper'
 // @ts-expect-error - 'hub:db' is a virtual alias
 import { db } from 'hub:db'
 
@@ -20,53 +18,24 @@ export default eventHandler(async (event) => {
 
   const resources = models.map((model) => {
     try {
-      const table = getTableForModel(model)
-      const columns = getDrizzleTableColumns(table)
-      const config = getTableConfig(table)
+      const schema = getSchemaDefinition(model)
 
-      const fields = Object.entries(columns)
-        .filter(([name]) => !getHiddenFields(model).includes(name))
-        .map(([name, col]) => {
-          let references = null
-          // @ts-expect-error - Drizzle foreign key internals
-          const fk = config?.foreignKeys.find(f => f.reference().columns[0].name === col.name)
-
-          if (fk) {
-            // @ts-expect-error - Drizzle internals
-            references = fk.reference().foreignTable[Symbol.for('drizzle:Name')]
-          }
-          // @ts-expect-error - Drizzle internal referenceConfig
-          else if (col.referenceConfig?.foreignTable) {
-            // @ts-expect-error - Drizzle internal referenceConfig
-            const foreignTable = col.referenceConfig.foreignTable
-            references = foreignTable[Symbol.for('drizzle:Name')] || foreignTable.name
-          }
-
-          const semanticType = col.columnType.toLowerCase().replace('sqlite', '')
-
-          return {
-            name,
-            type: semanticType,
-            required: col.notNull || false,
-            isEnum: !!col.enumValues,
-            options: col.enumValues || null,
-            references,
-            isRelation: !!references,
-            // Agentic Hint: Is this field writable by the user/agent?
-            isReadOnly: getProtectedFields().includes(name),
-          }
-        })
-
-      const fieldNames = fields.map(f => f.name)
-      const labelField = fieldNames.find(n => n === 'name')
-        || fieldNames.find(n => n === 'title')
-        || fieldNames.find(n => n === 'email')
-        || 'id'
+      // Transform SchemaDefinition to legacy API format
+      const fields = schema.fields.map((field) => ({
+        name: field.name,
+        type: field.type,
+        required: field.required,
+        isEnum: !!field.selectOptions,
+        options: field.selectOptions || null,
+        references: field.references || null,
+        isRelation: !!field.references,
+        isReadOnly: field.isReadOnly || false,
+      }))
 
       return {
         resource: model,
         endpoint: `${endpointPrefix}/${model}`,
-        labelField,
+        labelField: schema.labelField,
         methods: ['GET', 'POST', 'PATCH', 'DELETE'],
         fields,
       }

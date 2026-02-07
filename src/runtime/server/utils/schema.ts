@@ -3,11 +3,8 @@ import { getTableColumns } from 'drizzle-orm'
 import {
   getZodSchema,
   modelTableMap,
-  getHiddenFields,
-  getProtectedFields,
+  getSchemaDefinition,
   resolveTableRelations,
-  isDateColumn,
-  getLabelField,
   forEachModel,
 } from './modelMapper'
 import type { ZodType } from 'zod'
@@ -16,42 +13,48 @@ import type { SQLiteTable } from 'drizzle-orm/sqlite-core'
 
 import type { Field, SchemaDefinition } from '#nac/shared/utils/types'
 
+/**
+ * Enhanced schema builder that uses getSchemaDefinition() as base
+ * and enriches field types with Zod semantic hints and textarea detection.
+ */
 export function drizzleTableToFields(table: SQLiteTable, resourceName: string): SchemaDefinition {
+  // Start with base schema from modelMapper
+  const baseSchema = getSchemaDefinition(resourceName)
+  
   const columns = getTableColumns(table)
-  const fields: Field[] = []
-
   const zodSchema = getZodSchema(resourceName, 'insert')
-  const relations = resolveTableRelations(table, true) // Get all relations including system ones
 
-  for (const [key, col] of Object.entries(columns)) {
-    if (getHiddenFields(resourceName).includes(key)) continue
+  // Enhance each field with semantic type hints
+  const enhancedFields: Field[] = baseSchema.fields.map((field) => {
+    const column = columns[field.name] as Column | undefined
+    const zodField = (zodSchema.shape as Record<string, ZodType>)[field.name]
 
-    const column = col as Column
-    const zodField = (zodSchema.shape as Record<string, ZodType>)[key]
+    if (!column) return field
 
-    const { type, selectOptions } = mapColumnType(column, zodField)
+    const { type, selectOptions } = enhanceFieldType(column, zodField, field.type)
 
-    fields.push({
-      name: key,
+    return {
+      ...field,
       type,
-      required: column.notNull,
       selectOptions,
-      isReadOnly: getProtectedFields().includes(key),
-      references: relations[key], // Use the resolved relations map
-    })
+    }
+  })
+
+  return {
+    ...baseSchema,
+    fields: enhancedFields,
   }
-
-  const fieldNames = fields.map(f => f.name)
-  const labelField = getLabelField(fieldNames)
-
-  return { resource: resourceName, labelField, fields }
 }
 
-function mapColumnType(
+/**
+ * Enhances base field type with Zod semantic hints and domain-specific patterns.
+ */
+function enhanceFieldType(
   column: Column,
   zodField?: ZodType,
+  baseType?: string,
 ): { type: string, selectOptions?: string[] } {
-  // 1. Drizzle Enums
+  // 1. Drizzle Enums (highest priority)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const enumValues = (column as any).enumValues || (column as any).config?.enumValues
   if (enumValues) return { type: 'enum', selectOptions: enumValues }
@@ -64,21 +67,14 @@ function mapColumnType(
     if (checks.some(c => c.kind === 'url')) return { type: 'url' }
   }
 
-  const { dataType, columnType, name } = column
-
-  if (dataType === 'boolean') return { type: 'boolean' }
-  if (isDateColumn(column, name)) return { type: 'date' }
-  if (
-    dataType === 'number'
-    || columnType.includes('Integer')
-    || columnType.includes('Real')
-  ) {
-    return { type: 'number' }
-  }
-  if (['content', 'description', 'bio', 'message'].includes(name))
+  // 3. Textarea detection (domain-specific)
+  const { name } = column
+  if (['content', 'description', 'bio', 'message'].includes(name)) {
     return { type: 'textarea' }
+  }
 
-  return { type: 'string' }
+  // 4. Fallback to base type from modelMapper
+  return { type: baseType || 'string' }
 }
 
 export async function getSchemaRelations() {
