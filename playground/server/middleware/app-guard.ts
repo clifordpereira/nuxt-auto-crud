@@ -37,16 +37,6 @@ export default defineEventHandler(async (event) => {
   }
 })
 
-/**
- * Helper functions
- */
-
-// @ts-expect-error - permissions is extended on user session
-function hasPermission(user: { permissions?: Record<string, string[]> }, model: string, action: string) {
-  if (!user.permissions || !user.permissions[model]) return false
-  return user.permissions[model].includes(action)
-}
-
 function isAuthenticationDisabled() {
   const { auth } = useAutoCrudConfig()
   return auth?.authentication === false

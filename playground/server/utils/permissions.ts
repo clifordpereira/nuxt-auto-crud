@@ -1,5 +1,6 @@
 import { eq } from 'drizzle-orm'
 import { db, schema } from 'hub:db'
+import { fetchPermissionsForRole } from './auth'
 
 let publicPermissionsCache: Record<string, string[]> | null = null
 let lastCacheTime = 0
@@ -18,23 +19,8 @@ export async function getPublicPermissions(): Promise<Record<string, string[]>> 
     return {}
   }
 
-  const permissionsData = await db.select({
-    resource: schema.resources.name,
-    action: schema.permissions.code,
-  })
-    .from(schema.roleResourcePermissions)
-    .innerJoin(schema.resources, eq(schema.roleResourcePermissions.resourceId, schema.resources.id))
-    .innerJoin(schema.permissions, eq(schema.roleResourcePermissions.permissionId, schema.permissions.id))
-    .where(eq(schema.roleResourcePermissions.roleId, publicRole.id))
-    .all()
-
-  const permissions: Record<string, string[]> = {}
-  for (const p of permissionsData) {
-    if (!permissions[p.resource]) {
-      permissions[p.resource] = []
-    }
-    permissions[p.resource]!.push(p.action)
-  }
+  // Reuse shared permission fetching logic
+  const permissions = await fetchPermissionsForRole(publicRole.id)
 
   publicPermissionsCache = permissions
   lastCacheTime = now
