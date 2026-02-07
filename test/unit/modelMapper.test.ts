@@ -76,8 +76,8 @@ describe('modelMapper.ts', () => {
   })
 
   it('generates partial schemas for patch operations', () => {
-    // Use z.ZodObject<any> to access .shape safely in tests
-    const schema = mapper.getZodSchema('users', 'patch') as z.ZodObject<any>
+    // Use z.ZodObject<z.ZodRawShape> to access .shape safely in tests
+    const schema = mapper.getZodSchema('users', 'patch') as z.ZodObject<z.ZodRawShape>
 
     const emailSchema = schema.shape.email
     expect(emailSchema).toBeDefined()
@@ -175,7 +175,7 @@ describe('modelMapper.ts', () => {
 
     const resArray = mapper.formatResourceResult('users', array)
     expect(Array.isArray(resArray)).toBe(true)
-    expect((resArray as any[])[0]).not.toHaveProperty('password')
+    expect((resArray as Record<string, unknown>[])[0]).not.toHaveProperty('password')
   })
 
   it('extracts relations from table config', () => {

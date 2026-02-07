@@ -26,7 +26,7 @@ describe('NAC CRUD Fixture', async () => {
 
   // Tests [model].post.ts
   it(`POST /api/_nac/${model} creates a new user`, async () => {
-    const created = await $fetch<any>(`${endpointPrefix}/${model}`, {
+    const created = await $fetch<Record<string, unknown>>(`${endpointPrefix}/${model}`, {
       method: 'POST',
       body: newUser,
     })
@@ -34,26 +34,26 @@ describe('NAC CRUD Fixture', async () => {
     expect(created).toBeDefined()
     expect(created.id).toBeDefined()
     expect(created.email).toBe(newUser.email)
-    createdId = created.id
+    createdId = created.id as number
   })
 
   // Tests [model].get.ts
   it(`GET /api/_nac/${model} lists the created user`, async () => {
-    const list = await $fetch<any[]>(`${endpointPrefix}/${model}`)
+    const list = await $fetch<Record<string, unknown>[]>(`${endpointPrefix}/${model}`)
     expect(Array.isArray(list)).toBe(true)
     expect(list.find(u => u.id === createdId)).toBeDefined()
   })
 
   // Tests [model]/[id].get.ts
   it(`GET /api/_nac/${model}/:id retrieves the user`, async () => {
-    const item = await $fetch<any>(`${endpointPrefix}/${model}/${createdId}`)
+    const item = await $fetch<Record<string, unknown>>(`${endpointPrefix}/${model}/${createdId}`)
     expect(item.id).toBe(createdId)
     expect(item.email).toBe(newUser.email)
   })
 
   // Tests [model]/[id].patch.ts
   it(`PATCH /api/_nac/${model}/:id updates the user`, async () => {
-    const updated = await $fetch<any>(`${endpointPrefix}/${model}/${createdId}`, {
+    const updated = await $fetch<Record<string, unknown>>(`${endpointPrefix}/${model}/${createdId}`, {
       method: 'PATCH',
       body: { name: 'Updated Name' },
     })
@@ -61,7 +61,7 @@ describe('NAC CRUD Fixture', async () => {
   })
 
   it('PATCH /api/_nac/${model}/:id strictly ignores protected system fields', async () => {
-    const original = await $fetch<any>(`${endpointPrefix}/${model}/${createdId}`)
+    const original = await $fetch<Record<string, unknown>>(`${endpointPrefix}/${model}/${createdId}`)
     await $fetch(`${endpointPrefix}/${model}/${createdId}`, {
       method: 'PATCH',
       body: {
@@ -71,13 +71,13 @@ describe('NAC CRUD Fixture', async () => {
       },
     })
 
-    const verification = await $fetch<any>(`${endpointPrefix}/${model}/${createdId}`)
+    const verification = await $fetch<Record<string, unknown>>(`${endpointPrefix}/${model}/${createdId}`)
     expect(verification.id).toBe(original.id)
     expect(verification.name).toBe('Verified Name')
   })
 
   it(`GET /api/_nac/${model}/:id excludes fields defined in HIDDEN_FIELDS`, async () => {
-    const user = await $fetch<any>(`${endpointPrefix}/${model}/${createdId}`)
+    const user = await $fetch<Record<string, unknown>>(`${endpointPrefix}/${model}/${createdId}`)
 
     // 'password' should be in HIDDEN_FIELDS in your NAC constants
     expect(user).not.toHaveProperty('password')
@@ -94,8 +94,8 @@ describe('NAC CRUD Fixture', async () => {
     try {
       await $fetch(`${endpointPrefix}/${model}/${createdId}`)
     }
-    catch (err: any) {
-      expect(err.statusCode).toBe(404)
+    catch (err: unknown) {
+      expect((err as { statusCode: number }).statusCode).toBe(404)
     }
   })
 })

@@ -43,7 +43,7 @@ describe('useNacRelationDisplay', () => {
       { id: 2, username: 'bob' },
     ])
 
-    let composableResult: any
+    let composableResult!: ReturnType<typeof useNacRelationDisplay>
 
     await mountSuspended({
       setup() {
@@ -79,7 +79,7 @@ describe('useNacRelationDisplay', () => {
       throw createError({ statusCode: 500, statusMessage: 'Internal Error' })
     })
 
-    let composableResult: any
+    let composableResult!: ReturnType<typeof useNacRelationDisplay>
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
     await mountSuspended({
@@ -104,7 +104,7 @@ describe('useNacRelationDisplay', () => {
     }))
     registerEndpoint(`${endpointPrefix}/users`, () => [{ id: 99 }]) // No name/title/username
 
-    let result: any
+    let result!: ReturnType<typeof useNacRelationDisplay>
     await mountSuspended({
       setup() {
         result = useNacRelationDisplay(schema)
@@ -121,7 +121,7 @@ describe('useNacRelationDisplay', () => {
       non_existent: {},
     }))
 
-    let result: any
+    let result!: ReturnType<typeof useNacRelationDisplay>
     await mountSuspended({
       setup() {
         result = useNacRelationDisplay(schema)
@@ -144,7 +144,7 @@ describe('useNacRelationDisplay', () => {
       return [{ id: 1, name: 'Admin' }]
     })
 
-    let res: any
+    let res!: ReturnType<typeof useNacRelationDisplay>
     await mountSuspended({
       setup() {
         res = useNacRelationDisplay(schema)
@@ -167,7 +167,7 @@ describe('useNacRelationDisplay', () => {
       { id: 10, name: 'typescript' },
     ])
 
-    let res: any
+    let res!: ReturnType<typeof useNacRelationDisplay>
     await mountSuspended({
       setup() {
         res = useNacRelationDisplay(schema)
@@ -182,7 +182,7 @@ describe('useNacRelationDisplay', () => {
   })
 
   it('overwrites existing display values on subsequent fetches', async () => {
-    let res: any
+    let res!: ReturnType<typeof useNacRelationDisplay>
     await mountSuspended({
       setup() {
         res = useNacRelationDisplay(schema)
@@ -216,7 +216,7 @@ describe('useNacRelationDisplay', () => {
       { id: 'slug-1', name: 'Article' },
     ])
 
-    let res: any
+    let res!: ReturnType<typeof useNacRelationDisplay>
     await mountSuspended({
       setup() {
         res = useNacRelationDisplay(schema)
@@ -230,7 +230,7 @@ describe('useNacRelationDisplay', () => {
   })
 
   it('handles null or undefined values safely', async () => {
-    let res: any
+    let res!: ReturnType<typeof useNacRelationDisplay>
     await mountSuspended({
       setup() {
         res = useNacRelationDisplay(schema)
@@ -249,7 +249,7 @@ describe('useNacRelationDisplay', () => {
     }))
     registerEndpoint(`${endpointPrefix}/users`, () => []) // Empty table
 
-    let res: any
+    let res!: ReturnType<typeof useNacRelationDisplay>
     await mountSuspended({
       setup() {
         res = useNacRelationDisplay(schema)

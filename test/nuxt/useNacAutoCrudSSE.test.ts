@@ -33,12 +33,12 @@ describe('NAC Core: useNacAutoCrudSSE', () => {
     errorListeners = []
 
     // Define constructor mock using function declaration (not arrow) to support 'new'
-    const MockEventSource = vi.fn(function (this: any) {
-      this.addEventListener = vi.fn((type: string, cb: any) => {
+    const MockEventSource = vi.fn(function (this: { addEventListener: unknown, close: unknown }) {
+      this.addEventListener = vi.fn((type: string, cb: EventListener) => {
         if (type === 'crud') messageListeners.push(cb)
       })
       Object.defineProperty(this, 'onerror', {
-        set(cb: any) {
+        set(cb: EventListener) {
           errorListeners.push(cb)
         },
         configurable: true,
@@ -109,7 +109,7 @@ describe('NAC Core: useNacAutoCrudSSE', () => {
     // Simulate missing EventSource
     vi.stubGlobal('EventSource', undefined)
     if (typeof window !== 'undefined') {
-      delete (window as any).EventSource
+      delete (window as unknown as { EventSource?: unknown }).EventSource
     }
 
     await mountSuspended({
@@ -130,7 +130,7 @@ describe('NAC Core: useNacAutoCrudSSE', () => {
         return () => h('div')
       },
     })
-    const eventSourceInstance = (global.EventSource as any).mock.instances[0]
+    const eventSourceInstance = (global.EventSource as unknown as { mock: { instances: any[] } }).mock.instances[0]
     const addEventListenerSpy = eventSourceInstance.addEventListener
     expect(addEventListenerSpy).toHaveBeenCalledWith(
       'crud',
@@ -206,7 +206,7 @@ describe('NAC Core: useNacAutoCrudSSE', () => {
         useNacAutoCrudSSE(onEvent)
         if (
           global.EventSource
-          && (global.EventSource as any).calls?.length > 0
+          && (global.EventSource as unknown as { calls?: unknown[] }).calls?.length! > 0
         ) {
           sourceCalledDuringSetup = true
         }

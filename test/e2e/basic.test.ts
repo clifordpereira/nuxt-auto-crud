@@ -27,23 +27,23 @@ describe('NAC Core Engine', async () => {
   // Meta & Agentic Manifests
   describe('API: _meta', async () => {
     it('returns valid Clifland-NAC JSON manifest', async () => {
-      const data = await $fetch<any>(`${endpointPrefix}/_meta?token=${token}`)
+      const data = await $fetch<Record<string, unknown>>(`${endpointPrefix}/_meta?token=${token}`)
 
       expect(data.architecture).toBe('Clifland-NAC')
       expect(data.version).toContain('agentic')
       expect(Array.isArray(data.resources)).toBe(true)
 
-      const userResource = data.resources.find(
-        (r: any) => r.resource === 'users',
+      const userResource = (data.resources as any[]).find(
+        (r: { resource: string, fields: any[] }) => r.resource === 'users',
       )
       if (userResource) {
         // 1. Verify Protection Logic
-        const idField = userResource.fields.find((f: any) => f.name === 'id')
+        const idField = userResource.fields.find((f: { name: string, isReadOnly: boolean }) => f.name === 'id')
         expect(idField.isReadOnly).toBe(true)
 
         // 2. Verify Visibility Logic (Security)
         const hasPassword = userResource.fields.some(
-          (f: any) => f.name === 'password',
+          (f: { name: string }) => f.name === 'password',
         )
         expect(hasPassword).toBe(false) // Hidden fields must be omitted entirely
 
@@ -90,13 +90,13 @@ describe('NAC Core Engine', async () => {
 
       // Check for standard NAC relation structure
       for (const table of tables) {
-        const relations = response[table]
+        const relations = response[table] as Record<string, string>
         expect(typeof relations).toBe('object')
         expect(Array.isArray(relations)).toBe(false)
 
         const keys = Object.keys(relations)
         if (keys.length > 0) {
-          const target = relations[keys[0]]
+          const target = relations[keys[0]!]
           expect(typeof target).toBe('string')
         }
       }
@@ -108,7 +108,7 @@ describe('NAC Core Engine', async () => {
       // Example: If a 'post' belongs to a 'user'
       if (response.posts) {
         const userRel = Object.values(response.posts).find(
-          (r: any) => r === 'users',
+          (r: unknown) => r === 'users',
         )
         expect(userRel).toBeDefined()
       }
@@ -158,7 +158,7 @@ describe('NAC Core Engine', async () => {
           )
 
       const hasId = fields.some(
-        (f: any) => f.name === 'id' || f.dbName === 'id',
+        (f: { name: string, dbName?: string }) => f.name === 'id' || f.dbName === 'id',
       )
       expect(hasId).toBe(true)
     })

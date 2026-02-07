@@ -19,7 +19,7 @@ describe('SSE Bus Core', () => {
       write: vi.fn().mockRejectedValue(new Error('Closed')),
       close: vi.fn(),
     }
-    addClient('stale-id', mockWriter as any)
+    addClient('stale-id', mockWriter as unknown as WritableStreamDefaultWriter)
 
     await broadcast({ test: true })
 
@@ -47,8 +47,8 @@ describe('SSE Bus Core', () => {
       close: vi.fn(),
     }
 
-    addClient('client-1', writer1 as any)
-    addClient('client-2', writer2 as any)
+    addClient('client-1', writer1 as unknown as WritableStreamDefaultWriter)
+    addClient('client-2', writer2 as unknown as WritableStreamDefaultWriter)
 
     await broadcast({ msg: 'hello' })
 
@@ -58,7 +58,7 @@ describe('SSE Bus Core', () => {
 
   it('does not broadcast to removed clients', async () => {
     const writer = { write: vi.fn(), close: vi.fn() }
-    addClient('client-to-remove', writer as any)
+    addClient('client-to-remove', writer as unknown as WritableStreamDefaultWriter)
     removeClient('client-to-remove')
 
     await broadcast({ msg: 'test' })
