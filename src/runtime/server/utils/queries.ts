@@ -46,7 +46,8 @@ export async function getRows( table: TableWithId, context: { restriction?: stri
     query = query.where(eq((table as any)[ownerKey], Number(userId)));
   }
 
-return await query.orderBy(desc(table.id)).all();}
+  return await query.orderBy(desc(table.id)).all();
+}
 
 export async function createRow( table: TableWithId, data: Record<string, unknown>) {
   return await db.insert(table).values(data).returning().get();
