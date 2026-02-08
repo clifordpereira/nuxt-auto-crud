@@ -7,7 +7,6 @@ import { useRuntimeConfig } from "#imports";
 
 export async function getRows(table: TableWithId, context: QueryContext = {}) {
   const { restriction, userId, listAllStatus } = context;
-  console.log(context)
   let query = db.select().from(table).$dynamic();
   const filters = [];
 

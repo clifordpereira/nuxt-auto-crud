@@ -159,7 +159,7 @@ useNacAutoCrudSSE(({ table, action, data: sseData, primaryKey }) => {
           />
         </UDropdownMenu>
         <CrudCreateRow
-          v-if="allow('createRecord', resource)"
+          v-if="hasPermission(user, resource, 'create')"
           :resource="resource"
           :schema="schema"
         />

@@ -10,10 +10,13 @@ definePageMeta({
 
 const { endpointPrefix } = useRuntimeConfig().public.autoCrud
 
+const { user } = useUserSession()
+
 const { data: users } = useFetch<unknown[]>(`${endpointPrefix}/users`, {
   headers: crudHeaders(),
   lazy: true,
-  immediate: allow('listRecords', 'users'),
+  immediate: hasPermission(user.value, 'users', 'list'),
+  watch: [user],
 })
 
 const userCount = computed(() => users.value?.length || 0)
