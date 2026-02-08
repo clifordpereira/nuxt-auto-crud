@@ -13,7 +13,7 @@ export default eventHandler(async (event) => {
 
   const table = getTableForModel(model) as TableWithId;
 
-  const record = await getRow(table, id, { record: event.context.nacRecord });
+  const record = await getRow(table, id, event.context.nac || {});
   if (!record) throw new RecordNotFoundError();
 
   return formatResourceResult(model, record);

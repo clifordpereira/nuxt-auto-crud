@@ -15,7 +15,7 @@ export default eventHandler(async (event) => {
   const schema = getZodSchema(model, 'insert')
   const payload = await schema.parseAsync(sanitizedBody)
 
-  const newRecord = await createRow(table, payload)
+  const newRecord = await createRow(table, payload, event.context.nac || {})
   const sanitizedData = formatResourceResult(model, newRecord)
 
   await broadcast({

@@ -4,9 +4,6 @@ import { eq } from 'drizzle-orm'
 /**
  * Middleware to guard all NAC API routes
  */
-/**
- * Middleware to guard all NAC API routes
- */
 export default defineEventHandler(async (event) => {
   const pathname = new URL(event.path, 'http://internal').pathname
   if (isAuthenticationDisabled() || !isPathToGuard(pathname)) return
@@ -20,10 +17,9 @@ export default defineEventHandler(async (event) => {
   
   // 1. Initialize NAC context with promotion-ready listAllStatus
   event.context.nac = {
-      listAllStatus: hasPermission(user, model, 'list_all'),
       userId: user.id,
-      restriction: null, // default
-      record: null       // default
+      record: null,
+      permissions: user.permissions[model],
   }
 
   if (isAdmin(user)) return 
@@ -35,11 +31,9 @@ export default defineEventHandler(async (event) => {
   // 3. OWNERSHIP PERMISSION CHECK
   const ownAction = `${action}_own`
   if (hasPermission(user, model, ownAction)) {
-    if (!id) {
-      event.context.nac.restriction = 'own'
-      return
-    }
+    if (!id) return // for create/list action, let handler decide
 
+    // for update/delete/read actions, check ownership
     const record = await fetchRecord(model, id)
     if (!record) throw createError({ statusCode: 404, statusMessage: 'Not Found' })
     

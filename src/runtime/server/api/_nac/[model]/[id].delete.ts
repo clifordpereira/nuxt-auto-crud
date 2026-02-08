@@ -11,7 +11,7 @@ export default eventHandler(async (event) => {
 
   const table = getTableForModel(model) as TableWithId;
 
-  const deletedRecord = await deleteRow(table, id, { record: event.context.nacRecord });
+  const deletedRecord = await deleteRow(table, id, event.context.nac || {});
   if (!deletedRecord) throw new RecordNotFoundError();
 
   const sanitizedData = formatResourceResult(model, deletedRecord);
