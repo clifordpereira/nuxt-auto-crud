@@ -2,6 +2,7 @@
 <script setup lang="ts">
 import { useNacAutoCrudSSE } from '#imports'
 import { useChangeCase } from '@vueuse/integrations/useChangeCase'
+const { user } = useUserSession()
 
 const props = defineProps<{
   resource: string
@@ -234,18 +235,18 @@ useNacAutoCrudSSE(({ table, action, data: sseData, primaryKey }) => {
                 <template #content>
                   <div class="p-1 flex flex-col gap-1 min-w-[120px]">
                     <CrudViewRow
-                      v-if="allow('readRecord', resource)"
+                      v-if="hasRowPermission(user, resource, 'read', row)"
                       :row="row"
                       :schema="schema"
                     />
                     <CrudEditRow
-                      v-if="allow('updateOwnRecord', { ...row, resourceName: resource })"
+                      v-if="hasRowPermission(user, resource, 'update', row)"
                       :resource="resource"
                       :row="row"
                       :schema="schema"
                     />
                     <UButton
-                      v-if="allow('deleteOwnRecord', { ...row, resourceName: resource })"
+                      v-if="hasRowPermission(user, resource, 'delete', row)"
                       label="Delete"
                       color="error"
                       variant="ghost"

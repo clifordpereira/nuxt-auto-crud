@@ -1,5 +1,4 @@
 import { createError } from 'h3'
-import type { User } from '#auth-utils'
 import { eq } from 'drizzle-orm'
 
 /**
@@ -13,7 +12,7 @@ export default defineEventHandler(async (event) => {
 
   if (isNacSystemPath(pathname)) return // No need to authorize system paths
   
-  if (user.role === 'admin') return // Admins can do everything
+  if (isAdmin(user)) return // Admins can do everything
 
   // Authorize CRUD endpoints
   const { model, id } =   extractModelAndIdFromPath(pathname)
@@ -100,8 +99,4 @@ async function fetchRecord(model: string, id: string) {
   
   const records = await db.select().from(table).where(eq(table.id, id)).limit(1)
   return records[0] || null
-}
-
-function isOwner(user: User, record: Record<string, any>, ownerKey: string = 'createdBy'): boolean {
-  return user.id === record[ownerKey];
 }

@@ -1,52 +1,29 @@
 import type { User } from '#auth-utils'
 
-export const listRecords = defineAbility((user: User, model: string) => {
-  return hasPermission(user, model, 'list') || hasPermission(user, model, 'list_all') || hasPermission(user, model, 'list_own')
-})
+export function isAdmin(user: User | null | undefined) {
+  if (!user) return false;
+  return user?.role === 'admin'
+}
 
-export const readRecord = defineAbility((user: User, model: string) => {
-  return hasPermission(user, model, 'read') || hasPermission(user, model, 'read_own')
-})
+export function isOwner(user: User | null | undefined, record?: Record<string, any>, ownerKey: string = 'createdBy'): boolean {
+  if (!user?.id || !record) return false;
+  return Number(user.id) === Number(record[ownerKey]);
+}
 
-export const createRecord = defineAbility((user: User, model: string) => {
-  return hasPermission(user, model, 'create')
-})
+export function hasPermission(user: User | null | undefined, model: string, action: string) {
+  if (isAdmin(user)) return true;
+  if (!user) return false;
+  return !!user?.permissions?.[model]?.includes(action)
+}
 
-export const updateRecord = defineAbility((user: User, model: string) => {
-  return hasPermission(user, model, 'update') || hasPermission(user, model, 'update_own')
-})
+export function hasRowPermission(user: User | null | undefined, model: string, action: string, record?: any) {
+  if (!user) return false;
 
-export const deleteRecord = defineAbility((user: User, model: string) => {
-  return hasPermission(user, model, 'delete') || hasPermission(user, model, 'delete_own')
-})
+  if (hasPermission(user, model, action)) return true;
 
-export const updateOwnRecord = defineAbility((user: User, model: Record<string, unknown>) => {
-  // If user has full update permission, they can update anything
-  const resource = String(model?.resourceName || model?.collection || '')
-  if (hasPermission(user, resource, 'update')) return true
-
-  // If user only has update_own, check ownership
-  if (hasPermission(user, resource, 'update_own')) {
-    return user.id === model.authorId || user.id === model.userId || user.id === model.createdBy
+  if (hasPermission(user, model, `${action}_own`)) {
+    return isOwner(user, record);
   }
 
-  return false
-})
-
-export const deleteOwnRecord = defineAbility((user: User, model: Record<string, unknown>) => {
-  // If user has full delete permission, they can delete anything
-  const resource = String(model?.resourceName || model?.collection || '')
-  if (hasPermission(user, resource, 'delete')) return true
-
-  // If user only has delete_own, check ownership
-  if (hasPermission(user, resource, 'delete_own')) {
-    return user.id === model.authorId || user.id === model.userId || user.id === model.createdBy
-  }
-
-  return false
-})
-
-export function hasPermission(user: User, model: string, action: string) {
-  if (!user?.permissions || !user.permissions[model]) return false
-  return user.permissions[model].includes(action)
+  return false;
 }

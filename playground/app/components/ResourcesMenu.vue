@@ -7,13 +7,14 @@ const props = defineProps<{
 }>()
 
 const { schemas } = await useNacResourceSchemas()
+const { user } = useUserSession()
 
 const resourceNames = computed(() =>
   Object.keys(schemas.value || {}).filter((name) => {
     // Exclude system tables
     if (['users', 'roles', 'permissions', 'resources', 'roleResourcePermissions', 'testimonials', 'subscribers'].includes(name)) return false
 
-    return allow('listRecords', name)
+    return hasPermission(user.value, name, 'list')
   }).sort((a, b) => b.localeCompare(a)),
 )
 
