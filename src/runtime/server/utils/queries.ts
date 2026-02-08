@@ -1,11 +1,11 @@
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 // @ts-expect-error - hub:db is a virtual alias
 import { db } from "hub:db";
 import type { TableWithId } from "../types";
 import { useRuntimeConfig } from "#imports";
 
 
-export async function deleteRecord( table: TableWithId, id: string, context: { record?: Record<string, any> } = {}) {
+export async function deleteRow( table: TableWithId, id: string, context: { record?: Record<string, any> } = {}) {
   const targetId = Number(id);
 
   // If record is pre-verified by guard, delete via .run() to skip RETURNING overhead
@@ -18,14 +18,14 @@ export async function deleteRecord( table: TableWithId, id: string, context: { r
   return deleted;
 }
 
-export async function getRecord( table: TableWithId, id: string, context: { record?: Record<string, unknown> } = {}) {
+export async function getRow( table: TableWithId, id: string, context: { record?: Record<string, unknown> } = {}) {
   // If record is pre-verified by guard, return it
   if (context.record) return context.record;
 
   return await db.select().from(table).where(eq(table.id, Number(id))).get();
 }
 
-export async function updateRecord( table: TableWithId, id: string, data: Record<string, any>) {
+export async function updateRow( table: TableWithId, id: string, data: Record<string, any>) {
   const targetId = Number(id);
 
   const [updated] = await db
@@ -37,7 +37,7 @@ export async function updateRecord( table: TableWithId, id: string, data: Record
   return updated;
 }
 
-export async function getRecords( table: TableWithId, context: { restriction?: string | null; userId?: number | string } = {}) {
+export async function getRows( table: TableWithId, context: { restriction?: string | null; userId?: number | string } = {}) {
   const { restriction, userId } = context;
   let query = db.select().from(table).$dynamic();
 
@@ -46,9 +46,8 @@ export async function getRecords( table: TableWithId, context: { restriction?: s
     query = query.where(eq((table as any)[ownerKey], Number(userId)));
   }
 
-  return await query.all();
-}
+return await query.orderBy(desc(table.id)).all();}
 
-export async function createRecord( table: TableWithId, data: Record<string, unknown>) {
+export async function createRow( table: TableWithId, data: Record<string, unknown>) {
   return await db.insert(table).values(data).returning().get();
 }

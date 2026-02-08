@@ -1,7 +1,7 @@
 // server/api/_nac/[model]/index.post.ts
 import { eventHandler, getRouterParams, readBody } from 'h3'
 import { getTableForModel, getZodSchema, formatResourceResult, filterUpdatableFields } from '../../../utils/modelMapper'
-import { createRecord } from '../../../utils/queries'
+import { createRow } from '../../../utils/queries'
 import { broadcast } from '../../../utils/sse-bus'
 import type { TableWithId } from '../../../types'
 
@@ -15,7 +15,7 @@ export default eventHandler(async (event) => {
   const schema = getZodSchema(model, 'insert')
   const payload = await schema.parseAsync(sanitizedBody)
 
-  const newRecord = await createRecord(table, payload)
+  const newRecord = await createRow(table, payload)
   const sanitizedData = formatResourceResult(model, newRecord)
 
   await broadcast({
