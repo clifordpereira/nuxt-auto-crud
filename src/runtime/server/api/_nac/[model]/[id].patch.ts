@@ -14,7 +14,7 @@ export default eventHandler(async (event) => {
   const sanitizedBody = filterUpdatableFields(model, body)
   const schema = getZodSchema(model, 'patch')
   const payload = await schema.parseAsync(sanitizedBody)
-  const updatedRecord = await updateRow(table, id, payload)
+  const updatedRecord = await updateRow(table, id, payload, event.context.nac || {})
   if (!updatedRecord) throw new RecordNotFoundError()
 
   const sanitizedData = formatResourceResult(model, updatedRecord)

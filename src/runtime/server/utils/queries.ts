@@ -5,6 +5,12 @@ import type { TableWithId } from "../types";
 import type { QueryContext } from "../../types";
 import { useRuntimeConfig } from "#imports";
 
+/**
+ * Fetches rows from the database based on the provided table and context.
+ * @param table - The table to query.
+ * @param context - The context object containing user ID and permissions.
+ * @returns An array of rows from the database.
+ */
 export async function getRows(table: TableWithId, context: QueryContext = {}) {
   const { userId, permissions } = context;
   
@@ -41,11 +47,24 @@ export async function getRows(table: TableWithId, context: QueryContext = {}) {
   return await query.orderBy(desc(table.id)).all();
 }
 
+/**
+ * Fetches a single row from the database based on the provided table and ID.
+ * @param table - The table to query.
+ * @param id - The ID of the row to fetch.
+ * @param context - The context object containing user ID and permissions.
+ * @returns The row from the database.
+ */
 export async function getRow(table: TableWithId, id: string, context: QueryContext = {}) {
   if (context.record) return context.record;
   return await db.select().from(table).where(eq(table.id, Number(id))).get();
 }
 
+/**
+ * Creates a new row in the database based on the provided table and data.
+ * @param table - The table to query.
+ * @param data - The data to insert into the table.
+ * @param context - The context object containing user ID and permissions.
+ */
 export async function createRow(table: TableWithId, data: Record<string, unknown>, context: QueryContext = {}) {
   const ownerKey = useRuntimeConfig().autoCrud.auth?.ownerKey || "createdBy";
   
@@ -58,14 +77,38 @@ export async function createRow(table: TableWithId, data: Record<string, unknown
   return await db.insert(table).values(payload).returning().get();
 }
 
-export async function updateRow(table: TableWithId, id: string, data: Record<string, unknown>) {
+/**
+ * Updates a row in the database based on the provided table and ID.
+ * @param table - The table to query.
+ * @param id - The ID of the row to update.
+ * @param data - The data to update in the table.
+ * @param context - The context object containing user ID and permissions.
+ */
+export async function updateRow(table: TableWithId, id: string, data: Record<string, unknown>, context: QueryContext = {}) {
   const targetId = Number(id);
+  const payload = { ...data };
+
+  // Update audit metadata
+  if (context.userId && 'updatedBy' in table) {
+    payload.updatedBy = Number(context.userId);
+  }
   
-  const [updated] = await db.update(table).set(data).where(eq(table.id, targetId)).returning();
+  // Explicitly refresh updatedAt for SQLite
+  if ('updatedAt' in table) {
+    payload.updatedAt = new Date();
+  }
+  
+  const [updated] = await db.update(table).set(payload).where(eq(table.id, targetId)).returning();
 
   return updated;
 }
 
+/**
+ * Deletes a row from the database based on the provided table and ID.
+ * @param table - The table to query.
+ * @param id - The ID of the row to delete.
+ * @param context - The context object containing user ID and permissions.
+ */
 export async function deleteRow(table: TableWithId, id: string, context: QueryContext = {}) {
   const targetId = Number(id);
 
