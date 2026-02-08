@@ -17,8 +17,6 @@ export function hasPermission(user: User | null | undefined, model: string, acti
 }
 
 export function hasRowPermission(user: User | null | undefined, model: string, action: string, record?: any) {
-  if (!user) return false;
-
   if (hasPermission(user, model, action)) return true;
 
   if (hasPermission(user, model, `${action}_own`)) {

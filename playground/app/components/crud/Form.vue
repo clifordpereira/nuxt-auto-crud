@@ -37,10 +37,7 @@ const filteredFields = props.schema.fields.filter(
 
 const { user } = useUserSession()
 
-const canUpdateStatus = computed(() => {
-  const userPerms = (user.value as any)?.permissions?.[props.schema.resource] as string[] | undefined
-  return user.value?.role === 'admin' || (Array.isArray(userPerms) && userPerms.includes('update_status'))
-})
+const canUpdateStatus = computed(() => hasPermission(user.value, props.schema.resource, 'update_status'))
 
 // dynamically build zod schema
 const formSchema = useDynamicZodSchema(filteredFields, !!props.initialState)

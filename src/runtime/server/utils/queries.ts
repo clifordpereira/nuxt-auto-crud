@@ -1,33 +1,43 @@
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 // @ts-expect-error - hub:db is a virtual alias
 import { db } from "hub:db";
 import type { TableWithId } from "../types";
+import type { QueryContext } from "../../types";
 import { useRuntimeConfig } from "#imports";
 
+export async function getRows(table: TableWithId, context: QueryContext = {}) {
+  const { restriction, userId, listAllStatus } = context;
+  console.log(context)
+  let query = db.select().from(table).$dynamic();
+  const filters = [];
 
-export async function deleteRow( table: TableWithId, id: string, context: { record?: Record<string, any> } = {}) {
-  const targetId = Number(id);
-
-  // If record is pre-verified by guard, delete via .run() to skip RETURNING overhead
-  if (context.record) {
-    await db.delete(table).where(eq(table.id, targetId)).run();
-    return context.record;
+  if (restriction === "own" && userId) {
+    const ownerKey = useRuntimeConfig().autoCrud.auth?.ownerKey || "createdBy";
+    filters.push(eq((table as any)[ownerKey], Number(userId)));
   }
 
-  const [deleted] = await db.delete(table).where(eq(table.id, targetId)).returning();
-  return deleted;
+  // Only filter by status if user lacks list_all and column exists
+  if (!listAllStatus && 'status' in table) {
+    filters.push(eq((table as any).status, "active"));
+  }
+
+  if (filters.length > 0) query = query.where(and(...filters));
+  return await query.orderBy(desc(table.id)).all();
 }
 
-export async function getRow( table: TableWithId, id: string, context: { record?: Record<string, unknown> } = {}) {
-  // If record is pre-verified by guard, return it
+export async function getRow(table: TableWithId, id: string, context: QueryContext = {}) {
   if (context.record) return context.record;
-
   return await db.select().from(table).where(eq(table.id, Number(id))).get();
 }
 
-export async function updateRow( table: TableWithId, id: string, data: Record<string, any>) {
-  const targetId = Number(id);
+export async function createRow(table: TableWithId, data: Record<string, unknown>) {
+  return await db.insert(table).values(data).returning().get();
+}
 
+export async function updateRow(table: TableWithId, id: string, data: Record<string, unknown>, context: QueryContext = {}) {
+  const targetId = Number(id);
+  
+  // Optimization: If guard already fetched and verified record, we proceed
   const [updated] = await db
     .update(table)
     .set(data)
@@ -37,18 +47,13 @@ export async function updateRow( table: TableWithId, id: string, data: Record<st
   return updated;
 }
 
-export async function getRows( table: TableWithId, context: { restriction?: string | null; userId?: number | string } = {}) {
-  const { restriction, userId } = context;
-  let query = db.select().from(table).$dynamic();
+export async function deleteRow(table: TableWithId, id: string, context: QueryContext = {}) {
+  const targetId = Number(id);
 
-  if (restriction === "own" && userId) {
-    const ownerKey = useRuntimeConfig().autoCrud.auth?.ownerKey || "createdBy";
-    query = query.where(eq((table as any)[ownerKey], Number(userId)));
+  if (context.record) {
+    await db.delete(table).where(eq(table.id, targetId)).run();
+    return context.record;
   }
 
-  return await query.orderBy(desc(table.id)).all();
-}
-
-export async function createRow( table: TableWithId, data: Record<string, unknown>) {
-  return await db.insert(table).values(data).returning().get();
+  return await db.delete(table).where(eq(table.id, targetId)).returning().get();
 }

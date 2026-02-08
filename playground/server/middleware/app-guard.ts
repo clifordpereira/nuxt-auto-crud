@@ -4,37 +4,47 @@ import { eq } from 'drizzle-orm'
 /**
  * Middleware to guard all NAC API routes
  */
+/**
+ * Middleware to guard all NAC API routes
+ */
 export default defineEventHandler(async (event) => {
   const pathname = new URL(event.path, 'http://internal').pathname
   if (isAuthenticationDisabled() || !isPathToGuard(pathname)) return
 
   const { user } = await requireUserSession(event)
+  if (isNacSystemPath(pathname)) return 
 
-  if (isNacSystemPath(pathname)) return // No need to authorize system paths
-  
-  if (isAdmin(user)) return // Admins can do everything
-
-  // Authorize CRUD endpoints
-  const { model, id } =   extractModelAndIdFromPath(pathname)
+  const { model, id } = extractModelAndIdFromPath(pathname)
   const action = resolveAction(event.method, Boolean(id))
   if (!action) throw createError({ statusCode: 403, statusMessage: 'Forbidden'})
+  
+  // 1. Initialize NAC context with promotion-ready listAllStatus
+  event.context.nac = {
+      listAllStatus: hasPermission(user, model, 'list_all'),
+      userId: user.id,
+      restriction: null, // default
+      record: null       // default
+  }
+  
+  if (isAdmin(user)) return 
+
+  // 2. GLOBAL PERMISSION CHECK (The missing piece)
+  // If user has global 'list', 'read', 'update', etc., they pass here.
   if (hasPermission(user, model, action)) return
 
-  // If action permitted only on own records
+  // 3. OWNERSHIP PERMISSION CHECK
   const ownAction = `${action}_own`
   if (hasPermission(user, model, ownAction)) {
     if (!id) {
-      // Signal the 'list' handler to append a WHERE clause with the user's ID; eg: list posts createdBy user
-      event.context.nacAuth = { restriction: 'own', userId: user.id }
+      event.context.nac.restriction = 'own'
       return
     }
 
-    // For read/update/delete, verify ownership
     const record = await fetchRecord(model, id)
     if (!record) throw createError({ statusCode: 404, statusMessage: 'Not Found' })
+    
     if (isOwner(user, record)) {
-       // Attach the record to context to reuse it in the handler
-       event.context.nacRecord = record
+       event.context.nac.record = record
        return
     }
   }

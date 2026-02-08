@@ -8,7 +8,7 @@ export default eventHandler(async (event) => {
   const { model } = getRouterParams(event) as { model: string }
 
   const table = getTableForModel(model) as TableWithId
-  const results = await getRows(table, event.context.nacAuth || {})
+  const results = await getRows(table, event.context.nac || {})
 
   return formatResourceResult(model, results)
 })
