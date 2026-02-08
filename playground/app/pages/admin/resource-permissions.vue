@@ -175,11 +175,11 @@ const displayResources = computed(() => resources.value?.filter(r =>
 ) || [])
 
 const crudGroups = [
-  { label: 'List', any: 'list', anyLabel: 'Any', own: 'list_own', ownLabel: 'Own', all: 'list_all' },
-  { label: 'Read', any: 'read', anyLabel: 'Others', own: 'read_own', ownLabel: 'Own' },
+  { label: 'List', any: 'list', anyLabel: 'All', own: 'list_own', ownLabel: 'Own', all: 'list_all' },
+  { label: 'Read', any: 'read', anyLabel: 'Any', own: 'read_own', ownLabel: 'Own' },
   { label: 'Create', any: 'create', anyLabel: 'Own' },
-  { label: 'Update', any: 'update', anyLabel: 'Others', own: 'update_own', ownLabel: 'Own', status: 'update_status' },
-  { label: 'Delete', any: 'delete', anyLabel: 'Others', own: 'delete_own', ownLabel: 'Own' },
+  { label: 'Update', any: 'update', anyLabel: 'Any', own: 'update_own', ownLabel: 'Own', status: 'update_status' },
+  { label: 'Delete', any: 'delete', anyLabel: 'Any', own: 'delete_own', ownLabel: 'Own' },
 ]
 
 const getPermissionId = (code: string) => {
