@@ -25,3 +25,7 @@ export function hasRowPermission(user: User | null | undefined, model: string, a
 
   return false;
 }
+
+export function isAllowedToSeeResourceMenu(user: User | null | undefined, model: string) {
+  return hasPermission(user, model, 'list') || hasPermission(user, model, 'list_all') || hasPermission(user, model, 'list_own')
+}

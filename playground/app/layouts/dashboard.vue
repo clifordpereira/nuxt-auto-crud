@@ -20,10 +20,10 @@ const mainLinks = computed(() => {
     if (link.children) {
       link.children = link.children.filter((child) => {
         if (child.label === 'Testimonials') {
-          return hasPermission(user.value, 'testimonials', 'list')
+          return isAllowedToSeeResourceMenu(user.value, 'testimonials')
         }
         if (child.label === 'Subscribers') {
-          return hasPermission(user.value, 'subscribers', 'list')
+          return isAllowedToSeeResourceMenu(user.value, 'subscribers')
         }
         return true
       })

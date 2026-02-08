@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
       restriction: null, // default
       record: null       // default
   }
-  
+
   if (isAdmin(user)) return 
 
   // 2. GLOBAL PERMISSION CHECK (The missing piece)

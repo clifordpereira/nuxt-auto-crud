@@ -14,7 +14,7 @@ const resourceNames = computed(() =>
     // Exclude system tables
     if (['users', 'roles', 'permissions', 'resources', 'roleResourcePermissions', 'testimonials', 'subscribers'].includes(name)) return false
 
-    return hasPermission(user.value, name, 'list')
+    return isAllowedToSeeResourceMenu(user.value, name)
   }).sort((a, b) => b.localeCompare(a)),
 )
 
