@@ -1,18 +1,14 @@
 // server/api/_nac/[model]/index.get.ts
-
 import { eventHandler, getRouterParams } from 'h3'
 import { getTableForModel, formatResourceResult } from '../../../utils/modelMapper'
-// @ts-expect-error - hub:db is a virtual alias
-import { db } from 'hub:db'
-import { desc } from 'drizzle-orm'
 import type { TableWithId } from '../../../types'
+import { getRecords } from '../../../utils/queries'
 
 export default eventHandler(async (event) => {
   const { model } = getRouterParams(event) as { model: string }
 
   const table = getTableForModel(model) as TableWithId
-  const query = db.select().from(table)
-  const results = await query.orderBy(desc(table.id)).all()
+  const results = await getRecords(table, event.context.nacAuth || {})
 
   return formatResourceResult(model, results)
 })

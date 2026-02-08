@@ -106,6 +106,7 @@ export default defineNuxtConfig({
     auth: {
       authentication: true,
       authorization: true,
+      ownerKey: 'createdBy',
     },
     // Fields exposed to guest users.
     // Ensure the `list` permission for the `public` role is enabled for these resources in the Admin Dashboard.

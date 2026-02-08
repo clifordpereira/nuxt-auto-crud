@@ -1,11 +1,8 @@
 // server/api/_nac/[model]/[id].patch.ts
 import { eventHandler, getRouterParams, readBody } from 'h3'
-import { eq } from 'drizzle-orm'
-// @ts-expect-error - hub:db is a virtual alias
-import { db } from 'hub:db'
-
 import { getTableForModel, getZodSchema, filterUpdatableFields, formatResourceResult } from '../../../utils/modelMapper'
 import type { TableWithId } from '../../../types'
+import { updateRecord } from '../../../utils/queries'
 import { RecordNotFoundError } from '../../../exceptions'
 import { broadcast } from '../../../utils/sse-bus'
 
@@ -17,20 +14,7 @@ export default eventHandler(async (event) => {
   const sanitizedBody = filterUpdatableFields(model, body)
   const schema = getZodSchema(model, 'patch')
   const payload = await schema.parseAsync(sanitizedBody)
-
-  // Automatically update updatedAt if it exists
-  const updatePayload = {
-    ...payload,
-    ...('updatedAt' in table ? { updatedAt: new Date() } : {}),
-  }
-
-  const updatedRecord = (await db
-    .update(table)
-    .set(updatePayload)
-    .where(eq(table.id, Number(id)))
-    .returning()
-    .get()) as Record<string, unknown>
-
+  const updatedRecord = await updateRecord(table, id, payload)
   if (!updatedRecord) throw new RecordNotFoundError()
 
   const sanitizedData = formatResourceResult(model, updatedRecord)

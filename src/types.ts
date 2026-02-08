@@ -7,6 +7,7 @@ export interface ModuleOptions {
   auth: {
     authentication: boolean
     authorization: boolean
+    ownerKey: string
   }
   resources: Record<string, string[]>
 }

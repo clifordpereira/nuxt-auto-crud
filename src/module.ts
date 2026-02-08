@@ -25,6 +25,7 @@ export default defineNuxtModule<ModuleOptions>({
     auth: {
       authentication: false,
       authorization: false,
+      ownerKey: 'createdBy',
     },
     resources: {},
   },

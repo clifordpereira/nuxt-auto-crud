@@ -47,7 +47,6 @@ export const deleteOwnRecord = defineAbility((user: User, model: Record<string, 
 })
 
 export function hasPermission(user: User, model: string, action: string) {
-  if (user?.role === 'admin') return true
   if (!user?.permissions || !user.permissions[model]) return false
   return user.permissions[model].includes(action)
 }
