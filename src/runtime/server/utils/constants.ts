@@ -1,7 +1,7 @@
 // server/utils/constants.ts
 // for Audit Trials
 export const SYSTEM_USER_FIELDS = [
-  'createdBy', 'created_by',
+  // 'createdBy', 'created_by', // *_own permission requires createdBy
   'updatedBy', 'updated_by',
   'deletedBy', 'deleted_by',
 ]

@@ -1,5 +1,6 @@
 CREATE TABLE `categories` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`uuid` text NOT NULL,
 	`status` text DEFAULT 'active',
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
@@ -15,6 +16,7 @@ CREATE TABLE `categories` (
 CREATE UNIQUE INDEX `categories_slug_unique` ON `categories` (`slug`);--> statement-breakpoint
 CREATE TABLE `comments` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`uuid` text NOT NULL,
 	`status` text DEFAULT 'active',
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
@@ -35,6 +37,7 @@ CREATE TABLE `comments` (
 CREATE INDEX `resource_idx` ON `comments` (`resource_type`,`resource_id`);--> statement-breakpoint
 CREATE TABLE `permissions` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`uuid` text NOT NULL,
 	`status` text DEFAULT 'active',
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
@@ -48,6 +51,7 @@ CREATE TABLE `permissions` (
 --> statement-breakpoint
 CREATE TABLE `posts` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`uuid` text NOT NULL,
 	`status` text DEFAULT 'draft',
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
@@ -68,6 +72,7 @@ CREATE TABLE `posts` (
 CREATE UNIQUE INDEX `posts_slug_unique` ON `posts` (`slug`);--> statement-breakpoint
 CREATE TABLE `resources` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`uuid` text NOT NULL,
 	`status` text DEFAULT 'active',
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
@@ -81,6 +86,7 @@ CREATE TABLE `resources` (
 CREATE UNIQUE INDEX `resources_name_unique` ON `resources` (`name`);--> statement-breakpoint
 CREATE TABLE `role_resource_permissions` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`uuid` text NOT NULL,
 	`status` text DEFAULT 'active',
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
@@ -97,6 +103,7 @@ CREATE TABLE `role_resource_permissions` (
 --> statement-breakpoint
 CREATE TABLE `roles` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`uuid` text NOT NULL,
 	`status` text DEFAULT 'active',
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
@@ -110,6 +117,7 @@ CREATE TABLE `roles` (
 CREATE UNIQUE INDEX `roles_name_unique` ON `roles` (`name`);--> statement-breakpoint
 CREATE TABLE `subscribers` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`uuid` text NOT NULL,
 	`status` text DEFAULT 'active',
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
@@ -122,6 +130,7 @@ CREATE TABLE `subscribers` (
 CREATE UNIQUE INDEX `subscribers_email_unique` ON `subscribers` (`email`);--> statement-breakpoint
 CREATE TABLE `testimonials` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`uuid` text NOT NULL,
 	`status` text DEFAULT 'inactive',
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
@@ -137,6 +146,7 @@ CREATE TABLE `testimonials` (
 --> statement-breakpoint
 CREATE TABLE `users` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`uuid` text NOT NULL,
 	`status` text DEFAULT 'active',
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL,
