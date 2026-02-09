@@ -1,76 +1,89 @@
-import { eq } from 'drizzle-orm'
-import { db, schema } from 'hub:db'
+import { db } from 'hub:db'
 import type { H3Event } from 'h3'
 import { createError } from 'h3'
 
-/**
- * Fetches a user with their role and permissions
- * @param userId User ID
- * @returns User with role and permissions
- */
-export async function fetchUserWithPermissions(userId: number) {
-  const result = await db.select({
-    user: schema.users,
-    role: schema.roles.name,
+// --- Cache State ---
+let publicPermissionsCache: Record<string, string[]> | null = null
+let lastCacheTime = 0
+const CACHE_TTL = 60 * 1000
+
+// --- Transformer ---
+export function transformPermissions(
+  resourcePermissions: { 
+    resource: { name: string }; 
+    permission: { code: string } 
+  }[] = []
+): Record<string, string[]> {
+  return resourcePermissions.reduce((acc, rp) => {
+    const resource = rp.resource.name
+    acc[resource] ||= []
+    acc[resource].push(rp.permission.code)
+    return acc
+  }, {} as Record<string, string[]>)
+}
+
+// --- Queries ---
+export async function fetchPermissionsForRole(roleId: number | null) {
+  if (!roleId) return {}
+  const roleData = await db.query.roles.findFirst({
+    where: (roles, { eq }) => eq(roles.id, roleId),
+    with: {
+      resourcePermissions: {
+        with: {
+          resource: { columns: { name: true } },
+          permission: { columns: { code: true } },
+        },
+      },
+    },
   })
-    .from(schema.users)
-    .leftJoin(schema.roles, eq(schema.users.roleId, schema.roles.id))
-    .where(eq(schema.users.id, userId))
-    .get()
+  return transformPermissions(roleData?.resourcePermissions)
+}
 
-  if (!result || !result.user) return null
+export async function fetchUserWithPermissions(userId: number) {
+  const result = await db.query.users.findFirst({
+    where: (users, { eq }) => eq(users.id, userId),
+    columns: { password: false },
+    with: {
+      assignedRole: {
+        with: {
+          resourcePermissions: {
+            with: {
+              resource: { columns: { name: true } },
+              permission: { columns: { code: true } },
+            },
+          },
+        },
+      },
+    },
+  })
 
-  const user = result.user
-  const role = result.role || 'user'
-
-  const permissions = await fetchPermissionsForRole(user.roleId)
+  if (!result) return null
 
   return {
-    ...user,
-    role,
-    permissions,
+    ...result,
+    role: result.assignedRole?.name || 'user',
+    permissions: transformPermissions(result.assignedRole?.resourcePermissions),
   }
 }
 
-/**
- * Fetches permissions for a role
- * @param roleId Role ID
- * @returns Object with permissions
- */
-export async function fetchPermissionsForRole(roleId: number | null) {
-  const permissions: Record<string, string[]> = {}
+export async function getPublicPermissions(): Promise<Record<string, string[]>> {
+  const now = Date.now()
+  if (publicPermissionsCache && (now - lastCacheTime < CACHE_TTL)) return publicPermissionsCache
 
-  if (!roleId) return permissions
-
-  const permissionsData = await db.select({
-    resource: schema.resources.name,
-    action: schema.permissions.code,
+  const publicRole = await db.query.roles.findFirst({
+    where: (roles, { eq }) => eq(roles.name, 'public'),
+    columns: { id: true }
   })
-    .from(schema.roleResourcePermissions)
-    .innerJoin(schema.resources, eq(schema.roleResourcePermissions.resourceId, schema.resources.id))
-    .innerJoin(schema.permissions, eq(schema.roleResourcePermissions.permissionId, schema.permissions.id))
-    .where(eq(schema.roleResourcePermissions.roleId, roleId))
-    .all()
 
-  for (const p of permissionsData) {
-    if (!permissions[p.resource]) {
-      permissions[p.resource] = []
-    }
-    permissions[p.resource]!.push(p.action)
-  }
-
+  const permissions = publicRole ? await fetchPermissionsForRole(publicRole.id) : {}
+  publicPermissionsCache = permissions
+  lastCacheTime = now
   return permissions
 }
 
-/**
- * Refreshes the user session with the latest permissions
- * @param event H3 event
- * @param userId User ID
- * @returns Updated user data
- */
+// --- Session Management ---
 export async function refreshUserSession(event: H3Event, userId: number) {
   const userData = await fetchUserWithPermissions(userId)
-
   if (!userData) {
     await clearUserSession(event)
     throw createError({ statusCode: 401, message: 'User not found' })
@@ -86,6 +99,5 @@ export async function refreshUserSession(event: H3Event, userId: number) {
       permissions: userData.permissions,
     },
   })
-
   return userData
 }

@@ -17,6 +17,7 @@ export const PROTECTED_FIELDS = [
 // hiden from api responses
 export const HIDDEN_FIELDS = [
   // Sensitive Auth
+  'uuid',
   'password',
   'resetToken', 'reset_token',
   'resetExpires', 'reset_expires',
