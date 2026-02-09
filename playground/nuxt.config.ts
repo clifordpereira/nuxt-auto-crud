@@ -12,7 +12,6 @@ export default defineNuxtConfig({
     '@nuxthub/core',
     '@vueuse/nuxt',
     'nuxt-auth-utils',
-    'nuxt-authorization',
     'nuxt-security',
     'nuxt-delay-hydration',
     '../src/module',
@@ -96,7 +95,7 @@ export default defineNuxtConfig({
   },
 
   hub: {
-    db: 'sqlite',
+    db: { dialect: 'sqlite', casing: 'snake_case' },
     kv: true,
   },
 

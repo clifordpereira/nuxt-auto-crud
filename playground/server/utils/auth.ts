@@ -3,6 +3,11 @@ import { db, schema } from 'hub:db'
 import type { H3Event } from 'h3'
 import { createError } from 'h3'
 
+/**
+ * Fetches a user with their role and permissions
+ * @param userId User ID
+ * @returns User with role and permissions
+ */
 export async function fetchUserWithPermissions(userId: number) {
   const result = await db.select({
     user: schema.users,
@@ -27,6 +32,11 @@ export async function fetchUserWithPermissions(userId: number) {
   }
 }
 
+/**
+ * Fetches permissions for a role
+ * @param roleId Role ID
+ * @returns Object with permissions
+ */
 export async function fetchPermissionsForRole(roleId: number | null) {
   const permissions: Record<string, string[]> = {}
 
@@ -52,6 +62,12 @@ export async function fetchPermissionsForRole(roleId: number | null) {
   return permissions
 }
 
+/**
+ * Refreshes the user session with the latest permissions
+ * @param event H3 event
+ * @param userId User ID
+ * @returns Updated user data
+ */
 export async function refreshUserSession(event: H3Event, userId: number) {
   const userData = await fetchUserWithPermissions(userId)
 
