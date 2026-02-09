@@ -1,4 +1,4 @@
-title: Flexible Plans for Hobbyists, Developers & Businesses
+title: Flexible Plans for Developers & Businesses
 description: Whether you're a non-techie or a seasoned developer, we have options to support your journey.
 seo:
   title: Pricing
@@ -11,53 +11,42 @@ plans:
       month: $0
       year: $0
     button:
-      label: Download Source
+      label: Download Template
       color: neutral
       variant: subtle
-      to: https://github.com/clifordpereira/nuxt-auto-crud
+      to: https://github.com/clifordpereira/nuxt-auto-crud_template
       target: _blank
     features:
       - Full Source Code (FOSS)
-      - Standard CRUD Operations
+      - Dynamic CRUD Operations
+      - Dynamic Forms & Tables
+      - Built-in Authentication
       - Role-Based Access Control
-      - Database Schema Management
-      - Community Support
+      - Admin Dashboard
+      - Real-time updates
+      - Basic Relation handling
       - Self-Hosted only
       - Optional Phone/Chat Support ($25/hr)
-  - title: Managed Starter
-    description: Zero development fees. We build, host, and administer your custom application.
+  - title: Managed Pro
+    description: Advanced cloud hosting, leveraging edge computing for performance, scalability, and low-latency applications.
     price:
-      month: $5
-      year: $49
+      month: $9
+      year: $99
     highlight: true
     scale: true
     button:
       label: Get Started
-      to: mailto:clifordpereira@gmail.com
-    features:
-      - Standard Setup & Deployment
-      - Managed Hosting & Backups
-      - Business Data Management
-      - Role-Based Access Control
-      - Security & Version Updates
-      - Platform Health Support
-      - Optional Phone/Chat Support ($25/hr)
-  - title: Managed Pro
-    description: Advanced cloud hosting leveraging edge computing for performance, scalability, and low-latency applications.
-    price:
-      month: $10
-      year: $99
-    button:
-      label: Contact Sales
       color: neutral
       variant: subtle
-      to: mailto:clifordpereira@gmail.com
+      to: mailto:cliford@clifland.in
     features:
-      - Everything in Starter
+      - Managed Hosting & Backups
+      - Security & Version Updates
       - Priority Maintenance
       - Performance Monitoring
       - Priority Email Support
       - Advanced Data Exports
+      - Zero Development Cost (No Codebase Access)
       - Edge Computing via Cloudflare Workers
       - Optional Phone/Chat Support ($25/hr)
 faq:
