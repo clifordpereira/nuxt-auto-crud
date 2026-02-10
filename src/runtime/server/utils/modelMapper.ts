@@ -11,14 +11,13 @@ import {
 } from 'drizzle-orm'
 import { getTableConfig, type SQLiteTable } from 'drizzle-orm/sqlite-core'
 import { createError } from 'h3'
-import { useRuntimeConfig } from '#imports'
 import { createInsertSchema } from 'drizzle-zod'
 import { z } from 'zod'
 
 import type { Field, SchemaDefinition } from '#nac/shared/utils/types'
+import { getHiddenFields, getProtectedFields, getSystemUserFields, getPublicColumns } from './config-resolver'
 
 export const customUpdatableFields: Record<string, string[]> = {}
-export const customHiddenFields: Record<string, string[]> = {}
 
 type ForeignKey = ReturnType<typeof getTableConfig>['foreignKeys'][number]
 
@@ -173,29 +172,7 @@ export function getModelPluralName(modelName: string): string {
 export function getAvailableModels(): string[] {
   return Object.keys(modelTableMap)
 }
-
-export function getHiddenFields(modelName: string): string[] {
-  const { autoCrud } = useRuntimeConfig().public
-  const globalHidden = autoCrud.hiddenFields || []
-  const custom = customHiddenFields[modelName] || []
-
-  return [...globalHidden, ...custom]
-}
-
-export function getProtectedFields(): string[] {
-  const { autoCrud } = useRuntimeConfig().public
-  return autoCrud.protectedFields || []
-}
-
-export function getSystemUserFields(): string[] {
-  const { autoCrud } = useRuntimeConfig().public
-  return autoCrud.systemUserFields || []
-}
-
-export function getPublicColumns(modelName: string): string[] | undefined {
-  const { resources } = useRuntimeConfig().public.autoCrud
-  return resources?.[modelName]
-}
+// config resolver
 
 /**
  * Sanitizes resource data based on guest mode and configuration.
