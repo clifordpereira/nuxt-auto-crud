@@ -6,7 +6,7 @@ import {
   addImportsDir,
 } from '@nuxt/kit'
 
-import { SYSTEM_USER_FIELDS, PROTECTED_FIELDS, HIDDEN_FIELDS } from './runtime/server/utils/constants'
+import { NAC_API_HIDDEN_FIELDS, NAC_FORM_HIDDEN_FIELDS, NAC_DATA_TABLE_HIDDEN_FIELDS } from './runtime/server/utils/constants'
 import type { ModuleOptions } from './types'
 
 export type { ModuleOptions }
@@ -17,17 +17,19 @@ export default defineNuxtModule<ModuleOptions>({
     configKey: 'autoCrud',
   },
   defaults: {
-    endpointPrefix: '/api/_nac',
+    // Private config
     schemaPath: 'server/db/schema',
-    systemUserFields: SYSTEM_USER_FIELDS,
-    protectedFields: PROTECTED_FIELDS,
-    hiddenFields: HIDDEN_FIELDS,
     auth: {
       authentication: false,
       authorization: false,
       ownerKey: 'createdBy',
     },
+    apiHiddenFields: NAC_API_HIDDEN_FIELDS,
+    // Public config
+    endpointPrefix: '/api/_nac',
     resources: {},
+    formHiddenFields: NAC_FORM_HIDDEN_FIELDS,
+    dataTableHiddenFields: NAC_DATA_TABLE_HIDDEN_FIELDS,
   },
 
   async setup(options, nuxt) {
@@ -39,8 +41,8 @@ export default defineNuxtModule<ModuleOptions>({
     nuxt.options.alias['#nac/shared'] = resolver.resolve('./runtime/shared')
 
     // 2. Runtime Config (The Concrete State)
-    const { schemaPath, auth, ...publicOptions } = options
-    nuxt.options.runtimeConfig.autoCrud = { schemaPath, auth } // private runtime
+    const { schemaPath, auth, apiHiddenFields, ...publicOptions } = options
+    nuxt.options.runtimeConfig.autoCrud = { schemaPath, auth, apiHiddenFields } // private runtime
     nuxt.options.runtimeConfig.public.autoCrud = publicOptions // public runtime
 
     // 3. Auto-imports (The Engine)

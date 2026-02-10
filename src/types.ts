@@ -1,23 +1,26 @@
+// src/types.ts
+
 export interface ModuleOptions {
-  endpointPrefix: string
+  // Private config
   schemaPath: string
-  protectedFields: string[]
-  hiddenFields: string[]
-  systemUserFields: string[]
   auth: {
     authentication: boolean
     authorization: boolean
     ownerKey: string
   }
-  resources: Record<string, string[]>
+  apiHiddenFields: string[] /** Sensitive: Never leaves the server */
+  // Public config
+  endpointPrefix: string
+  resources: Record<string, string[]> /** Allowed fields for public apis */
+  formHiddenFields: string[] /** UI: Hidden from forms */
+  dataTableHiddenFields: string[] /** UI: Hidden from tables */
 }
 
 declare module '@nuxt/schema' {
   interface RuntimeConfig {
-    // Internal code sees these as required because of defaults
-    autoCrud: Required<Pick<ModuleOptions, 'schemaPath' | 'auth'>>
+    autoCrud: Pick<ModuleOptions, 'schemaPath' | 'auth' | 'apiHiddenFields'>
   }
   interface PublicRuntimeConfig {
-    autoCrud: Required<Omit<ModuleOptions, 'schemaPath' | 'auth'>>
+    autoCrud: Omit<ModuleOptions, 'schemaPath' | 'auth' | 'apiHiddenFields'>
   }
 }

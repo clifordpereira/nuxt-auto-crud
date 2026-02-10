@@ -1,10 +1,5 @@
 import { vi } from 'vitest'
 
-export const useAutoCrudConfig = vi.fn(() => ({
-  endpointPrefix: '/api/_nac',
-  auth: { authentication: true, authorization: true },
-}))
-
 export const useRuntimeConfig = vi.fn(() => ({
   apiSecretToken: 'test_secret',
 }))

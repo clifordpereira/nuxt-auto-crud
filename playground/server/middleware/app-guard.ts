@@ -50,7 +50,7 @@ export default defineEventHandler(async (event) => {
  * Helper functions
  */
 function isAuthenticationDisabled() {
-  const { auth } = useAutoCrudConfig()
+  const { auth } = useRuntimeConfig().autoCrud
   return auth?.authentication === false
 }
 
@@ -59,7 +59,7 @@ function isPathToGuard(pathname: string) {
 }
 
 function isNacPath(pathname: string) {
-  const { endpointPrefix = '/api/_nac' } = useAutoCrudConfig()
+  const { endpointPrefix = '/api/_nac' } = useRuntimeConfig().public.autoCrud
   return pathname.startsWith(endpointPrefix)
 }
 
@@ -69,12 +69,12 @@ function isAgenticPath(pathname: string) {
 }
 
 function isNacSystemPath(pathname: string) {
-  const { endpointPrefix = '/api/_nac' } = useAutoCrudConfig()
+  const { endpointPrefix = '/api/_nac' } = useRuntimeConfig().public.autoCrud
   return pathname.startsWith(endpointPrefix + '/_')
 }
 
 function extractModelAndIdFromPath(pathname: string) {
-  const { endpointPrefix = '/api/_nac' } = useAutoCrudConfig()
+  const { endpointPrefix = '/api/_nac' } = useRuntimeConfig().public.autoCrud
   const relativePath = pathname.slice(endpointPrefix.length).replace(/^\//, '')
   const [model, id] = relativePath.split('/')
   return { model: model || '', id }
