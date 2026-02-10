@@ -1,10 +1,8 @@
 // shared/types/auth.d.ts
-import type { users } from '../../server/db/schema/users'
-
-type DrizzleUser = typeof users.$inferSelect
+import type { User as DbUser } from '~/server/db/schema/users'
 
 declare module '#auth-utils' {
-  interface User extends Partial<DrizzleUser> {
+  interface User extends Partial<DbUser> {
     role: string
     permissions: Record<string, string[]>
   }

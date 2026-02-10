@@ -1,8 +1,13 @@
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
-import { roles } from './permissions'
-import { systemFields } from './utils'
+import { roles } from './roles-n-permissions'
+import { systemFields, auditRelations } from './utils'
 import { relations } from 'drizzle-orm'
 
+/**
+ * Users
+ * 
+ * Users are used to store user information.
+ */
 export const users = sqliteTable('users', {
   ...systemFields,
 
@@ -16,22 +21,11 @@ export const users = sqliteTable('users', {
   githubId: text('github_id').unique(),
   googleId: text('google_id').unique(),
 })
-
-export const usersRelations = relations(users, ({ one }) => ({
-  assignedRole: one(roles, {
+export const usersRelations = relations(users, (helpers) => ({
+  ...auditRelations(helpers, users, users), // Passes 'users' safely inside the callback
+  assignedRole: helpers.one(roles, {
     fields: [users.roleId],
     references: [roles.id],
   }),
-  creator: one(users, {
-    fields: [users.createdBy],
-    references: [users.id],
-    relationName: 'creator',
-  }),
-  updater: one(users, {
-    fields: [users.updatedBy],
-    references: [users.id],
-    relationName: 'updater',
-  }),
 }))
-
 export type User = typeof users.$inferSelect

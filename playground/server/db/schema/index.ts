@@ -1,4 +1,3 @@
 export * from './users'
-export * from './permissions'
-export * from './subscribers'
-export * from './testimonials'
+export * from './roles-n-permissions'
+export * from './template-schemas'

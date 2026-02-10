@@ -35,6 +35,24 @@ CREATE TABLE `comments` (
 );
 --> statement-breakpoint
 CREATE INDEX `resource_idx` ON `comments` (`resource_type`,`resource_id`);--> statement-breakpoint
+CREATE TABLE `notifications` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`uuid` text NOT NULL,
+	`status` text DEFAULT 'active',
+	`created_at` integer NOT NULL,
+	`updated_at` integer NOT NULL,
+	`deleted_at` integer,
+	`created_by` integer,
+	`updated_by` integer,
+	`user_id` integer NOT NULL,
+	`title` text NOT NULL,
+	`body` text,
+	`category` text,
+	`is_read` integer DEFAULT false,
+	`metadata` text,
+	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
+);
+--> statement-breakpoint
 CREATE TABLE `permissions` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`uuid` text NOT NULL,
@@ -101,6 +119,7 @@ CREATE TABLE `role_resource_permissions` (
 	FOREIGN KEY (`permission_id`) REFERENCES `permissions`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
+CREATE UNIQUE INDEX `unq_role_res_perm` ON `role_resource_permissions` (`role_id`,`resource_id`,`permission_id`);--> statement-breakpoint
 CREATE TABLE `roles` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`uuid` text NOT NULL,
