@@ -1,7 +1,7 @@
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
 import { roles } from './roles-n-permissions'
 import { systemFields, auditRelations } from './utils'
-import { relations } from 'drizzle-orm'
+import { defineRelations } from 'drizzle-orm';
 
 /**
  * Users
@@ -21,11 +21,19 @@ export const users = sqliteTable('users', {
   githubId: text('github_id').unique(),
   googleId: text('google_id').unique(),
 })
-export const usersRelations = relations(users, (helpers) => ({
-  ...auditRelations(helpers, users, users), // Passes 'users' safely inside the callback
-  assignedRole: helpers.one(roles, {
-    fields: [users.roleId],
-    references: [roles.id],
-  }),
+export const relations = defineRelations(schema, (r) => ({
+  users: {
+    assignedRole: r.one.roles({
+      from: r.users.roleId,
+      to: r.roles.id,
+    }),
+    
+    // Spread Audit Relations
+    // We pass 'r' which now contains the context of all tables
+    ...auditRelations({
+      ...r,
+      tables: r.users // Scopes the 'from' fields to the users table
+    }),
+  },
 }))
 export type User = typeof users.$inferSelect

@@ -1,6 +1,14 @@
 // src/runtime/utils/constants.ts
 
 /**
+ * Points to the primary key of users table.
+ * 
+ */
+export const NAC_OWNER_KEYS = [
+  'createdBy', 'updatedBy'
+]
+
+/**
  * Full system audit and identity fields.
  * Should not be editable by users.
  */

@@ -1,27 +1,27 @@
 // server/api/_nac/[model]/[id].delete.ts
 import { eventHandler, getRouterParams } from "h3";
-import { getTableForModel, formatResourceResult } from "../../../utils/modelMapper";
-import type { TableWithId } from "../../../types";
+import { modelTableMap, getSelectableFields } from "../../../utils/modelMapper";
 import { deleteRow } from "../../../utils/queries";
-import { RecordNotFoundError } from "../../../exceptions";
+import { RecordNotFoundError, ResourceNotFoundError } from "../../../exceptions";
 import { broadcast } from "../../../utils/sse-bus";
+import type { TableWithId } from "../../../types";
 
+// [id].delete.ts
 export default eventHandler(async (event) => {
   const { model, id } = getRouterParams(event) as { model: string; id: string };
 
-  const table = getTableForModel(model) as TableWithId;
+  const table = modelTableMap[model] as TableWithId;
+  if (!table) throw new ResourceNotFoundError();
 
   const deletedRecord = await deleteRow(table, id, event.context.nac || {});
   if (!deletedRecord) throw new RecordNotFoundError();
 
-  const sanitizedData = formatResourceResult(model, deletedRecord);
-
   await broadcast({
     table: model,
     action: "delete",
-    primaryKey: deletedRecord.id,
-    data: sanitizedData,
+    primaryKey: deletedRecord.id as number | string,
+    data: deletedRecord,
   });
 
-  return sanitizedData;
-});
+  return deletedRecord;
+}); 

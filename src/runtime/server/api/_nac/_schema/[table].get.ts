@@ -1,18 +1,14 @@
-import { eventHandler, createError, getRouterParam } from 'h3'
+import { eventHandler, getRouterParam } from 'h3'
 
 import { getSchema } from '../../../utils/schema'
+import { ResourceNotFoundError } from '../../../exceptions'
 
 export default eventHandler(async (event) => {
   const tableName = getRouterParam(event, 'table')
-
-  if (!tableName) {
-    throw createError({ statusCode: 400, message: 'Table name is required' })
-  }
+  if (!tableName) throw ResourceNotFoundError
 
   const schema = await getSchema(tableName)
-  if (!schema) {
-    throw createError({ statusCode: 404, message: `Table '${tableName}' not found` })
-  }
+  if (!schema) throw ResourceNotFoundError
 
   return schema
 })

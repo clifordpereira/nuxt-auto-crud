@@ -1,5 +1,5 @@
 // server/utils/schema.ts
-import { getTableColumns } from 'drizzle-orm'
+import { getColumns } from 'drizzle-orm'
 import {
   getZodSchema,
   modelTableMap,
@@ -13,6 +13,32 @@ import type { SQLiteTable } from 'drizzle-orm/sqlite-core'
 
 import type { Field, SchemaDefinition } from '#nac/shared/utils/types'
 
+
+
+export async function getAllSchemas() {
+  const schemas: Record<string, SchemaDefinition> = {}
+
+  forEachModel((tableName, table) => {
+    schemas[tableName] = drizzleTableToFields(table, tableName)
+  })
+  return schemas
+}
+
+export async function getSchema(tableName: string) {
+  const table = modelTableMap[tableName]
+  return table ? drizzleTableToFields(table as SQLiteTable, tableName) : undefined
+}
+
+export async function getSchemaRelations() {
+  const relations: Record<string, Record<string, string>> = {}
+
+  forEachModel((tableName, table) => {
+    relations[tableName] = resolveTableRelations(table, true)
+  })
+  return relations
+}
+
+
 /**
  * Enhanced schema builder that uses getSchemaDefinition() as base
  * and enriches field types with Zod semantic hints and textarea detection.
@@ -21,7 +47,7 @@ export function drizzleTableToFields(table: SQLiteTable, resourceName: string): 
   // Start with base schema from modelMapper
   const baseSchema = getSchemaDefinition(resourceName)
   
-  const columns = getTableColumns(table)
+  const columns = getColumns(table)
   const zodSchema = getZodSchema(resourceName, 'insert')
 
   // Enhance each field with semantic type hints
@@ -75,27 +101,4 @@ function enhanceFieldType(
 
   // 4. Fallback to base type from modelMapper
   return { type: baseType || 'string' }
-}
-
-export async function getSchemaRelations() {
-  const relations: Record<string, Record<string, string>> = {}
-
-  forEachModel((tableName, table) => {
-    relations[tableName] = resolveTableRelations(table, true)
-  })
-  return relations
-}
-
-export async function getAllSchemas() {
-  const schemas: Record<string, SchemaDefinition> = {}
-
-  forEachModel((tableName, table) => {
-    schemas[tableName] = drizzleTableToFields(table, tableName)
-  })
-  return schemas
-}
-
-export async function getSchema(tableName: string) {
-  const table = modelTableMap[tableName]
-  return table ? drizzleTableToFields(table as SQLiteTable, tableName) : undefined
 }

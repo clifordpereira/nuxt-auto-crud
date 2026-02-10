@@ -58,16 +58,6 @@ describe("modelMapper.ts", () => {
     );
   });
 
-  it("throws 404 with hints when model is missing", () => {
-    try {
-      mapper.getTableForModel("non_existent");
-    } catch (e: unknown) {
-      const error = e as H3Error;
-      expect(error.statusCode).toBe(404);
-      expect(error.message).toContain("users");
-    }
-  });
-
   it("generates agentic-safe Zod schemas", () => {
     const schema = mapper.getZodSchema("users", "insert");
     expect(schema.shape.id).toBeUndefined();

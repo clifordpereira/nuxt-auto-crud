@@ -23,3 +23,15 @@ export class RecordNotFoundError extends AutoCrudError {
     super(message, 404)
   }
 }
+
+export class ResourceNotFoundError extends AutoCrudError {
+  constructor(message: string = 'Resource not found') {
+    super(message, 404)
+  }
+}
+
+export class ValidationError extends AutoCrudError {
+  constructor(modelName: string, message: string = `${modelName} validation failed`) {
+    super(message, 400)
+  }
+}

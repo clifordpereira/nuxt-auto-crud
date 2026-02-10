@@ -1,9 +1,10 @@
-import { eq, desc, and, or } from "drizzle-orm";
+import { eq, desc, and, or, getColumns } from "drizzle-orm";
 // @ts-expect-error - hub:db is a virtual alias
 import { db } from "hub:db";
 import type { TableWithId } from "../types";
 import type { QueryContext } from "../../types";
 import { useRuntimeConfig } from "#imports";
+import { getSelectableFields } from "./modelMapper";
 
 /**
  * Fetches rows from the database based on the provided table and context.
@@ -41,7 +42,8 @@ export async function getRows(table: TableWithId, context: QueryContext = {}) {
     }
   }
 
-  let query = db.select().from(table).$dynamic();
+  const fields = getSelectableFields(table)
+  let query = db.select(fields).from(table).$dynamic();
   if (filters.length > 0) query = query.where(and(...filters));
 
   return await query.orderBy(desc(table.id)).all();
@@ -55,8 +57,16 @@ export async function getRows(table: TableWithId, context: QueryContext = {}) {
  * @returns The row from the database.
  */
 export async function getRow(table: TableWithId, id: string, context: QueryContext = {}) {
-  if (context.record) return context.record;
-  return await db.select().from(table).where(eq(table.id, Number(id))).get();
+  const fields = getSelectableFields(table)
+
+  // If record exists in context, we still need to sanitize it before returning
+  if (context.record) {
+    return Object.fromEntries(
+      Object.entries(context.record).filter(([key]) => key in fields)
+    );
+  }
+
+  return await db.select(fields).from(table).where(eq(table.id, Number(id))).get();
 }
 
 /**
@@ -69,12 +79,16 @@ export async function createRow(table: TableWithId, data: Record<string, unknown
   const ownerKey = useRuntimeConfig().autoCrud.auth?.ownerKey || "createdBy";
   
   const payload = { ...data };
+  const allColumns = getColumns(table);
+  const selectableFields = getSelectableFields(table);
+
   // Only inject if userId is provided and column exists in schema
-  if (context.userId && ownerKey in table) {
-    payload[ownerKey] = Number(context.userId);
+  if (context.userId) {
+    if (ownerKey in allColumns) payload[ownerKey] = Number(context.userId);
+    if ('updatedBy' in allColumns) payload.updatedBy = Number(context.userId);
   }
 
-  return await db.insert(table).values(payload).returning().get();
+  return await db.insert(table).values(payload).returning(selectableFields).get();
 }
 
 /**
@@ -88,18 +102,20 @@ export async function updateRow(table: TableWithId, id: string, data: Record<str
   const targetId = Number(id);
   const payload = { ...data };
 
+  const allColumns = getColumns(table);
+  const selectableFields = getSelectableFields(table);
+
   // Update audit metadata
-  if (context.userId && 'updatedBy' in table) {
+  if (context.userId && 'updatedBy' in allColumns) {
     payload.updatedBy = Number(context.userId);
   }
   
   // Explicitly refresh updatedAt for SQLite
-  if ('updatedAt' in table) {
+  if ('updatedAt' in allColumns) {
     payload.updatedAt = new Date();
   }
   
-  const [updated] = await db.update(table).set(payload).where(eq(table.id, targetId)).returning();
-
+  const [updated] = await db.update(table).set(payload).where(eq(table.id, targetId)).returning(selectableFields);
   return updated;
 }
 
@@ -111,11 +127,15 @@ export async function updateRow(table: TableWithId, id: string, data: Record<str
  */
 export async function deleteRow(table: TableWithId, id: string, context: QueryContext = {}) {
   const targetId = Number(id);
+  const fields = getSelectableFields(table);
 
   if (context.record) {
     await db.delete(table).where(eq(table.id, targetId)).run();
+    return Object.fromEntries(
+      Object.entries(context.record).filter(([key]) => key in fields)
+    );
     return context.record;
   }
 
-  return await db.delete(table).where(eq(table.id, targetId)).returning().get();
+  return await db.delete(table).where(eq(table.id, targetId)).returning(fields).get();
 }

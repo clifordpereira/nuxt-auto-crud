@@ -36,15 +36,13 @@ export const baseFields = {
  * @param userTable 
  * @returns 
  */
-export const auditRelations = (helpers: any, table: any, userTable: any) => ({
-  creator: helpers.one(userTable, {
-    fields: [table.createdBy],
-    references: [userTable.id],
-    relationName: `${table.toString()}_creator`, // Avoids collision in complex schemas
+export const auditRelations = (r: any) => ({
+  creator: r.one.users({
+    from: r.tables.createdBy,
+    to: r.users.id,
   }),
-  updater: helpers.one(userTable, {
-    fields: [table.updatedBy],
-    references: [userTable.id],
-    relationName: `${table.toString()}_updater`,
+  updater: r.one.users({
+    from: r.tables.updatedBy,
+    to: r.users.id,
   }),
 })

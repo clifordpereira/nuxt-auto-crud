@@ -1,135 +1,96 @@
 // runtime/server/utils/modelMapper.ts
+
 // @ts-expect-error - #site/schema is an alias defined by the module
 import * as schema from '#site/schema'
 import pluralize from 'pluralize'
 import { pascalCase } from 'scule'
-import {
-  getTableColumns as getDrizzleTableColumns,
-  getTableName,
-  type Column,
-  type Table,
-} from 'drizzle-orm'
+import { getColumns, type Column, Table } from 'drizzle-orm'
 import { getTableConfig, type SQLiteTable } from 'drizzle-orm/sqlite-core'
-import { createError } from 'h3'
-import { createInsertSchema } from 'drizzle-zod'
+import { createInsertSchema, createUpdateSchema } from 'drizzle-zod'
 import { z } from 'zod'
 
 import type { Field, SchemaDefinition } from '#nac/shared/utils/types'
-import { getHiddenFields, getProtectedFields, getSystemUserFields, getPublicColumns } from './config-resolver'
+import { useRuntimeConfig } from '#app'
+import { NAC_OWNER_KEYS, NAC_FORM_HIDDEN_FIELDS } from './constants'
+import { ResourceNotFoundError, ValidationError } from '../exceptions'
 
 export const customUpdatableFields: Record<string, string[]> = {}
 
 type ForeignKey = ReturnType<typeof getTableConfig>['foreignKeys'][number]
 
+
 /**
  * Builds a map of all exported Drizzle tables from the schema.
  */
-function buildModelTableMap(): Record<string, unknown> {
-  const tableMap: Record<string, unknown> = {}
-
-  for (const [key, value] of Object.entries(schema)) {
-    if (value && typeof value === 'object') {
-      try {
-        const tableName = getTableName(value as Table)
-        if (tableName) {
-          tableMap[key] = value
-        }
-      }
-      catch {
-        // Not a table
-      }
+export const buildModelTableMap = (): Record<string, SQLiteTable> => {
+  return Object.entries(schema).reduce((acc, [key, value]) => {
+    if (value && typeof value === 'object' && Table.is(value)) {
+      acc[key] = value as SQLiteTable
     }
-  }
-
-  return tableMap
+    return acc
+  }, {} as Record<string, SQLiteTable>)
 }
-
 export const modelTableMap = buildModelTableMap()
 
 /**
- * @throws 404 if modelName is not found in tableMap.
+ * Iterates over all models in the modelTableMap.
+ * @param callback The function to call for each model
  */
-export function getTableForModel(modelName: string): SQLiteTable {
-  const table = modelTableMap[modelName]
-
-  if (!table) {
-    const availableModels = Object.keys(modelTableMap).join(', ')
-    throw createError({
-      statusCode: 404,
-      message: `Model '${modelName}' not found. Available models: ${availableModels}`,
-    })
+export function forEachModel(callback: (name: string, table: SQLiteTable) => void) {
+  for (const [name, table] of Object.entries(modelTableMap)) {
+    try {
+      callback(name, table as SQLiteTable)
+    }
+    catch {
+      // Ignored for now. Could be logged later
+    }
   }
-
-  return table as SQLiteTable
-}
-
-export function getTableColumns(table: Table): string[] {
-  try {
-    const columns = getDrizzleTableColumns(table)
-    return Object.keys(columns)
-  }
-  catch (e) {
-    console.error('[getTableColumns] Error getting columns:', e)
-    return []
-  }
-}
-
-/**
- * Extracts the target table name from a Drizzle foreign key.
- */
-export function getTargetTableName(fk: ForeignKey): string {
-  // @ts-expect-error - Drizzle internals
-  return fk.reference().foreignTable[Symbol.for('drizzle:Name')]
 }
 
 /**
  * Resolves the property name for a foreign key's source column.
  * @returns The property name or undefined if not found
  */
+export function getForeignKeyPropertyName( fk: ForeignKey, columns: Record<string, Column>): string | undefined {
+  const dbName = fk.reference().columns[0]?.name
+  if (!dbName) return undefined
 
-export function getForeignKeyPropertyName(
-  fk: ForeignKey,
-  columns: Record<string, Column>,
-): string | undefined {
-  const sourceColName = fk.reference().columns[0]?.name
   return Object.entries(columns).find(
-    ([_, c]: [string, Column]) => c.name === sourceColName,
+    ([_, c]: [string, Column]) => c.name === dbName,
   )?.[0]
 }
 
+/**
+ * Returns an array of updatable fields for a given model.
+ * @param modelName The name of the model
+ * @returns An array of field names
+ */
+// move to shared/utils
 export function getUpdatableFields(modelName: string): string[] {
-  if (customUpdatableFields[modelName]) {
-    return customUpdatableFields[modelName]
-  }
-
+  const {formHiddenFields} = useRuntimeConfig().public.autoCrud
   const table = modelTableMap[modelName]
   if (!table) return []
 
-  const allColumns = getTableColumns(table as Table)
-  return allColumns.filter(
-    col => !getProtectedFields().includes(col) && !getHiddenFields(modelName).includes(col),
+  return Object.keys(getColumns(table as Table)).filter(
+    (key) => !formHiddenFields.includes(key)
   )
 }
 
+// keep in server/utils itself
+// used for CRUD getRow and getRows
 /**
- * Detects if a column represents a date or timestamp.
+ * Selectable fields to give as api response.
+ * @param table The table to query.
+ * @returns An object of field names and their values
  */
-export function isDateColumn(column: Column, key: string): boolean {
-  const col = column as unknown as { name?: string, dataType?: string, mode?: string, columnType?: string }
-  const name = col.name || key
-  const isDateName
-    = name.endsWith('_at')
-      || name.endsWith('At')
-      || name.endsWith('Login')
-      || name.endsWith('Date')
-      || name.endsWith('_date')
+export function getSelectableFields(table: SQLiteTable): Record<string, any> {
+  const { apiHiddenFields } = useRuntimeConfig().autoCrud
 
-  return (
-    col.dataType === 'date'
-    || col.mode === 'timestamp'
-    || col.columnType?.toLowerCase().includes('timestamp')
-    || ((col.dataType === 'string' || col.dataType === 'number' || col.columnType?.includes('Integer')) && isDateName)
-  ) ?? false
+  const allColumns = getColumns(table)
+
+  return Object.fromEntries(
+    Object.entries(allColumns).filter(([key]) => !apiHiddenFields.includes(key))
+  )
 }
 
 /**
@@ -139,21 +100,19 @@ export function filterUpdatableFields(
   modelName: string,
   data: Record<string, unknown>,
 ): Record<string, unknown> {
-  const allowedFields = getUpdatableFields(modelName)
-  const filtered: Record<string, unknown> = {}
   const table = modelTableMap[modelName]
-  const columns = table ? getDrizzleTableColumns(table as Table) : {}
+  if (!table) return {}
 
-  for (const field of allowedFields) {
-    if (data[field] !== undefined) {
-      let value = data[field]
-      const column = columns[field]
+  const schema = createUpdateSchema(table).partial()
+  const result = schema.safeParse(data)
+  if (!result.success) throw new ValidationError(modelName)
 
-      if (column && isDateColumn(column, field) && typeof value === 'string') {
-        value = new Date(value)
-      }
+  const allowedFields = getUpdatableFields(modelName)
+  const filtered: Record<string, any> = {}
 
-      filtered[field] = value
+  for (const key of allowedFields) {
+    if (result.data[key] !== undefined) {
+      filtered[key] = result.data[key]
     }
   }
 
@@ -180,17 +139,13 @@ export function getAvailableModels(): string[] {
  * - If isGuest=true AND resource has explicit public fields configured, filters to Allowlist.
  */
 export function sanitizeResource(
-  modelName: string,
   data: Record<string, unknown>,
 ): Record<string, unknown> {
-  const hidden = getHiddenFields(modelName)
+  const hidden = useRuntimeConfig().autoCrud.apiHiddenFields
   const filtered: Record<string, unknown> = {}
 
   for (const [key, value] of Object.entries(data)) {
-    // Drop fields in global HIDDEN_FIELDS or system-level exclusions
-    if (hidden.includes(key) || key === 'deletedAt') {
-      continue
-    }
+    if (hidden.includes(key)) continue
     filtered[key] = value
   }
 
@@ -200,40 +155,34 @@ export function sanitizeResource(
 /**
  * Derives Zod schema via drizzle-zod, omitting server-managed and protected fields.
  */
+export function getZodSchema(modelName: string, type: 'insert' | 'patch' = 'insert'): z.ZodObject<z.ZodRawShape> {
+  const table = modelTableMap[modelName]
+  if (!table) throw new ResourceNotFoundError
 
-export function getZodSchema(
-  modelName: string,
-  type: 'insert' | 'patch' = 'insert',
-): z.ZodObject<z.ZodRawShape> {
-  const table = getTableForModel(modelName)
-  const columns = getDrizzleTableColumns(table as Table)
+  const tableColumns = getColumns(table)
+  const columnNames = Object.keys(tableColumns)
 
-  // Custom schema overrides for date coercion
-  const customSchema: Record<string, z.ZodTypeAny> = {}
+  // 1. Generate schema with automatic Date coercion
+  const schema = createInsertSchema(table, ({ name, column }) => ({
+    [name]: column.columnType.includes('timestamp') || column.dataType === 'date' 
+      ? z.coerce.date() 
+      : undefined // Fallback to default drizzle-zod inference
+  }))
 
-  for (const [key, column] of Object.entries(columns)) {
-    if (isDateColumn(column, key)) {
-      customSchema[key] = z.coerce.date()
-      if (!column.notNull) {
-        customSchema[key] = customSchema[key].nullable().optional()
-      }
-    }
-  }
-
-  const schema = createInsertSchema(table, customSchema)
-
+  // 2. Handle Patch (Partial)
   if (type === 'patch') {
     return schema.partial() as z.ZodObject<z.ZodRawShape>
   }
 
+  // 3. Handle Insert (Omit protected/hidden fields)
   const OMIT_ON_CREATE = [...getProtectedFields(), ...getHiddenFields(modelName)]
   const fieldsToOmit: Record<string, true> = {}
 
-  OMIT_ON_CREATE.forEach((field) => {
-    if (columns[field]) {
+  for (const field of OMIT_ON_CREATE) {
+    if (columnNames.includes(field)) {
       fieldsToOmit[field] = true
     }
-  })
+  }
 
   return schema.omit(fieldsToOmit) as z.ZodObject<z.ZodRawShape>
 }
@@ -250,41 +199,48 @@ export function formatResourceResult(
 }
 
 /**
- * Shared utility to extract relations from a Drizzle table
+ * Resolves table relationships for NAC reflection.
+ * Maps property keys to target table names.
  */
-export function resolveTableRelations(table: SQLiteTable, includeSystemFields = false): Record<string, string> {
+export function resolveTableRelations(
+  table: SQLiteTable, 
+  includeSystemFields = false
+): Record<string, string> {
   const config = getTableConfig(table)
-  const columns = getDrizzleTableColumns(table as Table)
+  const columnsMap = getColumns(table as Table)
+  const propertyKeys = Object.keys(columnsMap)
   const relations: Record<string, string> = {}
 
-  // Resolve implicit user relations
+  // 1. Link NAC_OWNER_KEYS to users table
   if (includeSystemFields) {
-    const systemFields = getSystemUserFields()
-    for (const key of Object.keys(columns)) {
-      if (systemFields.includes(key)) relations[key] = 'users'
+    const systemFields = new Set(NAC_OWNER_KEYS)
+    for (const key of propertyKeys) {
+      if (systemFields.has(key)) {
+        relations[key] = 'users'
+      }
     }
   }
 
-  // Resolve explicit Foreign Keys
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  config.foreignKeys.forEach((fk: any) => {
-    const targetTableName = getTargetTableName(fk)
-    const propertyKey = getForeignKeyPropertyName(fk, columns)
+  // 2. Resolve explicit Foreign Keys from Schema
+  for (const fk of config.foreignKeys) {
+    const targetTable = getTableConfig(fk.reference().foreignTable).name;
+    const propertyKey = getForeignKeyPropertyName(fk, columnsMap)
 
     if (propertyKey) {
-      relations[propertyKey] = targetTableName
+      relations[propertyKey] = targetTable
     }
-  })
+  }
 
   return relations
 }
+
 
 export function getRelations(): Record<string, Record<string, string>> {
   const relations: Record<string, Record<string, string>> = {}
   const models = getAvailableModels()
 
   for (const model of models) {
-    const table = getTableForModel(model)
+    const table = modelTableMap[model] as SQLiteTable
     relations[model] = resolveTableRelations(table, false)
   }
 
@@ -296,17 +252,6 @@ export function getLabelField(columnNames: string[]): string {
   return candidates.find(n => columnNames.includes(n)) || 'id'
 }
 
-export function forEachModel(callback: (name: string, table: SQLiteTable) => void) {
-  for (const [name, table] of Object.entries(modelTableMap)) {
-    try {
-      callback(name, table as SQLiteTable)
-    }
-    catch {
-      // Ignored for now. Could be logged later
-    }
-  }
-}
-
 /**
  * Builds a complete SchemaDefinition for a model.
  * - Filters out hidden fields
@@ -315,38 +260,45 @@ export function forEachModel(callback: (name: string, table: SQLiteTable) => voi
  * - Resolves foreign key relations
  */
 export function getSchemaDefinition(modelName: string): SchemaDefinition {
-  const table = getTableForModel(modelName)
-  const columnNames = getTableColumns(table)
+  const table = modelTableMap[modelName]
+  if (!table) throw new Error(`Model ${modelName} not found`)
+
+  const columnEntries = Object.entries(getColumns(table))
+  const columnNames = columnEntries.map(([name]) => name)
   const labelField = getLabelField(columnNames)
-  const relations = resolveTableRelations(table, true) // Include system user fields
-  const drizzleColumns = getDrizzleTableColumns(table as Table)
-  const hiddenFields = getHiddenFields(modelName)
-  const protectedFields = getProtectedFields()
+  const relations = resolveTableRelations(table, true)
   
-  const fields: Field[] = columnNames
-    .filter(name => !hiddenFields.includes(name)) // Filter hidden fields
-    .map((name) => {
-      const column = drizzleColumns[name]
-      const col = column as unknown as { dataType?: string, notNull?: boolean, columnType?: string }
+  const config = useRuntimeConfig()
+  const hiddenFields = config.autoCrud.apiHiddenFields
+  const protectedFields = config.public.autoCrud.formHiddenFields
+
+  const zodSchema = createInsertSchema(table)
+  const shape = zodSchema.shape
+
+  const fields: Field[] = columnEntries
+    .filter(([name]) => !hiddenFields.includes(name))
+    .map(([name, column]) => {
+      const zodType = shape[name]
+      const col = column as any
       
-      // Infer field type
+      // Map Drizzle types via Zod shape
       let type = 'string'
-      if (column && isDateColumn(column, name)) {
+      if (zodType instanceof z.ZodDate || (zodType as any)._def?.typeName === 'ZodDate') {
         type = 'date'
-      } else if (col?.dataType === 'number' || col?.columnType?.includes('Integer')) {
+      } else if (zodType instanceof z.ZodNumber) {
         type = 'number'
-      } else if (col?.dataType === 'boolean') {
+      } else if (zodType instanceof z.ZodBoolean) {
         type = 'boolean'
       }
-      
+
       return {
         name,
         type,
         required: col?.notNull ?? false,
         references: relations[name],
-        isReadOnly: protectedFields.includes(name), // Mark protected fields
+        isReadOnly: protectedFields.includes(name),
       }
     })
-  
+
   return { resource: modelName, labelField, fields }
 }
