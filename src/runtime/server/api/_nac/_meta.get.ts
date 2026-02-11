@@ -1,8 +1,9 @@
-import { eventHandler, getQuery, getHeader } from 'h3'
-import { getSchemaDefinition, modelTableMap } from '../../utils/modelMapper'
+import { useRuntimeConfig } from '#imports'
 // @ts-expect-error - 'hub:db' is a virtual alias
 import { db } from 'hub:db'
-import { useRuntimeConfig } from '#imports'
+import { eventHandler, getQuery, getHeader } from 'h3'
+
+import { getSchemaDefinition, modelTableMap } from '../../utils/modelMapper'
 
 export default eventHandler(async (event) => {
   const config = useRuntimeConfig()

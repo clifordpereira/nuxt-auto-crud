@@ -1,11 +1,15 @@
-import { eq, desc, and, or, getColumns } from "drizzle-orm";
+import { useRuntimeConfig } from "#imports";
 // @ts-expect-error - hub:db is a virtual alias
 import { db } from "hub:db";
-import type { TableWithId } from "../types";
-import type { QueryContext } from "../../types";
-import { useRuntimeConfig } from "#imports";
+import { eq, desc, and, or, getColumns } from "drizzle-orm";
+import type { Table } from "drizzle-orm";
+
 import { getSelectableFields } from "./modelMapper";
+
 import { DeletionFailedError, InsertionFailedError, RecordNotFoundError, UpdationFailedError } from "../exceptions";
+
+import type { QueryContext } from "../../types";
+import type { TableWithId } from "../types";
 
 /**
  * Fetches rows from the database based on the provided table and context.
@@ -79,7 +83,7 @@ export async function getRow(table: TableWithId, id: string, context: QueryConte
  * @param data - The data to insert into the table.
  * @param context - The context object containing user ID and permissions.
  */
-export async function createRow(table: TableWithId, data: Record<string, unknown>, context: QueryContext = {}) {
+export async function createRow(table: Table, data: Record<string, unknown>, context: QueryContext = {}) {
   const ownerKey = useRuntimeConfig().autoCrud.auth?.ownerKey || "createdBy";
   
   const payload = { ...data };

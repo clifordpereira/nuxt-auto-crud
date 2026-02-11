@@ -1,7 +1,8 @@
-import { eventHandler, setResponseHeaders } from 'h3'
-import { addClient, removeClient, instanceId } from '../../utils/sse-bus'
 // @ts-expect-error - virtual import resolved by Nuxt/Nitro
 import { kv } from '@nuxthub/kv'
+import { eventHandler, setResponseHeaders } from 'h3'
+
+import { addClient, removeClient, instanceId } from '../../utils/sse-bus'
 
 export default eventHandler(async (event) => {
   const id = crypto.randomUUID()

@@ -1,6 +1,6 @@
 import { eventHandler } from 'h3'
 
-import { forEachModel, resolveTableRelations } from '../../utils/modelMapper'
+import { forEachModel, getTableRelations } from '../../../utils/modelMapper'
 
 /**
  * Returns the relations for all models in the database.
@@ -10,7 +10,7 @@ export default eventHandler(async () => {
   const relations: Record<string, Record<string, string>> = {}
 
   forEachModel((tableName, table) => {
-    relations[tableName] = resolveTableRelations(table, true)
+    relations[tableName] = getTableRelations(table)
   })
   return relations
 })

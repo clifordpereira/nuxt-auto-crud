@@ -104,6 +104,44 @@ export function resolveValidatedSchema( table: SQLiteTable, intent: 'insert' | '
   return (intent === 'patch' ? sanitizedSchema.partial() : sanitizedSchema) as z.ZodObject<z.ZodRawShape>
 }
 
+
+
+/**
+ * Extracts foreign key relationships for a specific table.
+ * @returns Record<string, string> 
+ * 
+ * @example
+ * { userId: 'users', categoryId: 'categories' }
+ */
+export function getTableRelations(table: SQLiteTable): Record<string, string> {
+  const { foreignKeys } = getTableConfig(table)
+  const columnsMap = getColumns(table as Table)
+  const relations: Record<string, string> = {}
+
+  for (const fk of foreignKeys) {
+    // 1. Get the target (referenced) table name
+    const remoteTable = fk.reference().foreignTable
+    const targetTableName = getTableConfig(remoteTable).name
+
+    // 2. Map the local column name to that table
+    // We use the first column in the reference since NAC assumes single-column FKs
+    const localColumnName = fk.reference().columns[0]?.name
+
+    if (localColumnName) {
+      // Find the property key (TS name) that matches the DB column name
+      const propertyKey = Object.entries(columnsMap).find(
+        ([_, col]) => col.name === localColumnName
+      )?.[0]
+
+      if (propertyKey) {
+        relations[propertyKey] = targetTableName
+      }
+    }
+  }
+
+  return relations
+}
+
 /**
  * Resolves table relationships for NAC reflection.
  * Maps property keys to target table names.

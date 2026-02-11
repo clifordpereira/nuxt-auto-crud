@@ -1,10 +1,13 @@
 // server/api/_nac/[model]/[id].patch.ts
 import { eventHandler, getRouterParams, readBody } from 'h3'
+
 import { modelTableMap, resolveValidatedSchema } from '../../../utils/modelMapper'
-import type { TableWithId } from '../../../types'
 import { updateRow } from '../../../utils/queries'
 import { broadcast } from '../../../utils/sse-bus'
+
 import { ResourceNotFoundError } from '../../../exceptions'
+
+import type { TableWithId } from '../../../types'
 
 export default eventHandler(async (event) => {
   const { model, id } = getRouterParams(event) as { model: string, id: string }

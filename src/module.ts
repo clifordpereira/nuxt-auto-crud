@@ -67,8 +67,9 @@ export default defineNuxtModule<ModuleOptions>({
       { path: '/_meta', method: 'get', handler: '_meta.get.ts' },
       { path: '/_sse', method: 'get', handler: '_sse.get.ts' },
       { path: '/_relations', method: 'get', handler: '_relations.get.ts' },
-      { path: '/_schema', method: 'get', handler: '_schema/index.get.ts' },
-      { path: '/_schema/:table', method: 'get', handler: '_schema/[table].get.ts' },
+      { path: '/_relations/:model', method: 'get', handler: '_relations/[model].get.ts' },
+      { path: '/_schemas', method: 'get', handler: '_schemas.get.ts' },
+      { path: '/_schemas/:model', method: 'get', handler: '_schemas/[model].get.ts' },
       // Dynamic CRUD Endpoints
       { path: '/:model', method: 'get', handler: '[model]/index.get.ts' },
       { path: '/:model', method: 'post', handler: '[model]/index.post.ts' },

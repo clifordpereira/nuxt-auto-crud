@@ -1,9 +1,12 @@
 // server/api/_nac/[model]/[id].delete.ts
 import { eventHandler, getRouterParams } from "h3";
+
 import { modelTableMap } from "../../../utils/modelMapper";
 import { deleteRow } from "../../../utils/queries";
-import { ResourceNotFoundError } from "../../../exceptions";
 import { broadcast } from "../../../utils/sse-bus";
+
+import { ResourceNotFoundError } from "../../../exceptions";
+
 import type { TableWithId } from "../../../types";
 
 export default eventHandler(async (event) => {

@@ -1,9 +1,12 @@
 // server/api/_nac/[model]/index.get.ts
 import { eventHandler, getRouterParams } from 'h3'
+
 import { modelTableMap } from '../../../utils/modelMapper'
-import type { TableWithId } from '../../../types'
 import { getRows } from '../../../utils/queries'
+
 import { ResourceNotFoundError } from '../../../exceptions'
+
+import type { TableWithId } from '../../../types'
 
 export default eventHandler(async (event) => {
   const { model } = getRouterParams(event) as { model: string }

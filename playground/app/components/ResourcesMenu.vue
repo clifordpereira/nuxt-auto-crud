@@ -9,14 +9,15 @@ const props = defineProps<{
 const { user } = useUserSession()
 
 const { endpointPrefix } = useRuntimeConfig().public.autoCrud
-const { data: schemas } = await useFetch(`${endpointPrefix}/_schema`)
-const resourceNames = computed(() =>
-  Object.keys(schemas.value || {}).filter((name) => {
-    // Exclude system tables
-    if (['users', 'roles', 'permissions', 'resources', 'roleResourcePermissions', 'testimonials', 'subscribers'].includes(name)) return false
+const systemTables = ['users', 'roles', 'permissions', 'resources', 'roleResourcePermissions', 'testimonials', 'subscribers']
+const { data: schemas } = await useFetch<string[]>(`${endpointPrefix}/_schemas`)
 
-    return isAllowedToSeeResourceMenu(user.value, name)
-  }).sort((a, b) => b.localeCompare(a)),
+const filteredResources = useArrayDifference(() => schemas.value || [], systemTables)
+
+const resourceNames = computed(() => 
+  filteredResources.value
+    .filter(name => isAllowedToSeeResourceMenu(user.value, name))
+    .sort((a, b) => a.localeCompare(b))
 )
 
 const items = computed(() => {

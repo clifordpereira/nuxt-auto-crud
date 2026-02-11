@@ -4,17 +4,11 @@
 import type { FormSubmitEvent } from '@nuxt/ui'
 import { useChangeCase } from '@vueuse/integrations/useChangeCase'
 
+import type { SchemaDefinition } from '#nac/shared/utils/types'
+
+
 const props = defineProps<{
-  schema: {
-    resource: string
-    fields: {
-      name: string
-      type: string
-      required?: boolean
-      selectOptions?: string[]
-      references?: string
-    }[]
-  }
+  schema: SchemaDefinition
   initialState?: Record<string, unknown>
   loading?: boolean
 }>()
