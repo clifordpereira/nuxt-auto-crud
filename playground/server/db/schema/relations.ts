@@ -41,24 +41,42 @@ export const relations = defineRelations(
         from: r.users.roleId,
         to: r.roles.id,
       }),
-      notifications: r.many.notifications(),
-      comments: r.many.comments(),
+      notifications: r.many.notifications({
+        from: r.users.id,
+        to: r.notifications.userId,
+      }),
+      comments: r.many.comments({
+        from: r.users.id,
+        to: r.comments.authorId,
+      }),
       ...auditRelations({ ...r, tables: r.users }),
     },
 
     roles: {
-      users: r.many.users(),
-      resourcePermissions: r.many.roleResourcePermissions(),
+      users: r.many.users({
+        from: r.roles.id,
+        to: r.users.roleId,
+      }),
+      resourcePermissions: r.many.roleResourcePermissions({
+        from: r.roles.id,
+        to: r.roleResourcePermissions.roleId,
+      }),
       ...auditRelations({ ...r, tables: r.roles }),
     },
 
     resources: {
-      rolePermissions: r.many.roleResourcePermissions(),
+      rolePermissions: r.many.roleResourcePermissions({
+        from: r.resources.id,
+        to: r.roleResourcePermissions.resourceId,
+      }),
       ...auditRelations({ ...r, tables: r.resources }),
     },
 
     permissions: {
-      rolePermissions: r.many.roleResourcePermissions(),
+      rolePermissions: r.many.roleResourcePermissions({
+        from: r.permissions.id,
+        to: r.roleResourcePermissions.permissionId,
+      }),
       ...auditRelations({ ...r, tables: r.permissions }),
     },
 
@@ -87,7 +105,10 @@ export const relations = defineRelations(
     },
 
     categories: {
-      posts: r.many.posts(),
+      posts: r.many.posts({
+        from: r.categories.id,
+        to: r.posts.categoryId,
+      }),
       ...auditRelations({ ...r, tables: r.categories }),
     },
 
