@@ -140,19 +140,6 @@ export function resolveTableRelations(
   return relations
 }
 
-
-export function getRelations(): Record<string, Record<string, string>> {
-  const relations: Record<string, Record<string, string>> = {}
-  const models = Object.keys(modelTableMap)
-
-  for (const model of models) {
-    const table = modelTableMap[model] as SQLiteTable
-    relations[model] = resolveTableRelations(table, false)
-  }
-
-  return relations
-}
-
 export function getLabelField(columnNames: string[]): string {
   const candidates = ['name', 'title', 'email', 'label', 'subject']
   return candidates.find(n => columnNames.includes(n)) || 'id'

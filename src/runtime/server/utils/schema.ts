@@ -1,41 +1,11 @@
 // server/utils/schema.ts
 import { getColumns } from 'drizzle-orm'
-import {
-  modelTableMap,
-  getSchemaDefinition,
-  resolveTableRelations,
-  forEachModel,
-  resolveValidatedSchema,
-} from './modelMapper'
+import { getSchemaDefinition, resolveValidatedSchema } from './modelMapper'
 import type { ZodType } from 'zod'
 import type { Column } from 'drizzle-orm'
 import type { SQLiteTable } from 'drizzle-orm/sqlite-core'
 
 import type { Field, SchemaDefinition } from '#nac/shared/utils/types'
-
-export async function getAllSchemas() {
-  const schemas: Record<string, SchemaDefinition> = {}
-
-  forEachModel((tableName, table) => {
-    schemas[tableName] = drizzleTableToFields(table, tableName)
-  })
-  return schemas
-}
-
-export async function getSchema(tableName: string) {
-  const table = modelTableMap[tableName]
-  return table ? drizzleTableToFields(table as SQLiteTable, tableName) : undefined
-}
-
-export async function getSchemaRelations() {
-  const relations: Record<string, Record<string, string>> = {}
-
-  forEachModel((tableName, table) => {
-    relations[tableName] = resolveTableRelations(table, true)
-  })
-  return relations
-}
-
 
 /**
  * Enhanced schema builder that uses getSchemaDefinition() as base

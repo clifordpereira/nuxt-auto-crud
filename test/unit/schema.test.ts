@@ -115,12 +115,6 @@ describe('schema.ts', () => {
     expect(emailField?.type).toBeDefined()
   })
 
-  it('retrieves all schemas', async () => {
-    const schemas = await schemaUtils.getAllSchemas()
-    expect(schemas.users).toBeDefined()
-    expect(schemas.users.fields).toBeInstanceOf(Array)
-  })
-
   it('retrieves a specific schema', async () => {
     const schema = await schemaUtils.getSchema('users')
     expect(schema).toBeDefined()
