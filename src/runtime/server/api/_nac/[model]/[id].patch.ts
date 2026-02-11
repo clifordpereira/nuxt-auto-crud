@@ -1,22 +1,20 @@
 // server/api/_nac/[model]/[id].patch.ts
 import { eventHandler, getRouterParams, readBody } from 'h3'
-import { modelTableMap, getZodSchema, filterUpdatableFields } from '../../../utils/modelMapper'
+import { modelTableMap, resolveValidatedSchema } from '../../../utils/modelMapper'
 import type { TableWithId } from '../../../types'
 import { updateRow } from '../../../utils/queries'
-import { RecordNotFoundError } from '../../../exceptions'
 import { broadcast } from '../../../utils/sse-bus'
+import { ResourceNotFoundError } from '../../../exceptions'
 
 export default eventHandler(async (event) => {
   const { model, id } = getRouterParams(event) as { model: string, id: string }
-  const table = modelTableMap[model] as TableWithId
   const body = await readBody(event)
 
-  const sanitizedBody = filterUpdatableFields(model, body)
-  const schema = getZodSchema(model, 'patch')
-  const payload = await schema.parseAsync(sanitizedBody)
+  const table = modelTableMap[model] as TableWithId
+  if (!table) throw new ResourceNotFoundError(model);
 
-  const updatedRecord = await updateRow(table, id, payload, event.context.nac || {})
-  if (!updatedRecord) throw new RecordNotFoundError()
+  const validatedData = await resolveValidatedSchema(table, 'patch').parseAsync(body)
+  const updatedRecord = await updateRow(table, id, validatedData, event.context.nac || {})
 
   await broadcast({
     table: model,

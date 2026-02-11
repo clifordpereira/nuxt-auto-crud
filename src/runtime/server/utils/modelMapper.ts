@@ -6,18 +6,17 @@ import pluralize from 'pluralize'
 import { pascalCase } from 'scule'
 import { getColumns, type Column, Table } from 'drizzle-orm'
 import { getTableConfig, type SQLiteTable } from 'drizzle-orm/sqlite-core'
-import { createInsertSchema, createUpdateSchema } from 'drizzle-zod'
+import { createInsertSchema } from 'drizzle-zod'
 import { z } from 'zod'
 
 import type { Field, SchemaDefinition } from '#nac/shared/utils/types'
 import { useRuntimeConfig } from '#app'
-import { NAC_OWNER_KEYS, NAC_FORM_HIDDEN_FIELDS } from './constants'
+import { NAC_OWNER_KEYS } from './constants'
 import { ResourceNotFoundError, ValidationError } from '../exceptions'
 
 export const customUpdatableFields: Record<string, string[]> = {}
 
 type ForeignKey = ReturnType<typeof getTableConfig>['foreignKeys'][number]
-
 
 /**
  * Builds a map of all exported Drizzle tables from the schema.
@@ -60,96 +59,52 @@ export function getForeignKeyPropertyName( fk: ForeignKey, columns: Record<strin
   )?.[0]
 }
 
-/**
- * Returns an array of updatable fields for a given model.
- * @param modelName The name of the model
- * @returns An array of field names
- */
-// move to shared/utils
-export function getUpdatableFields(modelName: string): string[] {
-  const {formHiddenFields} = useRuntimeConfig().public.autoCrud
-  const table = modelTableMap[modelName]
-  if (!table) return []
-
-  return Object.keys(getColumns(table as Table)).filter(
-    (key) => !formHiddenFields.includes(key)
-  )
-}
 
 // keep in server/utils itself
 // used for CRUD getRow and getRows
 /**
- * Selectable fields to give as api response.
+ * Selectable fields to give as api response. 
+ * Used in getRow (/[model]/[id].get.ts) and getRows (/[model]/index.get.ts).
  * @param table The table to query.
  * @returns An object of field names and their values
+ * result example: { field1: users.id, field2: users.name, }
  */
-export function getSelectableFields(table: SQLiteTable): Record<string, any> {
+export function getSelectableFields(table: SQLiteTable): Record<string, Column> {
   const { apiHiddenFields } = useRuntimeConfig().autoCrud
 
   const allColumns = getColumns(table)
 
-  return Object.fromEntries(
-    Object.entries(allColumns).filter(([key]) => !apiHiddenFields.includes(key))
+  const entries = Object.entries(allColumns).filter(
+    ([key]) => !apiHiddenFields.includes(key)
   )
+
+  return Object.fromEntries(entries) as Record<string, Column>
 }
 
 /**
- * Filters and coerces data for updates, handling timestamp conversion.
+ * Resolves a model-specific Zod schema that automatically strips
+ * NAC_FORM_HIDDEN_FIELDS and coerces technical types.
  */
-export function filterUpdatableFields(
-  modelName: string,
-  data: Record<string, unknown>,
-): Record<string, unknown> {
-  const table = modelTableMap[modelName]
-  if (!table) return {}
+export function resolveValidatedSchema( table: SQLiteTable, intent: 'insert' | 'patch' = 'insert'): z.ZodObject<z.ZodRawShape> {
+  const { formHiddenFields } = useRuntimeConfig().public.autoCrud
 
-  const schema = createUpdateSchema(table).partial()
-  const result = schema.safeParse(data)
-  if (!result.success) throw new ValidationError(modelName)
+  // 1. Base Schema with Date Coercion
+  const baseSchema = createInsertSchema(table, ({ name, column }: { name: string; column: Column }) => {
+    // Check columnType for 'timestamp' or 'date' strings
+    const isDateColumn = column.columnType.includes('timestamp') || column.columnType.includes('date')
 
-  const allowedFields = getUpdatableFields(modelName)
-  const filtered: Record<string, any> = {}
-
-  for (const key of allowedFields) {
-    if (result.data[key] !== undefined) {
-      filtered[key] = result.data[key]
+    return {
+      [name]: isDateColumn ? z.coerce.date() : undefined
     }
-  }
+  })
 
-  return filtered
-}
+  // 2. Filter NAC protected/hidden fields
+  const columnNames = Object.keys(getColumns(table))
+  const fieldsToOmit = formHiddenFields.filter(f => columnNames.includes(f))
+  const sanitizedSchema = baseSchema.omit(Object.fromEntries(fieldsToOmit.map(f => [f, true])))
 
-export function getModelSingularName(modelName: string): string {
-  const singular = pluralize.singular(modelName)
-  return pascalCase(singular)
-}
-
-export function getModelPluralName(modelName: string): string {
-  return pluralize.plural(modelName).toLowerCase()
-}
-
-export function getAvailableModels(): string[] {
-  return Object.keys(modelTableMap)
-}
-// config resolver
-
-/**
- * Sanitizes resource data based on guest mode and configuration.
- * - Always filters globally excluded HIDDEN_FIELDS.
- * - If isGuest=true AND resource has explicit public fields configured, filters to Allowlist.
- */
-export function sanitizeResource(
-  data: Record<string, unknown>,
-): Record<string, unknown> {
-  const hidden = useRuntimeConfig().autoCrud.apiHiddenFields
-  const filtered: Record<string, unknown> = {}
-
-  for (const [key, value] of Object.entries(data)) {
-    if (hidden.includes(key)) continue
-    filtered[key] = value
-  }
-
-  return filtered
+  // 3. Apply intent
+  return (intent === 'patch' ? sanitizedSchema.partial() : sanitizedSchema) as z.ZodObject<z.ZodRawShape>
 }
 
 /**
@@ -187,16 +142,20 @@ export function getZodSchema(modelName: string, type: 'insert' | 'patch' = 'inse
   return schema.omit(fieldsToOmit) as z.ZodObject<z.ZodRawShape>
 }
 
-export function formatResourceResult(
-  model: string,
-  data: Record<string, unknown> | Record<string, unknown>[] | null | undefined,
-): Record<string, unknown> | Record<string, unknown>[] | null | undefined {
-  if (!data) return data
 
-  const sanitize = (item: Record<string, unknown>) => sanitizeResource(model, item)
-
-  return Array.isArray(data) ? data.map(sanitize) : sanitize(data)
+export function getModelSingularName(modelName: string): string {
+  const singular = pluralize.singular(modelName)
+  return pascalCase(singular)
 }
+
+export function getModelPluralName(modelName: string): string {
+  return pluralize.plural(modelName).toLowerCase()
+}
+
+export function getAvailableModels(): string[] {
+  return Object.keys(modelTableMap)
+}
+
 
 /**
  * Resolves table relationships for NAC reflection.

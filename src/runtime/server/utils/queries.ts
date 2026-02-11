@@ -5,6 +5,7 @@ import type { TableWithId } from "../types";
 import type { QueryContext } from "../../types";
 import { useRuntimeConfig } from "#imports";
 import { getSelectableFields } from "./modelMapper";
+import { DeletionFailedError, InsertionFailedError, RecordNotFoundError, UpdationFailedError } from "../exceptions";
 
 /**
  * Fetches rows from the database based on the provided table and context.
@@ -66,7 +67,10 @@ export async function getRow(table: TableWithId, id: string, context: QueryConte
     );
   }
 
-  return await db.select(fields).from(table).where(eq(table.id, Number(id))).get();
+  const record = await db.select(fields).from(table).where(eq(table.id, Number(id))).get();
+  if (!record) throw new RecordNotFoundError();
+
+  return record;
 }
 
 /**
@@ -88,7 +92,10 @@ export async function createRow(table: TableWithId, data: Record<string, unknown
     if ('updatedBy' in allColumns) payload.updatedBy = Number(context.userId);
   }
 
-  return await db.insert(table).values(payload).returning(selectableFields).get();
+  const result = await db.insert(table).values(payload).returning(selectableFields).get();
+  if (!result) throw new InsertionFailedError();
+
+  return result;
 }
 
 /**
@@ -116,6 +123,8 @@ export async function updateRow(table: TableWithId, id: string, data: Record<str
   }
   
   const [updated] = await db.update(table).set(payload).where(eq(table.id, targetId)).returning(selectableFields);
+  if (!updated) throw new UpdationFailedError();
+  
   return updated;
 }
 
@@ -125,17 +134,12 @@ export async function updateRow(table: TableWithId, id: string, data: Record<str
  * @param id - The ID of the row to delete.
  * @param context - The context object containing user ID and permissions.
  */
-export async function deleteRow(table: TableWithId, id: string, context: QueryContext = {}) {
+export async function deleteRow(table: TableWithId, id: string) {
   const targetId = Number(id);
   const fields = getSelectableFields(table);
 
-  if (context.record) {
-    await db.delete(table).where(eq(table.id, targetId)).run();
-    return Object.fromEntries(
-      Object.entries(context.record).filter(([key]) => key in fields)
-    );
-    return context.record;
-  }
+  const deletedRecord = await db.delete(table).where(eq(table.id, targetId)).returning(fields).get();
+  if (!deletedRecord) throw new DeletionFailedError();
 
-  return await db.delete(table).where(eq(table.id, targetId)).returning(fields).get();
+  return deletedRecord;
 }

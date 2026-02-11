@@ -1,7 +1,7 @@
 // src/runtime/utils/constants.ts
 
 /**
- * Points to the primary key of users table.
+ * Points to (references) the primary key of users table.
  * 
  */
 export const NAC_OWNER_KEYS = [
