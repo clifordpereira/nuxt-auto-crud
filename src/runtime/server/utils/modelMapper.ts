@@ -2,29 +2,26 @@
 
 // @ts-expect-error - #site/schema is an alias defined by the module
 import * as schema from '#site/schema'
-import pluralize from 'pluralize'
-import { pascalCase } from 'scule'
-import { getColumns, type Column, Table } from 'drizzle-orm'
-import { getTableConfig, type SQLiteTable } from 'drizzle-orm/sqlite-core'
+import { getColumns, type Column, Table, is } from 'drizzle-orm'
+import { getTableConfig, SQLiteTable  } from 'drizzle-orm/sqlite-core'
 import { createInsertSchema } from 'drizzle-zod'
 import { z } from 'zod'
 
 import type { Field, SchemaDefinition } from '#nac/shared/utils/types'
 import { useRuntimeConfig } from '#app'
 import { NAC_OWNER_KEYS } from './constants'
-import { ResourceNotFoundError, ValidationError } from '../exceptions'
-
-export const customUpdatableFields: Record<string, string[]> = {}
 
 type ForeignKey = ReturnType<typeof getTableConfig>['foreignKeys'][number]
 
 /**
  * Builds a map of all exported Drizzle tables from the schema.
+ * @param {Record<string, any>} schema - The imported schema object containing table definitions and other exports.
+ * @returns {Record<string, SQLiteTable>} A mapping of export keys to their corresponding SQLiteTable instances.
  */
 export const buildModelTableMap = (): Record<string, SQLiteTable> => {
   return Object.entries(schema).reduce((acc, [key, value]) => {
-    if (value && typeof value === 'object' && Table.is(value)) {
-      acc[key] = value as SQLiteTable
+    if (is(value, SQLiteTable)) {
+      acc[key] = value
     }
     return acc
   }, {} as Record<string, SQLiteTable>)
@@ -108,56 +105,6 @@ export function resolveValidatedSchema( table: SQLiteTable, intent: 'insert' | '
 }
 
 /**
- * Derives Zod schema via drizzle-zod, omitting server-managed and protected fields.
- */
-export function getZodSchema(modelName: string, type: 'insert' | 'patch' = 'insert'): z.ZodObject<z.ZodRawShape> {
-  const table = modelTableMap[modelName]
-  if (!table) throw new ResourceNotFoundError
-
-  const tableColumns = getColumns(table)
-  const columnNames = Object.keys(tableColumns)
-
-  // 1. Generate schema with automatic Date coercion
-  const schema = createInsertSchema(table, ({ name, column }) => ({
-    [name]: column.columnType.includes('timestamp') || column.dataType === 'date' 
-      ? z.coerce.date() 
-      : undefined // Fallback to default drizzle-zod inference
-  }))
-
-  // 2. Handle Patch (Partial)
-  if (type === 'patch') {
-    return schema.partial() as z.ZodObject<z.ZodRawShape>
-  }
-
-  // 3. Handle Insert (Omit protected/hidden fields)
-  const OMIT_ON_CREATE = [...getProtectedFields(), ...getHiddenFields(modelName)]
-  const fieldsToOmit: Record<string, true> = {}
-
-  for (const field of OMIT_ON_CREATE) {
-    if (columnNames.includes(field)) {
-      fieldsToOmit[field] = true
-    }
-  }
-
-  return schema.omit(fieldsToOmit) as z.ZodObject<z.ZodRawShape>
-}
-
-
-export function getModelSingularName(modelName: string): string {
-  const singular = pluralize.singular(modelName)
-  return pascalCase(singular)
-}
-
-export function getModelPluralName(modelName: string): string {
-  return pluralize.plural(modelName).toLowerCase()
-}
-
-export function getAvailableModels(): string[] {
-  return Object.keys(modelTableMap)
-}
-
-
-/**
  * Resolves table relationships for NAC reflection.
  * Maps property keys to target table names.
  */
@@ -196,7 +143,7 @@ export function resolveTableRelations(
 
 export function getRelations(): Record<string, Record<string, string>> {
   const relations: Record<string, Record<string, string>> = {}
-  const models = getAvailableModels()
+  const models = Object.keys(modelTableMap)
 
   for (const model of models) {
     const table = modelTableMap[model] as SQLiteTable

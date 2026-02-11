@@ -1,19 +1,17 @@
 // server/utils/schema.ts
 import { getColumns } from 'drizzle-orm'
 import {
-  getZodSchema,
   modelTableMap,
   getSchemaDefinition,
   resolveTableRelations,
   forEachModel,
+  resolveValidatedSchema,
 } from './modelMapper'
 import type { ZodType } from 'zod'
 import type { Column } from 'drizzle-orm'
 import type { SQLiteTable } from 'drizzle-orm/sqlite-core'
 
 import type { Field, SchemaDefinition } from '#nac/shared/utils/types'
-
-
 
 export async function getAllSchemas() {
   const schemas: Record<string, SchemaDefinition> = {}
@@ -44,11 +42,10 @@ export async function getSchemaRelations() {
  * and enriches field types with Zod semantic hints and textarea detection.
  */
 export function drizzleTableToFields(table: SQLiteTable, resourceName: string): SchemaDefinition {
-  // Start with base schema from modelMapper
   const baseSchema = getSchemaDefinition(resourceName)
   
   const columns = getColumns(table)
-  const zodSchema = getZodSchema(resourceName, 'insert')
+  const zodSchema = resolveValidatedSchema(table, 'insert')
 
   // Enhance each field with semantic type hints
   const enhancedFields: Field[] = baseSchema.fields.map((field) => {

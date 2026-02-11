@@ -1,5 +1,5 @@
 import { eventHandler, getQuery, getHeader } from 'h3'
-import { getAvailableModels, getSchemaDefinition } from '../../utils/modelMapper'
+import { getSchemaDefinition, modelTableMap } from '../../utils/modelMapper'
 // @ts-expect-error - 'hub:db' is a virtual alias
 import { db } from 'hub:db'
 
@@ -12,8 +12,9 @@ export default eventHandler(async (event) => {
   const query = getQuery(event)
   const acceptHeader = getHeader(event, 'accept') || ''
 
-  const models = getAvailableModels().length > 0
-    ? getAvailableModels()
+  const availableModels = Object.keys(modelTableMap)
+  const models = availableModels.length > 0
+    ? availableModels
     : Object.keys(db?.query || {})
 
   const resources = models.map((model) => {
