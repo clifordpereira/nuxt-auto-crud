@@ -6,9 +6,9 @@ import { getColumns, type Column, Table, is } from 'drizzle-orm'
 import { getTableConfig, SQLiteTable  } from 'drizzle-orm/sqlite-core'
 import { createInsertSchema } from 'drizzle-zod'
 import { z } from 'zod'
+import { useRuntimeConfig } from '#imports'
 
 import type { Field, SchemaDefinition } from '#nac/shared/utils/types'
-import { useRuntimeConfig } from '#app'
 import { NAC_OWNER_KEYS } from './constants'
 
 type ForeignKey = ReturnType<typeof getTableConfig>['foreignKeys'][number]

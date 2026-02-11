@@ -1,13 +1,7 @@
 import { sqliteTable, text, index, integer } from 'drizzle-orm/sqlite-core'
-import { systemFields, baseFields, auditRelations } from './utils'
+import { systemFields, baseFields } from './utils'
 import { users } from './users'
-import { relations } from 'drizzle-orm'
 
-/**
- * Categories
- * 
- * Categories are used to organize content.
- */
 export const categories = sqliteTable('categories', {
   ...systemFields,
 
@@ -15,9 +9,6 @@ export const categories = sqliteTable('categories', {
   slug: text('slug').notNull().unique(),
   type: text('type', { enum: ['post', 'product', 'service'] }).notNull().default('post'),
 })
-export const categoriesRelations = relations(categories, (helpers) => ({
-  ...auditRelations(helpers, categories, users),
-}))
 
 /**
  * Polymorphic Comments/Reviews
@@ -45,12 +36,4 @@ export const comments = sqliteTable('comments', {
   isApproved: integer('is_approved', { mode: 'boolean' }).default(false),
 }, t => ({
   resourceIdx: index('resource_idx').on(t.resourceType, t.resourceId),
-}))
-export const commentsRelations = relations(comments, (helpers) => ({
-  ...auditRelations(helpers, comments, users),
-  author: helpers.one(users, {
-    fields: [comments.authorId],
-    references: [users.id],
-    relationName: 'comment_author',
-  }),
 }))

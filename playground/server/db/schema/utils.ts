@@ -26,23 +26,3 @@ export const baseFields = {
   name: text('name').notNull(),
   description: text('description'),
 }
-
-/**
- * Audit Relations
- * 
- * Audit relations are used to store audit information about a table.
- * @param helpers 
- * @param table 
- * @param userTable 
- * @returns 
- */
-export const auditRelations = (r: any) => ({
-  creator: r.one.users({
-    from: r.tables.createdBy,
-    to: r.users.id,
-  }),
-  updater: r.one.users({
-    from: r.tables.updatedBy,
-    to: r.users.id,
-  }),
-})
