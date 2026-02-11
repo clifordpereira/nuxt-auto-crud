@@ -27,8 +27,8 @@ const emit = defineEmits<{
 // filter out system fields
 const filteredFields = props.schema.fields.filter(
   (field) => {
-    const isSystem = ['id', 'created_at', 'updated_at', 'deleted_at', 'createdAt', 'updatedAt', 'deletedAt', 'created_by', 'updated_by', 'createdBy', 'updatedBy'].includes(field.name)
-    if (isSystem) return false
+    const { formHiddenFields } = useRuntimeConfig().public.autoCrud
+    if (formHiddenFields.includes(field.name)) return false
     // Hide status during creation
     if (field.name === 'status' && !props.initialState) return false
     return true

@@ -1,6 +1,6 @@
 // utils/helpers.ts
 export function crudHeaders() {
-  // For now, we rely on cookies for auth (nuxt-auth-utils)
-  // and we don't use x-api-key as requested.
-  return {}
+  // Proxies cookies during SSR to maintain session
+  return useRequestHeaders(['cookie'])
+  // Authorization: `Bearer ${token}`
 }

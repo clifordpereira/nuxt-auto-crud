@@ -1,8 +1,12 @@
 // shared/types/auth.d.ts
-import type { User as DbUser } from '~/server/db/schema/users'
 
 declare module '#auth-utils' {
-  interface User extends Partial<DbUser> {
+  interface User {
+    id: number
+    uuid: string
+    name: string
+    email: string
+    avatar?: string | null
     role: string
     permissions: Record<string, string[]>
   }

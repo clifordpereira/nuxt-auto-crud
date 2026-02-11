@@ -1,4 +1,3 @@
-import { db } from 'hub:db'
 import type { H3Event } from 'h3'
 import { createError } from 'h3'
 
@@ -9,15 +8,15 @@ const CACHE_TTL = 60 * 1000
 
 // --- Transformer ---
 export function transformPermissions(
-  resourcePermissions: { 
-    resource: { name: string }; 
-    permission: { code: string } 
-  }[] = []
+  resourcePermissions: any[] = []
 ): Record<string, string[]> {
   return resourcePermissions.reduce((acc, rp) => {
-    const resource = rp.resource.name
-    acc[resource] ||= []
-    acc[resource].push(rp.permission.code)
+    const resource = rp.resource?.name
+    const permission = rp.permission?.code
+    if (resource && permission && rp.resource?.status === 'active' && rp.permission?.status === 'active') {
+      acc[resource] ||= []
+      acc[resource].push(permission)
+    }
     return acc
   }, {} as Record<string, string[]>)
 }
@@ -26,12 +25,13 @@ export function transformPermissions(
 export async function fetchPermissionsForRole(roleId: number | null) {
   if (!roleId) return {}
   const roleData = await db.query.roles.findFirst({
-    where: (roles, { eq }) => eq(roles.id, roleId),
+    where: (roles: any, { eq, and }: any) => and(eq(roles.id, roleId), eq(roles.status, 'active')),
     with: {
       resourcePermissions: {
+        where: (rp: any, { eq }: any) => eq(rp.status, 'active'),
         with: {
-          resource: { columns: { name: true } },
-          permission: { columns: { code: true } },
+          resource: { columns: { name: true, status: true } },
+          permission: { columns: { code: true, status: true } },
         },
       },
     },
@@ -41,15 +41,17 @@ export async function fetchPermissionsForRole(roleId: number | null) {
 
 export async function fetchUserWithPermissions(userId: number) {
   const result = await db.query.users.findFirst({
-    where: (users, { eq }) => eq(users.id, userId),
+    where: (users: any, { eq, and }: any) => and(eq(users.id, userId), eq(users.status, 'active')),
     columns: { password: false },
     with: {
       assignedRole: {
+        where: (roles: any, { eq }: any) => eq(roles.status, 'active'),
         with: {
           resourcePermissions: {
+            where: (rp: any, { eq }: any) => eq(rp.status, 'active'),
             with: {
-              resource: { columns: { name: true } },
-              permission: { columns: { code: true } },
+              resource: { columns: { name: true, status: true } },
+              permission: { columns: { code: true, status: true } },
             },
           },
         },
@@ -71,7 +73,7 @@ export async function getPublicPermissions(): Promise<Record<string, string[]>> 
   if (publicPermissionsCache && (now - lastCacheTime < CACHE_TTL)) return publicPermissionsCache
 
   const publicRole = await db.query.roles.findFirst({
-    where: (roles, { eq }) => eq(roles.name, 'public'),
+    where: (roles: any, { eq, and }: any) => and(eq(roles.name, 'public'), eq(roles.status, 'active')),
     columns: { id: true }
   })
 
@@ -86,12 +88,13 @@ export async function refreshUserSession(event: H3Event, userId: number) {
   const userData = await fetchUserWithPermissions(userId)
   if (!userData) {
     await clearUserSession(event)
-    throw createError({ statusCode: 401, message: 'User not found' })
+    throw createError({ statusCode: 401, message: 'User not found or inactive' })
   }
 
   await setUserSession(event, {
     user: {
       id: userData.id,
+      uuid: userData.uuid,
       email: userData.email,
       name: userData.name,
       avatar: userData.avatar,

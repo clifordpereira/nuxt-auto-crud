@@ -6,9 +6,10 @@ const props = defineProps<{
   collapsed?: boolean
 }>()
 
-const { schemas } = await useNacResourceSchemas()
 const { user } = useUserSession()
 
+const { endpointPrefix } = useRuntimeConfig().public.autoCrud
+const { data: schemas } = await useFetch(`${endpointPrefix}/_schema`)
 const resourceNames = computed(() =>
   Object.keys(schemas.value || {}).filter((name) => {
     // Exclude system tables

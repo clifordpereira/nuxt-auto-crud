@@ -33,12 +33,8 @@ async function onSubmit() {
     })
     await refreshSession()
 
-    // Refresh schemas to ensure sidebar is updated with correct permissions
-    const { refresh } = await useNacResourceSchemas()
-    await refresh()
-
     isOpen.value = false
-    // Redirect to dashboard after successful login
+
     await navigateTo('/resource/users')
   }
   catch (err: unknown) {
