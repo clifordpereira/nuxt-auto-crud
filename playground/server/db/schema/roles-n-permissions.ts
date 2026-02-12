@@ -24,6 +24,6 @@ export const roleResourcePermissions = sqliteTable('role_resource_permissions', 
   roleId: integer('role_id').notNull().references(() => roles.id, { onDelete: 'cascade' }),
   resourceId: integer('resource_id').notNull().references(() => resources.id, { onDelete: 'cascade' }),
   permissionId: integer('permission_id').notNull().references(() => permissions.id, { onDelete: 'cascade' }),
-}, (t) => ({
+}, t => ({
   unq: uniqueIndex('unq_role_res_perm').on(t.roleId, t.resourceId, t.permissionId),
 }))

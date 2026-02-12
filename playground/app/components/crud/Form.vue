@@ -1,11 +1,9 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { FormSubmitEvent } from '@nuxt/ui'
 import { useChangeCase } from '@vueuse/integrations/useChangeCase'
 
 import type { SchemaDefinition } from '#nac/shared/utils/types'
-
 
 const props = defineProps<{
   schema: SchemaDefinition

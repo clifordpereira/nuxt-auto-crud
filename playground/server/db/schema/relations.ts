@@ -7,7 +7,7 @@ import { posts } from './cms'
 
 /**
  * Standard Audit Relations
- * 
+ *
  * Maps createdBy and updatedBy fields to the users table.
  */
 export const auditRelations = (r: any) => ({
@@ -35,7 +35,7 @@ export const relations = defineRelations(
     comments,
     categories,
   },
-  (r) => ({
+  r => ({
     users: {
       assignedRole: r.one.roles({
         from: r.users.roleId,

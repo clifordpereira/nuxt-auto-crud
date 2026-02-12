@@ -3,7 +3,7 @@ import { uuidv7 } from 'uuidv7'
 
 /**
  * System Fields
- * 
+ *
  * System fields are used to store system information.
  */
 export const systemFields = {
@@ -19,7 +19,7 @@ export const systemFields = {
 
 /**
  * Base Fields
- * 
+ *
  * Base fields are used to store common descriptive information.
  */
 export const baseFields = {

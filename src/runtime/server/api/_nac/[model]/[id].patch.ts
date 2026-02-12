@@ -13,7 +13,7 @@ export default eventHandler(async (event) => {
   const body = await readBody(event)
 
   const table = modelTableMap[model] as TableWithId
-  if (!table) throw new ResourceNotFoundError(model);
+  if (!table) throw new ResourceNotFoundError(model)
 
   const validatedData = await resolveValidatedSchema(table, 'patch').parseAsync(body)
   const updatedRecord = await updateRow(table, id, validatedData, event.context.nac || {})

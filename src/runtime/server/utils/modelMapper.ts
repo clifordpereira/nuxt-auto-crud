@@ -55,7 +55,7 @@ export function getForeignKeyPropertyName(fk: ForeignKey, columns: Record<string
 }
 
 /**
- * Selectable fields to give as api response. 
+ * Selectable fields to give as api response.
  * Used in getRow (/[model]/[id].get.ts) and getRows (/[model]/index.get.ts).
  * @param table The table to query.
  * @returns An object of field names and their values
@@ -80,16 +80,16 @@ export function getSelectableFields(table: Table): Record<string, Column> {
  * Resolves a model-specific Zod schema that automatically strips
  * NAC_FORM_HIDDEN_FIELDS and coerces technical types.
  */
-export function resolveValidatedSchema( table: Table, intent: 'insert' | 'patch' = 'insert'): z.ZodObject<z.ZodRawShape> {
+export function resolveValidatedSchema(table: Table, intent: 'insert' | 'patch' = 'insert'): z.ZodObject<z.ZodRawShape> {
   const { formHiddenFields } = useRuntimeConfig().public.autoCrud
 
   // 1. Base Schema with Date Coercion
-  const baseSchema = createInsertSchema(table, ({ name, column }: { name: string; column: Column }) => {
+  const baseSchema = createInsertSchema(table, ({ name, column }: { name: string, column: Column }) => {
     // Check columnType for 'timestamp' or 'date' strings
     const isDateColumn = column.columnType.includes('timestamp') || column.columnType.includes('date')
 
     return {
-      [name]: isDateColumn ? z.coerce.date() : undefined
+      [name]: isDateColumn ? z.coerce.date() : undefined,
     }
   })
 
@@ -107,8 +107,8 @@ export function resolveValidatedSchema( table: Table, intent: 'insert' | 'patch'
  * Maps property keys to target table names.
  */
 export function resolveTableRelations(
-  table: Table, 
-  includeSystemFields = false
+  table: Table,
+  includeSystemFields = false,
 ): Record<string, string> {
   const config = getTableConfig(table)
   const columnsMap = getColumns(table as Table)
@@ -123,7 +123,7 @@ export function resolveTableRelations(
 
   // 2. Resolve explicit Foreign Keys from Schema
   for (const fk of config.foreignKeys) {
-    const targetTable = getTableConfig(fk.reference().foreignTable).name;
+    const targetTable = getTableConfig(fk.reference().foreignTable).name
     const propertyKey = getForeignKeyPropertyName(fk, columnsMap)
     if (propertyKey) relations[propertyKey] = targetTable
   }
@@ -144,13 +144,13 @@ export function getLabelField(columnNames: string[]): string {
 const ZOD_TYPE_MAP: Record<string, Field['type']> = {
   ZodDate: 'date',
   ZodNumber: 'number',
-  ZodBoolean: 'boolean'
+  ZodBoolean: 'boolean',
 }
 
 const SEMANTIC_CHECK_MAP: Record<string, Field['type']> = {
   email: 'email',
   uuid: 'uuid',
-  url: 'url'
+  url: 'url',
 }
 
 const TEXTAREA_HINTS = ['content', 'description', 'bio', 'message']
@@ -169,7 +169,7 @@ export function getSchemaDefinition(modelName: string): SchemaDefinition {
   const config = useRuntimeConfig() as any
   const apiHiddenFields = config.autoCrud.apiHiddenFields as string[]
   const formHiddenFields = config.public.autoCrud.formHiddenFields as string[]
-  
+
   const columns = getColumns(table)
   const relations = resolveTableRelations(table, true)
   const shape = createInsertSchema(table).shape
@@ -191,13 +191,15 @@ export function getSchemaDefinition(modelName: string): SchemaDefinition {
       if (enumValues) {
         type = 'enum'
         selectOptions = enumValues
-      } else {
+      }
+      else {
         const checks = (zodField?._def?.checks as unknown as { kind: string }[]) || []
         const semanticMatch = checks.find(c => SEMANTIC_CHECK_MAP[c.kind])
-        
+
         if (semanticMatch) {
           type = SEMANTIC_CHECK_MAP[semanticMatch.kind]!
-        } else if (TEXTAREA_HINTS.includes(name)) {
+        }
+        else if (TEXTAREA_HINTS.includes(name)) {
           type = 'textarea'
         }
       }
@@ -212,9 +214,9 @@ export function getSchemaDefinition(modelName: string): SchemaDefinition {
       }
     })
 
-  return { 
-    resource: modelName, 
-    labelField: getLabelField(Object.keys(columns)), 
-    fields 
+  return {
+    resource: modelName,
+    labelField: getLabelField(Object.keys(columns)),
+    fields,
   }
 }

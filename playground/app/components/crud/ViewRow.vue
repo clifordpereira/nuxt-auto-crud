@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { dbFieldToLabel } from '~/utils/formatter';
+import { dbFieldToLabel } from '~/utils/formatter'
 
 const props = defineProps<{
   row: Record<string, unknown>

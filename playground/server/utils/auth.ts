@@ -8,7 +8,7 @@ const CACHE_TTL = 60 * 1000
 
 // --- Transformer ---
 export function transformPermissions(
-  resourcePermissions: any[] = []
+  resourcePermissions: any[] = [],
 ): Record<string, string[]> {
   return resourcePermissions.reduce((acc, rp) => {
     const resource = rp.resource?.name
@@ -74,7 +74,7 @@ export async function getPublicPermissions(): Promise<Record<string, string[]>> 
 
   const publicRole = await db.query.roles.findFirst({
     where: (roles: any, { eq, and }: any) => and(eq(roles.name, 'public'), eq(roles.status, 'active')),
-    columns: { id: true }
+    columns: { id: true },
   })
 
   const permissions = publicRole ? await fetchPermissionsForRole(publicRole.id) : {}

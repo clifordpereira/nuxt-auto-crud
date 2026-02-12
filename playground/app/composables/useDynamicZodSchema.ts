@@ -11,15 +11,17 @@ export function useDynamicZodSchema(fields: Field[], isEdit = false) {
 
     if (type === 'password') {
       schema = ValidationRules.password(isEdit)
-    } else if (type === 'enum') {
+    }
+    else if (type === 'enum') {
       schema = ValidationRules.enum(field.selectOptions || [])
-    } else {
+    }
+    else {
       const rule = (ValidationRules[type] || ValidationRules.string) as () => z.ZodTypeAny
       schema = rule()
     }
 
     // Treat undefined as false (not required)
-    const isRequired = field.required ?? false;
+    const isRequired = field.required ?? false
 
     if (!isRequired || isEdit) {
       schema = schema.optional().nullable()

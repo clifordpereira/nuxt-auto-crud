@@ -18,7 +18,6 @@ export class AutoCrudError extends Error {
   }
 }
 
-
 export class ValidationError extends AutoCrudError {
   constructor(modelName: string, message: string = `${modelName} validation failed`) {
     super(message, 400)

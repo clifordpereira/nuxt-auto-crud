@@ -14,10 +14,10 @@ const { data: schemas } = await useFetch<string[]>(`${endpointPrefix}/_schemas`)
 
 const filteredResources = useArrayDifference(() => schemas.value || [], systemTables)
 
-const resourceNames = computed(() => 
+const resourceNames = computed(() =>
   filteredResources.value
     .filter(name => isAllowedToSeeResourceMenu(user.value, name))
-    .sort((a, b) => a.localeCompare(b))
+    .sort((a, b) => a.localeCompare(b)),
 )
 
 const items = computed(() => {

@@ -11,7 +11,7 @@ export default eventHandler(async (event) => {
   const body = await readBody(event)
 
   const table = modelTableMap[model]
-  if (!table) throw new ResourceNotFoundError(model);
+  if (!table) throw new ResourceNotFoundError(model)
 
   const validatedData = await resolveValidatedSchema(table, 'insert').parseAsync(body)
 

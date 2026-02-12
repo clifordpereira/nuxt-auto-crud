@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
-import { dbFieldToLabel } from '~/utils/formatter';
+import { dbFieldToLabel } from '~/utils/formatter'
 import type { SchemaDefinition } from '#nac/shared/utils/types'
 
 const { user } = useUserSession()
@@ -56,10 +56,10 @@ const getExportData = (exclude: string[] = []) => {
     .filter(col => !exclude.includes(String(col)))
     .map(col => ({
       key: String(col),
-      label: dbFieldToLabel(String(col))
+      label: dbFieldToLabel(String(col)),
     }))
 
-  return items.map(row => {
+  return items.map((row) => {
     const exportRow: Record<string, any> = {}
     for (const { key, label } of columnMap) {
       exportRow[label] = row[key]

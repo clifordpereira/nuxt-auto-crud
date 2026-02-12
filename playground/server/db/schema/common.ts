@@ -12,12 +12,12 @@ export const categories = sqliteTable('categories', {
 
 /**
  * Polymorphic Comments/Reviews
- * 
+ *
  * This table is designed to be generic. It can be used for:
  * - Comments on posts
  * - Reviews on products
  * - Feedback on services
- * 
+ *
  * The `resourceType` and `resourceId` columns link the comment to the specific resource.
  */
 export const comments = sqliteTable('comments', {

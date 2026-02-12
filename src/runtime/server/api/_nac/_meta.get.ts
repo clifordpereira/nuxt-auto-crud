@@ -22,7 +22,7 @@ export default eventHandler(async (event) => {
       const schema = getSchemaDefinition(model)
 
       // Transform SchemaDefinition to legacy API format
-      const fields = schema.fields.map((field) => ({
+      const fields = schema.fields.map(field => ({
         name: field.name,
         type: field.type,
         required: field.required,

@@ -11,7 +11,7 @@ export default eventHandler(async (event) => {
   const { model } = getRouterParams(event) as { model: string }
 
   const table = modelTableMap[model] as TableWithId
-  if (!table) throw new ResourceNotFoundError(model);
+  if (!table) throw new ResourceNotFoundError(model)
 
   const results = await getRows(table, event.context.nac || {})
   return results

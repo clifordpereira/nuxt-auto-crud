@@ -1,9 +1,9 @@
 /**
  * Points to (references) the primary key of users table.
- * 
+ *
  */
 export const NAC_OWNER_KEYS = [
-  'createdBy', 'updatedBy'
+  'createdBy', 'updatedBy',
 ]
 
 /**
@@ -11,8 +11,8 @@ export const NAC_OWNER_KEYS = [
  * Should not be editable by users.
  */
 const NAC_SYSTEM_FIELDS = [
-  'id', 'uuid', 'created_at', 
-  'updated_at', 'deleted_at', 'created_by', 'updated_by'
+  'id', 'uuid', 'created_at',
+  'updated_at', 'deleted_at', 'created_by', 'updated_by',
 ]
 
 /**
@@ -22,7 +22,7 @@ const NAC_SYSTEM_FIELDS = [
 export const NAC_API_HIDDEN_FIELDS = [
   'password', 'secret', 'token',
   'reset_token', 'reset_expires',
-  'github_id', 'google_id'
+  'github_id', 'google_id',
 ]
 
 /**
@@ -41,5 +41,5 @@ export const NAC_FORM_HIDDEN_FIELDS = [
  */
 export const NAC_DATA_TABLE_HIDDEN_FIELDS = [
   // ...NAC_API_HIDDEN_FIELDS, // hidden by default.
-  'updated_at', 'deleted_at', 'created_by', 'updated_by' // from the api, hide these fields too
+  'updated_at', 'deleted_at', 'created_by', 'updated_by', // from the api, hide these fields too
 ]

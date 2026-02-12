@@ -25,4 +25,4 @@ export const notifications = sqliteTable('notifications', {
   category: text('category').$type<'system' | 'human'>(),
   isRead: integer('is_read', { mode: 'boolean' }).default(false),
   metadata: text('metadata', { mode: 'json' }), // For "Agentic Ready" links
-});
+})

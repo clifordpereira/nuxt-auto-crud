@@ -9,20 +9,20 @@ export default defineEventHandler(async (event) => {
   if (isAuthenticationDisabled() || !isPathToGuard(pathname)) return
 
   const { user } = await requireUserSession(event)
-  if (isNacSystemPath(pathname)) return 
+  if (isNacSystemPath(pathname)) return
 
   const { model, id } = extractModelAndIdFromPath(pathname)
   const action = resolveAction(event.method, Boolean(id))
-  if (!action) throw createError({ statusCode: 403, statusMessage: 'Forbidden'})
-  
+  if (!action) throw createError({ statusCode: 403, statusMessage: 'Forbidden' })
+
   // 1. Initialize NAC context with promotion-ready listAllStatus
   event.context.nac = {
-      userId: user.id,
-      record: null,
-      permissions: user.permissions[model],
+    userId: user.id,
+    record: null,
+    permissions: user.permissions[model],
   }
 
-  if (isAdmin(user)) return 
+  if (isAdmin(user)) return
 
   // 2. GLOBAL PERMISSION CHECK (The missing piece)
   // If user has global 'list', 'read', 'update', etc., they pass here.
@@ -36,14 +36,14 @@ export default defineEventHandler(async (event) => {
     // for update/delete/read actions, check ownership
     const record = await fetchRecord(model, id)
     if (!record) throw createError({ statusCode: 404, statusMessage: 'Not Found' })
-    
+
     if (isOwner(user, record)) {
-       event.context.nac.record = record
-       return
+      event.context.nac.record = record
+      return
     }
   }
 
-  throw createError({ statusCode: 403, statusMessage: 'Forbidden'})
+  throw createError({ statusCode: 403, statusMessage: 'Forbidden' })
 })
 
 /**
@@ -100,7 +100,7 @@ async function fetchRecord(model: string, id: string) {
   const { db, schema } = await import('hub:db')
   const table = (schema as any)[model]
   if (!table) return null
-  
+
   const records = await db.select().from(table).where(eq(table.id, id)).limit(1)
   return records[0] || null
 }
