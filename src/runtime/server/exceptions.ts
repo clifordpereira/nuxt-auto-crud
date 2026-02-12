@@ -25,6 +25,12 @@ export class ValidationError extends AutoCrudError {
   }
 }
 
+export class MissingSlugError extends AutoCrudError {
+  constructor(message: string = 'Missing slug/id') {
+    super(message, 400)
+  }
+}
+
 export class ResourceNotFoundError extends AutoCrudError {
   constructor(message: string = 'Resource not found') {
     super(message, 404)

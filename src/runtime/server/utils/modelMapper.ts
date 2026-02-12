@@ -63,25 +63,15 @@ export function getForeignKeyPropertyName(fk: ForeignKey, columns: Record<string
  * @returns An object of field names and their values
  * result example: { field1: users.id, field2: users.name, }
  */
-export function getFilteredFields(table: Table, type: 'api' | 'form' | 'dataTable'): Record<string, Column> {
-  const config = useRuntimeConfig()
+export function getSelectableFields(table: Table): Record<string, Column> {
+  const { apiHiddenFields } = useRuntimeConfig().autoCrud
   const allColumns = getColumns(table)
-  
-  let hiddenFields: string[] = []
-  
-  if (type === 'api') {
-    hiddenFields = config.autoCrud.apiHiddenFields
-  } else {
-    const configKey = type === 'form' ? 'formHiddenFields' : 'dataTableHiddenFields'
-    hiddenFields = config.public.autoCrud[configKey]
-  }
-
   const result: Record<string, Column> = {}
 
   for (const key in allColumns) {
-    const col = allColumns[key]
-    if (col && !hiddenFields.includes(key)) {
-      result[key] = col
+    if (!apiHiddenFields.includes(key)) {
+      const col = allColumns[key]
+      if (col) result[key] = col
     }
   }
 

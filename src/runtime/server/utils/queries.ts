@@ -4,7 +4,7 @@ import { db } from "hub:db";
 import { eq, desc, and, or, getColumns } from "drizzle-orm";
 import type { Table } from "drizzle-orm";
 
-import { getFilteredFields } from "./modelMapper";
+import { getSelectableFields } from "./modelMapper";
 
 import { DeletionFailedError, InsertionFailedError, RecordNotFoundError, UpdationFailedError } from "../exceptions";
 
@@ -47,7 +47,7 @@ export async function getRows(table: TableWithId, context: QueryContext = {}) {
     }
   }
 
-  const fields = getFilteredFields(table, 'api')
+  const fields = getSelectableFields(table)
   let query = db.select(fields).from(table).$dynamic();
   if (filters.length > 0) query = query.where(and(...filters));
 
@@ -62,7 +62,7 @@ export async function getRows(table: TableWithId, context: QueryContext = {}) {
  * @returns The row from the database.
  */
 export async function getRow(table: TableWithId, id: string, context: QueryContext = {}) {
-  const fields = getFilteredFields(table, 'api')
+  const fields = getSelectableFields(table)
 
   // If record exists in context, we still need to sanitize it before returning
   if (context.record) {
@@ -88,7 +88,7 @@ export async function createRow(table: Table, data: Record<string, unknown>, con
   
   const payload = { ...data };
   const allColumns = getColumns(table);
-  const selectableFields = getFilteredFields(table, 'api');
+  const selectableFields = getSelectableFields(table);
 
   // Only inject if userId is provided and column exists in schema
   if (context.userId) {
@@ -114,7 +114,7 @@ export async function updateRow(table: TableWithId, id: string, data: Record<str
   const payload = { ...data };
 
   const allColumns = getColumns(table);
-  const selectableFields = getFilteredFields(table, 'api');
+  const selectableFields = getSelectableFields(table);
 
   // Update audit metadata
   if (context.userId && 'updatedBy' in allColumns) {
@@ -140,7 +140,7 @@ export async function updateRow(table: TableWithId, id: string, data: Record<str
  */
 export async function deleteRow(table: TableWithId, id: string) {
   const targetId = Number(id);
-  const fields = getFilteredFields(table, 'api');
+  const fields = getSelectableFields(table);
 
   const deletedRecord = await db.delete(table).where(eq(table.id, targetId)).returning(fields).get();
   if (!deletedRecord) throw new DeletionFailedError();
