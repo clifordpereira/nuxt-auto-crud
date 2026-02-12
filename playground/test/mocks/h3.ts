@@ -6,9 +6,9 @@ export const readBody = vi.fn().mockImplementation(event => Promise.resolve(even
 
 // Ensure createError mimics the H3 object structure
 export const createError = vi.fn((opts) => {
-  const err = new Error(opts.message || opts.statusMessage);
-  (err as any).statusCode = opts.statusCode;
-  (err as any).statusMessage = opts.statusMessage || opts.message;
-  (err as any).data = opts.data
+  const err = new Error(opts.message || opts.statusMessage) as Error & { statusCode?: number, statusMessage?: string, data?: any }
+  err.statusCode = opts.statusCode
+  err.statusMessage = opts.statusMessage || opts.message
+  err.data = opts.data
   return err
 })

@@ -36,7 +36,9 @@ export const modelTableMap = buildModelTableMap()
  */
 export function forEachModel(callback: (modelName: string, table: Table) => void) {
   for (const [modelName, table] of Object.entries(modelTableMap)) {
-    try { callback(modelName, table) }
+    try {
+      callback(modelName, table)
+    }
     catch { /* TODO: NAC Internal Logger */ }
   }
 }
@@ -117,7 +119,7 @@ export function resolveTableRelations(
   // 1. Link NAC_OWNER_KEYS to users table
   if (includeSystemFields) {
     for (const key of Object.keys(columnsMap)) {
-      if (NAC_OWNER_KEYS.includes(key as any)) relations[key] = 'users'
+      if (NAC_OWNER_KEYS.includes(key as typeof NAC_OWNER_KEYS[number])) relations[key] = 'users'
     }
   }
 
@@ -166,9 +168,9 @@ export function getSchemaDefinition(modelName: string): SchemaDefinition {
   const table = modelTableMap[modelName]
   if (!table) throw new Error(`Model ${modelName} not found`)
 
-  const config = useRuntimeConfig() as any
-  const apiHiddenFields = config.autoCrud.apiHiddenFields as string[]
-  const formHiddenFields = config.public.autoCrud.formHiddenFields as string[]
+  const config = useRuntimeConfig() as unknown as { autoCrud: { apiHiddenFields: string[] }, public: { autoCrud: { formHiddenFields: string[] } } }
+  const apiHiddenFields = config.autoCrud.apiHiddenFields
+  const formHiddenFields = config.public.autoCrud.formHiddenFields
 
   const columns = getColumns(table)
   const relations = resolveTableRelations(table, true)
@@ -177,14 +179,14 @@ export function getSchemaDefinition(modelName: string): SchemaDefinition {
   const fields: Field[] = Object.entries(columns)
     .filter(([name]) => !apiHiddenFields.includes(name))
     .map(([name, col]) => {
-      const zodField = shape[name] as any
-      const zodTypeName = zodField?._def?.typeName
+      const zodField = shape[name] as z.ZodTypeAny | undefined
+      const zodTypeName = (zodField?._def as any)?.typeName
 
       // 1. Resolve Base Technical Type
       let type: Field['type'] = ZOD_TYPE_MAP[zodTypeName] ?? 'string'
 
       // 2. Resolve Enums & Semantic Overrides
-      const colInternal = col as any
+      const colInternal = col as Column & { enumValues?: string[], config?: { enumValues?: string[] } }
       const enumValues = colInternal.enumValues || colInternal.config?.enumValues
       let selectOptions: string[] | undefined
 

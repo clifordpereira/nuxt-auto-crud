@@ -8,7 +8,7 @@ const CACHE_TTL = 60 * 1000
 
 // --- Transformer ---
 export function transformPermissions(
-  resourcePermissions: any[] = [],
+  resourcePermissions: { resource?: { name: string, status: string }, permission?: { code: string, status: string } }[] = [],
 ): Record<string, string[]> {
   return resourcePermissions.reduce((acc, rp) => {
     const resource = rp.resource?.name
@@ -25,10 +25,10 @@ export function transformPermissions(
 export async function fetchPermissionsForRole(roleId: number | null) {
   if (!roleId) return {}
   const roleData = await db.query.roles.findFirst({
-    where: (roles: any, { eq, and }: any) => and(eq(roles.id, roleId), eq(roles.status, 'active')),
+    where: (roles: Record<string, any>, { eq, and }: any) => and(eq(roles.id, roleId), eq(roles.status, 'active')),
     with: {
       resourcePermissions: {
-        where: (rp: any, { eq }: any) => eq(rp.status, 'active'),
+        where: (rp: Record<string, any>, { eq }: any) => eq(rp.status, 'active'),
         with: {
           resource: { columns: { name: true, status: true } },
           permission: { columns: { code: true, status: true } },
@@ -41,14 +41,14 @@ export async function fetchPermissionsForRole(roleId: number | null) {
 
 export async function fetchUserWithPermissions(userId: number) {
   const result = await db.query.users.findFirst({
-    where: (users: any, { eq, and }: any) => and(eq(users.id, userId), eq(users.status, 'active')),
+    where: (users: Record<string, any>, { eq, and }: any) => and(eq(users.id, userId), eq(users.status, 'active')),
     columns: { password: false },
     with: {
       assignedRole: {
-        where: (roles: any, { eq }: any) => eq(roles.status, 'active'),
+        where: (roles: Record<string, any>, { eq }: any) => eq(roles.status, 'active'),
         with: {
           resourcePermissions: {
-            where: (rp: any, { eq }: any) => eq(rp.status, 'active'),
+            where: (rp: Record<string, any>, { eq }: any) => eq(rp.status, 'active'),
             with: {
               resource: { columns: { name: true, status: true } },
               permission: { columns: { code: true, status: true } },
@@ -73,7 +73,7 @@ export async function getPublicPermissions(): Promise<Record<string, string[]>> 
   if (publicPermissionsCache && (now - lastCacheTime < CACHE_TTL)) return publicPermissionsCache
 
   const publicRole = await db.query.roles.findFirst({
-    where: (roles: any, { eq, and }: any) => and(eq(roles.name, 'public'), eq(roles.status, 'active')),
+    where: (roles: Record<string, any>, { eq, and }: any) => and(eq(roles.name, 'public'), eq(roles.status, 'active')),
     columns: { id: true },
   })
 

@@ -5,7 +5,7 @@ export function isAdmin(user: User | null | undefined) {
   return user?.role === 'admin'
 }
 
-export function isOwner(user: User | null | undefined, record?: Record<string, any>, ownerKey: string = 'createdBy'): boolean {
+export function isOwner(user: User | null | undefined, record?: Record<string, unknown>, ownerKey: string = 'createdBy'): boolean {
   if (!user?.id || !record) return false
   return Number(user.id) === Number(record[ownerKey])
 }
@@ -16,7 +16,7 @@ export function hasPermission(user: User | null | undefined, model: string, acti
   return !!user?.permissions?.[model]?.includes(action)
 }
 
-export function hasRowPermission(user: User | null | undefined, model: string, action: string, record?: any) {
+export function hasRowPermission(user: User | null | undefined, model: string, action: string, record?: Record<string, unknown>) {
   if (hasPermission(user, model, action)) return true
 
   if (hasPermission(user, model, `${action}_own`)) {

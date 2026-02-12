@@ -48,7 +48,7 @@ export async function useCrudFetch(
 
     await refreshNuxtData()
   }
-  catch (err) {
+  catch {
     useToast().add({
       title: 'Error',
       description: toastMessage[method].errorMessage,

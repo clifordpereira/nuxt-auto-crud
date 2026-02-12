@@ -10,7 +10,7 @@ import { posts } from './cms'
  *
  * Maps createdBy and updatedBy fields to the users table.
  */
-export const auditRelations = (r: any) => ({
+export const auditRelations = (r: Record<string, any>) => ({
   creator: r.one.users({
     from: r.tables.createdBy,
     to: r.users.id,

@@ -98,7 +98,7 @@ function resolveAction(method: string, hasId: boolean) {
 
 async function fetchRecord(model: string, id: string) {
   const { db, schema } = await import('hub:db')
-  const table = (schema as any)[model]
+  const table = (schema as Record<string, any>)[model]
   if (!table) return null
 
   const records = await db.select().from(table).where(eq(table.id, id)).limit(1)

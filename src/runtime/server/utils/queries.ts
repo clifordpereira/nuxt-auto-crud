@@ -32,19 +32,19 @@ export async function getRows(table: TableWithId, context: QueryContext = {}) {
     if ('status' in table && ownerKey in table) {
       filters.push(
         or(
-          eq((table as any).status, 'active'),
-          eq((table as any)[ownerKey], Number(userId)),
+          eq((table as any as { status: any }).status, 'active'),
+          eq((table as any as Record<string, any>)[ownerKey], Number(userId)),
         ),
       )
     }
     else if ('status' in table) {
-      filters.push(eq((table as any).status, 'active'))
+      filters.push(eq((table as any as { status: any }).status, 'active'))
     }
   }
   else if (permissions?.includes('list_own') && userId) {
     // Strictly personal records, status ignored
     if (ownerKey in table) {
-      filters.push(eq((table as any)[ownerKey], Number(userId)))
+      filters.push(eq((table as any as Record<string, any>)[ownerKey], Number(userId)))
     }
   }
 
@@ -137,7 +137,6 @@ export async function updateRow(table: TableWithId, id: string, data: Record<str
  * Deletes a row from the database based on the provided table and ID.
  * @param table - The table to query.
  * @param id - The ID of the row to delete.
- * @param context - The context object containing user ID and permissions.
  */
 export async function deleteRow(table: TableWithId, id: string) {
   const targetId = Number(id)

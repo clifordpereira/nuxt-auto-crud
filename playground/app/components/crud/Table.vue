@@ -48,7 +48,7 @@ const getExportExclusions = (type: 'pdf' | 'excel') => {
 }
 
 const getExportData = (exclude: string[] = []) => {
-  const items = (data.value ?? []) as Record<string, any>[]
+  const items = (data.value ?? []) as Record<string, unknown>[]
   if (!items.length) return []
 
   // Pre-calculate Column Mapping once
@@ -60,7 +60,7 @@ const getExportData = (exclude: string[] = []) => {
     }))
 
   return items.map((row) => {
-    const exportRow: Record<string, any> = {}
+    const exportRow: Record<string, unknown> = {}
     for (const { key, label } of columnMap) {
       exportRow[label] = row[key]
     }
