@@ -18,7 +18,7 @@ vi.mock('#imports', () => ({
   }),
 }))
 
-vi.mock('#site/schema', async () => {
+vi.mock('#nac/schema', async () => {
   const utils = await import('../utils/schema')
   return utils.mockSchema
 })

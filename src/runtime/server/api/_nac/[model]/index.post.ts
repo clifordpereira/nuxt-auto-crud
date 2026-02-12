@@ -1,4 +1,3 @@
-// server/api/_nac/[model]/index.post.ts
 import { eventHandler, getRouterParams, readBody } from 'h3'
 
 import { modelTableMap, resolveValidatedSchema } from '../../../utils/modelMapper'

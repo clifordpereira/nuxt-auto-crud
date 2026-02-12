@@ -1,4 +1,3 @@
-// server/api/_nac/[model]/index.get.ts
 import { eventHandler, getRouterParams } from 'h3'
 
 import { modelTableMap } from '../../../utils/modelMapper'

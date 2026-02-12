@@ -1,5 +1,3 @@
-// src/runtime/utils/constants.ts
-
 /**
  * Points to (references) the primary key of users table.
  * 
@@ -13,9 +11,8 @@ export const NAC_OWNER_KEYS = [
  * Should not be editable by users.
  */
 const NAC_SYSTEM_FIELDS = [
-  'id', 'uuid',
-  'created_at', 'updated_at', 'deleted_at', 
-  'created_by', 'updated_by'
+  'id', 'uuid', 'created_at', 
+  'updated_at', 'deleted_at', 'created_by', 'updated_by'
 ]
 
 /**
@@ -34,8 +31,8 @@ export const NAC_API_HIDDEN_FIELDS = [
  * Includes System Fields (minus status/updated_at) + Hidden Fields.
  */
 export const NAC_FORM_HIDDEN_FIELDS = [
-  ...NAC_SYSTEM_FIELDS,
-  ...NAC_API_HIDDEN_FIELDS
+  // ...NAC_API_HIDDEN_FIELDS, // hidden by default.
+  ...NAC_SYSTEM_FIELDS, // from the api, hide system fields too
 ]
 
 /**
@@ -43,5 +40,6 @@ export const NAC_FORM_HIDDEN_FIELDS = [
  * UI clutter reduction for DataTables.
  */
 export const NAC_DATA_TABLE_HIDDEN_FIELDS = [
-  'updated_at', 'deleted_at', 'created_by', 'updated_by'
+  // ...NAC_API_HIDDEN_FIELDS, // hidden by default.
+  'updated_at', 'deleted_at', 'created_by', 'updated_by' // from the api, hide these fields too
 ]

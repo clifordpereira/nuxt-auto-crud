@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useChangeCase } from '@vueuse/integrations/useChangeCase'
+import { dbFieldToLabel } from '~/utils/formatter';
 
 const props = defineProps<{
   row: Record<string, unknown>
@@ -10,31 +10,6 @@ const props = defineProps<{
 }>()
 
 const isOpen = ref(false)
-
-const { fetchRelations, getDisplayValue } = useNacRelationDisplay(props.schema || { resource: '', fields: [] })
-
-watch(isOpen, async (val) => {
-  if (val && props.schema) {
-    await fetchRelations()
-  }
-})
-
-function formatKey(key: string) {
-  return useChangeCase(key, 'capitalCase').value
-}
-
-function formatValue(key: string, value: unknown) {
-  if (value === null || value === undefined) return '-'
-  if (typeof value === 'boolean') return value ? 'Yes' : 'No'
-
-  if (props.schema) {
-    const display = getDisplayValue(key, value)
-    if (display !== value) return display
-  }
-
-  if (typeof value === 'object') return JSON.stringify(value)
-  return String(value)
-}
 
 function isImage(key: string, value: unknown) {
   if (typeof value !== 'string') return false
@@ -77,7 +52,7 @@ function isImage(key: string, value: unknown) {
             class="px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4"
           >
             <dt class="text-sm font-medium leading-6 text-gray-900 dark:text-white">
-              {{ formatKey(String(key)) }}
+              {{ dbFieldToLabel(String(key)) }}
             </dt>
             <dd class="mt-1 text-sm leading-6 text-gray-700 dark:text-gray-400 sm:col-span-2 sm:mt-0 break-words">
               <img
@@ -86,7 +61,7 @@ function isImage(key: string, value: unknown) {
                 class="h-10 w-10 rounded object-cover"
                 alt="Preview"
               >
-              <span v-else>{{ formatValue(String(key), value) }}</span>
+              <span v-else>{{ value }}</span>
             </dd>
           </div>
         </dl>

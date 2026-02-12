@@ -1,5 +1,5 @@
 // src/runtime/types/index.d.ts
-declare module '#site/schema' {
+declare module '#nac/schema' {
   const schema: Record<string, unknown>
   export default schema
 }

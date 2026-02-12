@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { useChangeCase } from '@vueuse/integrations/useChangeCase'
+import type { SchemaDefinition } from '#nac/shared/utils/types'
 
 const props = defineProps<{
   resource: string
-  schema: {
-    resource: string
-    fields: { name: string, type: string, required?: boolean }[]
-  }
+  schema: SchemaDefinition
 }>()
 
 const open = ref(false)
