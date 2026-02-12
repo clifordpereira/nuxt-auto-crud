@@ -23,29 +23,25 @@ export async function getRows(table: TableWithId, context: QueryContext = {}) {
   const ownerKey = useRuntimeConfig().autoCrud.auth?.ownerKey || 'createdBy'
   const filters = []
 
-  if (permissions?.includes('list_all')) {
-    // Promotion: Return all records, zero filters
-  }
-  else if (permissions?.includes('list')) {
-    // Logic: (status == 'active') OR (owner == userId)
-    // This allows users to see public active content AND their own drafts/private items
-    if ('status' in table && ownerKey in table) {
+  const ownerCol = table[ownerKey]
+  const statusCol = table.status
+
+  if (permissions?.includes('list')) {
+    // Narrowing: ensure columns exist before use
+    if (statusCol && ownerCol) {
       filters.push(
         or(
-          eq((table as any as { status: any }).status, 'active'),
-          eq((table as any as Record<string, any>)[ownerKey], Number(userId)),
+          eq(statusCol, 'active'),
+          eq(ownerCol, Number(userId)),
         ),
       )
     }
-    else if ('status' in table) {
-      filters.push(eq((table as any as { status: any }).status, 'active'))
+    else if (statusCol) {
+      filters.push(eq(statusCol, 'active'))
     }
   }
-  else if (permissions?.includes('list_own') && userId) {
-    // Strictly personal records, status ignored
-    if (ownerKey in table) {
-      filters.push(eq((table as any as Record<string, any>)[ownerKey], Number(userId)))
-    }
+  else if (permissions?.includes('list_own') && userId && ownerCol) {
+    filters.push(eq(ownerCol, Number(userId)))
   }
 
   const fields = getSelectableFields(table)

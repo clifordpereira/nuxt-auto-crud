@@ -33,6 +33,7 @@ export default defineNuxtModule<ModuleOptions>({
 
     // 1. Aliases
     nuxt.options.alias['#nac/shared'] = resolver.resolve('./runtime/shared')
+    nuxt.options.alias['#nac/types'] = resolver.resolve('./runtime/server/types')
     nuxt.options.alias['#nac/schema'] = resolver.resolve(nuxt.options.rootDir, options.schemaPath!)
 
     // 2. Runtime Config (The Concrete State)
@@ -65,10 +66,9 @@ export default defineNuxtModule<ModuleOptions>({
       { path: '/:model/:id', method: 'patch', handler: '[model]/[id].patch.ts' },
       { path: '/:model/:id', method: 'delete', handler: '[model]/[id].delete.ts' },
       // System Endpoints
-      { path: '/_schemas', method: 'get', handler: '_schemas.get.ts' },
+      { path: '/_schemas', method: 'get', handler: '_schemas/index.get.ts' },
       { path: '/_schemas/:model', method: 'get', handler: '_schemas/[model].get.ts' },
       { path: '/_relations', method: 'get', handler: '_relations.get.ts' },
-      { path: '/_relations/:model', method: 'get', handler: '_relations/[model].get.ts' },
       { path: '/_meta', method: 'get', handler: '_meta.get.ts' },
       { path: '/_sse', method: 'get', handler: '_sse.get.ts' },
     ] as const
