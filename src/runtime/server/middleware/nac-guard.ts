@@ -1,5 +1,6 @@
-import { defineEventHandler, getQuery, createError, type H3Event } from 'h3'
+import { defineEventHandler, getQuery, type H3Event } from 'h3'
 import { useRuntimeConfig } from '#imports'
+import { UnauthorizedAccessError } from '../exceptions'
 
 /**
  * Allow Agentic/MCP access to NAC routes
@@ -11,10 +12,8 @@ export default defineEventHandler(async (event) => {
   const token = getQuery(event).token as string
   if (hasValidToken(event, token)) return
 
-  throw createError({
-    statusCode: 401,
-    statusMessage: 'NAC Core: Unauthorized access - Invalid API Token',
-  })
+  // If reached here, token is invalid
+  throw new UnauthorizedAccessError('NAC Core: Unauthorized access - Invalid API Token')
 })
 
 /**

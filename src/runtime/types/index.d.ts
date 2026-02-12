@@ -1,13 +1,21 @@
-// src/runtime/types/index.d.ts
+/**
+ * The schema path to make this import dynamic
+ * @default 'server/db/schema'
+ */
 declare module '#nac/schema' {
   const schema: Record<string, unknown>
   export default schema
 }
 
+/**
+ * Interface for injecting application-level context into the NAC core.
+ * Facilitates the transfer of actor metadata, permissions and record fetched,
+ * from the application to the nuxt-auto-crud engine.
+ */
 export interface QueryContext {
   userId?: number | string;
-  record?: Record<string, unknown>;
   permissions?: string[];
+  record?: Record<string, unknown>;
 }
 
 export {}

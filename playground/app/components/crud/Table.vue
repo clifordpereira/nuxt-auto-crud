@@ -15,7 +15,9 @@ const { data } = await useFetch(`${endpointPrefix}/${props.resource}`, {
   headers: crudHeaders(),
 })
 
-const { data: schema } = await useFetch<SchemaDefinition>(() => `${endpointPrefix}/_schemas/${props.resource}`)
+const { data: schema } = await useFetch<SchemaDefinition>(`${endpointPrefix}/_schemas/${props.resource}`, {
+  headers: crudHeaders(),
+})
 
 async function onDelete(id: number) {
   if (!confirm('Are you sure you want to delete this row?')) return

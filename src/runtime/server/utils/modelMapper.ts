@@ -54,8 +54,6 @@ export function getForeignKeyPropertyName(fk: ForeignKey, columns: Record<string
   }
 }
 
-// keep in server/utils itself
-// used for CRUD getRow and getRows
 /**
  * Selectable fields to give as api response. 
  * Used in getRow (/[model]/[id].get.ts) and getRows (/[model]/index.get.ts).
@@ -104,44 +102,6 @@ export function resolveValidatedSchema( table: Table, intent: 'insert' | 'patch'
   return (intent === 'patch' ? sanitizedSchema.partial() : sanitizedSchema) as z.ZodObject<z.ZodRawShape>
 }
 
-
-
-/**
- * Extracts foreign key relationships for a specific table.
- * @returns Record<string, string> 
- * 
- * @example
- * { userId: 'users', categoryId: 'categories' }
- */
-export function getTableRelations(table: Table): Record<string, string> {
-  const { foreignKeys } = getTableConfig(table)
-  const columnsMap = getColumns(table as Table)
-  const relations: Record<string, string> = {}
-
-  for (const fk of foreignKeys) {
-    // 1. Get the target (referenced) table name
-    const remoteTable = fk.reference().foreignTable
-    const targetTableName = getTableConfig(remoteTable).name
-
-    // 2. Map the local column name to that table
-    // We use the first column in the reference since NAC assumes single-column FKs
-    const localColumnName = fk.reference().columns[0]?.name
-
-    if (localColumnName) {
-      // Find the property key (TS name) that matches the DB column name
-      const propertyKey = Object.entries(columnsMap).find(
-        ([_, col]) => col.name === localColumnName
-      )?.[0]
-
-      if (propertyKey) {
-        relations[propertyKey] = targetTableName
-      }
-    }
-  }
-
-  return relations
-}
-
 /**
  * Resolves table relationships for NAC reflection.
  * Maps property keys to target table names.
@@ -152,16 +112,12 @@ export function resolveTableRelations(
 ): Record<string, string> {
   const config = getTableConfig(table)
   const columnsMap = getColumns(table as Table)
-  const propertyKeys = Object.keys(columnsMap)
   const relations: Record<string, string> = {}
 
   // 1. Link NAC_OWNER_KEYS to users table
   if (includeSystemFields) {
-    const systemFields = new Set(NAC_OWNER_KEYS)
-    for (const key of propertyKeys) {
-      if (systemFields.has(key)) {
-        relations[key] = 'users'
-      }
+    for (const key of Object.keys(columnsMap)) {
+      if (NAC_OWNER_KEYS.includes(key as any)) relations[key] = 'users'
     }
   }
 
@@ -169,19 +125,35 @@ export function resolveTableRelations(
   for (const fk of config.foreignKeys) {
     const targetTable = getTableConfig(fk.reference().foreignTable).name;
     const propertyKey = getForeignKeyPropertyName(fk, columnsMap)
-
-    if (propertyKey) {
-      relations[propertyKey] = targetTable
-    }
+    if (propertyKey) relations[propertyKey] = targetTable
   }
 
   return relations
 }
 
+/**
+ * Resolves the label field for a model.
+ * @param columnNames The names of the columns in the model
+ * @returns The name of the label field
+ */
 export function getLabelField(columnNames: string[]): string {
-  const candidates = ['name', 'title', 'email', 'label', 'subject']
+  const candidates = ['name', 'title', 'label', 'email']
   return candidates.find(n => columnNames.includes(n)) || 'id'
 }
+
+const ZOD_TYPE_MAP: Record<string, Field['type']> = {
+  ZodDate: 'date',
+  ZodNumber: 'number',
+  ZodBoolean: 'boolean'
+}
+
+const SEMANTIC_CHECK_MAP: Record<string, Field['type']> = {
+  email: 'email',
+  uuid: 'uuid',
+  url: 'url'
+}
+
+const TEXTAREA_HINTS = ['content', 'description', 'bio', 'message']
 
 /**
  * Builds a complete SchemaDefinition for a model.
@@ -194,42 +166,55 @@ export function getSchemaDefinition(modelName: string): SchemaDefinition {
   const table = modelTableMap[modelName]
   if (!table) throw new Error(`Model ${modelName} not found`)
 
-  const columnEntries = Object.entries(getColumns(table))
-  const columnNames = columnEntries.map(([name]) => name)
-  const labelField = getLabelField(columnNames)
-  const relations = resolveTableRelations(table, true)
+  const config = useRuntimeConfig() as any
+  const apiHiddenFields = config.autoCrud.apiHiddenFields as string[]
+  const formHiddenFields = config.public.autoCrud.formHiddenFields as string[]
   
-  const config = useRuntimeConfig()
-  const hiddenFields = config.autoCrud.apiHiddenFields
-  const protectedFields = config.public.autoCrud.formHiddenFields
+  const columns = getColumns(table)
+  const relations = resolveTableRelations(table, true)
+  const shape = createInsertSchema(table).shape
 
-  const zodSchema = createInsertSchema(table)
-  const shape = zodSchema.shape
+  const fields: Field[] = Object.entries(columns)
+    .filter(([name]) => !apiHiddenFields.includes(name))
+    .map(([name, col]) => {
+      const zodField = shape[name] as any
+      const zodTypeName = zodField?._def?.typeName
 
-  const fields: Field[] = columnEntries
-    .filter(([name]) => !hiddenFields.includes(name))
-    .map(([name, column]) => {
-      const zodType = shape[name]
-      const col = column as any
-      
-      // Map Drizzle types via Zod shape
-      let type = 'string'
-      if (zodType instanceof z.ZodDate || (zodType as any)._def?.typeName === 'ZodDate') {
-        type = 'date'
-      } else if (zodType instanceof z.ZodNumber) {
-        type = 'number'
-      } else if (zodType instanceof z.ZodBoolean) {
-        type = 'boolean'
+      // 1. Resolve Base Technical Type
+      let type: Field['type'] = ZOD_TYPE_MAP[zodTypeName] ?? 'string'
+
+      // 2. Resolve Enums & Semantic Overrides
+      const colInternal = col as any
+      const enumValues = colInternal.enumValues || colInternal.config?.enumValues
+      let selectOptions: string[] | undefined
+
+      if (enumValues) {
+        type = 'enum'
+        selectOptions = enumValues
+      } else {
+        const checks = (zodField?._def?.checks as unknown as { kind: string }[]) || []
+        const semanticMatch = checks.find(c => SEMANTIC_CHECK_MAP[c.kind])
+        
+        if (semanticMatch) {
+          type = SEMANTIC_CHECK_MAP[semanticMatch.kind]!
+        } else if (TEXTAREA_HINTS.includes(name)) {
+          type = 'textarea'
+        }
       }
 
       return {
         name,
         type,
-        required: col?.notNull ?? false,
+        selectOptions,
+        required: colInternal.notNull ?? false,
         references: relations[name],
-        isReadOnly: protectedFields.includes(name),
+        isReadOnly: formHiddenFields.includes(name),
       }
     })
 
-  return { resource: modelName, labelField, fields }
+  return { 
+    resource: modelName, 
+    labelField: getLabelField(Object.keys(columns)), 
+    fields 
+  }
 }

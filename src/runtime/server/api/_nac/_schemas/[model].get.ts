@@ -8,7 +8,6 @@ export default eventHandler(async (event) => {
   const { model } = getRouterParams(event)
   if (!model) throw ResourceNotFoundError
 
-  // should return SchemaDefinition
   const schema = getSchemaDefinition(model)
   if (!schema) throw ResourceNotFoundError
 

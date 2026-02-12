@@ -24,6 +24,11 @@ export class ValidationError extends AutoCrudError {
     super(message, 400)
   }
 }
+export class UnauthorizedAccessError extends AutoCrudError {
+  constructor(modelName: string, message: string = `${modelName} access denied`) {
+    super(message, 401)
+  }
+}
 
 export class MissingSlugError extends AutoCrudError {
   constructor(message: string = 'Missing slug/id') {
