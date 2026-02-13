@@ -21,3 +21,5 @@ Thumbs.db
 
 # Cloud Specifics
 **/.wrangler
+
+playground/.data
