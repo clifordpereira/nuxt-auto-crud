@@ -7,7 +7,7 @@ import { useRuntimeConfig } from '#imports'
 import * as schema from '#nac/schema'
 
 import type { Field, SchemaDefinition } from '#nac/shared/utils/types'
-import { NAC_OWNER_KEYS, NAC_SYSTEM_TABLES } from './constants'
+import { NAC_SYSTEM_TABLES } from './constants'
 
 type ForeignKey = ReturnType<typeof getTableConfig>['foreignKeys'][number]
 
@@ -74,52 +74,16 @@ export function getSelectableFields(table: Table): Record<string, Column> {
   return result
 }
 
-/**
- * Resolves a model-specific Zod schema that automatically strips
- * NAC_FORM_HIDDEN_FIELDS and coerces technical types.
- */
-export function resolveValidatedSchema(table: Table, intent: 'insert' | 'patch' = 'insert'): z.ZodObject<z.ZodRawShape> {
-  const { formHiddenFields } = useRuntimeConfig().public.autoCrud
-
-  // 1. Base Schema with Date Coercion
-  const baseSchema = createInsertSchema(table, ({ name, column }: { name: string, column: Column }) => {
-    // Check columnType for 'timestamp' or 'date' strings
-    const isDateColumn = column.columnType.includes('timestamp') || column.columnType.includes('date')
-
-    return {
-      [name]: isDateColumn ? z.coerce.date() : undefined,
-    }
-  })
-
-  // 2. Filter NAC protected/hidden fields
-  const columnNames = Object.keys(getColumns(table))
-  const fieldsToOmit = formHiddenFields.filter(f => columnNames.includes(f))
-  const sanitizedSchema = baseSchema.omit(Object.fromEntries(fieldsToOmit.map(f => [f, true])))
-
-  // 3. Apply intent
-  return (intent === 'patch' ? sanitizedSchema.partial() : sanitizedSchema) as z.ZodObject<z.ZodRawShape>
-}
 
 /**
  * Resolves table relationships for NAC reflection.
  * Maps property keys to target table names.
  */
-export function resolveTableRelations(
-  table: Table,
-  includeSystemFields = false,
-): Record<string, string> {
+export function resolveTableRelations(table: Table): Record<string, string> {
   const config = getTableConfig(table)
-  const columnsMap = getColumns(table as Table)
+  const columnsMap = getColumns(table)
   const relations: Record<string, string> = {}
 
-  // 1. Link NAC_OWNER_KEYS to users table
-  if (includeSystemFields) {
-    for (const key of Object.keys(columnsMap)) {
-      if (NAC_OWNER_KEYS.includes(key as typeof NAC_OWNER_KEYS[number])) relations[key] = 'users'
-    }
-  }
-
-  // 2. Resolve explicit Foreign Keys from Schema
   for (const fk of config.foreignKeys) {
     const targetTable = getTableConfig(fk.reference().foreignTable).name
     const propertyKey = getForeignKeyPropertyName(fk, columnsMap)
@@ -169,7 +133,7 @@ export function getSchemaDefinition(modelName: string): SchemaDefinition {
   const formHiddenFields = config.public.autoCrud.formHiddenFields
 
   const columns = getColumns(table)
-  const relations = resolveTableRelations(table, true)
+  const relations = resolveTableRelations(table)
   const shape = createInsertSchema(table).shape
 
   const fields: Field[] = Object.entries(columns)
