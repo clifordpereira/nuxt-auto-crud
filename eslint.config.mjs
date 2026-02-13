@@ -1,17 +1,18 @@
 // @ts-check
 import { createConfigForNuxt } from '@nuxt/eslint-config/flat'
 
-// Run `npx @eslint/config-inspector` to inspect the resolved config interactively
 export default createConfigForNuxt({
   features: {
-    // Rules for module authors
     tooling: true,
-    // Rules for formatting
     stylistic: true,
   },
   dirs: {
     src: [
+      './src',
       './playground',
+      './playground-saas',
+      './test/fixtures/basic',
+      './test/fixtures/authz',
     ],
   },
 })
@@ -19,6 +20,9 @@ export default createConfigForNuxt({
     {
       rules: {
         'vue/multi-word-component-names': 'off',
+        '@typescript-eslint/consistent-type-imports': 'error',
+        '@typescript-eslint/no-floating-promises': 'error',
+        '@typescript-eslint/no-explicit-any': 'error',
       },
     },
   )
