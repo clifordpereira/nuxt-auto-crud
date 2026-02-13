@@ -9,7 +9,7 @@ import { useRuntimeConfig } from '#imports'
 import * as schema from '#nac/schema'
 
 import type { Field, SchemaDefinition } from '#nac/shared/utils/types'
-import { NAC_OWNER_KEYS } from './constants'
+import { NAC_OWNER_KEYS, NAC_SYSTEM_TABLES } from './constants'
 
 type ForeignKey = ReturnType<typeof getTableConfig>['foreignKeys'][number]
 
@@ -18,11 +18,9 @@ type ForeignKey = ReturnType<typeof getTableConfig>['foreignKeys'][number]
  * @param {Record<string, any>} schema - The imported schema object containing table definitions and other exports.
  * @returns {Record<string, Table>} A mapping of export keys to their corresponding Table instances.
  */
-const EXCLUDED_MODELS = ['system_logs', 'migrations', 'internal_config']
-
 export const buildModelTableMap = (): Record<string, Table> => {
   return Object.entries(schema).reduce((acc, [key, value]) => {
-    if (is(value, Table) && !EXCLUDED_MODELS.includes(key)) {
+    if (is(value, Table) && !NAC_SYSTEM_TABLES.includes(key)) {
       acc[key] = value
     }
     return acc

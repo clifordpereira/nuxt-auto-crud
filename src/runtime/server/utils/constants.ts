@@ -43,3 +43,9 @@ export const NAC_DATA_TABLE_HIDDEN_FIELDS = [
   // ...NAC_API_HIDDEN_FIELDS, // hidden by default.
   'updated_at', 'deleted_at', 'created_by', 'updated_by', // from the api, hide these fields too
 ]
+
+/** Tables used by the underlying database engine/migration tool */
+export const NAC_SYSTEM_TABLES = [ '_hub_migrations', 'd1_migrations', 'sqlite_sequence', ]
+
+/** Internal Access Control schema; usually read-only for standard Auto-CRUD endpoints */
+export const NAC_ACL_TABLES = [ 'roles', 'resources', 'permissions', 'role_resource_permissions', ] as const
