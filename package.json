@@ -29,7 +29,7 @@
     "prepack": "nuxt-module-build build",
     "release": "npm run lint && npm run test && npm run prepack && changelogen --release && npm publish && git push --follow-tags",
     "play": "bun run dev:prepare && nuxi dev --bun",
-    "prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxi prepare",
+    "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxi prepare",
     "dev": "bun play playground",
     "dev:build": "nuxi build --bun playground",
     "lint": "eslint .",

@@ -1,4 +1,3 @@
-// test/unit/validator.resolveValidatedSchema.spec.ts
 import { describe, it, expect } from 'vitest'
 import { z } from 'zod'
 import * as schema from '#nac/schema'

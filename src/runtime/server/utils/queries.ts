@@ -1,5 +1,4 @@
 import { useRuntimeConfig } from '#imports'
-// @ts-expect-error - hub:db is a virtual alias
 import { db } from 'hub:db'
 import { type Table, eq, desc, and, or, getColumns } from 'drizzle-orm'
 
@@ -90,6 +89,10 @@ export async function createRow(table: Table, data: Record<string, unknown>, con
   if (context.userId) {
     if (ownerKey in allColumns) payload[ownerKey] = Number(context.userId)
     if ('updatedBy' in allColumns) payload.updatedBy = Number(context.userId)
+  }
+
+  if ('updatedAt' in allColumns) {
+    payload.updatedAt = new Date()
   }
 
   const result = await db.insert(table).values(payload).returning(selectableFields).get()

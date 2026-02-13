@@ -23,6 +23,8 @@ export const posts = sqliteTable('posts', {
   categoryId: integer('category_id').references(() => categories.id), // Should test relations
   createdAt: integer({ mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
   updatedAt: integer({ mode: 'timestamp' }).notNull(),
+  createdBy: integer('created_by'), // Add this
+  updatedBy: integer('updated_by'), // Add this
 })
 
 // System-level tables to test NAC_SYSTEM_TABLES exclusion

@@ -5,9 +5,10 @@
     "moduleResolution": "Bundler",
     "baseUrl": ".",
     "paths": {
+      "hub:db": ["./test/mocks/db.ts"],
       "#imports": ["./test/mocks/imports.ts"],
       "#nac/shared/*": ["./src/runtime/shared/*"],
-      "#nac/types": ["./src/runtime/server/types/index.d.ts"],
+      "#nac/types": ["./src/runtime/server/types.ts"],
       "#nac/schema": ["./test/fixtures/basic/server/db/schema.ts"]
     }
   },
