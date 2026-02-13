@@ -18,24 +18,11 @@ const fluentMock = {
   values: vi.fn(),
 }
 
-export const db = fluentMock
-
-// Mock schema objects to satisfy Drizzle table/column references
-export const basicSchema = {
-  users: { id: 'users.id', email: 'users.email' },
-  categories: { id: 'categories.id', name: 'categories.name' },
-  posts: { id: 'posts.id', title: 'posts.title', content: 'posts.content', status: 'posts.status', authorEmail: 'posts.authorEmail', publishedAt: 'posts.publishedAt', categoryId: 'posts.categoryId', createdAt: 'posts.createdAt', updatedAt: 'posts.updatedAt' },
-  _hub_migrations: { id: '_hub_migrations.id', name: '_hub_migrations.name' },
-}
-
-export const authzSchema = {
-  users: { id: 'users.id', email: 'users.email' },
-  roles: { id: 'roles.id', name: 'roles.name' },
-  resources: { id: 'resources.id', name: 'resources.name' },
-  permissions: { id: 'permissions.id', code: 'permissions.code' },
-  roleResourcePermissions: {
-    roleId: 'rrp.roleId',
-    resourceId: 'rrp.resourceId',
-    permissionId: 'rrp.permissionId',
-  },
+export const useDb = () => {
+  const db = {
+    ...fluentMock,
+    // transaction mock if needed later for soft-deletes
+    transaction: vi.fn((cb) => cb(fluentMock))
+  }
+  return db
 }

@@ -4,8 +4,6 @@ import { createInsertSchema } from 'drizzle-zod'
 import { z } from 'zod'
 
 import { useRuntimeConfig } from '#imports'
-
-// @ts-expect-error - #nac/schema is an alias defined by the module
 import * as schema from '#nac/schema'
 
 import type { Field, SchemaDefinition } from '#nac/shared/utils/types'

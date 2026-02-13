@@ -35,16 +35,21 @@
   ],
   "scripts": {
     "prepack": "nuxt-module-build build",
-    "dev": "bun run dev:prepare && nuxi dev --bun playground",
-    "dev:build": "nuxi build --bun playground",
-    "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxi prepare playground",
     "release": "npm run lint && npm run test && npm run prepack && changelogen --release && npm publish && git push --follow-tags",
+    "play": "bun run dev:prepare && nuxi dev --bun",
+    "prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxi prepare",
+    "dev": "bun play playground",
+    "dev:build": "nuxi build --bun playground",
     "lint": "eslint .",
+    "link": "npm link",
+    "dev:prepare:saas": "bun prepare playground-saas",
+    "dev:saas": "bun play playground-saas",
+    "dev:build:saas": "nuxi build --bun playground-saas",
     "test": "vitest run",
-    "test:api": "node scripts/test-api.mjs",
     "test:watch": "vitest watch",
-    "test:types": "vue-tsc --noEmit && cd playground && vue-tsc --noEmit",
-    "link": "npm link"
+    "test:types": "vue-tsc --noEmit && bun --cwd playground nuxi prepare && bun --cwd playground vue-tsc --noEmit && bun --cwd playground-saas nuxi prepare && bun --cwd playground-saas vue-tsc --noEmit",
+    "test:basic": "TEST_FIXTURE=basic vitest run",
+    "test:authz": "TEST_FIXTURE=authz vitest run"
   },
   "dependencies": {
     "@nuxt/kit": "^4.3.0",

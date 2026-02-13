@@ -1,5 +1,9 @@
 import { defineConfig } from 'vitest/config'
 import { defineVitestProject } from '@nuxt/test-utils/config'
+import { resolve } from 'node:path'
+
+const fixture = process.env.TEST_FIXTURE || 'basic'
+const r = (p: string) => resolve(__dirname, p)
 
 export default defineConfig({
   test: {
@@ -10,10 +14,14 @@ export default defineConfig({
           include: ['test/unit/*.{test,spec}.ts'],
           environment: 'node',
           alias: {
-            // 'h3': './test/mocks/h3.ts',
-            // 'drizzle-orm': './test/mocks/drizzle-orm.ts',
-            'hub:db': './test/mocks/db.ts',
-            '#imports': './test/mocks/imports.ts',
+            // Match module.ts aliases
+            '#nac/shared': r('./src/runtime/shared'),
+            '#nac/types': r('./src/runtime/server/types'),
+            '#nac/schema': r(`./test/fixtures/${fixture}/server/db/schema.ts`),
+            
+            // Mocking Nuxt environment
+            '#imports': r('./test/mocks/imports.ts'),
+            'hub:db': r('./test/mocks/db.ts'),
           },
         },
       },
