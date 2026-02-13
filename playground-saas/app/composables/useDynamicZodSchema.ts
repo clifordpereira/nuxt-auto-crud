@@ -1,6 +1,7 @@
 // src/runtime/composables/useDynamicZodSchema.ts
 import { z } from 'zod'
-import { ValidationRules, type Field, type FieldType } from '#nac/shared/utils/types'
+import { type Field, type FieldType } from '#nac/shared/utils/types'
+
 
 export function useDynamicZodSchema(fields: Field[], isEdit = false) {
   const validators: Record<string, z.ZodTypeAny> = {}

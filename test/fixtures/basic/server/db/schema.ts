@@ -19,10 +19,10 @@ export const posts = sqliteTable('posts', {
   content: text('content'), // Should map to textarea
   status: text('status', { enum: ['draft', 'published', 'archived'] }).default('draft'), // Should map to enum
   authorEmail: text('author_email'), // Should map to email type
-  publishedAt: text('published_at'), // Should test date coercion
+  publishedAt: integer({ mode: 'timestamp' }), // Should test date coercion
   categoryId: integer('category_id').references(() => categories.id), // Should test relations
-  createdAt: text('created_at').notNull(), // System field (hidden in form)
-  updatedAt: text('updated_at'), // System field (hidden in form)
+  createdAt: integer({ mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  updatedAt: integer({ mode: 'timestamp' }).notNull(),
 })
 
 // System-level tables to test NAC_SYSTEM_TABLES exclusion
