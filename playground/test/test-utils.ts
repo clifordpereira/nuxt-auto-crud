@@ -10,12 +10,12 @@ export const api = $fetch
  * Helper to create an authenticated wrapper around $fetch.
  */
 const createAuthenticatedClient = (cookie: string) => {
-  const client = (url: string, opts?: { headers?: Record<string, string>, [key: string]: any }) => $fetch(url, {
+  const client = (url: string, opts?: { headers?: Record<string, string>, [key: string]: unknown }) => $fetch(url, {
     ...opts,
     headers: { ...opts?.headers, cookie },
   })
 
-  client.raw = (url: string, opts?: { headers?: Record<string, string>, [key: string]: any }) => $fetch.raw(url, {
+  client.raw = (url: string, opts?: { headers?: Record<string, string>, [key: string]: unknown }) => $fetch.raw(url, {
     ...opts,
     headers: { ...opts?.headers, cookie },
   })

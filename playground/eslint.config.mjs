@@ -1,6 +1,9 @@
 // @ts-check
-import withNuxt from './.nuxt/eslint.config.mjs'
+import { createConfigForNuxt } from '@nuxt/eslint-config/flat'
 
-export default withNuxt({
-  // Your custom configs here
+export default createConfigForNuxt({
+  features: {
+    tooling: true,
+    stylistic: true,
+  },
 })

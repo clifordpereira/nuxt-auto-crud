@@ -180,7 +180,7 @@ export function getSchemaDefinition(modelName: string): SchemaDefinition {
     .filter(([name]) => !apiHiddenFields.includes(name))
     .map(([name, col]) => {
       const zodField = shape[name] as z.ZodTypeAny | undefined
-      const zodTypeName = (zodField?._def as any)?.typeName
+      const zodTypeName = (zodField?._def as unknown as { typeName: string })?.typeName
 
       // 1. Resolve Base Technical Type
       let type: Field['type'] = ZOD_TYPE_MAP[zodTypeName] ?? 'string'

@@ -10,6 +10,14 @@ declare module '#auth-utils' {
     role: string
     permissions: Record<string, string[]>
   }
+
+  interface AssignedRole {
+    name: string
+    resourcePermissions: {
+      resource?: { name: string, status: string }
+      permission?: { code: string, status: string }
+    }[]
+  }
 }
 
 export {}

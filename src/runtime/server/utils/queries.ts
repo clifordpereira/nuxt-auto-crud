@@ -1,8 +1,7 @@
 import { useRuntimeConfig } from '#imports'
 // @ts-expect-error - hub:db is a virtual alias
 import { db } from 'hub:db'
-import { eq, desc, and, or, getColumns } from 'drizzle-orm'
-import type { Table } from 'drizzle-orm'
+import { type Table, eq, desc, and, or, getColumns } from 'drizzle-orm'
 
 import { getSelectableFields } from './modelMapper'
 
