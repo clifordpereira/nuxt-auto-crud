@@ -1,33 +1,32 @@
+// validator.ts
 import { z } from 'zod'
 import { createSchemaFactory } from 'drizzle-zod'
 import { getColumns, type Table } from 'drizzle-orm'
-import { useRuntimeConfig } from '#imports'
 
-// Create a factory with explicit date coercion
-const { createInsertSchema } = createSchemaFactory({ coerce: { date: true } })
-
-export function resolveValidatedSchema(
-  table: Table, 
-  intent: 'insert' | 'patch' = 'insert'
-) {
-  const { formHiddenFields } = useRuntimeConfig().public.autoCrud
+const { createInsertSchema } = createSchemaFactory()
+// validator.ts
+export function resolveValidatedSchema(table: Table, intent: 'insert' | 'patch' = 'insert') {
   const columns = getColumns(table)
-
-  const baseSchema = createInsertSchema(table, Object.fromEntries(
-    Object.entries(columns)
-      .filter(([_, col]) => (col as any).mode === 'timestamp' || (col as any).mode === 'date')
-      .map(([name, col]) => [
-        name, 
-        col.notNull ? z.coerce.date() : z.coerce.date().nullable().optional()
-      ])
-  ) as any)
-
-  const columnNames = Object.keys(columns)
-  const fieldsToOmit = formHiddenFields.filter(f => columnNames.includes(f))
   
+  const timestampOverrides = Object.fromEntries(
+    Object.entries(columns)
+      .filter(([_, col]) => (col as any).mode === 'timestamp')
+      .map(([name]) => [
+        name, 
+        // 1. Add .optional() so Zod doesn't fail when the field is missing from the request
+        z.union([z.date(), z.string(), z.number()]).pipe(z.coerce.date()).optional()
+      ])
+  )
+
+  const baseSchema = createInsertSchema(table, timestampOverrides as any)
+
+  const { formHiddenFields } = useRuntimeConfig().public.autoCrud
+  const fieldsToOmit = formHiddenFields.filter(f => Object.keys(columns).includes(f))
+  
+  // 2. Use .omit() for fields you want to strip, but ensure the base was optional for those fields
   const sanitizedSchema = baseSchema.omit(
     Object.fromEntries(fieldsToOmit.map(f => [f, true])) as any
   )
 
-  return (intent === 'patch' ? sanitizedSchema.partial() : sanitizedSchema)
+  return intent === 'patch' ? sanitizedSchema.partial() : sanitizedSchema
 }

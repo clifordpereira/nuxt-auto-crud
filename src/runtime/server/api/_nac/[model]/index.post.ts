@@ -1,6 +1,7 @@
 import { eventHandler, getRouterParams, readBody } from 'h3'
 
-import { modelTableMap, resolveValidatedSchema } from '../../../utils/modelMapper'
+import { modelTableMap } from '../../../utils/modelMapper'
+import { resolveValidatedSchema } from '../../../utils/validator'
 import { createRow } from '../../../utils/queries'
 import { broadcast } from '../../../utils/sse-bus'
 

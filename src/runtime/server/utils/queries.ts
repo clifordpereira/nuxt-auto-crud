@@ -8,6 +8,7 @@ import { DeletionFailedError, InsertionFailedError, RecordNotFoundError, Updatio
 
 import type { QueryContext } from '../../types'
 import type { TableWithId } from '../types'
+import { pick } from '#nac/shared/utils/helpers'
 
 /**
  * Fetches rows from the database based on the provided table and context.
@@ -57,16 +58,14 @@ export async function getRows(table: TableWithId, context: QueryContext = {}) {
  * @returns The row from the database.
  */
 export async function getRow(table: TableWithId, id: string, context: QueryContext = {}) {
-  const fields = getSelectableFields(table)
+  const selectableFields = getSelectableFields(table)
 
   // If record exists in context, we still need to sanitize it before returning
   if (context.record) {
-    return Object.fromEntries(
-      Object.entries(context.record).filter(([key]) => key in fields),
-    )
+    return pick(context.record, Object.keys(selectableFields))
   }
 
-  const record = await db.select(fields).from(table).where(eq(table.id, Number(id))).get()
+  const record = await db.select(selectableFields).from(table).where(eq(table.id, Number(id))).get()
   if (!record) throw new RecordNotFoundError()
 
   return record

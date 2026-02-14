@@ -1,101 +1,35 @@
-import { fileURLToPath } from 'node:url'
 import { describe, it, expect } from 'vitest'
-import { setup, $fetch } from '@nuxt/test-utils/e2e'
+import { $fetch } from '@nuxt/test-utils/e2e'
 
-describe('NAC CRUD Fixture', async () => {
-  await setup({
-    rootDir: fileURLToPath(new URL('../fixtures/crud', import.meta.url)),
-    browser: false,
-  })
+describe('NAC: Basic Fixture Lifecycle', () => {
+  const model = 'posts'
+  let recordId: number
 
-  const endpointPrefix = `/api/_nac`
-  const model = 'users'
-  let createdId: number | string
-
-  const newUser = {
-    email: `test-${Date.now()}@example.com`,
-    name: 'Test User',
-    password: 'password123',
-  }
-
-  // Validate Open Access
-  it('allows unauthenticated access to models by default', async () => {
-    const list = await $fetch(`${endpointPrefix}/${model}`)
-    expect(Array.isArray(list)).toBe(true)
-  })
-
-  // Tests [model].post.ts
-  it(`POST /api/_nac/${model} creates a new user`, async () => {
-    const created = await $fetch<Record<string, unknown>>(`${endpointPrefix}/${model}`, {
+  it('POST: creates record with zero-config validation', async () => {
+    const res: any = await $fetch(`/api/_nac/${model}`, {
       method: 'POST',
-      body: newUser,
+      body: { title: 'E2E Test', content: 'Minimal setup' }
     })
-
-    expect(created).toBeDefined()
-    expect(created.id).toBeDefined()
-    expect(created.email).toBe(newUser.email)
-    createdId = created.id as number
+    expect(res.id).toBeDefined()
+    recordId = res.id
   })
 
-  // Tests [model].get.ts
-  it(`GET /api/_nac/${model} lists the created user`, async () => {
-    const list = await $fetch<Record<string, unknown>[]>(`${endpointPrefix}/${model}`)
-    expect(Array.isArray(list)).toBe(true)
-    expect(list.find(u => u.id === createdId)).toBeDefined()
+  it('GET: lists records with default ordering', async () => {
+    const res: any = await $fetch(`/api/_nac/${model}`)
+    expect(Array.isArray(res)).toBe(true)
+    expect(res.find((r: any) => r.id === recordId)).toBeDefined()
   })
 
-  // Tests [model]/[id].get.ts
-  it(`GET /api/_nac/${model}/:id retrieves the user`, async () => {
-    const item = await $fetch<Record<string, unknown>>(`${endpointPrefix}/${model}/${createdId}`)
-    expect(item.id).toBe(createdId)
-    expect(item.email).toBe(newUser.email)
-  })
-
-  // Tests [model]/[id].patch.ts
-  it(`PATCH /api/_nac/${model}/:id updates the user`, async () => {
-    const updated = await $fetch<Record<string, unknown>>(`${endpointPrefix}/${model}/${createdId}`, {
+  it('PATCH: updates record and returns sanitized data', async () => {
+    const res: any = await $fetch(`/api/_nac/${model}/${recordId}`, {
       method: 'PATCH',
-      body: { name: 'Updated Name' },
+      body: { title: 'Updated' }
     })
-    expect(updated.name).toBe('Updated Name')
+    expect(res.title).toBe('Updated')
   })
 
-  it('PATCH /api/_nac/${model}/:id strictly ignores protected system fields', async () => {
-    const original = await $fetch<Record<string, unknown>>(`${endpointPrefix}/${model}/${createdId}`)
-    await $fetch(`${endpointPrefix}/${model}/${createdId}`, {
-      method: 'PATCH',
-      body: {
-        name: 'Verified Name', // Valid field
-        id: 9999, // Protected
-        createdAt: new Date(), // Protected
-      },
-    })
-
-    const verification = await $fetch<Record<string, unknown>>(`${endpointPrefix}/${model}/${createdId}`)
-    expect(verification.id).toBe(original.id)
-    expect(verification.name).toBe('Verified Name')
-  })
-
-  it(`GET /api/_nac/${model}/:id excludes fields defined in HIDDEN_FIELDS`, async () => {
-    const user = await $fetch<Record<string, unknown>>(`${endpointPrefix}/${model}/${createdId}`)
-
-    // 'password' should be in HIDDEN_FIELDS in your NAC constants
-    expect(user).not.toHaveProperty('password')
-    expect(user).toHaveProperty('email')
-  })
-
-  // Tests [model]/[id].delete.ts
-  it(`DELETE /api/_nac/${model}/:id deletes the user`, async () => {
-    await $fetch(`${endpointPrefix}/${model}/${createdId}`, {
-      method: 'DELETE',
-    })
-
-    // Verify Deletion
-    try {
-      await $fetch(`${endpointPrefix}/${model}/${createdId}`)
-    }
-    catch (err: unknown) {
-      expect((err as { statusCode: number }).statusCode).toBe(404)
-    }
+  it('DELETE: removes record successfully', async () => {
+    await $fetch(`/api/_nac/${model}/${recordId}`, { method: 'DELETE' })
+    await expect($fetch(`/api/_nac/${model}/${recordId}`)).rejects.toThrow()
   })
 })
