@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { $fetch } from '@nuxt/test-utils/e2e'
 
-describe('NAC: Basic Fixture Lifecycle', () => {
+describe('NAC: Basic Fixture Lifecycle', async () => {
   const model = 'posts'
   let recordId: number
 

@@ -26,9 +26,3 @@ export const posts = sqliteTable('posts', {
   createdBy: integer('created_by'), // Add this
   updatedBy: integer('updated_by'), // Add this
 })
-
-// System-level tables to test NAC_SYSTEM_TABLES exclusion
-export const _hub_migrations = sqliteTable('_hub_migrations', {
-  id: integer('id').primaryKey(),
-  name: text('name'),
-})
