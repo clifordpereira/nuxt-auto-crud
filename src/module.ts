@@ -68,7 +68,6 @@ export default defineNuxtModule<ModuleOptions>({
       // System Endpoints
       { path: '/_schemas', method: 'get', handler: '_schemas/index.get.ts' },
       { path: '/_schemas/:model', method: 'get', handler: '_schemas/[model].get.ts' },
-      { path: '/_relations', method: 'get', handler: '_relations.get.ts' },
       { path: '/_meta', method: 'get', handler: '_meta.get.ts' },
       { path: '/_sse', method: 'get', handler: '_sse.get.ts' },
     ] as const

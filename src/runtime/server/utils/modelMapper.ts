@@ -27,19 +27,6 @@ export const buildModelTableMap = (): Record<string, Table> => {
 export const modelTableMap = buildModelTableMap()
 
 /**
- * Iterates over all models in the modelTableMap.
- * @param callback The function to call for each model
- */
-export function forEachModel(callback: (modelName: string, table: Table) => void) {
-  for (const [modelName, table] of Object.entries(modelTableMap)) {
-    try {
-      callback(modelName, table)
-    }
-    catch { /* TODO: NAC Internal Logger */ }
-  }
-}
-
-/**
  * Resolves the property name for a foreign key's source column.
  * @returns The property name or undefined if not found
  */
