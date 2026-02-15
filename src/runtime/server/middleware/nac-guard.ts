@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
   if (hasValidToken(token)) return
 
   // If reached here, token is invalid
-  throw new UnauthorizedAccessError('NAC Core: Unauthorized access - Invalid API Token')
+  throw new UnauthorizedAccessError('Nac Core: Unauthorized access').toH3()
 })
 
 /**

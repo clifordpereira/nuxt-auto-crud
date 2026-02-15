@@ -114,7 +114,7 @@ const TEXTAREA_HINTS = ['content', 'description', 'bio', 'message']
  */
 export function getSchemaDefinition(modelName: string): SchemaDefinition {
   const table = modelTableMap[modelName]
-  if (!table) throw new ResourceNotFoundError()
+  if (!table) throw new ResourceNotFoundError(modelName)
 
   const config = useRuntimeConfig() as unknown as { autoCrud: { apiHiddenFields: string[] }, public: { autoCrud: { formHiddenFields: string[] } } }
   const apiHiddenFields = config.autoCrud.apiHiddenFields

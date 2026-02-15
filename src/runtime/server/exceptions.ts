@@ -1,14 +1,25 @@
 import { createError } from 'h3'
 
 export class AutoCrudError extends Error {
-  constructor(message: string, statusCode: number) {
-    super(message)
+  public statusCode: number
 
+  constructor(message: string, statusCode: number = 500) {
+    // Pass message to native Error
+    super(message) 
+    this.statusCode = statusCode
+    
+    // Set class name for stack traces/logs
+    this.name = this.constructor.name
+    
+    // Maintain prototype chain (Crucial for instanceof)
     Object.setPrototypeOf(this, new.target.prototype)
+  }
 
+  toH3() {
     return createError({
-      statusCode,
-      statusMessage: message,
+      statusCode: this.statusCode,
+      statusMessage: this.message,
+      data: { code: this.name }
     })
   }
 }
@@ -18,6 +29,7 @@ export class ValidationError extends AutoCrudError {
     super(message, 400)
   }
 }
+
 export class UnauthorizedAccessError extends AutoCrudError {
   constructor(modelName: string, message: string = `${modelName} access denied`) {
     super(message, 401)
@@ -31,8 +43,8 @@ export class MissingSlugError extends AutoCrudError {
 }
 
 export class ResourceNotFoundError extends AutoCrudError {
-  constructor(message: string = 'Resource not found') {
-    super(message, 404)
+  constructor(modelName: string) {
+    super(`Resource ${modelName} not found`, 404)
   }
 }
 

@@ -36,6 +36,6 @@ describe('modelMapper: getSchemaDefinition', () => {
   })
 
   it('5) should throw error for non-existent models', () => {
-    expect(() => getSchemaDefinition('ghost_table')).toThrow('Model ghost_table not found')
+    expect(() => getSchemaDefinition('ghost_table')).toThrow('Resource ghost_table not found')
   })
 })
