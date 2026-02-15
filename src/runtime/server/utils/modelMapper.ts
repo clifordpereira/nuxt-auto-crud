@@ -8,6 +8,7 @@ import * as schema from '#nac/schema'
 
 import type { Field, SchemaDefinition } from '#nac/shared/utils/types'
 import { NAC_SYSTEM_TABLES } from './constants'
+import { ResourceNotFoundError } from '../exceptions'
 
 type ForeignKey = ReturnType<typeof getTableConfig>['foreignKeys'][number]
 
@@ -113,7 +114,7 @@ const TEXTAREA_HINTS = ['content', 'description', 'bio', 'message']
  */
 export function getSchemaDefinition(modelName: string): SchemaDefinition {
   const table = modelTableMap[modelName]
-  if (!table) throw new Error(`Model ${modelName} not found`)
+  if (!table) throw new ResourceNotFoundError()
 
   const config = useRuntimeConfig() as unknown as { autoCrud: { apiHiddenFields: string[] }, public: { autoCrud: { formHiddenFields: string[] } } }
   const apiHiddenFields = config.autoCrud.apiHiddenFields
