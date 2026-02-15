@@ -1,5 +1,3 @@
-// src/types.ts
-
 export interface ModuleOptions {
   // Private config
   schemaPath: string
@@ -9,6 +7,7 @@ export interface ModuleOptions {
     ownerKey: string
   }
   apiHiddenFields: string[] /** Sensitive: Never leaves the server */
+  nacAgenticToken: string
   // Public config
   endpointPrefix: string
   resources: Record<string, string[]> /** Allowed fields for public apis */
@@ -18,9 +17,9 @@ export interface ModuleOptions {
 
 declare module '@nuxt/schema' {
   interface RuntimeConfig {
-    autoCrud: Pick<ModuleOptions, 'schemaPath' | 'auth' | 'apiHiddenFields'>
+    autoCrud: Pick<ModuleOptions, 'schemaPath' | 'auth' | 'apiHiddenFields' | 'nacAgenticToken'>
   }
   interface PublicRuntimeConfig {
-    autoCrud: Omit<ModuleOptions, 'schemaPath' | 'auth' | 'apiHiddenFields'>
+    autoCrud: Omit<ModuleOptions, 'schemaPath' | 'auth' | 'apiHiddenFields' | 'nacAgenticToken'>
   }
 }

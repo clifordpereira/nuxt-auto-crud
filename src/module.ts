@@ -3,7 +3,6 @@ import { defineNuxtModule, createResolver, addServerHandler, addServerImportsDir
 import { NAC_API_HIDDEN_FIELDS, NAC_FORM_HIDDEN_FIELDS, NAC_DATA_TABLE_HIDDEN_FIELDS } from './runtime/server/utils/constants'
 
 import type { ModuleOptions } from './types'
-
 export type { ModuleOptions }
 
 export default defineNuxtModule<ModuleOptions>({
@@ -20,6 +19,7 @@ export default defineNuxtModule<ModuleOptions>({
       ownerKey: 'createdBy',
     },
     apiHiddenFields: NAC_API_HIDDEN_FIELDS,
+    nacAgenticToken: '',
     // Public config
     endpointPrefix: '/api/_nac',
     resources: {},
@@ -37,8 +37,8 @@ export default defineNuxtModule<ModuleOptions>({
     nuxt.options.alias['#nac/schema'] = resolver.resolve(nuxt.options.rootDir, options.schemaPath!)
 
     // 2. Runtime Config (The Concrete State)
-    const { schemaPath, auth, apiHiddenFields, ...publicOptions } = options
-    nuxt.options.runtimeConfig.autoCrud = { schemaPath, auth, apiHiddenFields } // private runtime
+    const { schemaPath, auth, apiHiddenFields, nacAgenticToken, ...publicOptions } = options
+    nuxt.options.runtimeConfig.autoCrud = { schemaPath, auth, apiHiddenFields, nacAgenticToken } // private runtime
     nuxt.options.runtimeConfig.public.autoCrud = publicOptions // public runtime
 
     // 3. Auto-imports (The Engine)

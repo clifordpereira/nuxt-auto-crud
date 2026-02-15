@@ -1,4 +1,5 @@
 import MyModule from '../../../src/module'
+import { defineNuxtConfig } from 'nuxt/config'
 
 export default defineNuxtConfig({
   modules: [
@@ -9,8 +10,4 @@ export default defineNuxtConfig({
     compatibilityVersion: 4,
   },
   compatibilityDate: '2026-01-26',
-  hub: {
-    db: 'sqlite',
-    kv: true,
-  },
 })

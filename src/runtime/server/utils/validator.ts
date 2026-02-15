@@ -1,10 +1,9 @@
-// validator.ts
 import { z } from 'zod'
 import { createSchemaFactory } from 'drizzle-zod'
 import { getColumns, type Table } from 'drizzle-orm'
 
 const { createInsertSchema } = createSchemaFactory()
-// validator.ts
+
 export function resolveValidatedSchema(table: Table, intent: 'insert' | 'patch' = 'insert') {
   const columns = getColumns(table)
   

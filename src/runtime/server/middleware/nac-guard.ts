@@ -1,16 +1,15 @@
-import { defineEventHandler, getQuery, type H3Event } from 'h3'
-import { useRuntimeConfig } from '#imports'
+import { defineEventHandler, getQuery } from 'h3'
 import { UnauthorizedAccessError } from '../exceptions'
 
 /**
- * Allow Agentic/MCP access to NAC routes
+ * Guard Agentic path with Agentic token
  */
 export default defineEventHandler(async (event) => {
   const pathname = new URL(event.path, 'http://internal').pathname
   if (!isAgenticPath(pathname)) return
 
   const token = getQuery(event).token as string
-  if (hasValidToken(event, token)) return
+  if (hasValidToken(token)) return
 
   // If reached here, token is invalid
   throw new UnauthorizedAccessError('NAC Core: Unauthorized access - Invalid API Token')
@@ -24,7 +23,7 @@ function isAgenticPath(pathname: string) {
   return agenticPaths.includes(pathname)
 }
 
-function hasValidToken(event: H3Event, token: string) {
-  const apiToken = useRuntimeConfig(event).apiSecretToken
-  return (apiToken && token === apiToken)
+function hasValidToken(token: string) {
+  const nacAgenticToken = useRuntimeConfig().autoCrud.nacAgenticToken
+  return (nacAgenticToken && token === nacAgenticToken)
 }

@@ -1,7 +1,7 @@
 import { vi } from 'vitest'
 
 export const useRuntimeConfig = vi.fn(() => ({
-  apiSecretToken: 'test_secret',
+  nacAgenticToken: 'test_secret',
 }))
 
 export const getUserSession = vi.fn()

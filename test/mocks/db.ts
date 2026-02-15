@@ -17,6 +17,7 @@ const fluentMock = {
   get: vi.fn(),
   all: vi.fn(),
   run: vi.fn(),
+  query: vi.fn(),
   $dynamic: vi.fn().mockReturnThis(),
 }
 

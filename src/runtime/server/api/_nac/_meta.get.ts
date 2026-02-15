@@ -1,5 +1,3 @@
-import { useRuntimeConfig } from '#imports'
-// @ts-expect-error - 'hub:db' is a virtual alias
 import { db } from 'hub:db'
 import { eventHandler, getQuery, getHeader } from 'h3'
 
