@@ -7,7 +7,8 @@ export const useRuntimeConfig = vi.fn(() => ({
   },
   public: {
     autoCrud: {
-      formHiddenFields: ['id', 'createdAt', 'updatedAt']
+      formHiddenFields: ['id', 'createdAt', 'updatedAt'],
+      endpointPrefix: '/api/_nac'
     }
   }
 }))

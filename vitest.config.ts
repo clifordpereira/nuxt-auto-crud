@@ -31,6 +31,9 @@ export default defineConfig({
           include: ['test/e2e/*.{test,spec}.ts'],
           setupFiles: [r('./test/e2e/setup.ts')],
           environment: 'node',
+          alias: {
+            '#imports': r('./test/mocks/imports.ts'),
+          }
         },
       },
       await defineVitestProject({
