@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { createSchemaFactory } from 'drizzle-zod'
 import { getColumns, type Table } from 'drizzle-orm'
+import { useRuntimeConfig } from '#imports'
 
 const { createInsertSchema } = createSchemaFactory()
 
