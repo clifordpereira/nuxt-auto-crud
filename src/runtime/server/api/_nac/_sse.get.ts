@@ -1,48 +1,32 @@
-// @ts-expect-error - virtual import resolved by Nuxt/Nitro
-import { kv } from '@nuxthub/kv'
 import { eventHandler, setResponseHeaders } from 'h3'
 
-import { addClient, removeClient, instanceId } from '../../utils/sse-bus'
+import { addClient, removeClient } from '../../utils/sse-bus'
 
 export default eventHandler(async (event) => {
   const id = crypto.randomUUID()
   const stream = new TransformStream()
   const writer = stream.writable.getWriter()
   const encoder = new TextEncoder()
-  let lastSeenTs = Date.now()
 
   addClient(id, writer)
 
-  const signalCheck = setInterval(async () => {
+  // Keep-alive heartbeat to prevent connection timeouts
+  const heartbeat = setInterval(async () => {
     try {
-      const signal = await kv.get<{ ts: number, payload: Record<string, unknown>, instanceId: string }>('nac_signal')
-
-      if (signal && signal.ts > lastSeenTs && signal.instanceId !== instanceId) {
-        lastSeenTs = signal.ts
-        const msg = `event: crud\ndata: ${JSON.stringify(signal.payload)}\n\n`
-        await writer.write(encoder.encode(msg))
-      }
-      else {
-        await writer.write(encoder.encode(': ping\n\n'))
-      }
+      await writer.write(encoder.encode(': ping\n\n'))
+    } catch (e) {
+      cleanup()
     }
-    catch (e) {
-      console.error('[nac:sse] KV Signal Check Error:', e)
-    }
-  }, 3000)
+  }, 20000)
 
   const cleanup = () => {
-    clearInterval(signalCheck)
+    clearInterval(heartbeat)
     removeClient(id)
-    writer.close().catch(() => {
-      // Handled empty block by moving catch logic to a no-op or logging
-    })
+    writer.close().catch(() => { /* ignore */ })
   }
 
-  // Split one-liner into two statements
-  writer.closed
-    .then(cleanup)
-    .catch(cleanup)
+  // Handle client disconnection
+  writer.closed.then(cleanup).catch(cleanup)
 
   setResponseHeaders(event, {
     'Content-Type': 'text/event-stream',

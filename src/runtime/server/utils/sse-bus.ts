@@ -1,57 +1,29 @@
-// server/utils/sse-bus.ts
-// @ts-expect-error - virtual import resolved by Nuxt/Nitro
-import { kv } from '@nuxthub/kv'
-
-// Use global state to persist clients across HMR/module reloads
 const globalState = globalThis as unknown as {
-  _nac_sse_clients: Map<string, { id: string, res: WritableStreamDefaultWriter }>
-  _nac_instance_id: string
+  _nac_sse_clients: Map<string, { id: string, res: WritableStreamDefaultWriter<Uint8Array> }>
 }
 
-globalState._nac_sse_clients = globalState._nac_sse_clients || new Map()
-globalState._nac_instance_id = globalState._nac_instance_id || crypto.randomUUID()
-
-export const instanceId = globalState._nac_instance_id
+globalState._nac_sse_clients ||= new Map()
 const clients = globalState._nac_sse_clients
 
-const encoder = new TextEncoder()
+export async function broadcast(payload: unknown): Promise<void> {
+  const encoder = new TextEncoder()
+  const msg = encoder.encode(`event: crud\ndata: ${JSON.stringify(payload)}\n\n`)
 
-async function localBroadcast(payload: unknown) {
-  const msg = `event: crud\ndata: ${JSON.stringify(payload)}\n\n`
-  const encoded = encoder.encode(msg)
-  const deliveries = []
+  const deliveries: Promise<void>[] = []
   for (const [id, client] of clients) {
     deliveries.push(
-      client.res.write(encoded).catch(() => {
+      client.res.write(msg).catch(() => {
         clients.delete(id)
-      }),
+      })
     )
   }
   await Promise.all(deliveries)
 }
 
-export function addClient(id: string, res: WritableStreamDefaultWriter) {
+export function addClient(id: string, res: WritableStreamDefaultWriter<Uint8Array>): void {
   clients.set(id, { id, res })
 }
 
-export function removeClient(id: string) {
+export function removeClient(id: string): void {
   clients.delete(id)
-}
-
-export async function broadcast(payload: unknown) {
-  // 1. Local Isolate Delivery (Immediate)
-  await localBroadcast(payload)
-
-  // 2. Global Instance Signal (Cross-Isolate)
-  // We include instanceId so other instances (or this one) can filter out echoes
-  try {
-    await kv.set('nac_signal', {
-      ts: Date.now(),
-      payload,
-      instanceId,
-    }, { ttl: 60 })
-  }
-  catch (e) {
-    console.error('[nac:sse] KV Signal Broadcast Error:', e)
-  }
 }

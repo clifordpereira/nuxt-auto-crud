@@ -84,7 +84,6 @@ export default defineNuxtConfig({
     },
     externals: {
       external: ['better-sqlite3', '@libsql/client', 'xlsx'],
-      inline: ['@nuxthub/kv'],
     },
     alias: {
       'node:crypto': 'crypto',
@@ -96,7 +95,6 @@ export default defineNuxtConfig({
 
   hub: {
     db: { dialect: 'sqlite', casing: 'snake_case' },
-    kv: true,
   },
 
   autoCrud: {
