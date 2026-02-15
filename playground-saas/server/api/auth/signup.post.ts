@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
-import { db, schema } from 'hub:db'
+import { db, schema } from '@nuxthub/db'
 import { hashUserPassword } from '#server/utils/hashing'
 import { UserAlreadyExistsError } from '#server/utils/errors'
 import { refreshUserSession } from '#server/utils/auth'

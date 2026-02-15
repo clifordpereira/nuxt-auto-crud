@@ -1,6 +1,6 @@
 import { eq, and, gt } from 'drizzle-orm'
 import { z } from 'zod'
-import { db, schema } from 'hub:db'
+import { db, schema } from '@nuxthub/db'
 import { hashUserPassword } from '../../utils/hashing'
 
 const resetPasswordSchema = z.object({

@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm'
-import { db, schema } from 'hub:db'
+import { db, schema } from '@nuxthub/db'
 import type { H3Event } from 'h3'
 import { refreshUserSession } from '#server/utils/auth'
 

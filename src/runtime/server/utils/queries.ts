@@ -1,5 +1,5 @@
 import { useRuntimeConfig } from '#imports'
-import { db } from 'hub:db'
+import { db } from '@nuxthub/db'
 import { type Table, eq, desc, and, or, getColumns } from 'drizzle-orm'
 
 import { getSelectableFields } from './modelMapper'

@@ -5,7 +5,7 @@
     "moduleResolution": "Bundler",
     "baseUrl": ".",
     "paths": {
-      "hub:db": ["./test/mocks/db.ts"],
+      "@nuxthub/db": ["./test/mocks/db.ts"],
       "#imports": ["./test/mocks/imports.ts"],
       "#nac/shared/*": ["./src/runtime/shared/*"],
       "#nac/types": ["./src/runtime/server/types.ts"],

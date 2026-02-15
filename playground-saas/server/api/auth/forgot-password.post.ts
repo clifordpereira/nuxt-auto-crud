@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
-import { db, schema } from 'hub:db'
+import { db, schema } from '@nuxthub/db'
 
 const forgotPasswordSchema = z.object({
   email: z.string().email(),

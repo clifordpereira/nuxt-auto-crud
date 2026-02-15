@@ -17,7 +17,7 @@ vi.mock('drizzle-orm', async () => {
 
 // 2. IMPORTS
 import { getRows, getRow, createRow, updateRow, deleteRow } from '../../src/runtime/server/utils/queries'
-import { db } from 'hub:db'
+import { db } from '@nuxthub/db'
 import { posts, users } from '#nac/schema'
 import { 
   RecordNotFoundError, 

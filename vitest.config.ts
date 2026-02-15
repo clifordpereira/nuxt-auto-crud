@@ -21,7 +21,7 @@ export default defineConfig({
             
             // Mocking Nuxt environment
             '#imports': r('./test/mocks/imports.ts'),
-            'hub:db': r('./test/mocks/db.ts'),
+            '@nuxthub/db': r('./test/mocks/db.ts'),
           },
         },
       },

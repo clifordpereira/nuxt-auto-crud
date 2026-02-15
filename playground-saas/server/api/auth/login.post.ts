@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
-import { db, schema } from 'hub:db'
+import { db, schema } from '@nuxthub/db'
 import { verifyUserPassword } from '#server/utils/hashing'
 import { InvalidCredentialError } from '#server/utils/errors'
 import { seedDatabase } from '#server/utils/seed'
