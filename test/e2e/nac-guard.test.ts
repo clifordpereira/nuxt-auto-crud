@@ -4,8 +4,7 @@ import { useRuntimeConfig } from '#imports'
 
 describe('NAC: Agentic Guard Security', () => {
   const metaPath = '/api/_nac/_meta'
-  const config = useRuntimeConfig()
-  const validToken = config.autoCrud.nacAgenticToken
+  const token = 'test-token'
 
   it('401: rejects agentic path without token', async () => {
     try {
@@ -28,7 +27,7 @@ describe('NAC: Agentic Guard Security', () => {
 
   it('200: allows agentic path with valid token', async () => {
     const res: any = await $fetch(metaPath, { 
-      query: { token: validToken } 
+      query: { token } 
     })
     
     // Verify architectural signature and content
@@ -37,7 +36,7 @@ describe('NAC: Agentic Guard Security', () => {
   })
 
   it('PASS: does not block standard CRUD endpoints', async () => {
-    const { endpointPrefix } = config.public.autoCrud
+    const { endpointPrefix } = useRuntimeConfig().public.autoCrud
     // Standard GET list should not be intercepted by nac-guard
     const res = await $fetch(`${endpointPrefix}/posts`)
     expect(Array.isArray(res)).toBe(true)
