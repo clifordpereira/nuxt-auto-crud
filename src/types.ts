@@ -13,6 +13,7 @@ export interface ModuleOptions {
   resources: Record<string, string[]> /** Allowed fields for public apis */
   formHiddenFields: string[] /** UI: Hidden from forms */
   dataTableHiddenFields: string[] /** UI: Hidden from tables */
+  realtime: boolean
 }
 
 declare module '@nuxt/schema' {
@@ -21,5 +22,11 @@ declare module '@nuxt/schema' {
   }
   interface PublicRuntimeConfig {
     autoCrud: Omit<ModuleOptions, 'schemaPath' | 'auth' | 'apiHiddenFields' | 'nacAgenticToken'>
+  }
+  interface NuxtConfig {
+    autoCrud?: Partial<ModuleOptions>
+  }
+  interface NuxtOptions {
+    autoCrud?: ModuleOptions
   }
 }

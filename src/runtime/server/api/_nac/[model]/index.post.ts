@@ -18,12 +18,15 @@ export default eventHandler(async (event) => {
 
   const newRecord = await createRow(table, validatedData, event.context.nac || {})
 
-  await broadcast({
-    table: model,
-    action: 'create',
-    primaryKey: newRecord.id,
-    data: newRecord,
-  })
+  const { realtime } = useRuntimeConfig().public.autoCrud
+  if (realtime) {
+    broadcast({
+      table: model,
+      action: 'create',
+      primaryKey: newRecord.id,
+      data: newRecord,
+    })
+  }
 
   return newRecord
 })

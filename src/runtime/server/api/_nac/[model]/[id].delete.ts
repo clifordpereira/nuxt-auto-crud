@@ -16,12 +16,15 @@ export default eventHandler(async (event) => {
 
   const deletedRecord = await deleteRow(table, id)
 
-  await broadcast({
-    table: model,
-    action: 'delete',
-    primaryKey: deletedRecord.id as number | string,
-    data: deletedRecord,
-  })
+  const { realtime } = useRuntimeConfig().public.autoCrud
+  if (realtime) {
+    broadcast({
+      table: model,
+      action: 'delete',
+      primaryKey: deletedRecord.id as number | string,
+      data: deletedRecord,
+    })
+  }
 
   return deletedRecord
 })

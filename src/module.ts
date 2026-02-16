@@ -25,6 +25,7 @@ export default defineNuxtModule<ModuleOptions>({
     resources: {},
     formHiddenFields: NAC_FORM_HIDDEN_FIELDS,
     dataTableHiddenFields: NAC_DATA_TABLE_HIDDEN_FIELDS,
+    realtime: false
   },
 
   async setup(options, nuxt) {
