@@ -4,7 +4,6 @@ export const useRuntimeConfig = vi.fn(() => ({
   autoCrud: {
     apiHiddenFields: ['deletedAt'],
     auth: { ownerKey: 'createdBy' },
-    nacAgenticToken: 'test-token'
   },
   public: {
     autoCrud: {
