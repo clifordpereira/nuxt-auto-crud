@@ -1,29 +1,32 @@
 import { defineEventHandler, getQuery } from 'h3'
-import { UnauthorizedAccessError } from '../exceptions'
+import { AuthenticationError } from '../exceptions'
 
-/**
- * Guard Agentic path with Agentic token
- */
 export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig(event)
   const pathname = new URL(event.path, 'http://internal').pathname
-  if (!isAgenticPath(pathname)) return
 
-  const token = getQuery(event).token as string
-  if (hasValidToken(token)) return
+  // Non-agentic paths - normal auth
+  if (!isAgenticPath(pathname)) {
+    const isAuthEnabled = config.autoCrud.auth.authentication
+    const isUserAuthenticated = Boolean(event.context.nac?.userId)
 
-  // If reached here, token is invalid
-  throw new UnauthorizedAccessError('Nac Core: Unauthorized access').toH3()
+    if (isAuthEnabled && !isUserAuthenticated) {
+      throw new AuthenticationError().toH3()
+    }
+
+    return
+  }
+
+  // Agentic paths - token auth
+  const token = getQuery(event).token as string | undefined
+  const { agenticToken } = config.autoCrud
+
+  if (!agenticToken || token !== agenticToken) {
+    throw new AuthenticationError('Invalid agentic token').toH3()
+  }
 })
 
-/**
- * Helper functions
- */
 function isAgenticPath(pathname: string) {
   const agenticPaths = ['/api/_nac/_meta']
   return agenticPaths.includes(pathname)
-}
-
-function hasValidToken(token: string) {
-  const nacAgenticToken = useRuntimeConfig().autoCrud.nacAgenticToken
-  return (nacAgenticToken && token === nacAgenticToken)
 }

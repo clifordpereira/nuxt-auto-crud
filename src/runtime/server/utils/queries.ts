@@ -4,7 +4,7 @@ import { type Table, eq, desc, and, or, getColumns } from 'drizzle-orm'
 
 import { getSelectableFields } from './modelMapper'
 
-import { DeletionFailedError, InsertionFailedError, RecordNotFoundError, UpdationFailedError } from '../exceptions'
+import { DeletionFailedError, InsertionFailedError, RecordNotFoundError, UpdateFailedError } from '../exceptions'
 
 import type { QueryContext } from '../../types'
 import type { TableWithId } from '../types'
@@ -125,7 +125,7 @@ export async function updateRow(table: TableWithId, id: string, data: Record<str
   }
 
   const [updated] = await db.update(table).set(payload).where(eq(table.id, targetId)).returning(selectableFields)
-  if (!updated) throw new UpdationFailedError()
+  if (!updated) throw new UpdateFailedError()
 
   return updated
 }

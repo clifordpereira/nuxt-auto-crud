@@ -12,7 +12,7 @@ describe('NAC: Agentic Guard Security', () => {
       throw new Error('Should have been blocked')
     } catch (err: any) {
       expect(err.statusCode).toBe(401)
-      expect(err.statusMessage).toContain('Unauthorized access')
+      expect(err.statusMessage).toContain('Invalid agentic token')
     }
   })
 

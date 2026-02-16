@@ -1,46 +1,71 @@
 import { createError } from 'h3'
 
+/**
+ * Base Auto CRUD Error
+ */
 export class AutoCrudError extends Error {
-  public statusCode: number
+  public readonly statusCode: number
 
   constructor(message: string, statusCode: number = 500) {
-    // Pass message to native Error
-    super(message) 
+    super(message)
+
     this.statusCode = statusCode
-    
-    // Set class name for stack traces/logs
-    this.name = this.constructor.name
-    
-    // Maintain prototype chain (Crucial for instanceof)
+    this.name = new.target.name
+
+    // Fix prototype chain
     Object.setPrototypeOf(this, new.target.prototype)
   }
 
+  /**
+   * Convert to Nuxt/H3 compatible error
+   */
   toH3() {
     return createError({
       statusCode: this.statusCode,
       statusMessage: this.message,
-      data: { code: this.name }
+      data: {
+        code: this.name,
+        message: this.message
+      }
     })
   }
 }
 
-export class ValidationError extends AutoCrudError {
-  constructor(modelName: string, message: string = `${modelName} validation failed`) {
-    super(message, 400)
-  }
-}
+/* -------------------------------------------------------------------------- */
+/*                               AUTH ERRORS                                  */
+/* -------------------------------------------------------------------------- */
 
-export class UnauthorizedAccessError extends AutoCrudError {
-  constructor(modelName: string, message: string = `${modelName} access denied`) {
+export class AuthenticationError extends AutoCrudError {
+  constructor(message: string = 'Authentication required') {
     super(message, 401)
   }
 }
 
+export class UnauthorizedAccessError extends AutoCrudError {
+  constructor(message: string = 'Forbidden') {
+    super(message, 403)
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/*                             VALIDATION ERRORS                              */
+/* -------------------------------------------------------------------------- */
+
+export class ValidationError extends AutoCrudError {
+  constructor(modelName: string, message?: string) {
+    super(message ?? `${modelName} validation failed`, 400)
+  }
+}
+
 export class MissingSlugError extends AutoCrudError {
-  constructor(message: string = 'Missing slug/id') {
+  constructor(message: string = 'Missing slug or ID') {
     super(message, 400)
   }
 }
+
+/* -------------------------------------------------------------------------- */
+/*                            RESOURCE / MODEL ERRORS                         */
+/* -------------------------------------------------------------------------- */
 
 export class ResourceNotFoundError extends AutoCrudError {
   constructor(modelName: string) {
@@ -48,7 +73,10 @@ export class ResourceNotFoundError extends AutoCrudError {
   }
 }
 
-// CRUD errors
+/* -------------------------------------------------------------------------- */
+/*                                CRUD ERRORS                                 */
+/* -------------------------------------------------------------------------- */
+
 export class RecordNotFoundError extends AutoCrudError {
   constructor(message: string = 'Record not found') {
     super(message, 404)
@@ -61,20 +89,20 @@ export class RecordAlreadyExistsError extends AutoCrudError {
   }
 }
 
-export class UpdationFailedError extends AutoCrudError {
-  constructor(message: string = 'Record updation failed') {
+export class InsertionFailedError extends AutoCrudError {
+  constructor(message: string = 'Record insertion failed') {
+    super(message, 500)
+  }
+}
+
+export class UpdateFailedError extends AutoCrudError {
+  constructor(message: string = 'Record update failed') {
     super(message, 500)
   }
 }
 
 export class DeletionFailedError extends AutoCrudError {
   constructor(message: string = 'Record deletion failed') {
-    super(message, 500)
-  }
-}
-
-export class InsertionFailedError extends AutoCrudError {
-  constructor(message: string = 'Record insertion failed') {
     super(message, 500)
   }
 }

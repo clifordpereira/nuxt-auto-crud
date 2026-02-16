@@ -22,7 +22,7 @@ import { posts, users } from '#nac/schema'
 import { 
   RecordNotFoundError, 
   InsertionFailedError, 
-  UpdationFailedError, 
+  UpdateFailedError, 
   DeletionFailedError 
 } from '../../src/runtime/server/exceptions'
 
@@ -200,9 +200,9 @@ describe('NAC Core Queries - Consolidated Suite', () => {
       expect(db.where).toHaveBeenCalled()
     })
 
-    it('throws UpdationFailedError when update fails', async () => {
+    it('throws UpdateFailedError when update fails', async () => {
       vi.mocked(db.returning).mockResolvedValue([])
-      await expect(updateRow(posts as any, '1', {})).rejects.toThrow(UpdationFailedError)
+      await expect(updateRow(posts as any, '1', {})).rejects.toThrow(UpdateFailedError)
     })
 
     it('enforces selectableFields filter on return', async () => {

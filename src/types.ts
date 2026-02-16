@@ -7,7 +7,7 @@ export interface ModuleOptions {
     ownerKey: string
   }
   apiHiddenFields: string[] /** Sensitive: Never leaves the server */
-  nacAgenticToken: string
+  agenticToken: string
   // Public config
   endpointPrefix: string
   resources: Record<string, string[]> /** Allowed fields for public apis */
@@ -18,10 +18,10 @@ export interface ModuleOptions {
 
 declare module '@nuxt/schema' {
   interface RuntimeConfig {
-    autoCrud: Pick<ModuleOptions, 'schemaPath' | 'auth' | 'apiHiddenFields' | 'nacAgenticToken'>
+    autoCrud: Pick<ModuleOptions, 'schemaPath' | 'auth' | 'apiHiddenFields' | 'agenticToken'>
   }
   interface PublicRuntimeConfig {
-    autoCrud: Omit<ModuleOptions, 'schemaPath' | 'auth' | 'apiHiddenFields' | 'nacAgenticToken'>
+    autoCrud: Omit<ModuleOptions, 'schemaPath' | 'auth' | 'apiHiddenFields' | 'agenticToken'>
   }
   interface NuxtConfig {
     autoCrud?: Partial<ModuleOptions>
