@@ -1,6 +1,6 @@
 import { defineNuxtModule, createResolver, addServerHandler, addServerImportsDir, addImportsDir } from '@nuxt/kit'
 
-import { NAC_API_HIDDEN_FIELDS, NAC_FORM_HIDDEN_FIELDS, NAC_DATA_TABLE_HIDDEN_FIELDS } from './runtime/server/utils/constants'
+import { NAC_API_HIDDEN_FIELDS, NAC_FORM_HIDDEN_FIELDS } from './runtime/server/utils/constants'
 
 import type { ModuleOptions } from './types'
 export type { ModuleOptions }
@@ -19,17 +19,16 @@ export default defineNuxtModule<ModuleOptions>({
       ownerKey: 'createdBy',
     },
     publicResources: {},
-    agenticToken: '',
     apiHiddenFields: NAC_API_HIDDEN_FIELDS,
+    agenticToken: '',
     schemaPath: 'server/db/schema',
     // Public config
-    dataTableHiddenFields: NAC_DATA_TABLE_HIDDEN_FIELDS,
     formHiddenFields: NAC_FORM_HIDDEN_FIELDS,
-    endpointPrefix: '/api/_nac',
+    nacEndpointPrefix: '/api/_nac',
   },
 
   async setup(options, nuxt) {
-    const prefix = options.endpointPrefix || '/api/_nac'
+    const prefix = options.nacEndpointPrefix || '/api/_nac'
     const resolver = createResolver(import.meta.url)
 
     // 1. Aliases
@@ -38,9 +37,9 @@ export default defineNuxtModule<ModuleOptions>({
     nuxt.options.alias['#nac/schema'] = resolver.resolve(nuxt.options.rootDir, options.schemaPath!)
 
     // 2. Runtime Config (The Concrete State)
-    const { dataTableHiddenFields, formHiddenFields, endpointPrefix, ...privateOptions } = options
+    const { formHiddenFields, nacEndpointPrefix, ...privateOptions } = options
     nuxt.options.runtimeConfig.autoCrud = privateOptions // private runtime
-    nuxt.options.runtimeConfig.public.autoCrud = { dataTableHiddenFields, formHiddenFields, endpointPrefix } // public runtime
+    nuxt.options.runtimeConfig.public.autoCrud = { formHiddenFields, nacEndpointPrefix } // public runtime
 
     // 3. Auto-imports (The Engine)
     addImportsDir(resolver.resolve('./runtime/composables'))

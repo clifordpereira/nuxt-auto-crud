@@ -3,8 +3,8 @@ import { $fetch } from '@nuxt/test-utils/e2e'
 import { useRuntimeConfig } from '#imports'
 
 describe('NAC: Schema Definition Reflection', async () => {
-  const { endpointPrefix } = useRuntimeConfig().public.autoCrud
-  const schemaBase = `${endpointPrefix}/_schemas`
+  const { nacEndpointPrefix } = useRuntimeConfig().public.autoCrud
+  const schemaBase = `${nacEndpointPrefix}/_schemas`
 
   it('GET: retrieves users schema with inferred metadata', async () => {
     const res = await $fetch<any>(`${schemaBase}/users`)

@@ -5,10 +5,10 @@ import { useRuntimeConfig } from '#imports'
 describe('NAC: Basic Fixture Lifecycle', async () => {
   const model = 'posts'
   let recordId: number
-  const { endpointPrefix } = useRuntimeConfig().public.autoCrud
+  const { nacEndpointPrefix } = useRuntimeConfig().public.autoCrud
 
   it('POST: creates record with zero-config validation', async () => {
-    const res: any = await $fetch(`${endpointPrefix}/${model}`, {
+    const res: any = await $fetch(`${nacEndpointPrefix}/${model}`, {
       method: 'POST',
       body: { title: 'E2E Test', content: 'Minimal setup' }
     })
@@ -17,20 +17,20 @@ describe('NAC: Basic Fixture Lifecycle', async () => {
   })
 
   it('GET: retrieves single record with correct structure', async () => {
-    const res: any = await $fetch(`${endpointPrefix}/${model}/${recordId}`)
+    const res: any = await $fetch(`${nacEndpointPrefix}/${model}/${recordId}`)
     expect(res).toBeTypeOf('object')
     expect(res.id).toBe(recordId)
     expect(res.title).toBe('E2E Test')
   })
 
   it('GET: lists records with default ordering', async () => {
-    const res: any = await $fetch(`${endpointPrefix}/${model}`)
+    const res: any = await $fetch(`${nacEndpointPrefix}/${model}`)
     expect(Array.isArray(res)).toBe(true)
     expect(res.find((r: any) => r.id === recordId)).toBeDefined()
   })
 
   it('PATCH: updates record and returns sanitized data', async () => {
-    const res: any = await $fetch(`${endpointPrefix}/${model}/${recordId}`, {
+    const res: any = await $fetch(`${nacEndpointPrefix}/${model}/${recordId}`, {
       method: 'PATCH',
       body: { title: 'Updated' }
     })
@@ -38,13 +38,13 @@ describe('NAC: Basic Fixture Lifecycle', async () => {
   })
 
   it('DELETE: removes record successfully', async () => {
-    await $fetch(`${endpointPrefix}/${model}/${recordId}`, { method: 'DELETE' })
-    await expect($fetch(`${endpointPrefix}/${model}/${recordId}`)).rejects.toThrow()
+    await $fetch(`${nacEndpointPrefix}/${model}/${recordId}`, { method: 'DELETE' })
+    await expect($fetch(`${nacEndpointPrefix}/${model}/${recordId}`)).rejects.toThrow()
   })
 
   it('GET: returns 404 for non-existent record', async () => {
     try {
-      await $fetch(`${endpointPrefix}/${model}/999999`)
+      await $fetch(`${nacEndpointPrefix}/${model}/999999`)
       throw new Error('Should have thrown 404')
     } catch (error: any) {
       expect(error.response?.status).toBe(404)
@@ -53,7 +53,7 @@ describe('NAC: Basic Fixture Lifecycle', async () => {
 
   it('GET: returns 404 for invalid model name', async () => {
     try {
-      await $fetch(`${endpointPrefix}/unknown_table/1`)
+      await $fetch(`${nacEndpointPrefix}/unknown_table/1`)
       throw new Error('Should have thrown 404')
     } catch (error: any) {
       expect(error.response?.status).toBe(404)

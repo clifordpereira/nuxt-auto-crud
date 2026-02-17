@@ -7,14 +7,14 @@ mockNuxtImport('useRuntimeConfig', () => {
   return () => ({
     public: {
       autoCrud: {
-        endpointPrefix: '/api/_nac',
+        nacEndpointPrefix: '/api/_nac',
       },
     },
   })
 })
 
 describe('NAC Core: useNacAutoCrudSSE', () => {
-  const endpointPrefix = `/api/_nac`
+  const nacEndpointPrefix = `/api/_nac`
   const closeMock = vi.fn()
   let messageListeners: ((event: MessageEvent) => void)[] = []
   let errorListeners: ((event: Event) => void)[] = []
@@ -65,7 +65,7 @@ describe('NAC Core: useNacAutoCrudSSE', () => {
     })
 
     // 1. Init check
-    expect(global.EventSource).toHaveBeenCalledWith(`${endpointPrefix}/_sse`)
+    expect(global.EventSource).toHaveBeenCalledWith(`${nacEndpointPrefix}/_sse`)
 
     // 2. Valid CRUD event check
     const validEvent = {

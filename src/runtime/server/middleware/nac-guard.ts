@@ -4,9 +4,9 @@ import { AuthenticationError } from '../exceptions'
 export default defineEventHandler(async (event) => {
   const pathname = new URL(event.path, 'http://internal').pathname
   const config = useRuntimeConfig(event)
-  const { endpointPrefix } = config.public.autoCrud
+  const { nacEndpointPrefix } = config.public.autoCrud
 
-  if (!isNacPath(pathname, endpointPrefix)) return
+  if (!isNacPath(pathname, nacEndpointPrefix)) return
 
   event.context.nac ||= { userId: null, isPublic: false }
 
@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
     const isUserAuthenticated = Boolean(event.context.nac?.userId)
 
     if (isAuthEnabled && !isUserAuthenticated) {
-      const model = getModelName(pathname, endpointPrefix)
+      const model = getModelName(pathname, nacEndpointPrefix)
       if (model && isPublicResource(model)) {
         event.context.nac.isPublic = true
       }
@@ -37,8 +37,8 @@ export default defineEventHandler(async (event) => {
   }
 })
 
-function getModelName(pathname: string, endpointPrefix: string) {
-  const regex = new RegExp(`^${endpointPrefix}/([^/]+)`)
+function getModelName(pathname: string, nacEndpointPrefix: string) {
+  const regex = new RegExp(`^${nacEndpointPrefix}/([^/]+)`)
   const match = pathname.match(regex)
   return match ? match[1] : null
 }
@@ -52,6 +52,6 @@ function isAgenticPath(pathname: string) {
   return pathname.includes('/_meta')
 }
 
-function isNacPath(pathname: string, endpointPrefix: string) {
-  return pathname.startsWith(endpointPrefix)
+function isNacPath(pathname: string, nacEndpointPrefix: string) {
+  return pathname.startsWith(nacEndpointPrefix)
 }

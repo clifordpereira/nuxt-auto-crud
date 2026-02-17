@@ -12,8 +12,8 @@ export function useNacAutoCrudSSE(onEvent: (e: AutoCrudEvent) => void) {
     if (typeof window === 'undefined' || !('EventSource' in window)) return
 
     const config = useRuntimeConfig()
-    const { endpointPrefix } = config.public.autoCrud
-    source = new EventSource(`${endpointPrefix}/_sse`)
+    const { nacEndpointPrefix } = config.public.autoCrud
+    source = new EventSource(`${nacEndpointPrefix}/_sse`)
 
     // 1. Connection Error Handler
     source.onerror = (err) => {

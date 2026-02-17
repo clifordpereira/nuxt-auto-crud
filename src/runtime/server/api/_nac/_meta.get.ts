@@ -5,7 +5,7 @@ import { getSchemaDefinition, modelTableMap } from '../../utils/modelMapper'
 
 export default eventHandler(async (event) => {
   const config = useRuntimeConfig()
-  const endpointPrefix = config.public.autoCrud.endpointPrefix
+  const nacEndpointPrefix = config.public.autoCrud.nacEndpointPrefix
 
   const query = getQuery(event)
   const acceptHeader = getHeader(event, 'accept') || ''
@@ -33,7 +33,7 @@ export default eventHandler(async (event) => {
 
       return {
         resource: model,
-        endpoint: `${endpointPrefix}/${model}`,
+        endpoint: `${nacEndpointPrefix}/${model}`,
         labelField: schema.labelField,
         methods: ['GET', 'POST', 'PATCH', 'DELETE'],
         fields,

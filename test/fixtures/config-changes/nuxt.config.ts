@@ -20,7 +20,6 @@ export default defineNuxtConfig({
     // when these are emtpy or not set, system defaults will apply
     apiHiddenFields: ['password'], // fields like password, token etc that should never be disclosed
     formHiddenFields: [], // user need not want to create/edit system generating fields and apiHiddenFields
-    dataTableHiddenFields: [], // not all fields from the api fields are to be shown in the data table
     // these fields are to be exposed to the public 
     // this is applicable only if authentication is enabled and user not logged in
     publicResources: {
@@ -28,6 +27,6 @@ export default defineNuxtConfig({
     },
     agenticToken: '', // (should be set in .env) set this if and only if wanted to allow _meta api for agents
     schemaPath: 'server/db/schema', // change this only if there is a change in schema path
-    endpointPrefix: '/api/_nac', // In case if the module author changes this
+    nacEndpointPrefix: '/api/_nac', // In case if the module author changes this
   }
 })

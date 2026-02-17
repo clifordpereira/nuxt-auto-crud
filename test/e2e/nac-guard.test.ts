@@ -36,9 +36,9 @@ describe('NAC: Agentic Guard Security', () => {
   })
 
   it('PASS: does not block standard CRUD endpoints', async () => {
-    const { endpointPrefix } = useRuntimeConfig().public.autoCrud
+    const { nacEndpointPrefix } = useRuntimeConfig().public.autoCrud
     // Standard GET list should not be intercepted by nac-guard
-    const res = await $fetch(`${endpointPrefix}/posts`)
+    const res = await $fetch(`${nacEndpointPrefix}/posts`)
     expect(Array.isArray(res)).toBe(true)
   })
 })

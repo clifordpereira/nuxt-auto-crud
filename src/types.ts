@@ -11,17 +11,16 @@ export interface ModuleOptions {
   agenticToken: string
   publicResources: Record<string, string[]> /** Allowed fields for public apis */
   // Public config
-  endpointPrefix: string
+  nacEndpointPrefix: string
   formHiddenFields: string[] /** UI: Hidden from forms */
-  dataTableHiddenFields: string[] /** UI: Hidden from tables */
 }
 
 declare module '@nuxt/schema' {
   interface RuntimeConfig {
-    autoCrud: Omit<ModuleOptions, 'endpointPrefix' | 'formHiddenFields' | 'dataTableHiddenFields'>
+    autoCrud: Omit<ModuleOptions, 'nacEndpointPrefix' | 'formHiddenFields'>
   }
   interface PublicRuntimeConfig {
-    autoCrud: Pick<ModuleOptions, 'endpointPrefix' | 'formHiddenFields' | 'dataTableHiddenFields'>
+    autoCrud: Pick<ModuleOptions, 'nacEndpointPrefix' | 'formHiddenFields'>
   }
   interface NuxtConfig {
     autoCrud?: Partial<ModuleOptions>
