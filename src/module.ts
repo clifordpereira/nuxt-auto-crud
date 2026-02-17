@@ -12,20 +12,20 @@ export default defineNuxtModule<ModuleOptions>({
   },
   defaults: {
     // Private config
-    schemaPath: 'server/db/schema',
+    realtime: false,
     auth: {
       authentication: false,
       authorization: false,
       ownerKey: 'createdBy',
     },
-    apiHiddenFields: NAC_API_HIDDEN_FIELDS,
+    publicResources: {},
     agenticToken: '',
+    apiHiddenFields: NAC_API_HIDDEN_FIELDS,
+    schemaPath: 'server/db/schema',
     // Public config
-    endpointPrefix: '/api/_nac',
-    resources: {},
-    formHiddenFields: NAC_FORM_HIDDEN_FIELDS,
     dataTableHiddenFields: NAC_DATA_TABLE_HIDDEN_FIELDS,
-    realtime: false
+    formHiddenFields: NAC_FORM_HIDDEN_FIELDS,
+    endpointPrefix: '/api/_nac',
   },
 
   async setup(options, nuxt) {

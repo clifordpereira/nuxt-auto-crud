@@ -19,7 +19,7 @@ export default eventHandler(async (event) => {
   const validatedData = await resolveValidatedSchema(table, 'patch').parseAsync(body)
   const updatedRecord = await updateRow(table, id, validatedData, event.context.nac || {})
 
-  const { realtime } = useRuntimeConfig().public.autoCrud
+  const { realtime } = useRuntimeConfig().autoCrud
   if (realtime) {
     broadcast({
       table: model,

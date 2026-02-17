@@ -1,5 +1,6 @@
 export interface ModuleOptions {
   // Private config
+  realtime: boolean
   schemaPath: string
   auth: {
     authentication: boolean
@@ -8,20 +9,19 @@ export interface ModuleOptions {
   }
   apiHiddenFields: string[] /** Sensitive: Never leaves the server */
   agenticToken: string
+  publicResources: Record<string, string[]> /** Allowed fields for public apis */
   // Public config
   endpointPrefix: string
-  resources: Record<string, string[]> /** Allowed fields for public apis */
   formHiddenFields: string[] /** UI: Hidden from forms */
   dataTableHiddenFields: string[] /** UI: Hidden from tables */
-  realtime: boolean
 }
 
 declare module '@nuxt/schema' {
   interface RuntimeConfig {
-    autoCrud: Pick<ModuleOptions, 'schemaPath' | 'auth' | 'apiHiddenFields' | 'agenticToken'>
+    autoCrud: Omit<ModuleOptions, 'endpointPrefix' | 'formHiddenFields' | 'dataTableHiddenFields'>
   }
   interface PublicRuntimeConfig {
-    autoCrud: Omit<ModuleOptions, 'schemaPath' | 'auth' | 'apiHiddenFields' | 'agenticToken'>
+    autoCrud: Pick<ModuleOptions, 'endpointPrefix' | 'formHiddenFields' | 'dataTableHiddenFields'>
   }
   interface NuxtConfig {
     autoCrud?: Partial<ModuleOptions>

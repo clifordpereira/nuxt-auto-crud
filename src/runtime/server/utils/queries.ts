@@ -43,7 +43,7 @@ export async function getRows(table: TableWithId, context: QueryContext = {}) {
     filters.push(eq(ownerCol, Number(userId)))
   }
 
-  const fields = getSelectableFields(table)
+  const fields = getSelectableFields(table, context)
   let query = db.select(fields).from(table).$dynamic()
   if (filters.length > 0) query = query.where(and(...filters))
 
@@ -58,7 +58,7 @@ export async function getRows(table: TableWithId, context: QueryContext = {}) {
  * @returns The row from the database.
  */
 export async function getRow(table: TableWithId, id: string, context: QueryContext = {}) {
-  const selectableFields = getSelectableFields(table)
+  const selectableFields = getSelectableFields(table, context)
 
   // If record exists in context, we still need to sanitize it before returning
   if (context.record) {
@@ -82,7 +82,7 @@ export async function createRow(table: Table, data: Record<string, unknown>, con
 
   const payload = { ...data }
   const allColumns = getColumns(table)
-  const selectableFields = getSelectableFields(table)
+  const selectableFields = getSelectableFields(table, context)
 
   // Only inject if userId is provided and column exists in schema
   if (context.userId) {
@@ -112,7 +112,7 @@ export async function updateRow(table: TableWithId, id: string, data: Record<str
   const payload = { ...data }
 
   const allColumns = getColumns(table)
-  const selectableFields = getSelectableFields(table)
+  const selectableFields = getSelectableFields(table, context)
 
   // Update audit metadata
   if (context.userId && 'updatedBy' in allColumns) {

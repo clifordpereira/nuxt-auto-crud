@@ -1,4 +1,4 @@
-import { getColumns, type Column, Table, is } from 'drizzle-orm'
+import { getColumns, type Column, Table, is, getTableName } from 'drizzle-orm'
 import { getTableConfig } from 'drizzle-orm/sqlite-core'
 import { createInsertSchema } from 'drizzle-zod'
 import { z } from 'zod'
@@ -9,6 +9,7 @@ import * as schema from '#nac/schema'
 import type { Field, SchemaDefinition } from '#nac/shared/utils/types'
 import { NAC_SYSTEM_TABLES } from './constants'
 import { ResourceNotFoundError } from '../exceptions'
+import type { QueryContext } from 'src/runtime/types'
 
 type ForeignKey = ReturnType<typeof getTableConfig>['foreignKeys'][number]
 
@@ -40,6 +41,14 @@ export function getForeignKeyPropertyName(fk: ForeignKey, columns: Record<string
   }
 }
 
+// helper for getSelectableFields()
+function getPublicFields(resource: string) {
+  const { publicResources } = useRuntimeConfig().autoCrud as { 
+    publicResources?: Record<string, string[]> 
+  }  
+  return publicResources?.[resource] || []
+}
+
 /**
  * Selectable fields to give as api response.
  * Used in getRow (/[model]/[id].get.ts) and getRows (/[model]/index.get.ts).
@@ -47,18 +56,25 @@ export function getForeignKeyPropertyName(fk: ForeignKey, columns: Record<string
  * @returns An object of field names and their values
  * result example: { field1: users.id, field2: users.name, }
  */
-export function getSelectableFields(table: Table): Record<string, Column> {
+export function getSelectableFields(table: Table, context: QueryContext = {}): Record<string, Column> {
   const { apiHiddenFields } = useRuntimeConfig().autoCrud
   const allColumns = getColumns(table)
   const result: Record<string, Column> = {}
 
-  for (const key in allColumns) {
-    if (!apiHiddenFields.includes(key)) {
-      const col = allColumns[key]
-      if (col) result[key] = col
-    }
-  }
+  const tableName = getTableName(table)
+  const isPublic = context?.isPublic
+  const publicFields = isPublic ? getPublicFields(tableName) : []
 
+  for (const key in allColumns) {
+    const hiddenSet = new Set(apiHiddenFields)
+    const publicSet = new Set(publicFields)
+
+    if (hiddenSet.has(key)) continue
+    if (isPublic && publicSet.size > 0 && !publicSet.has(key)) continue
+
+    const col = allColumns[key]
+    if (col) result[key] = col
+  }  
   return result
 }
 

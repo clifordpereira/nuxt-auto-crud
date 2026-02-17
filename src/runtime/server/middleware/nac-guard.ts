@@ -2,16 +2,27 @@ import { defineEventHandler, getQuery } from 'h3'
 import { AuthenticationError } from '../exceptions'
 
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig(event)
   const pathname = new URL(event.path, 'http://internal').pathname
+  const config = useRuntimeConfig(event)
+  const { endpointPrefix } = config.public.autoCrud
+
+  if (!isNacPath(pathname, endpointPrefix)) return
+
+  event.context.nac ||= { userId: null, isPublic: false }
 
   // Non-agentic paths - normal auth
   if (!isAgenticPath(pathname)) {
-    const isAuthEnabled = config.autoCrud.auth.authentication
+    const isAuthEnabled = config.autoCrud.auth?.authentication
     const isUserAuthenticated = Boolean(event.context.nac?.userId)
 
     if (isAuthEnabled && !isUserAuthenticated) {
-      throw new AuthenticationError().toH3()
+      const model = getModelName(pathname, endpointPrefix)
+      if (model && isPublicResource(model)) {
+        event.context.nac.isPublic = true
+      }
+      else {
+        throw new AuthenticationError('Unauthorized').toH3()
+      }
     }
 
     return
@@ -26,7 +37,21 @@ export default defineEventHandler(async (event) => {
   }
 })
 
+function getModelName(pathname: string, endpointPrefix: string) {
+  const regex = new RegExp(`^${endpointPrefix}/([^/]+)`)
+  const match = pathname.match(regex)
+  return match ? match[1] : null
+}
+
+function isPublicResource(model: string) {
+  const { publicResources } = useRuntimeConfig().autoCrud
+  return Object.keys(publicResources || {}).includes(model)
+}
+
 function isAgenticPath(pathname: string) {
-  const agenticPaths = ['/api/_nac/_meta']
-  return agenticPaths.includes(pathname)
+  return pathname.includes('/_meta')
+}
+
+function isNacPath(pathname: string, endpointPrefix: string) {
+  return pathname.startsWith(endpointPrefix)
 }

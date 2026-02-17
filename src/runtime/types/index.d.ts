@@ -13,9 +13,10 @@ declare module '#nac/schema' {
  * from the application to the nuxt-auto-crud engine.
  */
 export interface QueryContext {
-  userId?: number | string
-  permissions?: string[]
-  record?: Record<string, unknown>
+  userId?: number | string | null
+  permissions?: string[] | null
+  record?: Record<string, unknown> | null
+  isPublic?: boolean
 }
 
 export {}
