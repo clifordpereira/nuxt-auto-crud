@@ -38,9 +38,9 @@ export default defineNuxtModule<ModuleOptions>({
     nuxt.options.alias['#nac/schema'] = resolver.resolve(nuxt.options.rootDir, options.schemaPath!)
 
     // 2. Runtime Config (The Concrete State)
-    const { schemaPath, auth, apiHiddenFields, agenticToken, ...publicOptions } = options
-    nuxt.options.runtimeConfig.autoCrud = { schemaPath, auth, apiHiddenFields, agenticToken } // private runtime
-    nuxt.options.runtimeConfig.public.autoCrud = publicOptions // public runtime
+    const { dataTableHiddenFields, formHiddenFields, endpointPrefix, ...privateOptions } = options
+    nuxt.options.runtimeConfig.autoCrud = privateOptions // private runtime
+    nuxt.options.runtimeConfig.public.autoCrud = { dataTableHiddenFields, formHiddenFields, endpointPrefix } // public runtime
 
     // 3. Auto-imports (The Engine)
     addImportsDir(resolver.resolve('./runtime/composables'))
