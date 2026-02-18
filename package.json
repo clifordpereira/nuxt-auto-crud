@@ -37,7 +37,8 @@
     "dev": "bun run build:stub && nuxi prepare playground && nuxi dev --bun playground",
     "dev:build": "nuxi build --bun playground",
     "dev:saas": "bun run build:stub && nuxi prepare playground-saas && nuxi dev --bun playground-saas",
-    "saas:build": "nuxi build --bun playground-saas"
+    "saas:build": "nuxi build --bun playground-saas",
+    "postinstall": "nuxi prepare"
   },
   "dependencies": {
     "@nuxt/kit": "^4.3.1",

@@ -3,7 +3,7 @@ import { defineVitestProject } from '@nuxt/test-utils/config'
 import { resolve } from 'node:path'
 
 const fixture = process.env.TEST_FIXTURE || 'basic'
-const r = (p: string) => resolve(__dirname, p)
+const r = (p: string) => resolve(import.meta.dirname, p)
 
 export default defineConfig({
   test: {
