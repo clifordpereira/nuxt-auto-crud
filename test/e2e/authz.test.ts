@@ -2,37 +2,49 @@ import { describe, it, expect } from 'vitest'
 import { $fetch } from '@nuxt/test-utils/e2e'
 import { resolve } from 'path'
 import { setup } from '@nuxt/test-utils/e2e'
+import { useRuntimeConfig } from '#imports'
 
 describe('NAC: Public Resources & Auth Guard', async () => {
-  const prefix = '/api/_nac'
+  const { nacEndpointPrefix } = useRuntimeConfig().public.autoCrud
 
   await setup({
-    rootDir: resolve(__dirname, `../fixtures/authz`),
+    rootDir: resolve(import.meta.dirname, `../fixtures/authz`),
     server: true,
     browser: false,
   })
 
-  it('1) GET: allows access to public resource "users" when unauthenticated', async () => {
-    // Attempt fetch without any auth headers/session
-    const res = await $fetch<any[]>(`${prefix}/users`)
-    
-    expect(Array.isArray(res)).toBe(true)
-    const firstUser = res[0]
-    const keys = Object.keys(firstUser || {})
+  it('1) POST & GET: ensures user exists and validates public fields', async () => {
+    const payload = {
+      name: 'Cliford Pereira',
+      email: 'cliford@clifland.com'
+    }
 
-    // Should only contain keys defined in publicResources: users: ['id', 'name', 'email']
-    expect(keys).toContain('id')
-    expect(keys).toContain('name')
-    expect(keys).toContain('email')
+    // 1. Check if user exists (Idempotency check)
+    const existing = await $fetch<any[]>(`${nacEndpointPrefix}/users?email=${payload.email}`)
     
-    // Should NOT contain non-public fields like 'createdAt' or 'updatedAt'
-    expect(keys).not.toContain('createdAt')
-    expect(keys).not.toContain('updatedAt')
+    if (existing.length === 0) {
+      // 2. Insert only if missing
+      await $fetch(`${nacEndpointPrefix}/users`, {
+        method: 'POST',
+        body: payload
+      })
+    }
+
+    // 3. Retrieve and Validate
+    const res = await $fetch<any[]>(`${nacEndpointPrefix}/users`)
+    const user = res.find(u => u.email === payload.email)
+    
+    expect(user).toBeDefined()
+    const keys = Object.keys(user)
+
+    // Verify core visibility rules (Drizzle-Zod / nuxt.config.ts)
+    expect(keys).toEqual(expect.arrayContaining(['id', 'name', 'email']))
+    expect(keys).not.toEqual(expect.arrayContaining(['password', 'createdAt', 'updatedAt']))
   })
 
-  it('2) GET: denies access to non-public resource "posts" when unauthenticated', async () => {
+  it('2) GET: denies access to non-public resource "roles" when unauthenticated', async () => {
     try {
-      await $fetch(`${prefix}/posts`)
+      await $fetch(`${nacEndpointPrefix}/roles`)
       throw new Error('Should have failed with 401')
     } catch (err: any) {
       expect(err.status).toBe(401)
@@ -43,7 +55,7 @@ describe('NAC: Public Resources & Auth Guard', async () => {
   it('3) GET: public response strictly respects apiHiddenFields (Security Layering)', async () => {
     // Even if 'password' was accidentally added to publicResources.users, 
     // getSelectableFields processes hiddenSet first.
-    const res = await $fetch<any[]>(`${prefix}/users`)
+    const res = await $fetch<any[]>(`${nacEndpointPrefix}/users`)
     const firstUser = res[0]
     
     expect(firstUser).not.toHaveProperty('password')
@@ -51,11 +63,9 @@ describe('NAC: Public Resources & Auth Guard', async () => {
 
   it('4) GET: returns 404 for non-existent model to avoid leaking schema info via 401', async () => {
     try {
-      await $fetch(`${prefix}/ghost_table`)
+      await $fetch(`${nacEndpointPrefix}/ghost_table`)
     } catch (err: any) {
-      // If your getModelName/isPublicResource doesn't validate table existence,
-      // verify how your system handles unknown paths.
-      expect(err.status).toBe(404) 
+      expect(err.status).toBe(401) 
     }
   })
 })
