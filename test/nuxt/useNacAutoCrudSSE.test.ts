@@ -17,7 +17,7 @@ it('SSE: triggers callback within Nuxt context', async () => {
     setup() {
       useNacAutoCrudSSE(onEvent)
       return () => null
-    }
+    },
   })
 
   // Simulate server-side push
@@ -25,6 +25,6 @@ it('SSE: triggers callback within Nuxt context', async () => {
   sourceInstance.emit('crud', payload)
 
   expect(onEvent).toHaveBeenCalledWith(payload)
-  
+
   await component.unmount()
 })
