@@ -20,12 +20,12 @@ describe('SSE Bus Core', () => {
     const mockWriter = {
       write: vi.fn().mockRejectedValue(new Error('Stream Closed')),
     }
-    
+
     addClient('stale-id', mockWriter as any)
-    
+
     // First broadcast triggers the catch block
     await broadcast({ test: true })
-    
+
     expect(mockWriter.write).toHaveBeenCalled()
     expect(globalState._nac_sse_clients.has('stale-id')).toBe(false)
   })
@@ -41,7 +41,7 @@ describe('SSE Bus Core', () => {
     await broadcast(payload)
 
     const expectedData = new TextEncoder().encode(
-      `event: crud\ndata: ${JSON.stringify(payload)}\n\n`
+      `event: crud\ndata: ${JSON.stringify(payload)}\n\n`,
     )
 
     expect(writer1.write).toHaveBeenCalledWith(expectedData)
@@ -55,10 +55,10 @@ describe('SSE Bus Core', () => {
   it('manually removes clients', async () => {
     const writer = { write: vi.fn() }
     addClient('temp-id', writer as any)
-    
+
     removeClient('temp-id')
     await broadcast({ msg: 'test' })
-    
+
     expect(writer.write).not.toHaveBeenCalled()
     expect(globalState._nac_sse_clients.size).toBe(0)
   })

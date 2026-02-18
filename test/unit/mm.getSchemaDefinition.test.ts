@@ -3,7 +3,6 @@ import { describe, it, expect } from 'vitest'
 import { getSchemaDefinition } from '../../src/runtime/server/utils/modelMapper'
 
 describe('modelMapper: getSchemaDefinition', () => {
-
   it('1) should return a complete SchemaDefinition for posts', () => {
     const schema = getSchemaDefinition('posts')
 

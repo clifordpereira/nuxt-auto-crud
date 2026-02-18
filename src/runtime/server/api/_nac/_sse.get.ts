@@ -14,7 +14,8 @@ export default eventHandler(async (event) => {
   const heartbeat = setInterval(async () => {
     try {
       await writer.write(encoder.encode(': ping\n\n'))
-    } catch (e) {
+    }
+    catch (e) {
       cleanup()
     }
   }, 20000)

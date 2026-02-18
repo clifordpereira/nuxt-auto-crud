@@ -25,8 +25,8 @@ export class AutoCrudError extends Error {
       statusMessage: this.message,
       data: {
         code: this.name,
-        message: this.message
-      }
+        message: this.message,
+      },
     })
   }
 }

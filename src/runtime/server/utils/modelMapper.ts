@@ -1,7 +1,7 @@
 import { getColumns, type Column, Table, is, getTableName } from 'drizzle-orm'
 import { getTableConfig } from 'drizzle-orm/sqlite-core'
 import { createInsertSchema } from 'drizzle-zod'
-import { z } from 'zod'
+import type { z } from 'zod'
 
 import { useRuntimeConfig } from '#imports'
 import * as schema from '#nac/schema'
@@ -43,9 +43,9 @@ export function getForeignKeyPropertyName(fk: ForeignKey, columns: Record<string
 
 // helper for getSelectableFields()
 function getPublicFields(resource: string) {
-  const { publicResources } = useRuntimeConfig().autoCrud as { 
-    publicResources?: Record<string, string[]> 
-  }  
+  const { publicResources } = useRuntimeConfig().autoCrud as {
+    publicResources?: Record<string, string[]>
+  }
   return publicResources?.[resource] || []
 }
 
@@ -74,10 +74,9 @@ export function getSelectableFields(table: Table, context: QueryContext = {}): R
 
     const col = allColumns[key]
     if (col) result[key] = col
-  }  
+  }
   return result
 }
-
 
 /**
  * Resolves table relationships for NAC reflection.

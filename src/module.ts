@@ -3,6 +3,7 @@ import { defineNuxtModule, createResolver, addServerHandler, addServerImportsDir
 import { NAC_API_HIDDEN_FIELDS, NAC_FORM_HIDDEN_FIELDS } from './runtime/server/utils/constants'
 
 import type { ModuleOptions } from './types'
+
 export type { ModuleOptions }
 
 export default defineNuxtModule<ModuleOptions>({

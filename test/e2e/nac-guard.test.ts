@@ -10,7 +10,8 @@ describe('NAC: Agentic Guard Security', () => {
     try {
       await $fetch(metaPath)
       throw new Error('Should have been blocked')
-    } catch (err: any) {
+    }
+    catch (err: any) {
       expect(err.statusCode).toBe(401)
       expect(err.statusMessage).toContain('Invalid agentic token')
     }
@@ -20,16 +21,17 @@ describe('NAC: Agentic Guard Security', () => {
     try {
       await $fetch(metaPath, { query: { token: 'malicious_token' } })
       throw new Error('Should have been blocked')
-    } catch (err: any) {
+    }
+    catch (err: any) {
       expect(err.statusCode).toBe(401)
     }
   })
 
   it('200: allows agentic path with valid token', async () => {
-    const res: any = await $fetch(metaPath, { 
-      query: { token } 
+    const res: any = await $fetch(metaPath, {
+      query: { token },
     })
-    
+
     // Verify architectural signature and content
     expect(res.architecture).toBe('Clifland-NAC')
     expect(res).toBeTypeOf('object')

@@ -23,7 +23,7 @@ const fluentMock = {
 
 export const db = {
   ...fluentMock,
-  transaction: vi.fn((cb) => cb(fluentMock))
+  transaction: vi.fn(cb => cb(fluentMock)),
 }
 
 // Keep useDb for composition if needed

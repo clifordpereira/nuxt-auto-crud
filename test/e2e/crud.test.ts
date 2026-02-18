@@ -10,7 +10,7 @@ describe('NAC: Basic Fixture Lifecycle', async () => {
   it('POST: creates record with zero-config validation', async () => {
     const res: any = await $fetch(`${nacEndpointPrefix}/${model}`, {
       method: 'POST',
-      body: { title: 'E2E Test', content: 'Minimal setup' }
+      body: { title: 'E2E Test', content: 'Minimal setup' },
     })
     expect(res.id).toBeDefined()
     recordId = res.id
@@ -32,7 +32,7 @@ describe('NAC: Basic Fixture Lifecycle', async () => {
   it('PATCH: updates record and returns sanitized data', async () => {
     const res: any = await $fetch(`${nacEndpointPrefix}/${model}/${recordId}`, {
       method: 'PATCH',
-      body: { title: 'Updated' }
+      body: { title: 'Updated' },
     })
     expect(res.title).toBe('Updated')
   })
@@ -46,7 +46,8 @@ describe('NAC: Basic Fixture Lifecycle', async () => {
     try {
       await $fetch(`${nacEndpointPrefix}/${model}/999999`)
       throw new Error('Should have thrown 404')
-    } catch (error: any) {
+    }
+    catch (error: any) {
       expect(error.response?.status).toBe(404)
     }
   })
@@ -55,7 +56,8 @@ describe('NAC: Basic Fixture Lifecycle', async () => {
     try {
       await $fetch(`${nacEndpointPrefix}/unknown_table/1`)
       throw new Error('Should have thrown 404')
-    } catch (error: any) {
+    }
+    catch (error: any) {
       expect(error.response?.status).toBe(404)
     }
   })

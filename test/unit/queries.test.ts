@@ -1,12 +1,23 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 
+// 2. IMPORTS
+import { getRows, getRow, createRow, updateRow, deleteRow } from '../../src/runtime/server/utils/queries'
+import { db } from '@nuxthub/db'
+import { posts, users } from '#nac/schema'
+import {
+  RecordNotFoundError,
+  InsertionFailedError,
+  UpdateFailedError,
+  DeletionFailedError,
+} from '../../src/runtime/server/exceptions'
+
 // 1. HOISTED MOCK: Intercepts drizzle-orm before queries.ts loads
 vi.mock('drizzle-orm', async () => {
   const actual = await vi.importActual('drizzle-orm')
   return {
     ...actual,
     // Simply returns the object passed to it so we can control logic via mock objects
-    getColumns: vi.fn((table) => table),
+    getColumns: vi.fn(table => table),
     // Ensure standard Drizzle operators are preserved
     or: actual.or,
     and: actual.and,
@@ -14,17 +25,6 @@ vi.mock('drizzle-orm', async () => {
     desc: actual.desc,
   }
 })
-
-// 2. IMPORTS
-import { getRows, getRow, createRow, updateRow, deleteRow } from '../../src/runtime/server/utils/queries'
-import { db } from '@nuxthub/db'
-import { posts, users } from '#nac/schema'
-import { 
-  RecordNotFoundError, 
-  InsertionFailedError, 
-  UpdateFailedError, 
-  DeletionFailedError 
-} from '../../src/runtime/server/exceptions'
 
 describe('NAC Core Queries - Consolidated Suite', () => {
   beforeEach(() => {
@@ -78,8 +78,8 @@ describe('NAC Core Queries - Consolidated Suite', () => {
 
   describe('getRow()', () => {
     it('returns sanitized record from context cache immediately', async () => {
-      const result = await getRow(users as any, '1', { 
-        record: { id: 1, name: 'Clif', secret: 'internal' } 
+      const result = await getRow(users as any, '1', {
+        record: { id: 1, name: 'Clif', secret: 'internal' },
       })
       expect(result).not.toHaveProperty('secret')
       expect(db.select).not.toHaveBeenCalled()
@@ -109,13 +109,13 @@ describe('NAC Core Queries - Consolidated Suite', () => {
     })
 
     it('sanitizes cached record from context using selectableFields', async () => {
-      const context = { 
-        record: { id: 1, name: 'Clif', password: 'secret_hash' } 
+      const context = {
+        record: { id: 1, name: 'Clif', password: 'secret_hash' },
       }
-      
+
       // Pass '1' instead of 1
       const result = await getRow(users as any, '1', context)
-      
+
       expect(result.name).toBe('Clif')
       expect(result).not.toHaveProperty('password')
       expect(db.select).not.toHaveBeenCalled()
@@ -123,7 +123,7 @@ describe('NAC Core Queries - Consolidated Suite', () => {
 
     it('sanitizes DB result by passing selectableFields to db.select', async () => {
       await getRow(users as any, '1')
-      
+
       const selectedFields = vi.mocked(db.select).mock.calls[0]![0]
       expect(selectedFields).toHaveProperty('id')
       expect(selectedFields).toHaveProperty('name')
@@ -144,10 +144,10 @@ describe('NAC Core Queries - Consolidated Suite', () => {
       const { useRuntimeConfig } = await import('#imports')
       vi.mocked(useRuntimeConfig).mockReturnValueOnce({ autoCrud: { auth: { ownerKey: 'authorId' } } } as any)
       vi.mocked(db.get).mockResolvedValue({ id: 1 })
-      
+
       const mockTable = { authorId: {}, updatedBy: {}, updatedAt: {} }
       await createRow(mockTable as any, {}, { userId: '1' })
-      
+
       const payload = vi.mocked(db.values).mock.calls[0]![0] as any
       expect(payload).toHaveProperty('authorId', 1)
     })
@@ -174,11 +174,11 @@ describe('NAC Core Queries - Consolidated Suite', () => {
 
     it('enforces selectableFields in the returning clause', async () => {
       vi.mocked(db.get).mockResolvedValue({ id: 1, title: 'Returning Test' })
-      
+
       await createRow(users as any, { name: 'New User' })
 
       const returningFields = vi.mocked(db.returning).mock.calls[0]![0]
-      
+
       expect(returningFields).toHaveProperty('id')
       expect(returningFields).not.toHaveProperty('password')
     })

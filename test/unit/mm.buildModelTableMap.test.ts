@@ -5,7 +5,6 @@ import * as schema from '#nac/schema'
 import { buildModelTableMap, modelTableMap } from '../../src/runtime/server/utils/modelMapper'
 
 describe('modelMapper: buildModelTableMap', () => {
-  
   it('1) schema should be loaded correctly via alias', () => {
     expect(schema).toBeDefined()
     expect(schema.users).toBeDefined()
@@ -20,7 +19,7 @@ describe('modelMapper: buildModelTableMap', () => {
 
   it('3) output modelTableMap should be a Record of Tables', () => {
     const map = buildModelTableMap()
-    
+
     expect(typeof map).toBe('object')
     // Validate every entry in the resulting map is indeed a Table
     Object.values(map).forEach((table) => {

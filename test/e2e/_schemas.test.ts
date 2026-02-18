@@ -11,7 +11,7 @@ describe('NAC: Schema Definition Reflection', async () => {
 
     expect(res.resource).toBe('users')
     expect(res.labelField).toBe('name')
-    
+
     // Check specific field inference
     const bioField = res.fields.find((f: any) => f.name === 'bio')
     expect(bioField.type).toBe('textarea') // Inferred from TEXTAREA_HINTS
@@ -19,7 +19,7 @@ describe('NAC: Schema Definition Reflection', async () => {
 
   it('GET: respects hidden fields and read-only status', async () => {
     const res = await $fetch<any>(`${schemaBase}/posts`)
-    
+
     // Check system field protection/visibility
     const idField = res.fields.find((f: any) => f.name === 'id')
     // Assuming 'id' is in formHiddenFields in your nuxt.config.ts
@@ -45,7 +45,8 @@ describe('NAC: Schema Definition Reflection', async () => {
     try {
       await $fetch(`${schemaBase}/ghost_table`)
       throw new Error('Endpoint should have failed')
-    } catch (error: any) {
+    }
+    catch (error: any) {
       // ofetch throws an object containing the response
       expect(error.response?.status).toBe(404)
     }
@@ -53,13 +54,13 @@ describe('NAC: Schema Definition Reflection', async () => {
 
   it('GET: returns an array of all registered model keys', async () => {
     const res = await $fetch<string[]>(schemaBase)
-    
+
     expect(Array.isArray(res)).toBe(true)
     // Checks if the modelTableMap keys are correctly returned
     expect(res).toContain('users')
     expect(res).toContain('posts')
     expect(res).toContain('categories')
-    
+
     // Validates that NAC_SYSTEM_TABLES are filtered out
     expect(res).not.toContain('__drizzle_migrations')
   })

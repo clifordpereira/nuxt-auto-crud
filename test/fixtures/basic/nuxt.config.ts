@@ -11,9 +11,9 @@ export default defineNuxtConfig({
   },
   compatibilityDate: '2026-01-26',
   hub: {
-    db: 'sqlite'
+    db: 'sqlite',
   },
   autoCrud: {
     realtime: true,
-  }
+  },
 })

@@ -15,11 +15,12 @@ export async function broadcast(payload: unknown): Promise<void> {
       deliveries.push(
         client.res.write(msg).catch(() => {
           clients.delete(id)
-        })
+        }),
       )
     }
     await Promise.all(deliveries)
-  } catch (error) {
+  }
+  catch (error) {
     // Silent fail to protect the main CRUD execution flow
   }
 }

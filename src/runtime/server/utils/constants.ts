@@ -37,7 +37,7 @@ export const NAC_DATA_TABLE_HIDDEN_FIELDS = [
 ]
 
 /** Tables used by the underlying database engine/migration tool */
-export const NAC_SYSTEM_TABLES = [ '_hub_migrations', 'd1_migrations', 'sqlite_sequence', ]
+export const NAC_SYSTEM_TABLES = ['_hub_migrations', 'd1_migrations', 'sqlite_sequence']
 
 /** Internal Access Control schema; usually read-only for standard Auto-CRUD endpoints */
-export const NAC_ACL_TABLES = [ 'roles', 'resources', 'permissions', 'role_resource_permissions', ] as const
+export const NAC_ACL_TABLES = ['roles', 'resources', 'permissions', 'role_resource_permissions'] as const
