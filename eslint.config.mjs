@@ -18,6 +18,13 @@ export default createConfigForNuxt({
 })
   .append(
     {
+      files: ['**/*.ts', '**/*.vue'],
+      languageOptions: {
+        parserOptions: {
+          projectService: true,
+          extraFileExtensions: ['.vue'],
+        },
+      },
       rules: {
         'vue/multi-word-component-names': 'off',
         '@typescript-eslint/consistent-type-imports': 'error',

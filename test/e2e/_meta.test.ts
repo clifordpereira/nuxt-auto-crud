@@ -57,4 +57,20 @@ describe('NAC: Meta Discovery & Agentic Guard', () => {
       )
     }
   })
+
+  it('GET: fails with 401 on empty string token', async () => {
+    try {
+      await $fetch(metaPath, { query: { token: '' } })
+    } catch (err: any) {
+      expect(err.status).toBe(401)
+    }
+  })
+
+  it('GET: fails with 401 on missing token parameter', async () => {
+    try {
+      await $fetch(metaPath)
+    } catch (err: any) {
+      expect(err.status).toBe(401)
+    }
+  })
 })
