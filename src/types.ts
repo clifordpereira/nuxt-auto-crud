@@ -1,52 +1,31 @@
 export interface ModuleOptions {
-  /**
-   * Path to the database schema file
-   * @default 'server/database/schema'
-   */
-  schemaPath?: string
-
-  /**
-   * Authentication configuration
-   */
-  auth?: boolean | AuthOptions
-
-  /**
-   * Resource-specific configuration
-   * Define column visibility for unauthenticated users
-   */
-  resources?: {
-    [modelName: string]: string[]
+  // Private config
+  realtime: boolean
+  schemaPath: string
+  auth: {
+    authentication: boolean
+    authorization: boolean
+    ownerKey: string
   }
-
-  /**
-   * Fields that should be automatically hashed before storage
-   * @default ['password']
-   */
-  hashedFields?: string[]
+  apiHiddenFields: string[] /** Sensitive: Never leaves the server */
+  agenticToken: string
+  publicResources: Record<string, string[]> /** Allowed fields for public apis */
+  // Public config
+  nacEndpointPrefix: string
+  formHiddenFields: string[] /** UI: Hidden from forms */
 }
 
-export interface AuthOptions {
-  /**
-   * Authentication type
-   * @default 'session'
-   */
-  type?: 'session' | 'jwt'
-  /**
-   * JWT Secret (required if type is 'jwt')
-   */
-  jwtSecret?: string
-  /**
-   * Enable authentication checks (requires nuxt-auth-utils for session)
-   * @default false
-   */
-  authentication: boolean
-  /**
-   * Enable authorization checks (requires nuxt-authorization)
-   * @default false
-   */
-  authorization?: boolean
-}
-
-export interface RuntimeModuleOptions extends Omit<ModuleOptions, 'auth'> {
-  auth: AuthOptions
+declare module '@nuxt/schema' {
+  interface RuntimeConfig {
+    autoCrud: Omit<ModuleOptions, 'nacEndpointPrefix' | 'formHiddenFields'>
+  }
+  interface PublicRuntimeConfig {
+    autoCrud: Pick<ModuleOptions, 'nacEndpointPrefix' | 'formHiddenFields'>
+  }
+  interface NuxtConfig {
+    autoCrud?: Partial<ModuleOptions>
+  }
+  interface NuxtOptions {
+    autoCrud?: ModuleOptions
+  }
 }

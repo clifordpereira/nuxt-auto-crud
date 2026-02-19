@@ -1,34 +1,34 @@
-// server/utils/sse-bus.ts
-import { kv } from '@nuxthub/kv'
+const globalState = globalThis as unknown as {
+  _nac_sse_clients: Map<string, { id: string, res: WritableStreamDefaultWriter<Uint8Array> }>
+}
 
-type SSEClient = { id: string, res: WritableStreamDefaultWriter }
-const clients = new Map<string, SSEClient>()
-const encoder = new TextEncoder()
+globalState._nac_sse_clients ||= new Map()
+const clients = globalState._nac_sse_clients
 
-function localBroadcast(payload: unknown) {
-  const msg = `event: crud\ndata: ${JSON.stringify(payload)}\n\n`
-  const encoded = encoder.encode(msg)
-  for (const [id, client] of clients) {
-    client.res.write(encoded).catch(() => clients.delete(id))
+export async function broadcast(payload: unknown): Promise<void> {
+  try {
+    const encoder = new TextEncoder()
+    const msg = encoder.encode(`event: crud\ndata: ${JSON.stringify(payload)}\n\n`)
+
+    const deliveries: Promise<void>[] = []
+    for (const [id, client] of clients) {
+      deliveries.push(
+        client.res.write(msg).catch(() => {
+          clients.delete(id)
+        }),
+      )
+    }
+    await Promise.all(deliveries)
+  }
+  catch {
+    // Silent fail to protect the main CRUD execution flow
   }
 }
 
-export function addClient(id: string, res: WritableStreamDefaultWriter) {
+export function addClient(id: string, res: WritableStreamDefaultWriter<Uint8Array>): void {
   clients.set(id, { id, res })
 }
 
-export function removeClient(id: string) {
+export function removeClient(id: string): void {
   clients.delete(id)
-}
-
-export async function broadcast(payload: unknown) {
-  // 1. Local Isolate Delivery
-  localBroadcast(payload)
-
-  // 2. Global Instance Signal (Cross-Isolate)
-  // Each isolated instance has its own KV namespace via Nuxt Hub
-  await kv.set('nac_signal', {
-    ts: Date.now(),
-    payload,
-  }, { ttl: 60 })
 }

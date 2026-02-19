@@ -7,7 +7,7 @@ description: "Architecture and directory boundaries for NAC Interface, prioritiz
 # Antigravity Workspace Rules: nuxt-auto-crud
 
 ## 1. CAM Local Mapping (Interface & Playground)
-- **Interface (Core):** `src/`. Logic stored in `src/runtime/server/api/[model]/` (Backend ONLY).
+- **Interface (Core):** `src/`. Logic stored in `src/runtime/server/api/_nac/[model]/` (Backend ONLY).
 - **Abstract Class (Internal):** `playground/`. The only source for frontend/fullstack logic.
 - **The Sync Rule:** `playground/` is the internal mirror of the `auto-crud.clifland.in` template. 
     - Logic is identical. 
@@ -15,7 +15,7 @@ description: "Architecture and directory boundaries for NAC Interface, prioritiz
 
 ## 2. Default Context Inference (Implicit Scope)
 - **Frontend/UI Task:** Default to `playground/`. Prioritize `playground/app/components/crud/`. Do not scan other folders without asking.
-- **API/Core Logic Task:** Default to `src/runtime/server/api/[model]/`.
+- **API/Core Logic Task:** Default to `src/runtime/server/api/_nac/[model]/`.
 - **Constraint:** Do not scan `content/*` unless explicitly @mentioned.
 
 ## 3. Strict Folder Boundaries (Token Optimization)
@@ -30,3 +30,7 @@ description: "Architecture and directory boundaries for NAC Interface, prioritiz
 ## 5. Operational Instructions
 - Inform me before expanding analysis beyond `playground/app/components/crud/` for frontend tasks.
 - Prioritize **Gemini 3 Flash** for high speed and low token consumption.
+
+
+# Instruction for Antigravity
+- When generating or refactoring test cases for the `nuxt-auto-crud` core or template, always cross-reference `.agent/docs/nuxt-testing-doc.md` and `.agent/rules/test-case-instructions.md`. Prioritize server-side logic compatibility for Agentic/MCP tools and ensure zero-config validation paths are fully exercised.

@@ -18,7 +18,7 @@
     "auth": "db-driven-rbac"
   },
   "runtime_context": {
-    "logic_path": "src/runtime/server/api/[model]",
+    "logic_path": "src/runtime/server/api/_nac/[model]",
     "mapper": "src/runtime/server/utils/modelMapper.ts"
   },
   "agent_instructions": "./.ai-context.md"

@@ -1,7 +1,7 @@
 {
   "name": "nuxt-auto-crud",
-  "version": "1.31.0",
-  "description": "Exposes RESTful CRUD APIs for your Nuxt app based solely on your database migrations.",
+  "version": "2.0.0",
+  "description": "Dynamic RESTful CRUD APIs for Nuxt without code generation, fully schema-driven.",
   "author": "Cliford Pereira",
   "license": "MIT",
   "keywords": [
@@ -21,69 +21,69 @@
       "import": "./dist/module.mjs"
     }
   },
-  "main": "./dist/module.mjs",
-  "typesVersions": {
-    "*": {
-      ".": [
-        "./dist/types.d.mts"
-      ]
-    }
-  },
   "files": [
     "dist",
     "src/runtime"
   ],
   "scripts": {
     "prepack": "nuxt-module-build build",
-    "dev": "bun run dev:prepare && nuxi dev --bun playground",
-    "dev:build": "nuxi build --bun playground",
-    "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxi prepare playground",
-    "release": "npm run lint && npm run test && npm run prepack && changelogen --release && npm publish && git push --follow-tags",
+    "release": "bun run lint && bun run test && bun run prepack && changelogen --release && npm publish && git push --follow-tags",
     "lint": "eslint .",
     "test": "vitest run",
-    "test:api": "node scripts/test-api.mjs",
     "test:watch": "vitest watch",
     "test:types": "vue-tsc --noEmit && cd playground && vue-tsc --noEmit",
-    "link": "npm link"
+    "test:e2e": "bun run build:stub && vitest run",
+    "build:stub": "nuxt-module-build build --stub",
+    "dev": "bun run build:stub && nuxi prepare playground && nuxi dev --bun playground",
+    "dev:build": "nuxi build --bun playground",
+    "dev:saas": "bun run build:stub && nuxi prepare playground-saas && nuxi dev --bun playground-saas",
+    "saas:build": "nuxi build --bun playground-saas",
+    "postinstall": "nuxi prepare"
   },
   "dependencies": {
-    "@nuxt/kit": "^4.3.0",
-    "@nuxt/scripts": "^0.13.2",
-    "@types/pluralize": "^0.0.33",
-    "c12": "^3.3.3",
+    "@nuxt/kit": "^4.3.1",
     "drizzle-zod": "^0.8.3",
-    "jose": "^6.1.3",
-    "pluralize": "^8.0.0",
-    "scule": "^1.3.0"
+    "zod": "^4.3.6",
+    "pluralize": "^8.0.0"
   },
   "peerDependencies": {
-    "drizzle-orm": ">=0.30.0"
+    "@libsql/client": "^0.17.0",
+    "@nuxthub/core": "^0.10.6",
+    "drizzle-kit": ">=1.0.0-beta.15 <2",
+    "drizzle-orm": ">=1.0.0-beta.15 <2",
+    "nuxt": "^4.3.0"
   },
   "devDependencies": {
     "@iconify-json/heroicons": "^1.2.3",
-    "@iconify-json/lucide": "^1.2.86",
-    "@iconify-json/simple-icons": "^1.2.67",
-    "@iconify-json/vscode-icons": "^1.2.40",
+    "@iconify-json/lucide": "^1.2.91",
+    "@iconify-json/simple-icons": "^1.2.71",
+    "@iconify-json/vscode-icons": "^1.2.43",
     "@libsql/client": "^0.17.0",
-    "@nuxt/devtools": "^3.1.1",
-    "@nuxt/eslint-config": "^1.13.0",
+    "@nuxt/devtools": "^3.2.1",
+    "@nuxt/eslint-config": "^1.15.1",
     "@nuxt/module-builder": "^1.0.2",
-    "@nuxt/schema": "^4.3.0",
-    "@nuxt/test-utils": "^3.23.0",
-    "@nuxthub/core": "^0.10.5",
+    "@nuxt/schema": "^4.3.1",
+    "@nuxt/test-utils": "^4.0.0",
+    "@nuxthub/core": "^0.10.6",
     "@types/better-sqlite3": "^7.6.13",
-    "@types/node": "^25.0.10",
+    "@types/node": "latest",
+    "@vue/test-utils": "^2.4.6",
+    "@types/pluralize": "^0.0.33",
     "better-sqlite3": "^12.6.2",
     "changelogen": "^0.6.2",
-    "drizzle-kit": "^0.31.8",
-    "drizzle-orm": "^0.45.1",
-    "eslint": "^9.39.2",
-    "nuxt": "^4.3.0",
-    "nuxt-auth-utils": "^0.5.27",
-    "nuxt-authorization": "^0.3.5",
+    "drizzle-kit": "^1.0.0-beta.9-e89174b",
+    "drizzle-orm": "^1.0.0-beta.9-e89174b",
+    "eslint": "^10.0.0",
+    "happy-dom": "^20.6.2",
+    "nuxt": "^4.3.1",
+    "playwright-core": "^1.58.2",
     "typescript": "~5.9.3",
     "vitest": "^4.0.18",
-    "vue-tsc": "^3.2.3",
-    "wrangler": "^4.60.0"
+    "vue-tsc": "^3.2.4",
+    "wrangler": "^4.66.0"
+  },
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

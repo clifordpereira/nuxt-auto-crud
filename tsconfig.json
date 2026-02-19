@@ -1,10 +1,27 @@
 {
   "extends": "./.nuxt/tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "baseUrl": ".",
+    "paths": {
+      "@nuxthub/db": ["./test/mocks/db.ts"],
+      "#imports": ["./test/mocks/imports.ts"],
+      "#nac/shared/*": ["./src/runtime/shared/*"],
+      "#nac/types": ["./src/runtime/server/types.ts"],
+      "#nac/schema": ["./test/fixtures/basic/server/db/schema.ts"]
+    }
+  },
+  "include": [
+    "src",
+    "test",
+    ".nuxt/nuxt.d.ts",
+    "vitest.config.ts"
+  ],
   "exclude": [
     "dist",
     "node_modules",
     "playground",
-    "playground-backendonly",
-    "test/fixtures"
+    "playground-saas"
   ]
 }

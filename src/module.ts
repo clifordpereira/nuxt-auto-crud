@@ -1,22 +1,10 @@
-import {
-  defineNuxtModule,
-  createResolver,
-  addServerHandler,
-  addServerImportsDir,
-  addImportsDir,
-  hasNuxtModule,
-  addServerImports,
-} from '@nuxt/kit'
+import { defineNuxtModule, createResolver, addServerHandler, addServerImportsDir, addImportsDir } from '@nuxt/kit'
 
-import type { ModuleOptions, AuthOptions, RuntimeModuleOptions } from './types'
+import { NAC_API_HIDDEN_FIELDS, NAC_FORM_HIDDEN_FIELDS } from './runtime/server/utils/constants'
+
+import type { ModuleOptions } from './types'
 
 export type { ModuleOptions }
-
-declare module '@nuxt/schema' {
-  interface RuntimeConfig {
-    autoCrud: RuntimeModuleOptions
-  }
-}
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
@@ -24,119 +12,73 @@ export default defineNuxtModule<ModuleOptions>({
     configKey: 'autoCrud',
   },
   defaults: {
+    // Private config
+    realtime: false,
+    auth: {
+      authentication: false,
+      authorization: false,
+      ownerKey: 'createdBy',
+    },
+    publicResources: {},
+    apiHiddenFields: NAC_API_HIDDEN_FIELDS,
+    agenticToken: '',
     schemaPath: 'server/db/schema',
-
-    auth: false,
+    // Public config
+    formHiddenFields: NAC_FORM_HIDDEN_FIELDS,
+    nacEndpointPrefix: '/api/_nac',
   },
+
   async setup(options, nuxt) {
+    const prefix = options.nacEndpointPrefix || '/api/_nac'
     const resolver = createResolver(import.meta.url)
 
-    const schemaPath = resolver.resolve(
-      nuxt.options.rootDir,
-      options.schemaPath!,
-    )
-    nuxt.options.alias['#site/schema'] = schemaPath
+    // 1. Aliases
+    nuxt.options.alias['#nac/shared'] = resolver.resolve('./runtime/shared')
+    nuxt.options.alias['#nac/types'] = resolver.resolve('./runtime/server/types')
+    nuxt.options.alias['#nac/schema'] = resolver.resolve(nuxt.options.rootDir, options.schemaPath!)
 
-    addImportsDir(resolver.resolve(nuxt.options.rootDir, 'shared/utils'))
+    // 2. Runtime Config (The Concrete State)
+    const { formHiddenFields, nacEndpointPrefix, ...privateOptions } = options
+    nuxt.options.runtimeConfig.autoCrud = privateOptions // private runtime
+    nuxt.options.runtimeConfig.public.autoCrud = { formHiddenFields, nacEndpointPrefix } // public runtime
 
-    // Add stubs for optional modules
-    const stubsPath = resolver.resolve('./runtime/server/stubs/auth')
-    if (!hasNuxtModule('nuxt-auth-utils')) {
-      addServerImports([
-        { name: 'requireUserSession', from: stubsPath },
-        { name: 'getUserSession', from: stubsPath },
-        { name: 'hashPassword', from: stubsPath },
-      ])
-    }
-    if (!hasNuxtModule('nuxt-authorization')) {
-      addServerImports([
-        { name: 'allows', from: stubsPath },
-        { name: 'abilities', from: stubsPath },
-        { name: 'abilityLogic', from: stubsPath },
-      ])
-    }
-
-    nuxt.options.alias['#authorization'] ||= 'nuxt-authorization/utils'
-
-    const mergedAuth: AuthOptions = options.auth === false
-      ? { authentication: false, authorization: false, type: 'session' }
-      : {
-          authentication: true,
-          authorization: options.auth === true,
-          type: 'session',
-
-          ...(typeof options.auth === 'object' ? options.auth : {}),
-        }
-
-    nuxt.options.runtimeConfig.autoCrud = {
-      auth: {
-        authentication: mergedAuth.authentication ?? false,
-        authorization: mergedAuth.authorization ?? false,
-        type: mergedAuth.type ?? 'session',
-        jwtSecret: mergedAuth.jwtSecret,
-      },
-      resources: {
-        ...options.resources,
-      },
-      hashedFields: options.hashedFields ?? ['password'],
-    }
-
-    const apiDir = resolver.resolve('./runtime/server/api')
-
-    addServerHandler({
-      route: '/api/_schema',
-      method: 'get',
-      handler: resolver.resolve(apiDir, '_schema/index.get'),
-    })
-    addServerHandler({
-      route: '/api/_schema/:table',
-      method: 'get',
-      handler: resolver.resolve(apiDir, '_schema/[table].get'),
-    })
-    addServerHandler({
-      route: '/api/_relations',
-      method: 'get',
-      handler: resolver.resolve(apiDir, '_relations.get'),
-    })
-    addServerHandler({
-      route: '/api/_meta',
-      method: 'get',
-      handler: resolver.resolve(apiDir, '_meta.get'),
-    })
-    addServerHandler({
-      route: '/api/sse',
-      method: 'get',
-      handler: resolver.resolve(apiDir, 'sse'),
-    })
-
-    addServerHandler({
-      route: '/api/:model',
-      method: 'get',
-      handler: resolver.resolve(apiDir, '[model]/index.get'),
-    })
-    addServerHandler({
-      route: '/api/:model',
-      method: 'post',
-      handler: resolver.resolve(apiDir, '[model]/index.post'),
-    })
-    addServerHandler({
-      route: '/api/:model/:id',
-      method: 'get',
-      handler: resolver.resolve(apiDir, '[model]/[id].get'),
-    })
-    addServerHandler({
-      route: '/api/:model/:id',
-      method: 'patch',
-      handler: resolver.resolve(apiDir, '[model]/[id].patch'),
-    })
-    addServerHandler({
-      route: '/api/:model/:id',
-      method: 'delete',
-      handler: resolver.resolve(apiDir, '[model]/[id].delete'),
-    })
-
+    // 3. Auto-imports (The Engine)
+    addImportsDir(resolver.resolve('./runtime/composables'))
     addServerImportsDir(resolver.resolve('./runtime/server/utils'))
 
-    addImportsDir(resolver.resolve('./runtime/composables'))
+    // 4. Global Type Support (For the Playground/App)
+    nuxt.hook('prepare:types', ({ references }) => {
+      references.push({ path: resolver.resolve('./runtime/types/index.d.ts') })
+    })
+
+    // 5. Register the Security Guard (Intercepter)
+    addServerHandler({
+      middleware: true,
+      handler: resolver.resolve('./runtime/server/middleware/nac-guard.ts'),
+    })
+
+    // 6. Register Specific System Endpoints (Targets)
+    const apiDir = resolver.resolve('./runtime/server/api/_nac')
+    const routes = [
+      // Dynamic CRUD Endpoints
+      { path: '/:model', method: 'get', handler: '[model]/index.get.ts' },
+      { path: '/:model', method: 'post', handler: '[model]/index.post.ts' },
+      { path: '/:model/:id', method: 'get', handler: '[model]/[id].get.ts' },
+      { path: '/:model/:id', method: 'patch', handler: '[model]/[id].patch.ts' },
+      { path: '/:model/:id', method: 'delete', handler: '[model]/[id].delete.ts' },
+      // System Endpoints
+      { path: '/_schemas', method: 'get', handler: '_schemas/index.get.ts' },
+      { path: '/_schemas/:model', method: 'get', handler: '_schemas/[model].get.ts' },
+      { path: '/_meta', method: 'get', handler: '_meta.get.ts' },
+      { path: '/_sse', method: 'get', handler: '_sse.get.ts' },
+    ] as const
+
+    for (const route of routes) {
+      addServerHandler({
+        route: `${prefix}${route.path}`,
+        method: route.method,
+        handler: resolver.resolve(apiDir, route.handler),
+      })
+    }
   },
 })

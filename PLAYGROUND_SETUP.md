@@ -102,27 +102,27 @@ With the sample schema, the following endpoints are automatically available:
 
 ### Users
 
-- `GET /api/users` - List all users
-- `POST /api/users` - Create a new user
-- `GET /api/users/:id` - Get user by ID
-- `PATCH /api/users/:id` - Update user
-- `DELETE /api/users/:id` - Delete user
+- `GET /api/_nac/users` - List all users
+- `POST /api/_nac/users` - Create a new user
+- `GET /api/_nac/users/:id` - Get user by ID
+- `PATCH /api/_nac/users/:id` - Update user
+- `DELETE /api/_nac/users/:id` - Delete user
 
 ### Posts
 
-- `GET /api/posts` - List all posts
-- `POST /api/posts` - Create a new post
-- `GET /api/posts/:id` - Get post by ID
-- `PATCH /api/posts/:id` - Update post
-- `DELETE /api/posts/:id` - Delete post
+- `GET /api/_nac/posts` - List all posts
+- `POST /api/_nac/posts` - Create a new post
+- `GET /api/_nac/posts/:id` - Get post by ID
+- `PATCH /api/_nac/posts/:id` - Update post
+- `DELETE /api/_nac/posts/:id` - Delete post
 
 ### Comments
 
-- `GET /api/comments` - List all comments
-- `POST /api/comments` - Create a new comment
-- `GET /api/comments/:id` - Get comment by ID
-- `PATCH /api/comments/:id` - Update comment
-- `DELETE /api/comments/:id` - Delete comment
+- `GET /api/_nac/comments` - List all comments
+- `POST /api/_nac/comments` - Create a new comment
+- `GET /api/_nac/comments/:id` - Get comment by ID
+- `PATCH /api/_nac/comments/:id` - Update comment
+- `DELETE /api/_nac/comments/:id` - Delete comment
 
 ## How to Use the Playground
 

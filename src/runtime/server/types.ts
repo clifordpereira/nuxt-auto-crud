@@ -1,5 +1,6 @@
-import type { BaseSQLiteDatabase, SQLiteTable, SQLiteColumn } from 'drizzle-orm/sqlite-core'
+import type { Table, AnyColumn } from 'drizzle-orm'
 
-export type ModuleDatabase = BaseSQLiteDatabase<'async' | 'sync', unknown, Record<string, unknown>>
-
-export type TableWithId = SQLiteTable & { id: SQLiteColumn }
+export type TableWithId = Table & {
+  id: AnyColumn
+  [key: string]: AnyColumn
+}
