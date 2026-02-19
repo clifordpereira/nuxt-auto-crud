@@ -1,4 +1,4 @@
-import { createError } from 'h3'
+import { createError } from '#imports'
 
 /**
  * Base Auto CRUD Error

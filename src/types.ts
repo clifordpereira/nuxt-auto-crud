@@ -22,10 +22,4 @@ declare module '@nuxt/schema' {
   interface PublicRuntimeConfig {
     autoCrud: Pick<ModuleOptions, 'nacEndpointPrefix' | 'formHiddenFields'>
   }
-  interface NuxtConfig {
-    autoCrud?: Partial<ModuleOptions>
-  }
-  interface NuxtOptions {
-    autoCrud?: ModuleOptions
-  }
 }
