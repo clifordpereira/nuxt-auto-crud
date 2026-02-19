@@ -21,24 +21,30 @@
       "import": "./dist/module.mjs"
     }
   },
+  "main": "./dist/module.mjs",
+  "typesVersions": {
+    "*": {
+      ".": [
+        "./dist/types.d.mts"
+      ]
+    }
+  },
   "files": [
-    "dist",
-    "src/runtime"
+    "dist"
+  ],
+  "workspaces": [
+    "playground"
   ],
   "scripts": {
     "prepack": "nuxt-module-build build",
-    "release": "bun run lint && bun run test && bun run prepack && changelogen --release && npm publish && git push --follow-tags",
+    "dev": "npm run dev:prepare && nuxt dev playground",
+    "dev:build": "nuxt build playground",
+    "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxt prepare playground",
+    "release": "npm run lint && npm run test && npm run prepack && changelogen --release && npm publish && git push --follow-tags",
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest watch",
-    "test:types": "vue-tsc --noEmit && cd playground && vue-tsc --noEmit",
-    "test:e2e": "bun run build:stub && vitest run",
-    "build:stub": "nuxt-module-build build --stub",
-    "dev": "bun run build:stub && nuxi prepare playground && nuxi dev --bun playground",
-    "dev:build": "nuxi build --bun playground",
-    "dev:saas": "bun run build:stub && nuxi prepare playground-saas && nuxi dev --bun playground-saas",
-    "saas:build": "nuxi build --bun playground-saas",
-    "postinstall": "nuxi prepare"
+    "test:types": "vue-tsc --noEmit && cd playground && vue-tsc --noEmit"
   },
   "dependencies": {
     "@nuxt/kit": "^4.3.1",
