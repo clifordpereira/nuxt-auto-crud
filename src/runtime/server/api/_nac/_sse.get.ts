@@ -15,7 +15,7 @@ export default eventHandler(async (event) => {
     try {
       await writer.write(encoder.encode(': ping\n\n'))
     }
-    catch (e) {
+    catch {
       cleanup()
     }
   }, 20000)

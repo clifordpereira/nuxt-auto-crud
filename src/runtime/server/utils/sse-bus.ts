@@ -20,7 +20,7 @@ export async function broadcast(payload: unknown): Promise<void> {
     }
     await Promise.all(deliveries)
   }
-  catch (error) {
+  catch {
     // Silent fail to protect the main CRUD execution flow
   }
 }

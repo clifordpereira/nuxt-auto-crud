@@ -1,15 +1,15 @@
-import { vi } from "vitest";
+import { vi } from 'vitest'
 
 export class MockEventSource {
-  onmessage: any = null;
-  onerror: any = null;
-  listeners: Record<string, Function[]> = {};
+  onmessage: any = null
+  onerror: any = null
+  listeners: Record<string, Function[]> = {}
 
   constructor(public url: string) {}
 
   addEventListener(type: string, cb: Function) {
-    this.listeners[type] = this.listeners[type] || [];
-    this.listeners[type].push(cb);
+    this.listeners[type] = this.listeners[type] || []
+    this.listeners[type].push(cb)
   }
 
   // Helper to trigger events in tests
@@ -17,12 +17,12 @@ export class MockEventSource {
     const event = {
       data: JSON.stringify(data),
       type,
-    } as MessageEvent;
+    } as MessageEvent
 
-    this.listeners[type]?.forEach((cb) => cb(event));
+    this.listeners[type]?.forEach(cb => cb(event))
   }
 
   close() {
-    vi.fn();
+    vi.fn()
   }
 }

@@ -15,7 +15,8 @@
   "include": [
     "src",
     "test",
-    ".nuxt/nuxt.d.ts" 
+    ".nuxt/nuxt.d.ts",
+    "vitest.config.ts"
   ],
   "exclude": [
     "dist",

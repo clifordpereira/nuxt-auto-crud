@@ -15,7 +15,6 @@ type ForeignKey = ReturnType<typeof getTableConfig>['foreignKeys'][number]
 
 /**
  * Builds a map of all exported Drizzle tables from the schema.
- * @param {Record<string, any>} schema - The imported schema object containing table definitions and other exports.
  * @returns {Record<string, Table>} A mapping of export keys to their corresponding Table instances.
  */
 export const buildModelTableMap = (): Record<string, Table> => {

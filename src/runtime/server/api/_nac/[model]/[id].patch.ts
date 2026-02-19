@@ -21,7 +21,7 @@ export default eventHandler(async (event) => {
 
   const { realtime } = useRuntimeConfig().autoCrud
   if (realtime) {
-    broadcast({
+    void broadcast({
       table: model,
       action: 'update',
       primaryKey: updatedRecord.id,

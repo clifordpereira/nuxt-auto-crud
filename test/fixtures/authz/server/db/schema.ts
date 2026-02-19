@@ -12,4 +12,3 @@ export const roles = sqliteTable('roles', {
   name: text('name').notNull(),
   description: text('description'),
 })
-

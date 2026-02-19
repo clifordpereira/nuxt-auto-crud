@@ -2,7 +2,7 @@
 import { describe, it, expect } from 'vitest'
 import { Table, is } from 'drizzle-orm'
 import * as schema from '#nac/schema'
-import { buildModelTableMap, modelTableMap } from '../../src/runtime/server/utils/modelMapper'
+import { buildModelTableMap } from '../../src/runtime/server/utils/modelMapper'
 
 describe('modelMapper: buildModelTableMap', () => {
   it('1) schema should be loaded correctly via alias', () => {

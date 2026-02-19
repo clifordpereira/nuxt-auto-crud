@@ -18,7 +18,7 @@ export default eventHandler(async (event) => {
 
   const { realtime } = useRuntimeConfig().autoCrud
   if (realtime) {
-    broadcast({
+    void broadcast({
       table: model,
       action: 'delete',
       primaryKey: deletedRecord.id as number | string,
