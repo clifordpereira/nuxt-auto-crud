@@ -11,17 +11,19 @@ export default defineNuxtConfig({
     db: 'sqlite',
   },
   autoCrud: {
+    realtime: false,
     auth: {
       authentication: true,
       authorization: true,
-      ownerKey: 'ownerId', // it successfuly identifies different ownerKey field like 'ownerId'
+      ownerKey: 'ownerId', 
     },
-    apiHiddenFields: ['password'], // it filter out apiHiddenFields from the response
-    formHiddenFields: [], //
-    // it successfully returns allColumns union publicResources - apiHiddenFields
     publicResources: {
       users: ['id', 'name', 'email', 'samoosa'],
     },
-    agenticToken: '', // it correctly captures the token from .env
+    apiHiddenFields: ['password'], 
+    agenticToken: '', 
+    formHiddenFields: [], 
+    nacEndpointPrefix: '/api/_nac',
+    schemaPath: 'server/db/schema',
   },
 })

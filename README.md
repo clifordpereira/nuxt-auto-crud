@@ -1,15 +1,14 @@
-## Nuxt Auto CRUD (nac 2.0)
+## nuxt-auto-crud (nac 2.0)
 
-**Nuxt Auto CRUD** provides **Dynamic RESTful CRUD Endpoints** from Drizzle schemas. No need to write/**generate** extra code for CRUD operations.
+**Zero-Codegen Dynamic RESTful CRUD APIs** derived directly from schemas. It eliminates the need to manually write or generate boilerplate for CRUD operations.
 
 ---
 
 ### 🚀 Core Features
 
-* **Dynamic RESTful CRUD endpoints**: Automatically maps `GET|POST|PATCH|DELETE` to your Drizzle tables.
-* **Zero-Codegen**: No files are generated extra for new tables or schemas, preventing code bloat. Your Drizzle schema acts as the Single Source of Truth (SSOT) to power all endpoints automatically.
-* **Real-time Sync**: Built-in SSE broadcasting for `create`, `update`, and `delete` events.
-* **Agentic Compatibility**: Built with an MCP-friendly structure to allow AI Agents to interact directly with the schema-driven API.
+* **Zero-Codegen Dynamic RESTful CRUD APIs**: nuxt-auto-crud leverages Drizzle ORM, Zod, Nuxt, and Nitro to eliminate the need for manual CRUD coding.
+* **Single Source of Truth (SSOT)**: Your Drizzle schemas (`schema/db/schema`) define the entire API structure and validation.
+* **Constant Bundle Size**: Since no code is generated, the bundle size remains virtually identical whether you have one table or one hundred (scaling only with your schema definitions).
 
 ---
 
@@ -37,32 +36,175 @@ Nb: Endpoints follow the pattern `/api/_nac/:model`.
 
 
 ---
-### 🤖 Discovery & AI Endpoints
+### 🛠 Frontend Integration APIs
 
-Enable UIs and AI Agents to resolve data structures dynamically.
+In addition to CRUD endpoints, **nac** provides metadata APIs to power dynamic forms and tables in your frontend.
 
-| Endpoint | Purpose |
-| --- | --- |
-| `GET /_schema` | Returns full Drizzle-Zod schemas for all models |
-| `GET /_schema/:table` | Returns validation rules for a specific table |
-| `GET /_relations` | Exposes foreign key constraints and mappings |
-| `GET /_meta` | Consolidated MCP-optimized discovery manifest |
+* **List Resources**: `GET /api/_nac/_schemas` returns all tables (excluding system-protected tables).
+* **Resource Metadata**: `GET /api/_nac/_schemas/:resource` returns the field definitions, validation rules, and relationship data for a specific table.
 
-Eg: http://localhost:3000/api/_nac/_schema/users
+---
 
+### Schema Interface
+
+```typescript
+export interface Field {
+  name: string
+  type: string
+  required?: boolean
+  selectOptions?: string[]
+  references?: string
+  isReadOnly?: boolean
+}
+
+export interface SchemaDefinition {
+  resource: string
+  labelField: string
+  fields: Field[]
+}
+
+```
+
+### Example Response
+
+`GET /api/_nac/_schemas/users`
+
+```json
+{
+  "resource": "users",
+  "labelField": "name",
+  "fields": [
+    { "name": "id", "type": "string", "required": true, "isReadOnly": true },
+    { "name": "name", "type": "string", "required": true, "isReadOnly": false },
+    { "name": "email", "type": "string", "required": true, "isReadOnly": false }
+  ]
+}
+
+```
+---
+
+### 🛡 Security & Configuration
+
+Enabling `authentication` in the `autoCrud` config protects all **nac** routes (`/api/_nac/*`), except those explicitly defined in `publicResources`.
+
+#### 🔒 Access Control & Data Safety
+
+* **`apiHiddenFields`**: Globally hides sensitive columns from all API responses. Default: `['password', 'secret', 'token', 'reset_token', 'reset_expires', 'github_id', 'google_id']`.
+* **`formHiddenFields`**: Columns excluded from the frontend schema metadata to prevent user input. Defaults to `apiHiddenFields` plus system-managed fields like `id`, `uuid`, `createdAt`, `updatedAt`, `createdBy`, etc.
+* **Validation Logic**: If a field is in `apiHiddenFields` or does not exist in the schema, it is silently stripped from the response even if listed in `publicResources`.
+
+---
+
+#### ⚙️ Configuration Reference
+
+| Key | Default | Description |
+| --- | --- | --- |
+| `realtime` | `true` | Enables/disables real-time capabilities. |
+| `auth.authentication` | `true` | Requires a valid session for all NAC routes. |
+| `auth.authorization` | `true` | Enables role/owner-based access checks. |
+| `auth.ownerKey` | `'ownerId'` | The column name used to identify the record creator. |
+| `publicResources` | `{}` | Defines tables and specific columns accessible without auth. |
+| `nacEndpointPrefix` | `'/api/_nac'` | The base path for NAC routes. Access via `useRuntimeConfig().public.autoCrud`. |
+| `schemaPath` | `'server/db/schema'` | Location of your Drizzle schema files. |
+
+#### Example `nuxt.config.ts`
+
+```typescript
+autoCrud: {
+  realtime: true,
+  auth: {
+    authentication: true,
+    authorization: true,
+    ownerKey: 'ownerId', 
+  },
+  publicResources: {
+    users: ['id', 'name', 'email'],
+  },
+  apiHiddenFields: ['password'], 
+  agenticToken: process.env.NAC_AGENTIC_TOKEN, 
+  formHiddenFields: [], 
+  nacEndpointPrefix: '/api/_nac',
+  schemaPath: 'server/db/schema',
+}
+
+```
+
+> **Note**: Modify `nacEndpointPrefix` or `schemaPath` only if the Nuxt/Nitro conventions change or you use a non-standard directory structure.
+---
+### 🛡 Filtering & Performance Optimization
+
+#### Automatic Status Filtering
+
+To align with standard application behavior, **nac** automatically filters records if a `status` column exists. By default, it will only return **active** records, reducing boilerplate for soft-state management.
+
+#### Ownership & Permissions
+
+While the implementing app handles the authentication layer, **nac** provides a standardized way to enforce record ownership and granular access.
+
+If your middleware populates `event.context.nac` with `resourcePermissions`, **nac** automatically injects the necessary SQL filters.
+
+**Example: Restricting users to their own records**
+If the permissions array includes `'list_own'`, **nac** appends a filter where `ownerCol === userId`.
+
+```typescript
+// Example: Setting context in your Auth Middleware
+event.context.nac = {
+  userId: user.id,
+  resourcePermissions: user.permissions[model], // e.g., ['list_own', 'list']
+  record: null, // Optional: Pre-fetched record to prevent double-hitting the DB
+}
+
+```
+
+#### Performance: The `record` Context
+
+For `UPDATE`, `DELETE`, or `GET` (by ID) operations, **nac** must verify ownership.
+
+* **Standard**: **nac** fetches the record to check the owner ID.
+* **Optimized**: If your middleware has already fetched the record for validation, pass it to `event.context.nac.record`. **nac** will use this object instead of executing an additional database query.
+---
+
+### 📡 Real-time Synchronization (SSE)
+
+When `realtime` is enabled, all `create`, `update`, and `delete` operations are automatically broadcasted:
+
+```typescript
+if (realtime) {
+  void broadcast({
+    table: model,
+    action: 'create',
+    primaryKey: newRecord.id,
+    data: newRecord,
+  })
+}
+
+```
+
+#### Frontend Usage
+
+NAC provides a `useNacAutoCrudSSE` composable to listen for these changes in your frontend:
+
+```typescript
+useNacAutoCrudSSE(({ table, action, data: sseData, primaryKey }) => {
+  // Optional: Filter by specific table
+  // if (table !== currentTable.value) return
+
+  if (action === 'update') {
+    // updateRow(primaryKey, sseData)
+  }
+
+  if (action === 'create') {
+    // addRow(sseData)
+  }
+
+  if (action === 'delete') {
+    // removeRow(primaryKey)
+  }
+})
+
+```
 ---
 ## ⚠️ Limitations
-**Database Support:** Currently tested and optimized for SQLite/libSQL only.
+**Database Support:** Currently optimized for SQLite/libSQL only.
 
 ---
-
-## Installation
-It is highly recommended to use the [Template](https://auto-crud.clifland.in/docs/auto-crud) for new installations.
-
-If you are adding it to an existing application, refer to the [Manual Installation](https://auto-crud.clifland.in/docs/manual-installation/pre-requisites) guide.
-
-[YouTube Walkthrough](https://www.youtube.com/watch?v=_o0cddJUU50&list=PLnbvxcojhIixqM1J08Tnm7vmMdx2wsy4B)
-
-[NPM Package](https://www.npmjs.com/package/nuxt-auto-crud)
-
-[Creator: Clifland](https://www.clifland.in/)
