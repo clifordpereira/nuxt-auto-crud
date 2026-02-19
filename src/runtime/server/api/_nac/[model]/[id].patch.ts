@@ -2,7 +2,7 @@ import { eventHandler, getRouterParams, readBody } from 'h3'
 
 import { modelTableMap } from '../../../utils/modelMapper'
 import { resolveValidatedSchema } from '../../../utils/validator'
-import { updateRow } from '../../../utils/queries'
+import { nacUpdateRow } from '../../../utils/queries'
 import { broadcast } from '../../../utils/sse-bus'
 
 import { ResourceNotFoundError } from '../../../exceptions'
@@ -17,7 +17,7 @@ export default eventHandler(async (event) => {
   if (!table) throw new ResourceNotFoundError(model)
 
   const validatedData = await resolveValidatedSchema(table, 'patch').parseAsync(body)
-  const updatedRecord = await updateRow(table, id, validatedData, event.context.nac || {})
+  const updatedRecord = await nacUpdateRow(table, id, validatedData, event.context.nac || {})
 
   const { realtime } = useRuntimeConfig().autoCrud
   if (realtime) {

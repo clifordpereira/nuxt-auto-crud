@@ -1,7 +1,7 @@
 import { eventHandler, getRouterParams } from 'h3'
 
 import { modelTableMap } from '../../../utils/modelMapper'
-import { getRows } from '../../../utils/queries'
+import { nacGetRows } from '../../../utils/queries'
 
 import { ResourceNotFoundError } from '../../../exceptions'
 
@@ -13,6 +13,6 @@ export default eventHandler(async (event) => {
   const table = modelTableMap[model] as TableWithId
   if (!table) throw new ResourceNotFoundError(model)
 
-  const results = await getRows(table, event.context.nac || {})
+  const results = await nacGetRows(table, event.context.nac || {})
   return results
 })

@@ -50,7 +50,7 @@ function getPublicFields(resource: string) {
 
 /**
  * Selectable fields to give as api response.
- * Used in getRow (/[model]/[id].get.ts) and getRows (/[model]/index.get.ts).
+ * Used in nacGetRow (/[model]/[id].get.ts) and nacGetRows (/[model]/index.get.ts).
  * @param table The table to query.
  * @returns An object of field names and their values
  * result example: { field1: users.id, field2: users.name, }

@@ -1,7 +1,7 @@
 import { eventHandler, getRouterParams } from 'h3'
 
 import { modelTableMap } from '../../../utils/modelMapper'
-import { deleteRow } from '../../../utils/queries'
+import { nacDeleteRow } from '../../../utils/queries'
 import { broadcast } from '../../../utils/sse-bus'
 
 import { ResourceNotFoundError } from '../../../exceptions'
@@ -14,7 +14,7 @@ export default eventHandler(async (event) => {
   const table = modelTableMap[model] as TableWithId
   if (!table) throw new ResourceNotFoundError(model)
 
-  const deletedRecord = await deleteRow(table, id)
+  const deletedRecord = await nacDeleteRow(table, id)
 
   const { realtime } = useRuntimeConfig().autoCrud
   if (realtime) {

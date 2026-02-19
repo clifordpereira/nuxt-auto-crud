@@ -2,7 +2,7 @@ import { eventHandler, getRouterParams, readBody } from 'h3'
 
 import { modelTableMap } from '../../../utils/modelMapper'
 import { resolveValidatedSchema } from '../../../utils/validator'
-import { createRow } from '../../../utils/queries'
+import { nacCreateRow } from '../../../utils/queries'
 import { broadcast } from '../../../utils/sse-bus'
 
 import { ResourceNotFoundError } from '../../../exceptions'
@@ -16,7 +16,7 @@ export default eventHandler(async (event) => {
 
   const validatedData = await resolveValidatedSchema(table, 'insert').parseAsync(body)
 
-  const newRecord = await createRow(table, validatedData, event.context.nac || {})
+  const newRecord = await nacCreateRow(table, validatedData, event.context.nac || {})
 
   const { realtime } = useRuntimeConfig().autoCrud
   if (realtime) {

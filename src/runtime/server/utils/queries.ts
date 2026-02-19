@@ -16,7 +16,7 @@ import { pick } from '#nac/shared/utils/helpers'
  * @param context - The context object containing user ID and permissions.
  * @returns An array of rows from the database.
  */
-export async function getRows(table: TableWithId, context: QueryContext = {}) {
+export async function nacGetRows(table: TableWithId, context: QueryContext = {}) {
   const { userId, permissions } = context
 
   const ownerKey = useRuntimeConfig().autoCrud.auth?.ownerKey || 'createdBy'
@@ -57,7 +57,7 @@ export async function getRows(table: TableWithId, context: QueryContext = {}) {
  * @param context - The context object containing user ID and permissions.
  * @returns The row from the database.
  */
-export async function getRow(table: TableWithId, id: string, context: QueryContext = {}) {
+export async function nacGetRow(table: TableWithId, id: string, context: QueryContext = {}) {
   const selectableFields = getSelectableFields(table, context)
 
   // If record exists in context, we still need to sanitize it before returning
@@ -77,7 +77,7 @@ export async function getRow(table: TableWithId, id: string, context: QueryConte
  * @param data - The data to insert into the table.
  * @param context - The context object containing user ID and permissions.
  */
-export async function createRow(table: Table, data: Record<string, unknown>, context: QueryContext = {}) {
+export async function nacCreateRow(table: Table, data: Record<string, unknown>, context: QueryContext = {}) {
   const ownerKey = useRuntimeConfig().autoCrud.auth?.ownerKey || 'createdBy'
 
   const payload = { ...data }
@@ -107,7 +107,7 @@ export async function createRow(table: Table, data: Record<string, unknown>, con
  * @param data - The data to update in the table.
  * @param context - The context object containing user ID and permissions.
  */
-export async function updateRow(table: TableWithId, id: string, data: Record<string, unknown>, context: QueryContext = {}) {
+export async function nacUpdateRow(table: TableWithId, id: string, data: Record<string, unknown>, context: QueryContext = {}) {
   const targetId = Number(id)
   const payload = { ...data }
 
@@ -135,7 +135,7 @@ export async function updateRow(table: TableWithId, id: string, data: Record<str
  * @param table - The table to query.
  * @param id - The ID of the row to delete.
  */
-export async function deleteRow(table: TableWithId, id: string) {
+export async function nacDeleteRow(table: TableWithId, id: string) {
   const targetId = Number(id)
   const fields = getSelectableFields(table)
 
