@@ -1,4 +1,6 @@
 import { defineEventHandler, getQuery } from 'h3'
+import { useRuntimeConfig } from '#imports'
+
 import { AuthenticationError } from '../exceptions'
 
 export default defineEventHandler(async (event) => {

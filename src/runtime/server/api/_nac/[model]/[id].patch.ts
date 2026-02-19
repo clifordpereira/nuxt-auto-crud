@@ -1,4 +1,5 @@
 import { eventHandler, getRouterParams, readBody } from 'h3'
+import { useRuntimeConfig } from '#imports'
 
 import { modelTableMap } from '../../../utils/modelMapper'
 import { resolveValidatedSchema } from '../../../utils/validator'

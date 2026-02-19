@@ -9,7 +9,7 @@ import * as schema from '#nac/schema'
 import type { Field, SchemaDefinition } from '#nac/shared/utils/types'
 import { NAC_SYSTEM_TABLES } from './constants'
 import { ResourceNotFoundError } from '../exceptions'
-import type { QueryContext } from 'src/runtime/types'
+import type { QueryContext } from '../../types'
 
 type ForeignKey = ReturnType<typeof getTableConfig>['foreignKeys'][number]
 

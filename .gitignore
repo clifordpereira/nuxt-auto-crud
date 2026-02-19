@@ -22,4 +22,11 @@ Thumbs.db
 # Cloud Specifics
 **/.wrangler
 
+# NAC Core specific
+.eslintcache
+*.tsbuildinfo
+
+# Coverage reports for vitest
+**/coverage
+
 playground/.data

@@ -1,4 +1,5 @@
 import { eventHandler, getRouterParams } from 'h3'
+import { useRuntimeConfig } from '#imports'
 
 import { modelTableMap } from '../../../utils/modelMapper'
 import { nacDeleteRow } from '../../../utils/queries'
