@@ -3,14 +3,15 @@ import { $fetch, setup } from '@nuxt/test-utils/e2e'
 import { resolve } from 'node:path'
 import { useRuntimeConfig } from '#imports'
 
-describe('NAC: Public Resources & Auth Guard', async () => {
-  const { nacEndpointPrefix } = useRuntimeConfig().public.autoCrud
+await setup({
+  rootDir: resolve(import.meta.dirname, `../fixtures/authz`),
+  server: true,
+  browser: false,
+  dev: false,
+})
 
-  await setup({
-    rootDir: resolve(import.meta.dirname, `../fixtures/authz`),
-    server: true,
-    browser: false,
-  })
+describe('NAC: Public Resources & Auth Guard', () => {
+  const { nacEndpointPrefix } = useRuntimeConfig().public.autoCrud
 
   it('1) POST & GET: ensures user exists and validates public fields', async () => {
     const payload = {

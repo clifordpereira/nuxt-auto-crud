@@ -34,6 +34,7 @@ export default defineConfig({
           alias: {
             '#imports': r('./test/mocks/imports.ts'),
           },
+          fileParallelism: false,
         },
       },
       await defineVitestProject({
