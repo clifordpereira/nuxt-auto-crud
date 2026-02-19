@@ -1,12 +1,25 @@
 import { describe, it, expect } from 'vitest'
 import { $fetch } from '@nuxt/test-utils/e2e'
+import type { FetchError } from 'ofetch'
+
+interface MetaResource {
+  methods: string[]
+  [key: string]: unknown
+}
+
+interface MetaResponse {
+  architecture: string
+  version: string
+  resources: MetaResource[]
+  [key: string]: unknown
+}
 
 describe('NAC: Meta Discovery & Agentic Guard', () => {
   const metaPath = '/api/_nac/_meta'
   const token = 'test-token'
 
   it('GET: returns valid JSON manifest with query token', async () => {
-    const res: any = await $fetch(metaPath, {
+    const res = await $fetch<MetaResponse>(metaPath, {
       query: { token },
     })
 
@@ -42,18 +55,19 @@ describe('NAC: Meta Discovery & Agentic Guard', () => {
     try {
       await $fetch(metaPath, { query: { token: 'invalid' } })
     }
-    catch (err: any) {
-      expect(err.response?.status).toBe(401)
+    catch (err: unknown) {
+      const e = err as FetchError
+      expect(e.response?.status).toBe(401)
     }
   })
 
   it('GET: ensures resources map standard CRUD methods', async () => {
-    const res: any = await $fetch(metaPath, {
+    const res = await $fetch<MetaResponse>(metaPath, {
       query: { token },
     })
 
     if (res.resources.length > 0) {
-      expect(res.resources[0].methods).toEqual(
+      expect(res.resources[0]!.methods).toEqual(
         expect.arrayContaining(['GET', 'POST', 'PATCH', 'DELETE']),
       )
     }
@@ -63,8 +77,9 @@ describe('NAC: Meta Discovery & Agentic Guard', () => {
     try {
       await $fetch(metaPath, { query: { token: '' } })
     }
-    catch (err: any) {
-      expect(err.status).toBe(401)
+    catch (err: unknown) {
+      const e = err as FetchError
+      expect(e.status).toBe(401)
     }
   })
 
@@ -72,8 +87,9 @@ describe('NAC: Meta Discovery & Agentic Guard', () => {
     try {
       await $fetch(metaPath)
     }
-    catch (err: any) {
-      expect(err.status).toBe(401)
+    catch (err: unknown) {
+      const e = err as FetchError
+      expect(e.status).toBe(401)
     }
   })
 })

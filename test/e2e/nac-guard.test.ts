@@ -11,9 +11,10 @@ describe('NAC: Agentic Guard Security', () => {
       await $fetch(metaPath)
       throw new Error('Should have been blocked')
     }
-    catch (err: any) {
-      expect(err.statusCode).toBe(401)
-      expect(err.statusMessage).toContain('Invalid agentic token')
+    catch (err: unknown) {
+      const error = err as { statusCode: number, statusMessage: string }
+      expect(error.statusCode).toBe(401)
+      expect(error.statusMessage).toContain('Invalid agentic token')
     }
   })
 
@@ -22,13 +23,13 @@ describe('NAC: Agentic Guard Security', () => {
       await $fetch(metaPath, { query: { token: 'malicious_token' } })
       throw new Error('Should have been blocked')
     }
-    catch (err: any) {
-      expect(err.statusCode).toBe(401)
+    catch (err: unknown) {
+      expect((err as { statusCode: number }).statusCode).toBe(401)
     }
   })
 
   it('200: allows agentic path with valid token', async () => {
-    const res: any = await $fetch(metaPath, {
+    const res = await $fetch<{ architecture: string }>(metaPath, {
       query: { token },
     })
 

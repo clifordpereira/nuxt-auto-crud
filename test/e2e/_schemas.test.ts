@@ -1,27 +1,28 @@
 import { describe, it, expect } from 'vitest'
 import { $fetch } from '@nuxt/test-utils/e2e'
 import { useRuntimeConfig } from '#imports'
+import type { SchemaDefinition } from '#nac/shared/utils/types'
 
 describe('NAC: Schema Definition Reflection', async () => {
   const { nacEndpointPrefix } = useRuntimeConfig().public.autoCrud
   const schemaBase = `${nacEndpointPrefix}/_schemas`
 
   it('GET: retrieves users schema with inferred metadata', async () => {
-    const res = await $fetch<any>(`${schemaBase}/users`)
+    const res = await $fetch<SchemaDefinition>(`${schemaBase}/users`)
 
     expect(res.resource).toBe('users')
     expect(res.labelField).toBe('name')
 
     // Check specific field inference
-    const bioField = res.fields.find((f: any) => f.name === 'bio')
-    expect(bioField.type).toBe('textarea') // Inferred from TEXTAREA_HINTS
+    const bioField = res.fields.find(f => f.name === 'bio')
+    expect(bioField?.type).toBe('textarea') // Inferred from TEXTAREA_HINTS
   })
 
   it('GET: respects hidden fields and read-only status', async () => {
-    const res = await $fetch<any>(`${schemaBase}/posts`)
+    const res = await $fetch<SchemaDefinition>(`${schemaBase}/posts`)
 
     // Check system field protection/visibility
-    const idField = res.fields.find((f: any) => f.name === 'id')
+    const idField = res.fields.find(f => f.name === 'id')
     // Assuming 'id' is in formHiddenFields in your nuxt.config.ts
     if (idField) {
       expect(idField.isReadOnly).toBe(true)
@@ -29,16 +30,16 @@ describe('NAC: Schema Definition Reflection', async () => {
   })
 
   it('GET: retrieves posts schema with complex types', async () => {
-    const res = await $fetch<any>(`${schemaBase}/posts`)
+    const res = await $fetch<SchemaDefinition>(`${schemaBase}/posts`)
 
     // Verify Enum detection from status: text(..., { enum: [...] })
-    const statusField = res.fields.find((f: any) => f.name === 'status')
-    expect(statusField.type).toBe('enum')
-    expect(statusField.selectOptions).toEqual(['draft', 'published', 'archived'])
+    const statusField = res.fields.find(f => f.name === 'status')
+    expect(statusField?.type).toBe('enum')
+    expect(statusField?.selectOptions).toEqual(['draft', 'published', 'archived'])
 
     // Verify Relation mapping via categoryId
-    const categoryField = res.fields.find((f: any) => f.name === 'categoryId')
-    expect(categoryField.references).toBe('categories')
+    const categoryField = res.fields.find(f => f.name === 'categoryId')
+    expect(categoryField?.references).toBe('categories')
   })
 
   it('GET: returns 404 for non-existent model schema', async () => {
@@ -46,9 +47,9 @@ describe('NAC: Schema Definition Reflection', async () => {
       await $fetch(`${schemaBase}/ghost_table`)
       throw new Error('Endpoint should have failed')
     }
-    catch (error: any) {
+    catch (error: unknown) {
       // ofetch throws an object containing the response
-      expect(error.response?.status).toBe(404)
+      expect((error as { response?: { status: number } }).response?.status).toBe(404)
     }
   })
 

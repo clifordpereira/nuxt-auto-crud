@@ -7,7 +7,9 @@ import {
 
 describe('SSE Bus Core', () => {
   // Access global state to reset between tests
-  const globalState = globalThis as any
+  const globalState = globalThis as unknown as {
+    _nac_sse_clients: Map<string, { id: string, res: WritableStreamDefaultWriter<Uint8Array> }>
+  }
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -21,7 +23,7 @@ describe('SSE Bus Core', () => {
       write: vi.fn().mockRejectedValue(new Error('Stream Closed')),
     }
 
-    addClient('stale-id', mockWriter as any)
+    addClient('stale-id', mockWriter as unknown as WritableStreamDefaultWriter<Uint8Array>)
 
     // First broadcast triggers the catch block
     await broadcast({ test: true })
@@ -35,8 +37,8 @@ describe('SSE Bus Core', () => {
     const writer2 = { write: vi.fn().mockResolvedValue(undefined) }
     const payload = { msg: 'hello' }
 
-    addClient('c1', writer1 as any)
-    addClient('c2', writer2 as any)
+    addClient('c1', writer1 as unknown as WritableStreamDefaultWriter<Uint8Array>)
+    addClient('c2', writer2 as unknown as WritableStreamDefaultWriter<Uint8Array>)
 
     await broadcast(payload)
 
@@ -54,7 +56,7 @@ describe('SSE Bus Core', () => {
 
   it('manually removes clients', async () => {
     const writer = { write: vi.fn() }
-    addClient('temp-id', writer as any)
+    addClient('temp-id', writer as unknown as WritableStreamDefaultWriter<Uint8Array>)
 
     removeClient('temp-id')
     await broadcast({ msg: 'test' })

@@ -24,9 +24,9 @@ describe('NAC: SSE Smoke Test', () => {
 
       if (response.body) await response.body.cancel()
     }
-    catch (err: any) {
+    catch (err: unknown) {
       // If it's just our manual abort, the test actually passed the connectivity check
-      if (err.name !== 'AbortError') throw err
+      if ((err as Error).name !== 'AbortError') throw err
     }
     finally {
       clearTimeout(timeout)

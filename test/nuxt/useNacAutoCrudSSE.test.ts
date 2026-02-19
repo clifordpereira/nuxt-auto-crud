@@ -12,7 +12,7 @@ it('SSE: triggers callback within Nuxt context', async () => {
   global.EventSource = vi.fn(function (url: string) {
     sourceInstance = new MockEventSource(url)
     return sourceInstance
-  }) as any
+  }) as unknown as typeof EventSource
 
   const component = await mountSuspended({
     setup() {

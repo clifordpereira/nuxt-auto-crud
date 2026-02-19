@@ -19,7 +19,7 @@ describe('NAC: Public Resources & Auth Guard', async () => {
     }
 
     // 1. Check if user exists (Idempotency check)
-    const existing = await $fetch<any[]>(`${nacEndpointPrefix}/users?email=${payload.email}`)
+    const existing = await $fetch<Record<string, unknown>[]>(`${nacEndpointPrefix}/users?email=${payload.email}`)
 
     if (existing.length === 0) {
       // 2. Insert only if missing
@@ -30,10 +30,11 @@ describe('NAC: Public Resources & Auth Guard', async () => {
     }
 
     // 3. Retrieve and Validate
-    const res = await $fetch<any[]>(`${nacEndpointPrefix}/users`)
+    const res = await $fetch<Record<string, unknown>[]>(`${nacEndpointPrefix}/users`)
     const user = res.find(u => u.email === payload.email)
 
     expect(user).toBeDefined()
+    if (!user) throw new Error('User not found')
     const keys = Object.keys(user)
 
     // Verify core visibility rules (Drizzle-Zod / nuxt.config.ts)
@@ -46,16 +47,17 @@ describe('NAC: Public Resources & Auth Guard', async () => {
       await $fetch(`${nacEndpointPrefix}/roles`)
       throw new Error('Should have failed with 401')
     }
-    catch (err: any) {
-      expect(err.status).toBe(401)
-      expect(err.data.message).toBe('Unauthorized')
+    catch (err: unknown) {
+      const error = err as { status: number, data: { message: string } }
+      expect(error.status).toBe(401)
+      expect(error.data.message).toBe('Unauthorized')
     }
   })
 
   it('3) GET: public response strictly respects apiHiddenFields (Security Layering)', async () => {
     // Even if 'password' was accidentally added to publicResources.users,
     // getSelectableFields processes hiddenSet first.
-    const res = await $fetch<any[]>(`${nacEndpointPrefix}/users`)
+    const res = await $fetch<Record<string, unknown>[]>(`${nacEndpointPrefix}/users`)
     const firstUser = res[0]
 
     expect(firstUser).not.toHaveProperty('password')
@@ -65,8 +67,8 @@ describe('NAC: Public Resources & Auth Guard', async () => {
     try {
       await $fetch(`${nacEndpointPrefix}/ghost_table`)
     }
-    catch (err: any) {
-      expect(err.status).toBe(401)
+    catch (err: unknown) {
+      expect((err as { status: number }).status).toBe(401)
     }
   })
 })
