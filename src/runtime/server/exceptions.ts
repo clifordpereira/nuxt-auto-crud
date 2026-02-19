@@ -1,4 +1,4 @@
-import { createError } from '#imports'
+import { createError, type H3Error } from '#imports'
 
 /**
  * Base Auto CRUD Error
@@ -19,7 +19,7 @@ export class AutoCrudError extends Error {
   /**
    * Convert to Nuxt/H3 compatible error
    */
-  toH3() {
+  toH3(): H3Error {
     return createError({
       statusCode: this.statusCode,
       statusMessage: this.message,
