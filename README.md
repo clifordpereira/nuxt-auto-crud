@@ -99,7 +99,7 @@ Enabling `authentication` in the `autoCrud` config protects all **nac** routes (
 
 | Key | Default | Description |
 | --- | --- | --- |
-| `realtime` | `true` | Enables/disables real-time capabilities. |
+| `realtime` | `false` | Enables/disables real-time capabilities. |
 | `auth.authentication` | `true` | Requires a valid session for all NAC routes. |
 | `auth.authorization` | `true` | Enables role/owner-based access checks. |
 | `auth.ownerKey` | `'ownerId'` | The column name used to identify the record creator. |
@@ -111,7 +111,7 @@ Enabling `authentication` in the `autoCrud` config protects all **nac** routes (
 
 ```typescript
 autoCrud: {
-  realtime: true,
+  realtime: false,
   auth: {
     authentication: true,
     authorization: true,
