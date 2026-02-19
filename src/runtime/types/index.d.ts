@@ -9,12 +9,12 @@ declare module '#nac/schema' {
 
 /**
  * Interface for injecting application-level context into the NAC core.
- * Facilitates the transfer of actor metadata, permissions and record fetched,
+ * Facilitates the transfer of actor metadata, resourcePermissions and record fetched,
  * from the application to the nuxt-auto-crud engine.
  */
 export interface QueryContext {
   userId?: number | string | null
-  permissions?: string[] | null
+  resourcePermissions?: string[] | null
   record?: Record<string, unknown> | null
   isPublic?: boolean
 }

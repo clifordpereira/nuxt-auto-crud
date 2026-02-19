@@ -47,17 +47,17 @@ describe('NAC Core Queries - Consolidated Suite', () => {
   describe('nacGetRows()', () => {
     it('applies list permission logic (status OR owner)', async () => {
       vi.mocked(db.all).mockResolvedValue([])
-      await nacGetRows(posts as unknown as TableWithId, { userId: '1', permissions: ['list'] })
+      await nacGetRows(posts as unknown as TableWithId, { userId: '1', resourcePermissions: ['list'] })
       expect(db.where).toHaveBeenCalled()
     })
 
     it('applies list_own permission logic strictly', async () => {
       vi.mocked(db.all).mockResolvedValue([])
-      await nacGetRows(posts as unknown as TableWithId, { userId: '1', permissions: ['list_own'] })
+      await nacGetRows(posts as unknown as TableWithId, { userId: '1', resourcePermissions: ['list_own'] })
       expect(db.where).toHaveBeenCalled()
     })
 
-    it('bypasses filters for admin (no permissions provided)', async () => {
+    it('bypasses filters for admin (no resourcePermissions provided)', async () => {
       vi.mocked(db.all).mockResolvedValue([])
       await nacGetRows(posts as unknown as TableWithId, {})
       expect(db.where).not.toHaveBeenCalled()
@@ -66,7 +66,7 @@ describe('NAC Core Queries - Consolidated Suite', () => {
     it('handles tables missing status/owner columns gracefully', async () => {
       vi.mocked(db.all).mockResolvedValue([])
       // 'users' fixture lacks 'status' column
-      await nacGetRows(users as unknown as TableWithId, { userId: '1', permissions: ['list'] })
+      await nacGetRows(users as unknown as TableWithId, { userId: '1', resourcePermissions: ['list'] })
       expect(db.where).not.toHaveBeenCalled()
     })
 

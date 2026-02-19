@@ -13,11 +13,11 @@ import { pick } from '#nac/shared/utils/helpers'
 /**
  * Fetches rows from the database based on the provided table and context.
  * @param table - The table to query.
- * @param context - The context object containing user ID and permissions.
+ * @param context - The context object containing user ID and resourcePermissions.
  * @returns An array of rows from the database.
  */
 export async function nacGetRows(table: TableWithId, context: QueryContext = {}) {
-  const { userId, permissions } = context
+  const { userId, resourcePermissions } = context
 
   const ownerKey = useRuntimeConfig().autoCrud.auth?.ownerKey || 'createdBy'
   const filters = []
@@ -25,7 +25,7 @@ export async function nacGetRows(table: TableWithId, context: QueryContext = {})
   const ownerCol = table[ownerKey]
   const statusCol = table.status
 
-  if (permissions?.includes('list')) {
+  if (resourcePermissions?.includes('list')) {
     // Narrowing: ensure columns exist before use
     if (statusCol && ownerCol) {
       filters.push(
@@ -39,7 +39,7 @@ export async function nacGetRows(table: TableWithId, context: QueryContext = {})
       filters.push(eq(statusCol, 'active'))
     }
   }
-  else if (permissions?.includes('list_own') && userId && ownerCol) {
+  else if (resourcePermissions?.includes('list_own') && userId && ownerCol) {
     filters.push(eq(ownerCol, Number(userId)))
   }
 
@@ -54,7 +54,7 @@ export async function nacGetRows(table: TableWithId, context: QueryContext = {})
  * Fetches a single row from the database based on the provided table and ID.
  * @param table - The table to query.
  * @param id - The ID of the row to fetch.
- * @param context - The context object containing user ID and permissions.
+ * @param context - The context object containing user ID and resourcePermissions.
  * @returns The row from the database.
  */
 export async function nacGetRow(table: TableWithId, id: string, context: QueryContext = {}) {
@@ -75,7 +75,7 @@ export async function nacGetRow(table: TableWithId, id: string, context: QueryCo
  * Creates a new row in the database based on the provided table and data.
  * @param table - The table to query.
  * @param data - The data to insert into the table.
- * @param context - The context object containing user ID and permissions.
+ * @param context - The context object containing user ID and resourcePermissions.
  */
 export async function nacCreateRow(table: Table, data: Record<string, unknown>, context: QueryContext = {}) {
   const ownerKey = useRuntimeConfig().autoCrud.auth?.ownerKey || 'createdBy'
@@ -105,7 +105,7 @@ export async function nacCreateRow(table: Table, data: Record<string, unknown>, 
  * @param table - The table to query.
  * @param id - The ID of the row to update.
  * @param data - The data to update in the table.
- * @param context - The context object containing user ID and permissions.
+ * @param context - The context object containing user ID and resourcePermissions.
  */
 export async function nacUpdateRow(table: TableWithId, id: string, data: Record<string, unknown>, context: QueryContext = {}) {
   const targetId = Number(id)
