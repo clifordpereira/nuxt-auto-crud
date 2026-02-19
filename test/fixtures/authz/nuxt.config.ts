@@ -15,14 +15,14 @@ export default defineNuxtConfig({
     auth: {
       authentication: true,
       authorization: true,
-      ownerKey: 'ownerId', 
+      ownerKey: 'ownerId',
     },
     publicResources: {
       users: ['id', 'name', 'email', 'samoosa'],
     },
-    apiHiddenFields: ['password'], 
-    agenticToken: '', 
-    formHiddenFields: [], 
+    apiHiddenFields: ['password'],
+    agenticToken: '',
+    formHiddenFields: [],
     nacEndpointPrefix: '/api/_nac',
     schemaPath: 'server/db/schema',
   },
