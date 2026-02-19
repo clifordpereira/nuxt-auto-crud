@@ -10,7 +10,6 @@ export default createConfigForNuxt({
     src: [
       './src',
       './playground',
-      './playground-saas',
       './test/fixtures/basic',
       './test/fixtures/authz',
     ],

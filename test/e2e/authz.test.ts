@@ -7,7 +7,6 @@ await setup({
   rootDir: resolve(import.meta.dirname, `../fixtures/authz`),
   server: true,
   browser: false,
-  dev: false,
 })
 
 describe('NAC: Public Resources & Auth Guard', () => {

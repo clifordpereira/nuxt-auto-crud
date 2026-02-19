@@ -1,18 +1,72 @@
-## nuxt-auto-crud (nac 2.0)
+# nuxt-auto-crud (nac 2.0)
 
 **Zero-Codegen Dynamic RESTful CRUD APIs** derived directly from schemas. It eliminates the need to manually write or generate boilerplate for CRUD operations.
 
 ---
 
-### 🚀 Core Features
+## 🚀 Core Features
 
 * **Zero-Codegen Dynamic RESTful CRUD APIs**: nuxt-auto-crud leverages Drizzle ORM, Zod, Nuxt, and Nitro to eliminate the need for manual CRUD coding.
 * **Single Source of Truth (SSOT)**: Your Drizzle schemas (`schema/db/schema`) define the entire API structure and validation.
 * **Constant Bundle Size**: Since no code is generated, the bundle size remains virtually identical whether you have one table or one hundred (scaling only with your schema definitions).
+---
+
+## Installation Guide
+
+```bash
+bun create nuxt@latest my-app
+npx nuxi module add hub
+bun add drizzle-orm@beta @libsql/client nuxt-auto-crud
+bun add -D drizzle-kit@beta
+
+```
+
+### Configuration
+
+Update `nuxt.config.ts`:
+
+```typescript
+export default defineNuxtConfig({
+  modules: [
+    '@nuxthub/core',
+    'nuxt-auto-crud'
+  ],
+  hub: {
+    db: 'sqlite'
+  }
+})
+
+```
+
+### Schema Definition
+
+Define your schema in `server/database/schema.ts`:
+
+```typescript
+import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
+
+export const users = sqliteTable('users', {
+  id: integer().primaryKey({ autoIncrement: true }),
+  name: text().notNull(),
+  email: text().notNull().unique(),
+  password: text().notNull(),
+  avatar: text().notNull(),
+  createdAt: integer({ mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+})
+
+```
+
+### Initialize and Run
+
+```bash
+npx nuxi generate
+npx nuxi dev
+
+```
 
 ---
 
-### 🌐 Dynamic RESTful CRUD endpoints
+## 🌐 Dynamic RESTful CRUD endpoints
 
 Nb: Endpoints follow the pattern `/api/_nac/:model`.
 
@@ -34,9 +88,9 @@ Nb: Endpoints follow the pattern `/api/_nac/:model`.
 | **Update** | `PATCH` | `/api/_nac/users/1` | Partial update to user `1` |
 | **Delete** | `DELETE` | `/api/_nac/users/1` | User `1` hard deleted from DB |
 
-
 ---
-### 🛠 Frontend Integration APIs
+
+## 🛠 Frontend Integration APIs
 
 In addition to CRUD endpoints, **nac** provides metadata APIs to power dynamic forms and tables in your frontend.
 
@@ -83,19 +137,19 @@ export interface SchemaDefinition {
 ```
 ---
 
-### 🛡 Security & Configuration
+## 🛡 Security & Configuration
 
 Enabling `authentication` in the `autoCrud` config protects all **nac** routes (`/api/_nac/*`), except those explicitly defined in `publicResources`.
 
-#### 🔒 Access Control & Data Safety
+### 🔒 Access Control & Data Safety
 
 * **`apiHiddenFields`**: Globally hides sensitive columns from all API responses. Default: `['password', 'secret', 'token', 'reset_token', 'reset_expires', 'github_id', 'google_id']`.
 * **`formHiddenFields`**: Columns excluded from the frontend schema metadata to prevent user input. Defaults to `apiHiddenFields` plus system-managed fields like `id`, `uuid`, `createdAt`, `updatedAt`, `createdBy`, etc.
-* **Validation Logic**: If a field is in `apiHiddenFields` or does not exist in the schema, it is silently stripped from the response even if listed in `publicResources`.
+* **Response Scrubbing**: If a field is in `apiHiddenFields` or does not exist in the schema, it is silently stripped from the response even if listed in `publicResources`.
 
 ---
 
-#### ⚙️ Configuration Reference
+### ⚙️ Configuration Reference
 
 | Key | Default | Description |
 | --- | --- | --- |
@@ -107,7 +161,7 @@ Enabling `authentication` in the `autoCrud` config protects all **nac** routes (
 | `nacEndpointPrefix` | `'/api/_nac'` | The base path for NAC routes. Access via `useRuntimeConfig().public.autoCrud`. |
 | `schemaPath` | `'server/db/schema'` | Location of your Drizzle schema files. |
 
-#### Example `nuxt.config.ts`
+### Example `nuxt.config.ts`
 
 ```typescript
 autoCrud: {
@@ -129,15 +183,16 @@ autoCrud: {
 
 ```
 
-> **Note**: Modify `nacEndpointPrefix` or `schemaPath` only if the Nuxt/Nitro conventions change or you use a non-standard directory structure.
+> **Note**: Modify `nacEndpointPrefix` or `schemaPath` only if the Nuxt/Nitro conventions change.
 ---
-### 🛡 Filtering & Performance Optimization
 
-#### Automatic Status Filtering
+## 🛡 Filtering & Performance Optimization
+
+### Automatic Status Filtering
 
 To align with standard application behavior, **nac** automatically filters records if a `status` column exists. By default, it will only return **active** records, reducing boilerplate for soft-state management.
 
-#### Ownership & Permissions
+### Ownership & Permissions
 
 While the implementing app handles the authentication layer, **nac** provides a standardized way to enforce record ownership and granular access.
 
@@ -156,15 +211,13 @@ event.context.nac = {
 
 ```
 
-#### Performance: The `record` Context
+### Optimization: Skip Redundant Fetches 
 
-For `UPDATE`, `DELETE`, or `GET` (by ID) operations, **nac** must verify ownership.
+If your middleware has already fetched the record, pass it to `event.context.nac.record` (as shown above). **nac** will use this object instead of executing an additional database query.
 
-* **Standard**: **nac** fetches the record to check the owner ID.
-* **Optimized**: If your middleware has already fetched the record for validation, pass it to `event.context.nac.record`. **nac** will use this object instead of executing an additional database query.
 ---
 
-### 📡 Real-time Synchronization (SSE)
+## 📡 Real-time Synchronization (SSE)
 
 When `realtime` is enabled, all `create`, `update`, and `delete` operations are automatically broadcasted:
 
@@ -180,7 +233,7 @@ if (realtime) {
 
 ```
 
-#### Frontend Usage
+### Frontend Usage
 
 NAC provides a `useNacAutoCrudSSE` composable to listen for these changes in your frontend:
 
@@ -204,6 +257,7 @@ useNacAutoCrudSSE(({ table, action, data: sseData, primaryKey }) => {
 
 ```
 ---
+
 ## ⚠️ Limitations
 **Database Support:** Currently optimized for SQLite/libSQL only.
 
