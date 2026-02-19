@@ -1,4 +1,4 @@
-# nuxt-auto-crud (nac 2.0)
+# nuxt-auto-crud (nac 2.x)
 
 **Zero-Codegen Dynamic RESTful CRUD APIs** derived directly from schemas. It eliminates the need to manually write or generate boilerplate for CRUD operations.
 
