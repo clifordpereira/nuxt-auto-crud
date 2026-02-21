@@ -40,7 +40,7 @@ export default defineNuxtConfig({
 
 ### Schema Definition
 
-Define your schema in `server/database/schema.ts`:
+Define your schema in `server/db/schema.ts`:
 
 ```typescript
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
