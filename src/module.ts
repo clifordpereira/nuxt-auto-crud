@@ -54,23 +54,23 @@ export default defineNuxtModule<ModuleOptions>({
     // 5. Register the Security Guard (Intercepter)
     addServerHandler({
       middleware: true,
-      handler: resolver.resolve('./runtime/server/middleware/nac-guard.ts'),
+      handler: resolver.resolve('./runtime/server/middleware/nac-guard'),
     })
 
     // 6. Register Specific System Endpoints (Targets)
     const apiDir = resolver.resolve('./runtime/server/api/_nac')
     const routes = [
       // Dynamic CRUD Endpoints
-      { path: '/:model', method: 'get', handler: '[model]/index.get.ts' },
-      { path: '/:model', method: 'post', handler: '[model]/index.post.ts' },
-      { path: '/:model/:id', method: 'get', handler: '[model]/[id].get.ts' },
-      { path: '/:model/:id', method: 'patch', handler: '[model]/[id].patch.ts' },
-      { path: '/:model/:id', method: 'delete', handler: '[model]/[id].delete.ts' },
+      { path: '/:model', method: 'get', handler: '[model]/index.get' },
+      { path: '/:model', method: 'post', handler: '[model]/index.post' },
+      { path: '/:model/:id', method: 'get', handler: '[model]/[id].get' },
+      { path: '/:model/:id', method: 'patch', handler: '[model]/[id].patch' },
+      { path: '/:model/:id', method: 'delete', handler: '[model]/[id].delete' },
       // System Endpoints
-      { path: '/_schemas', method: 'get', handler: '_schemas/index.get.ts' },
-      { path: '/_schemas/:model', method: 'get', handler: '_schemas/[model].get.ts' },
-      { path: '/_meta', method: 'get', handler: '_meta.get.ts' },
-      { path: '/_sse', method: 'get', handler: '_sse.get.ts' },
+      { path: '/_schemas', method: 'get', handler: '_schemas/index.get' },
+      { path: '/_schemas/:model', method: 'get', handler: '_schemas/[model].get' },
+      { path: '/_meta', method: 'get', handler: '_meta.get' },
+      { path: '/_sse', method: 'get', handler: '_sse.get' },
     ] as const
 
     for (const route of routes) {
