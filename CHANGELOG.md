@@ -1,3 +1,19 @@
+## v2.1.1
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v2.1.0...v2.1.1)
+
+### 🩹 Fixes
+
+- Remove '.ts' extension from server handler in module.ts ([3025e6c](https://github.com/clifordpereira/nuxt-auto-crud/commit/3025e6c))
+
+### 🏡 Chore
+
+- Remove unnecessary files ([5862bca](https://github.com/clifordpereira/nuxt-auto-crud/commit/5862bca))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v2.1.0
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v1.31.0...v2.1.0)
