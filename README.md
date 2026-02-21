@@ -59,8 +59,8 @@ export const users = sqliteTable('users', {
 ### Initialize and Run
 
 ```bash
-npx nuxi generate
-npx nuxi dev
+nuxi db generate
+nuxi dev
 
 ```
 
