@@ -63,6 +63,7 @@ nuxi db generate
 nuxi dev
 
 ```
+> If you encounter `Error: Cannot find module 'typescript'`, run `bun add -D typescript`.
 
 ---
 
