@@ -56,7 +56,7 @@ export const users = sqliteTable('users', {
 
 ```
 
-### Initialize and Run
+### Generate Migrations and Start Dev Server
 
 ```bash
 nuxi db generate
