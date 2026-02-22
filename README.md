@@ -59,8 +59,8 @@ export const users = sqliteTable('users', {
 ### Generate Migrations and Start Dev Server
 
 ```bash
-nuxi db generate
-nuxi dev
+nuxt db generate
+nuxt dev
 
 ```
 > If you encounter `Error: Cannot find module 'typescript'`, run `bun add -D typescript`.
