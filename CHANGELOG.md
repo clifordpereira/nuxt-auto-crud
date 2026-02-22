@@ -1,3 +1,15 @@
+## v2.1.3
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v2.1.2...v2.1.3)
+
+### 🩹 Fixes
+
+- Update db generate command ([bd1a2ec](https://github.com/clifordpereira/nuxt-auto-crud/commit/bd1a2ec))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v2.1.2
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v2.1.1...v2.1.2)
