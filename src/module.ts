@@ -13,6 +13,7 @@ export default defineNuxtModule<ModuleOptions>({
   },
   defaults: {
     // Private config
+    statusFiltering: true,
     realtime: false,
     auth: {
       authentication: false,

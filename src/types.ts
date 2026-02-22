@@ -1,5 +1,6 @@
 export interface ModuleOptions {
   // Private config
+  statusFiltering: boolean
   realtime: boolean
   schemaPath: string
   auth: {
