@@ -73,7 +73,7 @@ Nb: Endpoints follow the pattern `/api/_nac/:model`.
 
 | Method | Endpoint | Action |
 | --- | --- | --- |
-| **GET** | `/:model` | List records (supports filtering & pagination) |
+| **GET** | `/:model` | List records |
 | **POST** | `/:model` | Create record with Zod validation |
 | **GET** | `/:model/:id` | Fetch single record |
 | **PATCH** | `/:model/:id` | Partial update with validation |
@@ -83,7 +83,7 @@ Nb: Endpoints follow the pattern `/api/_nac/:model`.
 
 | Action | HTTP Method | Endpoint | Example Result |
 | --- | --- | --- | --- |
-| **Fetch All** | `GET` | `/api/_nac/users` | List of all users (paginated) |
+| **Fetch All** | `GET` | `/api/_nac/users` | List of all users |
 | **Create** | `POST` | `/api/_nac/users` | New user record added |
 | **Fetch One** | `GET` | `/api/_nac/users/1` | Details of user with `id: 1` |
 | **Update** | `PATCH` | `/api/_nac/users/1` | Partial update to user `1` |
@@ -157,7 +157,7 @@ Enabling `authentication` in the `autoCrud` config protects all **nac** routes (
 | `realtime` | `false` | Enables/disables real-time capabilities. |
 | `auth.authentication` | `true` | Requires a valid session for all NAC routes. |
 | `auth.authorization` | `true` | Enables role/owner-based access checks. |
-| `auth.ownerKey` | `'ownerId'` | The column name used to identify the record creator. |
+| `auth.ownerKey` | `'createdBy'` | The column name used to identify the record creator. |
 | `publicResources` | `{}` | Defines tables and specific columns accessible without auth. |
 | `nacEndpointPrefix` | `'/api/_nac'` | The base path for NAC routes. Access via `useRuntimeConfig().public.autoCrud`. |
 | `schemaPath` | `'server/db/schema'` | Location of your Drizzle schema files. |
@@ -170,7 +170,7 @@ autoCrud: {
   auth: {
     authentication: true,
     authorization: true,
-    ownerKey: 'ownerId', 
+    ownerKey: 'createdBy', 
   },
   publicResources: {
     users: ['id', 'name', 'email'],
@@ -195,7 +195,7 @@ To align with standard application behavior, **nac** automatically filters recor
 
 ### Ownership & Permissions
 
-While the implementing app handles the authentication layer, **nac** provides a standardized way to enforce record ownership and granular access.
+While the implementing app handles the authentication & authorization layer, **nac** provides a standardized way to enforce record ownership and granular access.
 
 If your middleware populates `event.context.nac` with `resourcePermissions`, **nac** automatically injects the necessary SQL filters.
 
