@@ -13,6 +13,13 @@
 
 ## Installation Guide
 
+### Option A: Starter Template
+```bash
+npx nuxi init -t gh:clifordpereira/nac-starter my-app
+```
+
+### Option B: Manual Installation
+
 ```bash
 bun create nuxt@latest my-app
 npx nuxi module add hub
@@ -21,7 +28,7 @@ bun add -D drizzle-kit@beta
 
 ```
 
-### Configuration
+#### Configuration
 
 Update `nuxt.config.ts`:
 
@@ -38,7 +45,7 @@ export default defineNuxtConfig({
 
 ```
 
-### Schema Definition
+#### Schema Definition
 
 Define your schema in `server/db/schema.ts`:
 
@@ -59,6 +66,7 @@ export const users = sqliteTable('users', {
 ### Generate Migrations and Start Dev Server
 
 ```bash
+cd my-app
 nuxt db generate
 nuxt dev
 
