@@ -64,6 +64,7 @@ export const users = sqliteTable('users', {
 ```
 
 ### Generate Migrations and Start Dev Server
+After installing (either option), run the following commands:
 
 ```bash
 cd my-app
