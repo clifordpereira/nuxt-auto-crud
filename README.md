@@ -72,7 +72,7 @@ nuxt db generate
 nuxt dev
 
 ```
-> If you encounter `Error: Cannot find module 'typescript'`, run `bun add -D typescript`.
+> If you encounter `Error: Cannot find module 'typescript'`, install it using `bun add -D typescript`.
 
 ---
 
