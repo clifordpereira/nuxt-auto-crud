@@ -76,7 +76,7 @@ nuxt dev
 
 ---
 
-## 🌐 Dynamic RESTful CRUD endpoints
+## 🌐 Exposed Dynamic RESTful CRUD endpoints
 
 Nb: Endpoints follow the pattern `/api/_nac/:model`.
 
