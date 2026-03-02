@@ -68,7 +68,7 @@ function hasAnyListPermissions(context: QueryContext = {}) {
  */
 export async function nacGetRows(table: TableWithId, context: QueryContext = {}) {
   const isAuthorizationEnabled = useRuntimeConfig().autoCrud.auth?.authorization
-  if (isAuthorizationEnabled && !hasAnyListPermissions(context)) {
+  if (isAuthorizationEnabled && !context.isPublic && !hasAnyListPermissions(context)) {
     throw new UnauthorizedAccessError()
   }
 
