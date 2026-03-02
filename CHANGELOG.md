@@ -1,3 +1,20 @@
+## v2.2.0
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v2.1.4...v2.2.0)
+
+### 🚀 Enhancements
+
+- Add status column filtering ([ac726dd](https://github.com/clifordpereira/nuxt-auto-crud/commit/ac726dd))
+
+### 🩹 Fixes
+
+- Lint errors ([777ea94](https://github.com/clifordpereira/nuxt-auto-crud/commit/777ea94))
+- Authz logic in nacGetRows ([2feee45](https://github.com/clifordpereira/nuxt-auto-crud/commit/2feee45))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v2.1.4
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v2.1.3...v2.1.4)
