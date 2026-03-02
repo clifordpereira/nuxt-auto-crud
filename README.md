@@ -163,6 +163,7 @@ Enabling `authentication` in the `autoCrud` config protects all **nac** routes (
 
 | Key | Default | Description |
 | --- | --- | --- |
+| `statusFiltering` | `false` | Enables/disables automatic filtering of records based on the `status` column. |
 | `realtime` | `false` | Enables/disables real-time capabilities. |
 | `auth.authentication` | `true` | Requires a valid session for all NAC routes. |
 | `auth.authorization` | `true` | Enables role/owner-based access checks. |
@@ -175,6 +176,7 @@ Enabling `authentication` in the `autoCrud` config protects all **nac** routes (
 
 ```typescript
 autoCrud: {
+  statusFiltering: false,
   realtime: false,
   auth: {
     authentication: true,
@@ -200,7 +202,7 @@ autoCrud: {
 
 ### Automatic Status Filtering
 
-To align with standard application behavior, **nac** automatically filters records if a `status` column exists. By default, it will only return **active** records, reducing boilerplate for soft-state management.
+If `statusFiltering` is enabled, **nac** applies global visibility constraints. When a status column exists, queries are automatically restricted to `active` records. This logic integrates with the authorization layer, allowing users to see their own records (regardless of status) if they possess the `list_active` permission.
 
 ### Ownership & Permissions
 
@@ -209,7 +211,9 @@ While the implementing app handles the authentication & authorization layer, **n
 If your middleware populates `event.context.nac` with `resourcePermissions`, **nac** automatically injects the necessary SQL filters.
 
 **Example: Restricting users to their own records**
-If the permissions array includes `'list_own'`, **nac** appends a filter where `ownerCol === userId`.
+If the permissions array includes `'list_own'`, **nac** appends a filter where `ownerKey` (defaulting to `createdBy`) matches the `userId`.
+
+If `list_active` is present, it applies a hybrid OR logic: users can see all active records OR any record they own, regardless of its status.
 
 ```typescript
 // Example: Setting context in your Auth Middleware

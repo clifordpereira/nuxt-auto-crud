@@ -1,4 +1,5 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest'
+import { useRuntimeConfig } from '#imports'
 
 // 2. IMPORTS
 import { nacGetRows, nacGetRow, nacCreateRow, nacUpdateRow, nacDeleteRow } from '../../src/runtime/server/utils/queries'
@@ -46,8 +47,28 @@ describe('NAC Core Queries - Consolidated Suite', () => {
 
   describe('nacGetRows()', () => {
     it('applies list permission logic (status OR owner)', async () => {
+      // 1. Ensure Config is ON
+      vi.mocked(useRuntimeConfig).mockReturnValue({
+        autoCrud: {
+          statusFiltering: true,
+          auth: { authorization: true, ownerKey: 'createdBy' }
+        }
+      } as any)
+
+      // 2. Ensure Table has the required columns for the logic to trigger
+      const mockPosts = {
+        ...posts,
+        status: { name: 'status' },
+        createdBy: { name: 'createdBy' }
+      }
+
       vi.mocked(db.all).mockResolvedValue([])
-      await nacGetRows(posts as unknown as TableWithId, { userId: '1', resourcePermissions: ['list'] })
+      
+      await nacGetRows(mockPosts as unknown as TableWithId, { 
+        userId: '1', 
+        resourcePermissions: ['list_active'] 
+      })
+
       expect(db.where).toHaveBeenCalled()
     })
 
@@ -58,6 +79,11 @@ describe('NAC Core Queries - Consolidated Suite', () => {
     })
 
     it('bypasses filters for admin (no resourcePermissions provided)', async () => {
+      // Explicitly disable features to test "Admin/Default" bypass
+      vi.mocked(useRuntimeConfig).mockReturnValue({
+        autoCrud: { statusFiltering: false, auth: { authorization: false } }
+      } as any)
+
       vi.mocked(db.all).mockResolvedValue([])
       await nacGetRows(posts as unknown as TableWithId, {})
       expect(db.where).not.toHaveBeenCalled()
@@ -66,11 +92,16 @@ describe('NAC Core Queries - Consolidated Suite', () => {
     it('handles tables missing status/owner columns gracefully', async () => {
       vi.mocked(db.all).mockResolvedValue([])
       // 'users' fixture lacks 'status' column
-      await nacGetRows(users as unknown as TableWithId, { userId: '1', resourcePermissions: ['list'] })
+      await nacGetRows(users as unknown as TableWithId, { userId: '1', resourcePermissions: ['list_active'] })
       expect(db.where).not.toHaveBeenCalled()
     })
 
     it('ensures descending ID order is always applied', async () => {
+      // Use default config
+      vi.mocked(useRuntimeConfig).mockReturnValue({
+        autoCrud: { statusFiltering: false, auth: { authorization: false } }
+      } as any)
+
       vi.mocked(db.all).mockResolvedValue([])
       await nacGetRows(posts as unknown as TableWithId)
       expect(db.orderBy).toHaveBeenCalled()
@@ -142,7 +173,6 @@ describe('NAC Core Queries - Consolidated Suite', () => {
     })
 
     it('respects runtimeConfig ownerKey override', async () => {
-      const { useRuntimeConfig } = await import('#imports')
       vi.mocked(useRuntimeConfig).mockReturnValueOnce({ autoCrud: { auth: { ownerKey: 'authorId' } } } as unknown as ReturnType<typeof useRuntimeConfig>)
       vi.mocked(db.get).mockResolvedValue({ id: 1 })
 

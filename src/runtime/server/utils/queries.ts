@@ -4,11 +4,61 @@ import { type Table, eq, desc, and, or, getColumns } from 'drizzle-orm'
 
 import { getSelectableFields } from './modelMapper'
 
-import { DeletionFailedError, InsertionFailedError, RecordNotFoundError, UpdateFailedError } from '../exceptions'
+import { DeletionFailedError, InsertionFailedError, RecordNotFoundError, UnauthorizedAccessError, UpdateFailedError } from '../exceptions'
 
 import type { QueryContext } from '../../types'
 import type { TableWithId } from '../types'
 import { pick } from '#nac/shared/utils/helpers'
+
+
+export function getVisibilityFilters(table: TableWithId, context: QueryContext = {}) {
+  const isAuthorizationEnabled = useRuntimeConfig().autoCrud.auth?.authorization
+  const isStatusFilteringEnabled = useRuntimeConfig().autoCrud.statusFiltering
+
+  if (!isAuthorizationEnabled && !isStatusFilteringEnabled) return []
+
+  const { userId, resourcePermissions = [] } = context
+
+  // 1. Full Access Bypass
+  if (isAuthorizationEnabled && resourcePermissions?.includes('list_all')) return []
+
+  const ownerKey = useRuntimeConfig().autoCrud.auth?.ownerKey || 'createdBy'
+  const ownerCol = table[ownerKey]
+  const statusCol = table.status
+  const filters = []
+
+  // 2. Hybrid Logic (Auth + Status)
+  if (isAuthorizationEnabled && isStatusFilteringEnabled) {
+    if (resourcePermissions?.includes('list_active')) {
+      if (statusCol && ownerCol && userId != null) {
+        filters.push(or(eq(statusCol, 'active'), eq(ownerCol, Number(userId))))
+      } else if (statusCol) {
+        filters.push(eq(statusCol, 'active'))
+      }
+    } 
+    else if (resourcePermissions?.includes('list_own') && ownerCol && userId != null) {
+      filters.push(eq(ownerCol, Number(userId)))
+    }
+  } 
+  // 3. Status Only Logic
+  else if (isStatusFilteringEnabled) {
+    if (statusCol) filters.push(eq(statusCol, 'active'))
+  } 
+  // 4. Authorization Only Logic
+  else if (isAuthorizationEnabled) {
+    if (resourcePermissions?.includes('list_own') && ownerCol && userId != null) {
+      filters.push(eq(ownerCol, Number(userId)))
+    }
+  }
+
+  return filters
+}
+
+// helper used in nacGetRows
+function hasAnyListPermissions(context: QueryContext = {}) {
+  const { resourcePermissions = [] } = context
+  return resourcePermissions?.includes('list_all') || resourcePermissions?.includes('list_active') || resourcePermissions?.includes('list_own')
+}
 
 /**
  * Fetches rows from the database based on the provided table and context.
@@ -17,34 +67,15 @@ import { pick } from '#nac/shared/utils/helpers'
  * @returns An array of rows from the database.
  */
 export async function nacGetRows(table: TableWithId, context: QueryContext = {}) {
-  const { userId, resourcePermissions } = context
-
-  const ownerKey = useRuntimeConfig().autoCrud.auth?.ownerKey || 'createdBy'
-  const filters = []
-
-  const ownerCol = table[ownerKey]
-  const statusCol = table.status
-
-  if (resourcePermissions?.includes('list')) {
-    // Narrowing: ensure columns exist before use
-    if (statusCol && ownerCol) {
-      filters.push(
-        or(
-          eq(statusCol, 'active'),
-          eq(ownerCol, Number(userId)),
-        ),
-      )
-    }
-    else if (statusCol) {
-      filters.push(eq(statusCol, 'active'))
-    }
-  }
-  else if (resourcePermissions?.includes('list_own') && userId && ownerCol) {
-    filters.push(eq(ownerCol, Number(userId)))
+  const isAuthorizationEnabled = useRuntimeConfig().autoCrud.auth?.authorization
+  if (isAuthorizationEnabled && !hasAnyListPermissions(context)) {
+    throw new UnauthorizedAccessError()
   }
 
   const fields = getSelectableFields(table, context)
   let query = db.select(fields).from(table).$dynamic()
+
+  const filters = getVisibilityFilters(table, context)
   if (filters.length > 0) query = query.where(and(...filters))
 
   return await query.orderBy(desc(table.id)).all()

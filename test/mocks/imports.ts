@@ -2,8 +2,12 @@ import { vi } from 'vitest'
 
 export const useRuntimeConfig = vi.fn(() => ({
   autoCrud: {
+    statusFiltering: false,
+    auth: {
+      authorization: false,
+      ownerKey: 'createdBy'
+    },
     apiHiddenFields: ['deletedAt'],
-    auth: { ownerKey: 'createdBy' },
   },
   public: {
     autoCrud: {
