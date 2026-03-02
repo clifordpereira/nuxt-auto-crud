@@ -10,7 +10,6 @@ import type { QueryContext } from '../../types'
 import type { TableWithId } from '../types'
 import { pick } from '#nac/shared/utils/helpers'
 
-
 export function getVisibilityFilters(table: TableWithId, context: QueryContext = {}) {
   const isAuthorizationEnabled = useRuntimeConfig().autoCrud.auth?.authorization
   const isStatusFilteringEnabled = useRuntimeConfig().autoCrud.statusFiltering
@@ -32,18 +31,19 @@ export function getVisibilityFilters(table: TableWithId, context: QueryContext =
     if (resourcePermissions?.includes('list_active')) {
       if (statusCol && ownerCol && userId != null) {
         filters.push(or(eq(statusCol, 'active'), eq(ownerCol, Number(userId))))
-      } else if (statusCol) {
+      }
+      else if (statusCol) {
         filters.push(eq(statusCol, 'active'))
       }
-    } 
+    }
     else if (resourcePermissions?.includes('list_own') && ownerCol && userId != null) {
       filters.push(eq(ownerCol, Number(userId)))
     }
-  } 
+  }
   // 3. Status Only Logic
   else if (isStatusFilteringEnabled) {
     if (statusCol) filters.push(eq(statusCol, 'active'))
-  } 
+  }
   // 4. Authorization Only Logic
   else if (isAuthorizationEnabled) {
     if (resourcePermissions?.includes('list_own') && ownerCol && userId != null) {

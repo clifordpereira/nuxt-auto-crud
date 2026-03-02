@@ -5,7 +5,7 @@ export const useRuntimeConfig = vi.fn(() => ({
     statusFiltering: false,
     auth: {
       authorization: false,
-      ownerKey: 'createdBy'
+      ownerKey: 'createdBy',
     },
     apiHiddenFields: ['deletedAt'],
   },

@@ -51,22 +51,22 @@ describe('NAC Core Queries - Consolidated Suite', () => {
       vi.mocked(useRuntimeConfig).mockReturnValue({
         autoCrud: {
           statusFiltering: true,
-          auth: { authorization: true, ownerKey: 'createdBy' }
-        }
-      } as any)
+          auth: { authorization: true, ownerKey: 'createdBy' },
+        },
+      } as unknown as ReturnType<typeof useRuntimeConfig>)
 
       // 2. Ensure Table has the required columns for the logic to trigger
       const mockPosts = {
         ...posts,
         status: { name: 'status' },
-        createdBy: { name: 'createdBy' }
+        createdBy: { name: 'createdBy' },
       }
 
       vi.mocked(db.all).mockResolvedValue([])
-      
-      await nacGetRows(mockPosts as unknown as TableWithId, { 
-        userId: '1', 
-        resourcePermissions: ['list_active'] 
+
+      await nacGetRows(mockPosts as unknown as TableWithId, {
+        userId: '1',
+        resourcePermissions: ['list_active'],
       })
 
       expect(db.where).toHaveBeenCalled()
@@ -81,8 +81,8 @@ describe('NAC Core Queries - Consolidated Suite', () => {
     it('bypasses filters for admin (no resourcePermissions provided)', async () => {
       // Explicitly disable features to test "Admin/Default" bypass
       vi.mocked(useRuntimeConfig).mockReturnValue({
-        autoCrud: { statusFiltering: false, auth: { authorization: false } }
-      } as any)
+        autoCrud: { statusFiltering: false, auth: { authorization: false } },
+      } as unknown as ReturnType<typeof useRuntimeConfig>)
 
       vi.mocked(db.all).mockResolvedValue([])
       await nacGetRows(posts as unknown as TableWithId, {})
@@ -99,8 +99,8 @@ describe('NAC Core Queries - Consolidated Suite', () => {
     it('ensures descending ID order is always applied', async () => {
       // Use default config
       vi.mocked(useRuntimeConfig).mockReturnValue({
-        autoCrud: { statusFiltering: false, auth: { authorization: false } }
-      } as any)
+        autoCrud: { statusFiltering: false, auth: { authorization: false } },
+      } as unknown as ReturnType<typeof useRuntimeConfig>)
 
       vi.mocked(db.all).mockResolvedValue([])
       await nacGetRows(posts as unknown as TableWithId)

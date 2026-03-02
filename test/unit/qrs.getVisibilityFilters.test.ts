@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { useRuntimeConfig } from '#imports'
+import type { TableWithId } from '../../src/runtime/server/types'
 import { getVisibilityFilters, nacGetRows } from '../../src/runtime/server/utils/queries'
 
 // Mock table structure
@@ -8,8 +9,8 @@ const mockTable = {
   status: { name: 'status' },
   createdBy: { name: 'createdBy' },
   // Drizzle internal key needed for some helpers
-  _: { name: 'posts' } 
-} as any
+  _: { name: 'posts' },
+} as unknown as TableWithId
 
 describe('getVisibilityFilters()', () => {
   beforeEach(() => {
@@ -18,8 +19,8 @@ describe('getVisibilityFilters()', () => {
 
   it('should return empty array when all features are disabled', () => {
     vi.mocked(useRuntimeConfig).mockReturnValue({
-      autoCrud: { statusFiltering: false, auth: { authorization: false } }
-    } as any)
+      autoCrud: { statusFiltering: false, auth: { authorization: false } },
+    } as unknown as ReturnType<typeof useRuntimeConfig>)
 
     const result = getVisibilityFilters(mockTable, {})
     expect(result).toEqual([])
@@ -27,19 +28,19 @@ describe('getVisibilityFilters()', () => {
 
   it('should allow everything for list_all permission', () => {
     vi.mocked(useRuntimeConfig).mockReturnValue({
-      autoCrud: { statusFiltering: true, auth: { authorization: true } }
-    } as any)
+      autoCrud: { statusFiltering: true, auth: { authorization: true } },
+    } as unknown as ReturnType<typeof useRuntimeConfig>)
 
-    const result = getVisibilityFilters(mockTable, { 
-      resourcePermissions: ['list_all'] 
+    const result = getVisibilityFilters(mockTable, {
+      resourcePermissions: ['list_all'],
     })
     expect(result).toEqual([])
   })
 
   it('should enforce status=active when statusFiltering is on but auth is off', () => {
     vi.mocked(useRuntimeConfig).mockReturnValue({
-      autoCrud: { statusFiltering: true, auth: { authorization: false } }
-    } as any)
+      autoCrud: { statusFiltering: true, auth: { authorization: false } },
+    } as unknown as ReturnType<typeof useRuntimeConfig>)
 
     const result = getVisibilityFilters(mockTable, {})
     // Using Drizzle equality check
@@ -49,15 +50,15 @@ describe('getVisibilityFilters()', () => {
 
   it('should apply hybrid filter (active OR own) for list_active permission', () => {
     vi.mocked(useRuntimeConfig).mockReturnValue({
-      autoCrud: { 
-        statusFiltering: true, 
-        auth: { authorization: true, ownerKey: 'createdBy' } 
-      }
-    } as any)
+      autoCrud: {
+        statusFiltering: true,
+        auth: { authorization: true, ownerKey: 'createdBy' },
+      },
+    } as unknown as ReturnType<typeof useRuntimeConfig>)
 
     const result = getVisibilityFilters(mockTable, {
       userId: 123,
-      resourcePermissions: ['list_active']
+      resourcePermissions: ['list_active'],
     })
 
     const filterString = JSON.stringify(result[0])
@@ -67,8 +68,8 @@ describe('getVisibilityFilters()', () => {
 
   it('should return empty filters if auth enabled but no permissions match', () => {
     vi.mocked(useRuntimeConfig).mockReturnValue({
-      autoCrud: { auth: { authorization: true }, statusFiltering: false }
-    } as any)
+      autoCrud: { auth: { authorization: true }, statusFiltering: false },
+    } as unknown as ReturnType<typeof useRuntimeConfig>)
 
     const result = getVisibilityFilters(mockTable, { resourcePermissions: [] })
     expect(result).toEqual([])
@@ -78,12 +79,12 @@ describe('getVisibilityFilters()', () => {
 describe('nacGetRows()', () => {
   it('should throw 403 when authorization is enabled but no list permissions exist', async () => {
     vi.mocked(useRuntimeConfig).mockReturnValue({
-      autoCrud: { auth: { authorization: true } }
-    } as any)
+      autoCrud: { auth: { authorization: true } },
+    } as unknown as ReturnType<typeof useRuntimeConfig>)
 
     // context with empty permissions
     const context = { resourcePermissions: [] }
-    
+
     await expect(nacGetRows(mockTable, context))
       .rejects.toThrowError(expect.objectContaining({ statusCode: 403 }))
   })
