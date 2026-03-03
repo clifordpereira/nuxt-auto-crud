@@ -11,11 +11,23 @@
 * **Constant Bundle Size**: Since no code is generated, the bundle size remains virtually identical whether you have one table or one hundred (scaling only with your schema definitions).
 ---
 
+## Supported Databases
+* **SQLite (libSQL)**
+* **MySQL**
+
+---
+
 ## Installation Guide
 
 ### Option A: Starter Template
+#### SQLite
 ```bash
 npx nuxi init -t gh:clifordpereira/nac-starter my-app
+```
+
+#### MySQL
+```bash
+npx nuxi init -t gh:clifordpereira/nac-starter-mysql my-app
 ```
 
 ### Option B: Manual Installation
@@ -27,6 +39,7 @@ bun add drizzle-orm@beta @libsql/client nuxt-auto-crud
 bun add -D drizzle-kit@beta
 
 ```
+> Mysql users may replace `@libsql/client` with `mysql2`
 
 #### Configuration
 
@@ -40,12 +53,13 @@ export default defineNuxtConfig({
   ],
   hub: {
     db: 'sqlite'
+    // db: 'mysql'
   }
 })
 
 ```
 
-#### Schema Definition
+#### Schema Definition (SQLite)
 
 Define your schema in `server/db/schema.ts`:
 
@@ -59,6 +73,24 @@ export const users = sqliteTable('users', {
   password: text().notNull(),
   avatar: text().notNull(),
   createdAt: integer({ mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+})
+
+```
+
+#### Schema Definition (MySQL)
+
+Define your schema in `server/db/schema.ts`:
+
+```typescript
+import { mysqlTable, text, serial, timestamp } from 'drizzle-orm/mysql-core'
+
+export const users = mysqlTable('users', {
+  id: serial().primaryKey(),
+  name: text().notNull(),
+  email: text().notNull().unique(),
+  password: text().notNull(),
+  avatar: text().notNull(),
+  createdAt: timestamp().notNull().defaultNow(),
 })
 
 ```
@@ -86,7 +118,7 @@ Nb: Endpoints follow the pattern `/api/_nac/:model`.
 | **POST** | `/:model` | Create record with Zod validation |
 | **GET** | `/:model/:id` | Fetch single record |
 | **PATCH** | `/:model/:id` | Partial update with validation |
-| **DELETE** | `/:model/:id` | Hard delete |
+| **DELETE** | `/:model/:id` | Delete record |
 
 
 **Example (`users` table):** 
@@ -97,7 +129,7 @@ Nb: Endpoints follow the pattern `/api/_nac/:model`.
 | **Create** | `POST` | `/api/_nac/users` | New user record added |
 | **Fetch One** | `GET` | `/api/_nac/users/1` | Details of user with `id: 1` |
 | **Update** | `PATCH` | `/api/_nac/users/1` | Partial update to user `1` |
-| **Delete** | `DELETE` | `/api/_nac/users/1` | User `1` hard deleted from DB |
+| **Delete** | `DELETE` | `/api/_nac/users/1` | User `1` removed from DB |
 
 ---
 
@@ -107,6 +139,7 @@ In addition to CRUD endpoints, **nac** provides metadata APIs to power dynamic f
 
 * **List Resources**: `GET /api/_nac/_schemas` returns all tables (excluding system-protected tables).
 * **Resource Metadata**: `GET /api/_nac/_schemas/:resource` returns the field definitions, validation rules, and relationship data for a specific table.
+* **Agentic Discovery**: `GET /api/_nac/_meta?format=md` returns a markdown manifest for LLM context injection.
 
 ---
 
@@ -166,8 +199,8 @@ Enabling `authentication` in the `autoCrud` config protects all **nac** routes (
 | --- | --- | --- |
 | `statusFiltering` | `false` | Enables/disables automatic filtering of records based on the `status` column. |
 | `realtime` | `false` | Enables/disables real-time capabilities. |
-| `auth.authentication` | `true` | Requires a valid session for all NAC routes. |
-| `auth.authorization` | `true` | Enables role/owner-based access checks. |
+| `auth.authentication` | `false` | Requires a valid session for all NAC routes. |
+| `auth.authorization` | `false` | Enables role/owner-based access checks. |
 | `auth.ownerKey` | `'createdBy'` | The column name used to identify the record creator. |
 | `publicResources` | `{}` | Defines tables and specific columns accessible without auth. |
 | `nacEndpointPrefix` | `'/api/_nac'` | The base path for NAC routes. Access via `useRuntimeConfig().public.autoCrud`. |
@@ -180,8 +213,8 @@ autoCrud: {
   statusFiltering: false,
   realtime: false,
   auth: {
-    authentication: true,
-    authorization: true,
+    authentication: false,
+    authorization: false,
     ownerKey: 'createdBy', 
   },
   publicResources: {
@@ -273,7 +306,6 @@ useNacAutoCrudSSE(({ table, action, data: sseData, primaryKey }) => {
 ```
 ---
 
-## ⚠️ Limitations
-**Database Support:** Currently optimized for SQLite/libSQL only.
+
 
 ---
