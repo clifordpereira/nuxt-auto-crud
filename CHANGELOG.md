@@ -1,3 +1,15 @@
+## v2.3.0
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v2.2.0...v2.3.0)
+
+### 🚀 Enhancements
+
+- Add mysql support ([874efc1](https://github.com/clifordpereira/nuxt-auto-crud/commit/874efc1))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v2.2.0
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v2.1.4...v2.2.0)
