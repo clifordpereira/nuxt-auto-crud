@@ -1,5 +1,5 @@
 import { useRuntimeConfig } from '#imports'
-import { db } from '@nuxthub/db'
+import { db, type NuxtHubRuntimeConfig } from '@nuxthub/db'
 import { type Table, eq, desc, and, or, getColumns } from 'drizzle-orm'
 
 import { getSelectableFields } from './modelMapper'
@@ -10,6 +10,14 @@ import type { QueryContext } from '../../types'
 import type { TableWithId } from '../types'
 import { pick } from '#nac/shared/utils/helpers'
 
+// helper used in this file
+function isMysql() {
+  const hub = (useRuntimeConfig() as unknown as NuxtHubRuntimeConfig).hub
+  const dbConfig = hub?.db
+  return dbConfig === 'mysql' || (typeof dbConfig === 'object' && dbConfig?.dialect === 'mysql')
+}
+
+// helper used in nacGetRows
 export function getVisibilityFilters(table: TableWithId, context: QueryContext = {}) {
   const isAuthorizationEnabled = useRuntimeConfig().autoCrud.auth?.authorization
   const isStatusFilteringEnabled = useRuntimeConfig().autoCrud.statusFiltering
@@ -78,7 +86,11 @@ export async function nacGetRows(table: TableWithId, context: QueryContext = {})
   const filters = getVisibilityFilters(table, context)
   if (filters.length > 0) query = query.where(and(...filters))
 
-  return await query.orderBy(desc(table.id)).all()
+  const baseQuery = query.orderBy(desc(table.id))
+  if (isMysql()) {
+    return await baseQuery
+  }
+  return await baseQuery.all()
 }
 
 /**
@@ -96,7 +108,8 @@ export async function nacGetRow(table: TableWithId, id: string, context: QueryCo
     return pick(context.record, Object.keys(selectableFields))
   }
 
-  const record = await db.select(selectableFields).from(table).where(eq(table.id, Number(id))).get()
+  const query = db.select(selectableFields).from(table).where(eq(table.id, Number(id)))
+  const record = isMysql() ? (await query)[0] : await query.get()
   if (!record) throw new RecordNotFoundError()
 
   return record
@@ -123,6 +136,16 @@ export async function nacCreateRow(table: Table, data: Record<string, unknown>, 
 
   if ('updatedAt' in allColumns) {
     payload.updatedAt = new Date()
+  }
+
+  if (isMysql()) {
+    const [res] = await db.insert(table).values(payload)
+    // Fetch manually to simulate .returning()
+    const rows = await db.select(selectableFields)
+      .from(table)
+      .where(eq((table as TableWithId).id, res.insertId))
+
+    return rows[0]
   }
 
   const result = await db.insert(table).values(payload).returning(selectableFields).get()
@@ -155,6 +178,11 @@ export async function nacUpdateRow(table: TableWithId, id: string, data: Record<
     payload.updatedAt = new Date()
   }
 
+  if (isMysql()) {
+    await db.update(table).set(payload).where(eq(table.id, targetId))
+    return await nacGetRow(table, id, context) // Reuse existing fetch logic
+  }
+
   const [updated] = await db.update(table).set(payload).where(eq(table.id, targetId)).returning(selectableFields)
   if (!updated) throw new UpdateFailedError()
 
@@ -169,6 +197,12 @@ export async function nacUpdateRow(table: TableWithId, id: string, data: Record<
 export async function nacDeleteRow(table: TableWithId, id: string) {
   const targetId = Number(id)
   const fields = getSelectableFields(table)
+
+  if (isMysql()) {
+    const recordToDelete = await nacGetRow(table, id)
+    await db.delete(table).where(eq(table.id, targetId))
+    return recordToDelete
+  }
 
   const deletedRecord = await db.delete(table).where(eq(table.id, targetId)).returning(fields).get()
   if (!deletedRecord) throw new DeletionFailedError()

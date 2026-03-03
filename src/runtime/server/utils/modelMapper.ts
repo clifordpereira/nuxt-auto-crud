@@ -1,17 +1,15 @@
 import { getColumns, type Column, Table, is, getTableName } from 'drizzle-orm'
-import { getTableConfig } from 'drizzle-orm/sqlite-core'
+import type { ForeignKey } from 'drizzle-orm/sqlite-core'
 import { createInsertSchema } from 'drizzle-zod'
 import type { z } from 'zod'
 
 import { useRuntimeConfig } from '#imports'
 import * as schema from '#nac/schema'
 
-import type { Field, SchemaDefinition } from '#nac/shared/utils/types'
+import type { Field, SchemaDefinition } from '../../shared/utils/types'
 import { NAC_SYSTEM_TABLES } from './constants'
 import { ResourceNotFoundError } from '../exceptions'
 import type { QueryContext } from '../../types'
-
-type ForeignKey = ReturnType<typeof getTableConfig>['foreignKeys'][number]
 
 /**
  * Builds a map of all exported Drizzle tables from the schema.
@@ -81,7 +79,12 @@ export function getSelectableFields(table: Table, context: QueryContext = {}): R
  * Resolves table relationships for NAC reflection.
  * Maps property keys to target table names.
  */
-export function resolveTableRelations(table: Table): Record<string, string> {
+export async function resolveTableRelations(table: Table): Promise<Record<string, string>> {
+  const { hub } = useRuntimeConfig() as unknown as { hub: { db: { dialect?: string } | string } }
+  const dbConfig = hub.db
+  const isMysql = dbConfig === 'mysql' || (typeof dbConfig === 'object' && dbConfig?.dialect === 'mysql')
+  const { getTableConfig } = (await (isMysql ? import('drizzle-orm/mysql-core') : import('drizzle-orm/sqlite-core')))
+
   const config = getTableConfig(table)
   const columnsMap = getColumns(table)
   const relations: Record<string, string> = {}
@@ -126,7 +129,7 @@ const TEXTAREA_HINTS = ['content', 'description', 'bio', 'message']
  * - Infers types from Drizzle columns
  * - Resolves foreign key relations
  */
-export function getSchemaDefinition(modelName: string): SchemaDefinition {
+export async function getSchemaDefinition(modelName: string): Promise<SchemaDefinition> {
   const table = modelTableMap[modelName]
   if (!table) throw new ResourceNotFoundError(modelName)
 
@@ -135,7 +138,7 @@ export function getSchemaDefinition(modelName: string): SchemaDefinition {
   const formHiddenFields = config.public.autoCrud.formHiddenFields
 
   const columns = getColumns(table)
-  const relations = resolveTableRelations(table)
+  const relations = await resolveTableRelations(table)
   const shape = createInsertSchema(table).shape
 
   const fields: Field[] = Object.entries(columns)

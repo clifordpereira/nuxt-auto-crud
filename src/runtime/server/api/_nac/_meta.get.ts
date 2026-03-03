@@ -3,6 +3,7 @@ import { eventHandler, getQuery, getHeader } from 'h3'
 import { useRuntimeConfig } from '#imports'
 
 import { getSchemaDefinition, modelTableMap } from '../../utils/modelMapper'
+import type { SchemaDefinition, Field } from '../../../shared/utils/types'
 
 export default eventHandler(async (event) => {
   const config = useRuntimeConfig()
@@ -16,12 +17,10 @@ export default eventHandler(async (event) => {
     ? availableModels
     : Object.keys(db?.query || {})
 
-  const resources = models.map((model) => {
+  const resourcesResults = await Promise.all(models.map(async (model) => {
     try {
-      const schema = getSchemaDefinition(model)
-
-      // Transform SchemaDefinition to legacy API format
-      const fields = schema.fields.map(field => ({
+      const schema: SchemaDefinition = await getSchemaDefinition(model)
+      const fields = schema.fields.map((field: Field) => ({
         name: field.name,
         type: field.type,
         required: field.required,
@@ -43,7 +42,9 @@ export default eventHandler(async (event) => {
     catch {
       return null
     }
-  }).filter(Boolean)
+  }))
+
+  const resources = resourcesResults.filter((res): res is NonNullable<typeof res> => res !== null)
 
   const payload = {
     architecture: 'Clifland-NAC',
@@ -53,6 +54,7 @@ export default eventHandler(async (event) => {
 
   // --- CONTENT NEGOTIATION FOR AGENTIC TOOLS ---
   if (query.format === 'md' || acceptHeader.includes('text/markdown')) {
+    setResponseHeader(event, 'Content-Type', 'text/markdown; charset=utf-8')
     let markdown = `# ${payload.architecture} API Manifest (v${payload.version})\n\n`
 
     payload.resources.forEach((res) => {

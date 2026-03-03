@@ -1,4 +1,4 @@
-# nuxt-auto-crud (nac 2.x)
+# nuxt-auto-crud (nac 2.x beta)
 
 **Zero-Codegen Dynamic RESTful CRUD APIs** derived directly from schemas. It eliminates the need to manually write or generate boilerplate for CRUD operations.
 
@@ -87,6 +87,7 @@ Nb: Endpoints follow the pattern `/api/_nac/:model`.
 | **GET** | `/:model/:id` | Fetch single record |
 | **PATCH** | `/:model/:id` | Partial update with validation |
 | **DELETE** | `/:model/:id` | Hard delete |
+
 
 **Example (`users` table):** 
 

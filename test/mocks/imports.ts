@@ -1,6 +1,9 @@
 import { vi } from 'vitest'
 
 export const useRuntimeConfig = vi.fn(() => ({
+  hub: {
+    db: 'sqlite',
+  },
   autoCrud: {
     statusFiltering: false,
     auth: {
