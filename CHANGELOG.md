@@ -1,3 +1,20 @@
+## v2.4.0
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v2.3.0...v2.4.0)
+
+### 🚀 Enhancements
+
+- **core:** Implement formReadOnlyFields and enforce formHiddenFields filtering and validate _meta token ([6316d7d](https://github.com/clifordpereira/nuxt-auto-crud/commit/6316d7d))
+
+### 🩹 Fixes
+
+- Test formReadOnlyFields with title instead of slug ([6f7ae17](https://github.com/clifordpereira/nuxt-auto-crud/commit/6f7ae17))
+- Lint-errors ([710c7ce](https://github.com/clifordpereira/nuxt-auto-crud/commit/710c7ce))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v2.3.0
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v2.2.0...v2.3.0)
