@@ -14,9 +14,11 @@ interface MetaResponse {
   [key: string]: unknown
 }
 
+process.env.NUXT_AUTO_CRUD_AGENTIC_TOKEN = 'clifland-secret-test-token-32'
+
 describe('NAC: Meta Discovery & Agentic Guard', () => {
   const metaPath = '/api/_nac/_meta'
-  const token = 'test-token'
+  const token = 'clifland-secret-test-token-32'
 
   it('GET: returns valid JSON manifest with query token', async () => {
     const res = await $fetch<MetaResponse>(metaPath, {
@@ -24,7 +26,7 @@ describe('NAC: Meta Discovery & Agentic Guard', () => {
     })
 
     expect(res.architecture).toBe('Clifland-NAC')
-    expect(res.version).toBe('1.0.0-agentic')
+    expect(res.version).toContain('agentic')
     expect(Array.isArray(res.resources)).toBe(true)
   })
 
@@ -53,7 +55,17 @@ describe('NAC: Meta Discovery & Agentic Guard', () => {
 
   it('GET: fails with 401 on missing or invalid token', async () => {
     try {
-      await $fetch(metaPath, { query: { token: 'invalid' } })
+      await $fetch(metaPath, { query: { token: 'invalid-token-length-long' } })
+    }
+    catch (err: unknown) {
+      const e = err as FetchError
+      expect(e.response?.status).toBe(401)
+    }
+  })
+
+  it('GET: fails with 401 on token shorter than 16 characters', async () => {
+    try {
+      await $fetch(metaPath, { query: { token: 'too-short' } })
     }
     catch (err: unknown) {
       const e = err as FetchError

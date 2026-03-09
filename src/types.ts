@@ -14,13 +14,14 @@ export interface ModuleOptions {
   // Public config
   nacEndpointPrefix: string
   formHiddenFields: string[] /** UI: Hidden from forms */
+  formReadOnlyFields: string[] /** UI: Read only fields */
 }
 
 declare module '@nuxt/schema' {
   interface RuntimeConfig {
-    autoCrud: Omit<ModuleOptions, 'nacEndpointPrefix' | 'formHiddenFields'>
+    autoCrud: Omit<ModuleOptions, 'nacEndpointPrefix' | 'formHiddenFields' | 'formReadOnlyFields'>
   }
   interface PublicRuntimeConfig {
-    autoCrud: Pick<ModuleOptions, 'nacEndpointPrefix' | 'formHiddenFields'>
+    autoCrud: Pick<ModuleOptions, 'nacEndpointPrefix' | 'formHiddenFields' | 'formReadOnlyFields'>
   }
 }

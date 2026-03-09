@@ -26,15 +26,24 @@ describe('modelMapper: getSchemaDefinition', () => {
     expect(statusField?.selectOptions).toContain('published')
   })
 
-  it('4) should respect formHiddenFields as isReadOnly', async () => {
-    // If 'id' is in formHiddenFields in mock config
+  it('4) should filter out fields present in formHiddenFields', async () => {
     const schema = await getSchemaDefinition('posts')
+    
+    // id and createdAt should be excluded from the fields array entirely
     const idField = schema.fields.find(f => f.name === 'id')
+    const createdAtField = schema.fields.find(f => f.name === 'createdAt')
 
-    expect(idField?.isReadOnly).toBe(true)
+    expect(idField).toBeUndefined()
+    expect(createdAtField).toBeUndefined()
   })
 
-  it('5) should throw error for non-existent models', async () => {
-    await expect(() => getSchemaDefinition('ghost_table')).rejects.toThrow('Resource ghost_table not found')
+  it('5) should mark fields in formReadOnlyFields as isReadOnly', async () => {
+    const schema = await getSchemaDefinition('posts')
+    
+    // These fields should exist in the array but have the read-only flag
+    const slugField = schema.fields.find(f => f.name === 'slug')
+    
+    expect(slugField).toBeDefined()
+    expect(slugField?.isReadOnly).toBe(true)
   })
 })

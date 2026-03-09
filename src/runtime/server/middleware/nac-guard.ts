@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
 
     if (isAuthEnabled && !isUserAuthenticated) {
       const model = getModelName(pathname, nacEndpointPrefix)
-      if (model && isPublicResource(model)) {
+      if (model && isPublicResource(model, config.autoCrud.publicResources)) {
         event.context.nac.isPublic = true
       }
       else {
@@ -31,13 +31,28 @@ export default defineEventHandler(async (event) => {
   }
 
   // Agentic paths - token auth
-  const token = getQuery(event).token as string | undefined
+  const token = getQuery(event).token as string
   const { agenticToken } = config.autoCrud
 
-  if (!agenticToken || token !== agenticToken) {
+  if (!validateToken(token, agenticToken)) {
     throw new AuthenticationError('Invalid agentic token').toH3()
   }
 })
+
+function validateToken(token: string, agenticToken: string) {
+  // 1. Basic presence and length check
+  if (!token || !agenticToken || agenticToken.length < 16) return false
+  
+  // 2. Exact length match is a prerequisite for timing-safe comparison
+  if (token.length !== agenticToken.length) return false
+
+  // 3. Web-standard timing-safe equality (to prevent timing attacks)
+  let diff = 0
+  for (let i = 0; i < token.length; i++) {
+    diff |= token.charCodeAt(i) ^ agenticToken.charCodeAt(i)
+  }
+  return diff === 0
+}
 
 function getModelName(pathname: string, nacEndpointPrefix: string) {
   const regex = new RegExp(`^${nacEndpointPrefix}/([^/]+)`)
@@ -45,9 +60,8 @@ function getModelName(pathname: string, nacEndpointPrefix: string) {
   return match ? match[1] : null
 }
 
-function isPublicResource(model: string) {
-  const { publicResources } = useRuntimeConfig().autoCrud
-  return Object.keys(publicResources || {}).includes(model)
+function isPublicResource(model: string, publicResources: any = {}) {
+  return Object.keys(publicResources).includes(model)
 }
 
 function isAgenticPath(pathname: string) {

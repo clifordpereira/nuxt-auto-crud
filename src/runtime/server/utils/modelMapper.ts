@@ -133,16 +133,16 @@ export async function getSchemaDefinition(modelName: string): Promise<SchemaDefi
   const table = modelTableMap[modelName]
   if (!table) throw new ResourceNotFoundError(modelName)
 
-  const config = useRuntimeConfig() as unknown as { autoCrud: { apiHiddenFields: string[] }, public: { autoCrud: { formHiddenFields: string[] } } }
+  const config = useRuntimeConfig()
   const apiHiddenFields = config.autoCrud.apiHiddenFields
-  const formHiddenFields = config.public.autoCrud.formHiddenFields
+  const { formHiddenFields, formReadOnlyFields } = config.public.autoCrud
 
   const columns = getColumns(table)
   const relations = await resolveTableRelations(table)
   const shape = createInsertSchema(table).shape
 
   const fields: Field[] = Object.entries(columns)
-    .filter(([name]) => !apiHiddenFields.includes(name))
+    .filter(([name]) => !apiHiddenFields.includes(name) && !formHiddenFields.includes(name))
     .map(([name, col]) => {
       const zodField = shape[name] as z.ZodTypeAny | undefined
       const zodTypeName = (zodField?._def as unknown as { typeName: string })?.typeName
@@ -177,7 +177,7 @@ export async function getSchemaDefinition(modelName: string): Promise<SchemaDefi
         selectOptions,
         required: colInternal.notNull ?? false,
         references: relations[name],
-        isReadOnly: formHiddenFields.includes(name),
+        isReadOnly: formReadOnlyFields.includes(name) || name === 'id',
       }
     })
 

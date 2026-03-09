@@ -1,6 +1,6 @@
 import { defineNuxtModule, createResolver, addServerHandler, addServerImportsDir, addImportsDir } from '@nuxt/kit'
 
-import { NAC_API_HIDDEN_FIELDS, NAC_FORM_HIDDEN_FIELDS } from './runtime/server/utils/constants'
+import { NAC_API_HIDDEN_FIELDS, NAC_FORM_HIDDEN_FIELDS, NAC_FORM_READ_ONLY_FIELDS } from './runtime/server/utils/constants'
 
 import type { ModuleOptions } from './types'
 
@@ -26,6 +26,7 @@ export default defineNuxtModule<ModuleOptions>({
     schemaPath: 'server/db/schema',
     // Public config
     formHiddenFields: NAC_FORM_HIDDEN_FIELDS,
+    formReadOnlyFields: NAC_FORM_READ_ONLY_FIELDS,
     nacEndpointPrefix: '/api/_nac',
   },
 
@@ -39,9 +40,9 @@ export default defineNuxtModule<ModuleOptions>({
     nuxt.options.alias['#nac/schema'] = resolver.resolve(nuxt.options.rootDir, options.schemaPath!)
 
     // 2. Runtime Config (The Concrete State)
-    const { formHiddenFields, nacEndpointPrefix, ...privateOptions } = options
+    const { formHiddenFields, nacEndpointPrefix, formReadOnlyFields, ...privateOptions } = options
     nuxt.options.runtimeConfig.autoCrud = privateOptions // private runtime
-    nuxt.options.runtimeConfig.public.autoCrud = { formHiddenFields, nacEndpointPrefix } // public runtime
+    nuxt.options.runtimeConfig.public.autoCrud = { formHiddenFields, nacEndpointPrefix, formReadOnlyFields } // public runtime
 
     // 3. Auto-imports (The Engine)
     addImportsDir(resolver.resolve('./runtime/composables'))

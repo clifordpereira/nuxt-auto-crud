@@ -15,6 +15,7 @@ export const categories = sqliteTable('categories', {
 
 export const posts = sqliteTable('posts', {
   id: integer('id').primaryKey({ autoIncrement: true }),
+  slug: text('slug').notNull().unique(),
   title: text('title').notNull(),
   content: text('content'), // Should map to textarea
   status: text('status', { enum: ['draft', 'published', 'archived'] }).default('draft'), // Should map to enum

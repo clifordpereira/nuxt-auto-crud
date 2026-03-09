@@ -1,5 +1,5 @@
 import { db } from '@nuxthub/db'
-import { eventHandler, getQuery, getHeader } from 'h3'
+import { eventHandler, getQuery, getHeader, setResponseHeader } from 'h3'
 import { useRuntimeConfig } from '#imports'
 
 import { getSchemaDefinition, modelTableMap } from '../../utils/modelMapper'

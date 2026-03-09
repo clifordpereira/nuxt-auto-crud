@@ -139,7 +139,7 @@ In addition to CRUD endpoints, **nac** provides metadata APIs to power dynamic f
 
 * **List Resources**: `GET /api/_nac/_schemas` returns all tables (excluding system-protected tables).
 * **Resource Metadata**: `GET /api/_nac/_schemas/:resource` returns the field definitions, validation rules, and relationship data for a specific table.
-* **Agentic Discovery**: `GET /api/_nac/_meta?format=md` returns a markdown manifest for LLM context injection.
+* **Agentic Discovery**: `GET /api/_nac/_meta?format=md` returns a token-efficient Markdown manifest for LLM context injection. While similar to the _schema endpoint, it is optional and specifically optimized for AI Agents. Access is secured via the `agenticToken`. To enable this, simply add `NUXT_AUTO_CRUD_AGENTIC_TOKEN` (min 16 characters) to your .env file.
 
 ---
 
@@ -187,8 +187,9 @@ Enabling `authentication` in the `autoCrud` config protects all **nac** routes (
 
 ### 🔒 Access Control & Data Safety
 
-* **`apiHiddenFields`**: Globally hides sensitive columns from all API responses. Default: `['password', 'secret', 'token', 'reset_token', 'reset_expires', 'github_id', 'google_id']`.
-* **`formHiddenFields`**: Columns excluded from the frontend schema metadata to prevent user input. Defaults to `apiHiddenFields` plus system-managed fields like `id`, `uuid`, `createdAt`, `updatedAt`, `createdBy`, etc.
+* **`apiHiddenFields`**: Globally hides sensitive columns from all API responses. Default: ['password', 'secret', 'token', 'resetToken', 'resetExpires', 'githubId', 'googleId'].
+* **`formHiddenFields`**: Columns excluded from the frontend schema metadata to prevent user input. Defaults to apiHiddenFields plus system-managed fields like `id`, `uuid`, `createdAt`, `updatedAt`, `deletedAt`, `createdBy`, and `updatedBy`.
+* **`formReadOnlyFields`**: Columns visible in the UI for context but protected from user modification (e.g., slug, status).
 * **Response Scrubbing**: If a field is in `apiHiddenFields` or does not exist in the schema, it is silently stripped from the response even if listed in `publicResources`.
 
 ---
@@ -198,11 +199,15 @@ Enabling `authentication` in the `autoCrud` config protects all **nac** routes (
 | Key | Default | Description |
 | --- | --- | --- |
 | `statusFiltering` | `false` | Enables/disables automatic filtering of records based on the `status` column. |
-| `realtime` | `false` | Enables/disables real-time capabilities. |
+| `realtime` | `false` | Enables real-time broadcasting of all Create, Update, and Delete (CUD) operations via SSE. |
 | `auth.authentication` | `false` | Requires a valid session for all NAC routes. |
 | `auth.authorization` | `false` | Enables role/owner-based access checks. |
 | `auth.ownerKey` | `'createdBy'` | The column name used to identify the record creator. |
 | `publicResources` | `{}` | Defines tables and specific columns accessible without auth. |
+| `apiHiddenFields` | `NAC_API_HIDDEN_FIELDS` | Arrays of keys to exclude from all API responses. |
+| `formHiddenFields` | `NAC_FORM_HIDDEN_FIELDS` | Arrays of keys to exclude from dynamic forms. |
+| `formReadOnlyFields` | `NAC_FORM_READ_ONLY_FIELDS` | List of visible but non-editable fields (UI only). |
+| `agenticToken` | `''` | Secret key used to secure the /_meta endpoint, preventing unauthorized AI agents from introspecting your schema. |
 | `nacEndpointPrefix` | `'/api/_nac'` | The base path for NAC routes. Access via `useRuntimeConfig().public.autoCrud`. |
 | `schemaPath` | `'server/db/schema'` | Location of your Drizzle schema files. |
 
@@ -221,8 +226,9 @@ autoCrud: {
     users: ['id', 'name', 'email'],
   },
   apiHiddenFields: ['password'], 
-  agenticToken: process.env.NAC_AGENTIC_TOKEN, 
-  formHiddenFields: [], 
+  formHiddenFields: ['createdAt'], // All fields should be camelCase
+  formReadOnlyFields: ['slug', 'externalId'], // Locked for user input
+  agenticToken: '', 
   nacEndpointPrefix: '/api/_nac',
   schemaPath: 'server/db/schema',
 }
@@ -253,7 +259,7 @@ If `list_active` is present, it applies a hybrid OR logic: users can see all act
 // Example: Setting context in your Auth Middleware
 event.context.nac = {
   userId: user.id,
-  resourcePermissions: user.permissions[model], // e.g., ['list_own', 'list']
+  resourcePermissions: user.permissions[model], // e.g., ['list_own', 'list_active']
   record: null, // Optional: Pre-fetched record to prevent double-hitting the DB
 }
 
@@ -306,6 +312,3 @@ useNacAutoCrudSSE(({ table, action, data: sseData, primaryKey }) => {
 ```
 ---
 
-
-
----
