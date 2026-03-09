@@ -28,7 +28,7 @@ describe('modelMapper: getSchemaDefinition', () => {
 
   it('4) should filter out fields present in formHiddenFields', async () => {
     const schema = await getSchemaDefinition('posts')
-    
+
     // id and createdAt should be excluded from the fields array entirely
     const idField = schema.fields.find(f => f.name === 'id')
     const createdAtField = schema.fields.find(f => f.name === 'createdAt')
@@ -39,10 +39,10 @@ describe('modelMapper: getSchemaDefinition', () => {
 
   it('5) should mark fields in formReadOnlyFields as isReadOnly', async () => {
     const schema = await getSchemaDefinition('posts')
-    
+
     // These fields should exist in the array but have the read-only flag
     const titleField = schema.fields.find(f => f.name === 'title')
-    
+
     expect(titleField).toBeDefined()
     expect(titleField?.isReadOnly).toBe(true)
   })

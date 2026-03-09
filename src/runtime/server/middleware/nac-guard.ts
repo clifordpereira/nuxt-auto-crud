@@ -42,7 +42,7 @@ export default defineEventHandler(async (event) => {
 function validateToken(token: string, agenticToken: string) {
   // 1. Basic presence and length check
   if (!token || !agenticToken || agenticToken.length < 16) return false
-  
+
   // 2. Exact length match is a prerequisite for timing-safe comparison
   if (token.length !== agenticToken.length) return false
 
@@ -60,7 +60,7 @@ function getModelName(pathname: string, nacEndpointPrefix: string) {
   return match ? match[1] : null
 }
 
-function isPublicResource(model: string, publicResources: any = {}) {
+function isPublicResource(model: string, publicResources: Record<string, string[]> = {}) {
   return Object.keys(publicResources).includes(model)
 }
 
