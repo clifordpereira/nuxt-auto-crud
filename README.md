@@ -108,9 +108,9 @@ nuxt dev
 
 ---
 
-## 🌐 Exposed Dynamic RESTful CRUD endpoints
+## 🌐 Data APIs (Dynamic RESTful CRUD)
 
-Nb: Endpoints follow the pattern `/api/_nac/:model`.
+> Note: All endpoints follow the pattern ${nacEndpointPrefix}/:model. By default, this is /api/_nac/:model.
 
 | Method | Endpoint | Action |
 | --- | --- | --- |
@@ -133,15 +133,23 @@ Nb: Endpoints follow the pattern `/api/_nac/:model`.
 
 ---
 
-## 🛠 Frontend Integration APIs
+## 🛠 Introspection & Metadata APIs
 
-In addition to CRUD endpoints, **nac** provides metadata APIs to power dynamic forms and tables in your frontend.
+Use these endpoints to build dynamic UI components (like menus and forms) or provide context to AI agents. These use the `_schemas` and `_meta` reserved paths.
 
-* **List Resources**: `GET /api/_nac/_schemas` returns all tables (excluding system-protected tables).
-* **Resource Metadata**: `GET /api/_nac/_schemas/:resource` returns the field definitions, validation rules, and relationship data for a specific table.
-* **Agentic Discovery**: `GET /api/_nac/_meta?format=md` returns a token-efficient Markdown manifest for LLM context injection. While similar to the _schema endpoint, it is optional and specifically optimized for AI Agents. Access is secured via the `agenticToken`. To enable this, simply add `NUXT_AUTO_CRUD_AGENTIC_TOKEN` (min 16 characters) to your .env file.
+### 1. Discovery Endpoints
 
----
+* **List Resource Names**: `GET /api/_nac/_schemas`
+* Returns an array of all available table names. Useful for generating dynamic navigation menus.
+* **Resource Metadata**: `GET /api/_nac/_schemas/:resource`
+* Returns field definitions, validation rules, and `isReadOnly` status for a specific table.
+* **Example:** `GET /api/_nac/_schemas/users` returns the schema for the users table.
+
+### 2. Agentic Discovery
+
+* **Manifest**: `GET /api/_nac/_meta?format=md`
+* Returns a token-efficient Markdown manifest for LLM context injection.
+* **Security:** Requires `NUXT_AUTO_CRUD_AGENTIC_TOKEN` (min 16 characters) in your `.env`.
 
 ### Schema Interface
 
