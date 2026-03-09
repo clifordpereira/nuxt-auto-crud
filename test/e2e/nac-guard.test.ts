@@ -1,10 +1,12 @@
 import { describe, it, expect } from 'vitest'
 import { $fetch } from '@nuxt/test-utils/e2e'
-import { useRuntimeConfig } from '#imports'
+
+process.env.NUXT_AUTO_CRUD_AGENTIC_TOKEN = 'clifland-secret-test-token-32'
 
 describe('NAC: Agentic Guard Security', () => {
-  const metaPath = '/api/_nac/_meta'
-  const token = 'test-token'
+  const nacPrefix = '/api/_nac'
+  const metaPath = `${nacPrefix}/_meta`
+  const token = 'clifland-secret-test-token-32'
 
   it('401: rejects agentic path without token', async () => {
     try {
@@ -39,9 +41,8 @@ describe('NAC: Agentic Guard Security', () => {
   })
 
   it('PASS: does not block standard CRUD endpoints', async () => {
-    const { nacEndpointPrefix } = useRuntimeConfig().public.autoCrud
     // Standard GET list should not be intercepted by nac-guard
-    const res = await $fetch(`${nacEndpointPrefix}/posts`)
+    const res = await $fetch(`/api/_nac/posts`)
     expect(Array.isArray(res)).toBe(true)
   })
 })

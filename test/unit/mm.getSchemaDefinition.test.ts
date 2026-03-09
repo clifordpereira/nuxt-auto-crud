@@ -41,9 +41,9 @@ describe('modelMapper: getSchemaDefinition', () => {
     const schema = await getSchemaDefinition('posts')
     
     // These fields should exist in the array but have the read-only flag
-    const slugField = schema.fields.find(f => f.name === 'slug')
+    const titleField = schema.fields.find(f => f.name === 'title')
     
-    expect(slugField).toBeDefined()
-    expect(slugField?.isReadOnly).toBe(true)
+    expect(titleField).toBeDefined()
+    expect(titleField?.isReadOnly).toBe(true)
   })
 })
