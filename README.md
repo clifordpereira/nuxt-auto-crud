@@ -23,6 +23,7 @@
 #### SQLite
 ```bash
 npx nuxi init -t gh:clifordpereira/nac-starter my-app
+cd my-app
 ```
 
 #### MySQL
@@ -32,6 +33,7 @@ Visit [nac-starter-mysql](https://github.com/clifordpereira/nac-starter-mysql) f
 
 ```bash
 bun create nuxt@latest my-app
+cd my-app
 npx nuxi module add hub
 bun add drizzle-orm@beta @libsql/client nuxt-auto-crud
 bun add -D drizzle-kit@beta
@@ -68,7 +70,6 @@ export const users = sqliteTable('users', {
   id: integer().primaryKey({ autoIncrement: true }),
   name: text().notNull(),
   email: text().notNull().unique(),
-  password: text().notNull(),
   avatar: text().notNull(),
   createdAt: integer({ mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
 })
@@ -86,18 +87,29 @@ export const users = mysqlTable('users', {
   id: serial().primaryKey(),
   name: text().notNull(),
   email: text().notNull().unique(),
-  password: text().notNull(),
   avatar: text().notNull(),
   createdAt: timestamp().notNull().defaultNow(),
 })
 
 ```
 
+#### Using Docker for MySQL
+If you are using mysql, make sure that you have set hub.db to 'mysql' in nuxt.config.ts.
+
+If you have docker installed, copy and paste [docker-compose.yml](https://github.com/clifordpereira/nac-starter-mysql/blob/main/docker-compose.yml) to your project root.
+
+Then start mysql service:
+
+```bash
+docker compose up -d
+# Stop service: docker compose down
+# Purge data: docker compose down -v
+```
+
 ### Generate Migrations and Start Dev Server
 After installing (either option), run the following commands:
 
 ```bash
-cd my-app
 nuxt db generate
 nuxt dev
 
