@@ -1,3 +1,15 @@
+## v2.5.0
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v2.4.0...v2.5.0)
+
+### 🚀 Enhancements
+
+- Upgrade drizzle ([476079d](https://github.com/clifordpereira/nuxt-auto-crud/commit/476079d))
+
+### ❤️ Contributors
+
+- Cliford Pereira <cliford.pereira@gmail.com>
+
 ## v2.4.0
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v2.3.0...v2.4.0)
