@@ -36,8 +36,7 @@ bun create nuxt@latest my-app
 cd my-app
 npx nuxi module add hub
 bun add drizzle-orm@beta @libsql/client nuxt-auto-crud
-bun add -D drizzle-kit@beta
-
+bun add -D drizzle-kit@beta typescript
 ```
 > Mysql users may replace `@libsql/client` with `mysql2`
 
@@ -81,29 +80,41 @@ export const users = sqliteTable('users', {
 Define your schema in `server/db/schema.ts`:
 
 ```typescript
-import { mysqlTable, text, serial, timestamp } from 'drizzle-orm/mysql-core'
+import { mysqlTable, serial, timestamp, varchar } from 'drizzle-orm/mysql-core'
 
 export const users = mysqlTable('users', {
   id: serial().primaryKey(),
-  name: text().notNull(),
-  email: text().notNull().unique(),
-  avatar: text().notNull(),
+  name: varchar('name', { length: 255 }).notNull(),
+  email: varchar('email', { length: 255 }).notNull().unique(),
+  avatar: varchar('avatar', { length: 512 }).notNull(),
   createdAt: timestamp().notNull().defaultNow(),
 })
 
 ```
 
 #### Using Docker for MySQL
-If you are using mysql, make sure that you have set hub.db to 'mysql' in nuxt.config.ts.
 
-If you have docker installed, copy and paste [docker-compose.yml](https://github.com/clifordpereira/nac-starter-mysql/blob/main/docker-compose.yml) to your project root.
+> Note: Ensure hub.db is set to 'mysql' in nuxt.config.ts.
 
-Then start mysql service:
+If Docker is installed, place the [docker-compose.yml](https://github.com/clifordpereira/nac-starter-mysql/blob/main/docker-compose.yml) in your project root.
+
+Execute the following to manage the MySQL service:
 
 ```bash
+# Start service
 docker compose up -d
-# Stop service: docker compose down
-# Purge data: docker compose down -v
+
+# Stop service
+# docker compose down
+
+# Purge data
+# docker compose down -v
+```
+
+Create a .env file with the following content:
+
+```env
+DATABASE_URL="mysql://root:root@127.0.0.1:3306/nac_db"
 ```
 
 ### Generate Migrations and Start Dev Server
@@ -114,8 +125,6 @@ nuxt db generate
 nuxt dev
 
 ```
-> If you encounter `Error: Cannot find module 'typescript'`, install it using `bun add -D typescript`.
-
 ---
 
 ## 🌐 Data APIs (Dynamic RESTful CRUD)

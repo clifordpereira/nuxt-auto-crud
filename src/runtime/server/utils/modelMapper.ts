@@ -1,6 +1,6 @@
 import { getColumns, type Column, Table, is, getTableName } from 'drizzle-orm'
 import type { ForeignKey } from 'drizzle-orm/sqlite-core'
-import { createInsertSchema } from 'drizzle-zod'
+import { createInsertSchema } from 'drizzle-orm/zod'
 import type { z } from 'zod'
 
 import { useRuntimeConfig } from '#imports'
