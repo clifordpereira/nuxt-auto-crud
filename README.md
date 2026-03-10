@@ -24,6 +24,8 @@
 ```bash
 npx nuxi init -t gh:clifordpereira/nac-starter my-app
 cd my-app
+nuxt db generate
+nuxt dev
 ```
 
 #### MySQL
@@ -117,8 +119,7 @@ Create a .env file with the following content:
 DATABASE_URL="mysql://root:root@127.0.0.1:3306/nac_db"
 ```
 
-### Generate Migrations and Start Dev Server
-After installing (either option), run the following commands:
+#### Generate Migrations and Start Dev Server
 
 ```bash
 nuxt db generate
