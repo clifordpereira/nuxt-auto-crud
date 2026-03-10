@@ -27,7 +27,10 @@ npx nuxi init -t gh:clifordpereira/nac-starter my-app
 
 #### MySQL
 ```bash
-npx nuxi init -t gh:clifordpereira/nac-starter-mysql my-app
+npx nuxi init -t gh:clifordpereira/nac-starter-mysql my-app --no-install
+cd my-app
+cp .env.example .env
+bun install
 ```
 
 ### Option B: Manual Installation
