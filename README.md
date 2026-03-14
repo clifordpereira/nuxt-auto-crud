@@ -165,13 +165,7 @@ Use these endpoints to build dynamic UI components (like menus and forms) or pro
 * Returns field definitions, validation rules, and `isReadOnly` status for a specific table.
 * **Example:** `GET /api/_nac/_schemas/users` returns the schema for the users table.
 
-### 2. Agentic Discovery
-
-* **Manifest**: `GET /api/_nac/_meta?format=md`
-* Returns a token-efficient Markdown manifest for LLM context injection.
-* **Security:** Requires `NUXT_AUTO_CRUD_AGENTIC_TOKEN` (min 16 characters) in your `.env`.
-
-### Schema Interface
+#### Schema Interface
 
 ```typescript
 export interface Field {
@@ -191,7 +185,7 @@ export interface SchemaDefinition {
 
 ```
 
-### Example Response
+#### Example Response
 
 `GET /api/_nac/_schemas/users`
 
@@ -207,6 +201,13 @@ export interface SchemaDefinition {
 }
 
 ```
+
+### 2. Agentic Discovery
+
+* **Manifest**: `GET /api/_nac/_meta?format=md`
+* Returns a token-efficient Markdown manifest for LLM context injection.
+* **Security:** Requires `NUXT_AUTO_CRUD_AGENTIC_TOKEN` (min 16 characters) in your `.env`.
+
 ---
 
 ## 🛡 Security & Configuration
