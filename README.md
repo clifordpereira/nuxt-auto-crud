@@ -17,19 +17,15 @@
 
 ---
 
-## Installation Guide
+## Installation Guide (SQLite)
 
 ### Option A: Starter Template
-#### SQLite
 ```bash
 npx nuxi init -t gh:clifordpereira/nac-starter my-app
 cd my-app
 nuxt db generate
 nuxt dev
 ```
-
-#### MySQL
-Visit [nac-starter-mysql](https://github.com/clifordpereira/nac-starter-mysql) for instructions.
 
 ### Option B: Manual Installation
 
@@ -40,7 +36,6 @@ npx nuxi module add hub
 bun add drizzle-orm@beta @libsql/client nuxt-auto-crud
 bun add -D drizzle-kit@beta typescript
 ```
-> Mysql users may replace `@libsql/client` with `mysql2`
 
 #### Configuration
 
@@ -54,13 +49,12 @@ export default defineNuxtConfig({
   ],
   hub: {
     db: 'sqlite'
-    // db: 'mysql'
   }
 })
 
 ```
 
-#### Schema Definition (SQLite)
+#### Schema Definition
 
 Define your schema in `server/db/schema.ts`:
 
@@ -77,49 +71,9 @@ export const users = sqliteTable('users', {
 
 ```
 
-#### Schema Definition (MySQL)
+> For MySQL installation instructions, visit [INSTALLATION.md](https://github.com/clifordpereira/nac-starter-mysql/INSTALLATION.md).
 
-Define your schema in `server/db/schema.ts`:
-
-```typescript
-import { mysqlTable, serial, timestamp, varchar } from 'drizzle-orm/mysql-core'
-
-export const users = mysqlTable('users', {
-  id: serial().primaryKey(),
-  name: varchar('name', { length: 255 }).notNull(),
-  email: varchar('email', { length: 255 }).notNull().unique(),
-  avatar: varchar('avatar', { length: 512 }).notNull(),
-  createdAt: timestamp().notNull().defaultNow(),
-})
-
-```
-
-#### Using Docker for MySQL
-
-> Note: Ensure hub.db is set to 'mysql' in nuxt.config.ts.
-
-If Docker is installed, place the [docker-compose.yml](https://github.com/clifordpereira/nac-starter-mysql/blob/main/docker-compose.yml) in your project root.
-
-Execute the following to manage the MySQL service:
-
-```bash
-# Start service
-docker compose up -d
-
-# Stop service
-# docker compose down
-
-# Purge data
-# docker compose down -v
-```
-
-Create a .env file with the following content:
-
-```env
-DATABASE_URL="mysql://root:root@127.0.0.1:3306/nac_db"
-```
-
-#### Generate Migrations and Start Dev Server
+### Generate Migrations and Start Dev Server
 
 ```bash
 nuxt db generate
