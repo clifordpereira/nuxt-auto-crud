@@ -71,7 +71,7 @@ export const users = sqliteTable('users', {
 
 ```
 
-> For MySQL installation instructions, visit [INSTALLATION.md](https://github.com/clifordpereira/nac-starter-mysql/INSTALLATION.md).
+> For MySQL installation instructions, visit [INSTALLATION.md](https://github.com/clifordpereira/nac-starter-mysql/blob/main/INSTALLATION.md).
 
 ### Generate Migrations and Start Dev Server
 

@@ -50,7 +50,7 @@ export const users = mysqlTable('users', {
 
 #### Using Docker for MySQL
 
-If Docker is installed, place the [docker-compose.yml](https://github.com/clifordpereira/nac-starter-mysql/docker-compose.yml) in your project root.
+If Docker is installed, place the [docker-compose.yml](https://github.com/clifordpereira/nac-starter-mysql/blob/main/docker-compose.yml) in your project root.
 
 Execute the following to manage the MySQL service:
 
@@ -80,4 +80,4 @@ nuxt dev
 ```
 ---
 
-> Visit [README.md](https://github.com/clifordpereira/nuxt-auto-crud/README.md) for complete feature documentation.
+> Visit [README.md](https://github.com/clifordpereira/nuxt-auto-crud/blob/main/README.md) for complete feature documentation.
