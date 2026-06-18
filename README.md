@@ -88,11 +88,11 @@ nuxt dev
 
 | Method | Endpoint | Action |
 | --- | --- | --- |
-| **GET** | `/:model` | List records |
-| **POST** | `/:model` | Create record with Zod validation |
-| **GET** | `/:model/:id` | Fetch single record |
-| **PATCH** | `/:model/:id` | Partial update with validation |
-| **DELETE** | `/:model/:id` | Delete record |
+| **GET** | `/api/_nac/:model` | List records |
+| **POST** | `/api/_nac/:model` | Create record with Zod validation |
+| **GET** | `/api/_nac/:model/:id` | Fetch single record |
+| **PATCH** | `/api/_nac/:model/:id` | Partial update with validation |
+| **DELETE** | `/api/_nac/:model/:id` | Delete record |
 
 
 **Example (`users` table):** 
