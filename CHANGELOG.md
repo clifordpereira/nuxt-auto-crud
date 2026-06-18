@@ -1,3 +1,15 @@
+## v2.5.2
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v2.5.1...v2.5.2)
+
+### 🏡 Chore
+
+- **release:** V2.5.1 ([e7fd001](https://github.com/clifordpereira/nuxt-auto-crud/commit/e7fd001))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v2.5.1
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v2.5.0...v2.5.1)
