@@ -1,6 +1,6 @@
 # nuxt-auto-crud (nac 2.x beta)
 
-**Zero-Codegen Dynamic RESTful CRUD APIs** derived directly from schemas. It eliminates the need to manually write or generate boilerplate for CRUD operations.
+A Nuxt.js module providing dynamic **RESTful CRUD APIs** derived directly from your Drizzle schemas, without writing any code for CRUD operations.
 
 ---
 
