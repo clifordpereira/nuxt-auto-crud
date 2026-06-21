@@ -1,3 +1,21 @@
+## v2.5.3
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v2.5.2...v2.5.3)
+
+### 🩹 Fixes
+
+- Add inlcude in tsconfig ([35bdc2c](https://github.com/clifordpereira/nuxt-auto-crud/commit/35bdc2c))
+- Include test folder too tsconfig ([0a6f3f6](https://github.com/clifordpereira/nuxt-auto-crud/commit/0a6f3f6))
+- Include root ts files too ([2e8587f](https://github.com/clifordpereira/nuxt-auto-crud/commit/2e8587f))
+
+### 🏡 Chore
+
+- **release:** V2.5.2 ([93ee8ff](https://github.com/clifordpereira/nuxt-auto-crud/commit/93ee8ff))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v2.5.2
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v2.5.1...v2.5.2)
