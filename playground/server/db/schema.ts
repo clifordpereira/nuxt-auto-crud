@@ -5,7 +5,6 @@ export const users = sqliteTable('users', {
   status: text('status', { enum: ['active', 'inactive'] }).default('active').notNull(),
   name: text().notNull(),
   email: text().notNull().unique(),
-  password: text().notNull(),
   avatar: text().notNull(),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
 })
