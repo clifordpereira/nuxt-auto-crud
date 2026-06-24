@@ -71,8 +71,6 @@ export const users = sqliteTable('users', {
 
 ```
 
-> For MySQL installation instructions, visit [INSTALLATION.md](https://github.com/clifordpereira/nuxt-auto-crud/blob/main/INSTALLATION.md).
-
 ### Generate Migrations and Start Dev Server
 
 ```bash
@@ -80,6 +78,9 @@ nuxt db generate
 nuxt dev
 
 ```
+
+> For MySQL installation instructions, visit [INSTALLATION.md](https://github.com/clifordpereira/nuxt-auto-crud/blob/main/INSTALLATION.md).
+
 ---
 
 ## 🌐 Data APIs (Dynamic RESTful CRUD)
