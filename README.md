@@ -117,7 +117,7 @@ Use these endpoints to build dynamic UI components (like menus and forms) or pro
 * **List Resource Names**: `GET /api/_nac/_schemas`
 * Returns an array of all available table names. Useful for generating dynamic navigation menus.
 * **Resource Metadata**: `GET /api/_nac/_schemas/:resource`
-* Returns field definitions, validation rules, and `isReadOnly` status for a specific table.
+* Returns field definitions, validation rules, and `readonly` status for a specific table.
 * **Example:** `GET /api/_nac/_schemas/users` returns the schema for the users table.
 
 #### Schema Interface
@@ -129,7 +129,7 @@ export interface Field {
   required?: boolean
   selectOptions?: string[]
   references?: string
-  isReadOnly?: boolean
+  readonly?: boolean
 }
 
 export interface SchemaDefinition {
@@ -149,9 +149,9 @@ export interface SchemaDefinition {
   "resource": "users",
   "labelField": "name",
   "fields": [
-    { "name": "id", "type": "string", "required": true, "isReadOnly": true },
-    { "name": "name", "type": "string", "required": true, "isReadOnly": false },
-    { "name": "email", "type": "string", "required": true, "isReadOnly": false }
+    { "name": "id", "type": "string", "required": true, "readonly": true },
+    { "name": "name", "type": "string", "required": true, "readonly": false },
+    { "name": "email", "type": "string", "required": true, "readonly": false }
   ]
 }
 

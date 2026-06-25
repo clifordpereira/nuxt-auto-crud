@@ -25,7 +25,7 @@ describe('NAC: Schema Definition Reflection', async () => {
     const idField = res.fields.find(f => f.name === 'id')
     // Assuming 'id' is in formHiddenFields in your nuxt.config.ts
     if (idField) {
-      expect(idField.isReadOnly).toBe(true)
+      expect(idField.readonly).toBe(true)
     }
   })
 

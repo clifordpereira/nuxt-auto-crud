@@ -37,13 +37,13 @@ describe('modelMapper: getSchemaDefinition', () => {
     expect(createdAtField).toBeUndefined()
   })
 
-  it('5) should mark fields in formReadOnlyFields as isReadOnly', async () => {
+  it('5) should mark fields in formReadOnlyFields as readonly', async () => {
     const schema = await getSchemaDefinition('posts')
 
     // These fields should exist in the array but have the read-only flag
     const titleField = schema.fields.find(f => f.name === 'title')
 
     expect(titleField).toBeDefined()
-    expect(titleField?.isReadOnly).toBe(true)
+    expect(titleField?.readonly).toBe(true)
   })
 })

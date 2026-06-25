@@ -4,7 +4,7 @@ export interface Field {
   required?: boolean
   selectOptions?: string[]
   references?: string
-  isReadOnly?: boolean
+  readonly?: boolean
 }
 
 export interface SchemaDefinition {

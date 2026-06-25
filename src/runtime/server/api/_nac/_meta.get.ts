@@ -28,7 +28,7 @@ export default eventHandler(async (event) => {
         options: field.selectOptions || null,
         references: field.references || null,
         isRelation: !!field.references,
-        isReadOnly: field.isReadOnly || false,
+        readonly: field.readonly || false,
       }))
 
       return {
@@ -68,7 +68,7 @@ export default eventHandler(async (event) => {
 
       res.fields.forEach((f) => {
         const details = f.isEnum && f.options ? `Options: ${f.options.join(', ')}` : (f.references ? `Refs: ${f.references}` : '-')
-        markdown += `| ${f.name} | ${f.type} | ${f.required ? '✅' : '❌'} | ${f.isReadOnly ? '❌' : '✅'} | ${details} |\n`
+        markdown += `| ${f.name} | ${f.type} | ${f.required ? '✅' : '❌'} | ${f.readonly ? '❌' : '✅'} | ${details} |\n`
       })
       markdown += `\n---\n`
     })

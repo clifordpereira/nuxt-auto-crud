@@ -177,7 +177,7 @@ export async function getSchemaDefinition(modelName: string): Promise<SchemaDefi
         selectOptions,
         required: colInternal.notNull ?? false,
         references: relations[name],
-        isReadOnly: formReadOnlyFields.includes(name) || name === 'id',
+        readonly: formReadOnlyFields.includes(name) || name === 'id',
       }
     })
 
