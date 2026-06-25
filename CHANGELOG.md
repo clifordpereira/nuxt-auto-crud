@@ -1,3 +1,20 @@
+## v2.5.4
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v2.5.3...v2.5.4)
+
+### 🩹 Fixes
+
+- Remove password field from playground's users table ([10ee057](https://github.com/clifordpereira/nuxt-auto-crud/commit/10ee057))
+
+### 🏡 Chore
+
+- **release:** V2.5.3 ([3244af2](https://github.com/clifordpereira/nuxt-auto-crud/commit/3244af2))
+- Rename isReadOnly to readonly ([d3da991](https://github.com/clifordpereira/nuxt-auto-crud/commit/d3da991))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v2.5.3
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v2.5.2...v2.5.3)
