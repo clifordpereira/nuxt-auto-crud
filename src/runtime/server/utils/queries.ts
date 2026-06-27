@@ -6,7 +6,7 @@ import { getSelectableFields } from './modelMapper'
 
 import { DeletionFailedError, InsertionFailedError, RecordNotFoundError, UnauthorizedAccessError, UpdateFailedError } from '../exceptions'
 
-import type { QueryContext } from '../../types'
+import type { QueryContext } from '../../shared/utils/types'
 import type { TableWithId } from '../types'
 import { pick } from '#nac/shared/utils/helpers'
 

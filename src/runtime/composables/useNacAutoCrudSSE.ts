@@ -1,4 +1,4 @@
-import { onBeforeUnmount, onMounted } from "#imports"
+import { onBeforeUnmount, onMounted } from '#imports'
 
 export interface AutoCrudEvent {
   table: string

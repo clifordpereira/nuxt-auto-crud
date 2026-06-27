@@ -6,10 +6,10 @@ import type { z } from 'zod'
 import { useRuntimeConfig } from '#imports'
 import * as schema from '#nac/schema'
 
-import type { Field, SchemaDefinition } from '../../shared/utils/types'
+import type { Field, SchemaDefinition, QueryContext } from '../../shared/utils/types'
+import type { ColumnInternal, ZodTypeDef } from '../types'
 import { NAC_SYSTEM_TABLES } from './constants'
 import { ResourceNotFoundError } from '../exceptions'
-import type { QueryContext } from '../../types'
 
 /**
  * Builds a map of all exported Drizzle tables from the schema.
@@ -125,15 +125,15 @@ function inferFieldType(name: string, col: Column, zodField?: z.ZodTypeAny): {
   type: Field['type']
   selectOptions?: string[]
 } {
-  const zodTypeName = (zodField?._def as any)?.typeName
-  let type: Field['type'] = ZOD_TYPE_MAP[zodTypeName] ?? 'string'
+  const zodTypeName = (zodField?._def as ZodTypeDef | undefined)?.typeName
+  const type: Field['type'] = ZOD_TYPE_MAP[zodTypeName ?? ''] ?? 'string'
 
-  const colInternal = col as any
+  const colInternal = col as Column & ColumnInternal
   const enumValues = colInternal.enumValues || colInternal.config?.enumValues
 
   if (enumValues) return { type: 'enum', selectOptions: enumValues }
 
-  const checks = (zodField?._def?.checks as any[]) || []
+  const checks = (zodField?._def as ZodTypeDef | undefined)?.checks ?? []
   const semanticMatch = checks.find(c => SEMANTIC_CHECK_MAP[c.kind])
   if (semanticMatch) return { type: SEMANTIC_CHECK_MAP[semanticMatch.kind]! }
   if (TEXTAREA_HINTS.includes(name)) return { type: 'textarea' }
@@ -157,7 +157,7 @@ export async function getSchemaDefinition(modelName: string): Promise<SchemaDefi
     .map(([name, col]) => ({
       name,
       ...inferFieldType(name, col, shape[name]),
-      required: (col as any).notNull ?? false,
+      required: (col as Column & ColumnInternal).notNull ?? false,
       references: relations[name],
       readonly: publicAutoCrud.formReadOnlyFields.includes(name) || name === 'id',
     }))
