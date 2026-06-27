@@ -1,3 +1,17 @@
+## v2.5.5
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v2.5.4...v2.5.5)
+
+### 🏡 Chore
+
+- **release:** V2.5.4 ([1ef78a2](https://github.com/clifordpereira/nuxt-auto-crud/commit/1ef78a2))
+- Add products schema and refactor modelMapper for better readability ([336e85f](https://github.com/clifordpereira/nuxt-auto-crud/commit/336e85f))
+- Replace 'any' with proper types ([9503039](https://github.com/clifordpereira/nuxt-auto-crud/commit/9503039))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v2.5.4
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v2.5.3...v2.5.4)
