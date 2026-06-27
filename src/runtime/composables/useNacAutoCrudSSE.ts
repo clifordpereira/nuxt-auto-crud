@@ -1,3 +1,5 @@
+import { onBeforeUnmount, onMounted } from "#imports"
+
 export interface AutoCrudEvent {
   table: string
   action: 'create' | 'update' | 'delete'

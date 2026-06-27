@@ -62,13 +62,12 @@ export function getSelectableFields(table: Table, context: QueryContext = {}): R
   const isPublic = context?.isPublic
   const publicFields = isPublic ? getPublicFields(tableName) : []
 
-  for (const key in allColumns) {
-    const hiddenSet = new Set(apiHiddenFields)
-    const publicSet = new Set(publicFields)
+  const hiddenSet = new Set(apiHiddenFields)
+  const publicSet = new Set(publicFields)
 
+  for (const key in allColumns) {
     if (hiddenSet.has(key)) continue
     if (isPublic && publicSet.size > 0 && !publicSet.has(key)) continue
-
     const col = allColumns[key]
     if (col) result[key] = col
   }
@@ -122,64 +121,46 @@ const SEMANTIC_CHECK_MAP: Record<string, Field['type']> = {
 
 const TEXTAREA_HINTS = ['content', 'description', 'bio', 'message']
 
-/**
- * Builds a complete SchemaDefinition for a model.
- * - Filters out hidden fields
- * - Marks protected fields as read-only
- * - Infers types from Drizzle columns
- * - Resolves foreign key relations
- */
+function inferFieldType(name: string, col: Column, zodField?: z.ZodTypeAny): {
+  type: Field['type']
+  selectOptions?: string[]
+} {
+  const zodTypeName = (zodField?._def as any)?.typeName
+  let type: Field['type'] = ZOD_TYPE_MAP[zodTypeName] ?? 'string'
+
+  const colInternal = col as any
+  const enumValues = colInternal.enumValues || colInternal.config?.enumValues
+
+  if (enumValues) return { type: 'enum', selectOptions: enumValues }
+
+  const checks = (zodField?._def?.checks as any[]) || []
+  const semanticMatch = checks.find(c => SEMANTIC_CHECK_MAP[c.kind])
+  if (semanticMatch) return { type: SEMANTIC_CHECK_MAP[semanticMatch.kind]! }
+  if (TEXTAREA_HINTS.includes(name)) return { type: 'textarea' }
+
+  return { type }
+}
+
 export async function getSchemaDefinition(modelName: string): Promise<SchemaDefinition> {
   const table = modelTableMap[modelName]
   if (!table) throw new ResourceNotFoundError(modelName)
 
-  const config = useRuntimeConfig()
-  const apiHiddenFields = config.autoCrud.apiHiddenFields
-  const { formHiddenFields, formReadOnlyFields } = config.public.autoCrud
-
+  const { autoCrud, public: { autoCrud: publicAutoCrud } } = useRuntimeConfig()
   const columns = getColumns(table)
   const relations = await resolveTableRelations(table)
   const shape = createInsertSchema(table).shape
 
+  const hiddenFields = new Set([...autoCrud.apiHiddenFields, ...publicAutoCrud.formHiddenFields])
+
   const fields: Field[] = Object.entries(columns)
-    .filter(([name]) => !apiHiddenFields.includes(name) && !formHiddenFields.includes(name))
-    .map(([name, col]) => {
-      const zodField = shape[name] as z.ZodTypeAny | undefined
-      const zodTypeName = (zodField?._def as unknown as { typeName: string })?.typeName
-
-      // 1. Resolve Base Technical Type
-      let type: Field['type'] = ZOD_TYPE_MAP[zodTypeName] ?? 'string'
-
-      // 2. Resolve Enums & Semantic Overrides
-      const colInternal = col as Column & { enumValues?: string[], config?: { enumValues?: string[] } }
-      const enumValues = colInternal.enumValues || colInternal.config?.enumValues
-      let selectOptions: string[] | undefined
-
-      if (enumValues) {
-        type = 'enum'
-        selectOptions = enumValues
-      }
-      else {
-        const checks = (zodField?._def?.checks as unknown as { kind: string }[]) || []
-        const semanticMatch = checks.find(c => SEMANTIC_CHECK_MAP[c.kind])
-
-        if (semanticMatch) {
-          type = SEMANTIC_CHECK_MAP[semanticMatch.kind]!
-        }
-        else if (TEXTAREA_HINTS.includes(name)) {
-          type = 'textarea'
-        }
-      }
-
-      return {
-        name,
-        type,
-        selectOptions,
-        required: colInternal.notNull ?? false,
-        references: relations[name],
-        readonly: formReadOnlyFields.includes(name) || name === 'id',
-      }
-    })
+    .filter(([name]) => !hiddenFields.has(name))
+    .map(([name, col]) => ({
+      name,
+      ...inferFieldType(name, col, shape[name]),
+      required: (col as any).notNull ?? false,
+      references: relations[name],
+      readonly: publicAutoCrud.formReadOnlyFields.includes(name) || name === 'id',
+    }))
 
   return {
     resource: modelName,
