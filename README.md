@@ -25,6 +25,7 @@ npx nuxi init -t gh:clifordpereira/nac-starter my-app
 cd my-app
 nuxt db generate
 nuxt dev
+
 ```
 
 ### Option B: Manual Installation
@@ -35,6 +36,7 @@ cd my-app
 npx nuxi module add hub
 bun add drizzle-orm@beta @libsql/client nuxt-auto-crud
 bun add -D drizzle-kit@beta typescript
+
 ```
 
 #### Configuration
@@ -59,14 +61,16 @@ export default defineNuxtConfig({
 Define your schema in `server/db/schema.ts`:
 
 ```typescript
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
+import { sqliteTable, text, integer, numeric } from 'drizzle-orm/sqlite-core'
 
-export const users = sqliteTable('users', {
-  id: integer().primaryKey({ autoIncrement: true }),
-  name: text().notNull(),
-  email: text().notNull().unique(),
-  avatar: text().notNull(),
+export const products = sqliteTable('products', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  name: text('name').notNull(),
+  sku: text('sku').notNull(),
+  price: numeric('price', { mode: 'number' }).notNull(),
+  stock: integer('stock').notNull(),
   createdAt: integer({ mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  updatedAt: integer({ mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
 })
 
 ```
@@ -95,16 +99,13 @@ nuxt dev
 | **PATCH** | `/api/_nac/:model/:id` | Partial update with validation |
 | **DELETE** | `/api/_nac/:model/:id` | Delete record |
 
-
-**Example (`users` table):** 
-
-| Action | HTTP Method | Endpoint | Example Result |
+**Example (`products` table):** | Action | HTTP Method | Endpoint | Example Result |
 | --- | --- | --- | --- |
-| **Fetch All** | `GET` | `/api/_nac/users` | List of all users |
-| **Create** | `POST` | `/api/_nac/users` | New user record added |
-| **Fetch One** | `GET` | `/api/_nac/users/1` | Details of user with `id: 1` |
-| **Update** | `PATCH` | `/api/_nac/users/1` | Partial update to user `1` |
-| **Delete** | `DELETE` | `/api/_nac/users/1` | User `1` removed from DB |
+| **Fetch All** | `GET` | `/api/_nac/products` | List of all products |
+| **Create** | `POST` | `/api/_nac/products` | New product record added |
+| **Fetch One** | `GET` | `/api/_nac/products/1` | Details of product with `id: 1` |
+| **Update** | `PATCH` | `/api/_nac/products/1` | Partial update to product `1` |
+| **Delete** | `DELETE` | `/api/_nac/products/1` | Product `1` removed from DB |
 
 ---
 
@@ -118,7 +119,7 @@ Use these endpoints to build dynamic UI components (like menus and forms) or pro
 * Returns an array of all available table names. Useful for generating dynamic navigation menus.
 * **Resource Metadata**: `GET /api/_nac/_schemas/:resource`
 * Returns field definitions, validation rules, and `readonly` status for a specific table.
-* **Example:** `GET /api/_nac/_schemas/users` returns the schema for the users table.
+* **Example:** `GET /api/_nac/_schemas/products` returns the schema for the products table.
 
 #### Schema Interface
 
@@ -142,16 +143,18 @@ export interface SchemaDefinition {
 
 #### Example Response
 
-`GET /api/_nac/_schemas/users`
+`GET /api/_nac/_schemas/products`
 
 ```json
 {
-  "resource": "users",
+  "resource": "products",
   "labelField": "name",
   "fields": [
-    { "name": "id", "type": "string", "required": true, "readonly": true },
+    { "name": "id", "type": "number", "required": true, "readonly": true },
     { "name": "name", "type": "string", "required": true, "readonly": false },
-    { "name": "email", "type": "string", "required": true, "readonly": false }
+    { "name": "sku", "type": "string", "required": true, "readonly": false },
+    { "name": "price", "type": "number", "required": true, "readonly": false },
+    { "name": "stock", "type": "number", "required": true, "readonly": false }
   ]
 }
 
@@ -207,11 +210,11 @@ autoCrud: {
     ownerKey: 'createdBy', 
   },
   publicResources: {
-    users: ['id', 'name', 'email'],
+    products: ['id', 'name', 'sku', 'price'],
   },
-  apiHiddenFields: ['password'], 
-  formHiddenFields: ['createdAt'], // All fields should be camelCase
-  formReadOnlyFields: ['slug', 'externalId'], // Locked for user input
+  apiHiddenFields: ['cost_price'], 
+  formHiddenFields: ['created_at', 'updated_at'],
+  formReadOnlyFields: ['sku'], // Locked for user input after generation
   agenticToken: '', 
   nacEndpointPrefix: '/api/_nac',
   schemaPath: 'server/db/schema',
@@ -220,6 +223,7 @@ autoCrud: {
 ```
 
 > **Note**: Modify `nacEndpointPrefix` or `schemaPath` only if the Nuxt/Nitro conventions change.
+
 ---
 
 ## 🛡 Filtering & Performance Optimization
@@ -249,7 +253,7 @@ event.context.nac = {
 
 ```
 
-### Optimization: Skip Redundant Fetches 
+### Optimization: Skip Redundant Fetches
 
 If your middleware has already fetched the record, pass it to `event.context.nac.record` (as shown above). **nac** will use this object instead of executing an additional database query.
 
@@ -278,7 +282,7 @@ NAC provides a `useNacAutoCrudSSE` composable to listen for these changes in you
 ```typescript
 useNacAutoCrudSSE(({ table, action, data: sseData, primaryKey }) => {
   // Optional: Filter by specific table
-  // if (table !== currentTable.value) return
+  if (table !== 'products') return
 
   if (action === 'update') {
     // updateRow(primaryKey, sseData)
@@ -294,5 +298,5 @@ useNacAutoCrudSSE(({ table, action, data: sseData, primaryKey }) => {
 })
 
 ```
----
 
+---
