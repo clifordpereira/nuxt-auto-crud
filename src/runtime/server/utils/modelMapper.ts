@@ -126,11 +126,24 @@ function inferFieldType(name: string, col: Column, zodField?: z.ZodTypeAny): {
   selectOptions?: string[]
 } {
   const zodTypeName = (zodField?._def as ZodTypeDef | undefined)?.typeName
-  const type: Field['type'] = ZOD_TYPE_MAP[zodTypeName ?? ''] ?? 'string'
+  let type: Field['type'] = ZOD_TYPE_MAP[zodTypeName ?? ''] ?? 'string'
 
   const colInternal = col as Column & ColumnInternal
-  const enumValues = colInternal.enumValues || colInternal.config?.enumValues
 
+  // DRIZZLE TYPE OVERRIDE FALLBACK
+  if (
+    type === 'string' && (
+      colInternal.columnType === 'PgNumeric' || 
+      colInternal.columnType === 'MySqlNumeric' || 
+      colInternal.mapTo === 'number' ||
+      colInternal.dataType === 'number' ||
+      colInternal.columnType?.includes('Integer')
+    )
+  ) {
+    type = 'number'
+  }
+
+  const enumValues = colInternal.enumValues || colInternal.config?.enumValues
   if (enumValues) return { type: 'enum', selectOptions: enumValues }
 
   const checks = (zodField?._def as ZodTypeDef | undefined)?.checks ?? []

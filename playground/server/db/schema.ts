@@ -14,7 +14,7 @@ export const products = sqliteTable('products', {
   name: text('name').notNull(),
   sku: text('sku').notNull(),
   price: numeric('price', { mode: 'number' }).notNull(),
-  stock: integer('stock', { mode: 'number' }).notNull(),
+  stock: integer('stock').notNull(),
   createdAt: integer({ mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
   updatedAt: integer({ mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
 })
