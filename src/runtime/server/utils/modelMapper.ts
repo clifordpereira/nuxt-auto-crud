@@ -133,11 +133,11 @@ function inferFieldType(name: string, col: Column, zodField?: z.ZodTypeAny): {
   // DRIZZLE TYPE OVERRIDE FALLBACK
   if (
     type === 'string' && (
-      colInternal.columnType === 'PgNumeric' || 
-      colInternal.columnType === 'MySqlNumeric' || 
-      colInternal.mapTo === 'number' ||
-      colInternal.dataType === 'number' ||
-      colInternal.columnType?.includes('Integer')
+      colInternal.columnType === 'PgNumeric'
+      || colInternal.columnType === 'MySqlNumeric'
+      || colInternal.mapTo === 'number'
+      || colInternal.dataType === 'number'
+      || colInternal.columnType?.includes('Integer')
     )
   ) {
     type = 'number'

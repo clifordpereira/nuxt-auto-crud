@@ -9,9 +9,9 @@ export type TableWithId = Table & {
 export interface ColumnInternal {
   enumValues?: string[]
   notNull?: boolean
-  columnType?: string   // Add this for checking 'PgNumeric' / 'MySqlNumeric'
-  mapTo?: string        // Add this for custom mappings
-  dataType?: string     // Add this for Drizzle's primitive data types
+  columnType?: string // Add this for checking 'PgNumeric' / 'MySqlNumeric'
+  mapTo?: string // Add this for custom mappings
+  dataType?: string // Add this for Drizzle's primitive data types
   config?: {
     enumValues?: string[]
   }
