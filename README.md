@@ -99,7 +99,9 @@ nuxt dev
 | **PATCH** | `/api/_nac/:model/:id` | Partial update with validation |
 | **DELETE** | `/api/_nac/:model/:id` | Delete record |
 
-**Example (`products` table):** | Action | HTTP Method | Endpoint | Example Result |
+**Example (`products` table):**
+
+| Action | HTTP Method | Endpoint | Example Result |
 | --- | --- | --- | --- |
 | **Fetch All** | `GET` | `/api/_nac/products` | List of all products |
 | **Create** | `POST` | `/api/_nac/products` | New product record added |
@@ -299,4 +301,3 @@ useNacAutoCrudSSE(({ table, action, data: sseData, primaryKey }) => {
 
 ```
 
----
