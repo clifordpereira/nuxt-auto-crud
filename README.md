@@ -87,6 +87,12 @@ nuxt dev
 
 ---
 
+### 🛠️ Critical Stability Update (v2.5+)
+* **The "String-instead-of-Number" Bug is Fixed!** Previous versions had an issue inheriting Drizzle-Zod's underlying behavior where `numeric` and `integer` columns erroneously parsed as `string` types in the UI metadata. This caused type-mismatches with frontend form components and required manual parsing. 
+  
+  **Fixed in recent versions:** The module now fully infers, converts, and enforces native database numeric types strictly as `number` payloads. No more manual casting or frontend form component type hacks are required.
+
+
 ## 🌐 Data APIs (Dynamic RESTful CRUD)
 
 > Note: All endpoints follow the pattern ${nacEndpointPrefix}/:model. By default, this is /api/_nac/:model.
