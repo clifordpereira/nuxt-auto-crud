@@ -1,3 +1,20 @@
+## v2.5.6
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v2.5.5...v2.5.6)
+
+### 🩹 Fixes
+
+- Integer and numeric (decimal) returning as string in schemaDefinition ([899ff78](https://github.com/clifordpereira/nuxt-auto-crud/commit/899ff78))
+- Lint errors ([d9c7d17](https://github.com/clifordpereira/nuxt-auto-crud/commit/d9c7d17))
+
+### 🏡 Chore
+
+- **release:** V2.5.5 ([58032e8](https://github.com/clifordpereira/nuxt-auto-crud/commit/58032e8))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v2.5.5
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v2.5.4...v2.5.5)
