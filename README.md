@@ -34,8 +34,8 @@ nuxt dev
 bun create nuxt@latest my-app
 cd my-app
 npx nuxi module add hub
-bun add drizzle-orm@beta @libsql/client nuxt-auto-crud
-bun add -D drizzle-kit@beta typescript
+bun add drizzle-orm@rc @libsql/client nuxt-auto-crud
+bun add -D drizzle-kit@rc typescript
 
 ```
 
