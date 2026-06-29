@@ -1,5 +1,5 @@
 import { useRuntimeConfig } from '#imports'
-import { db, type NuxtHubRuntimeConfig } from '@nuxthub/db'
+import { type NuxtHubRuntimeConfig } from '@nuxthub/db'
 import { type Table, eq, desc, and, or, getColumns } from 'drizzle-orm'
 
 import { getSelectableFields } from './modelMapper'
@@ -9,6 +9,9 @@ import { DeletionFailedError, InsertionFailedError, RecordNotFoundError, Unautho
 import type { QueryContext } from '../../shared/utils/types'
 import type { TableWithId } from '../types'
 import { pick } from '#nac/shared/utils/helpers'
+import { getTableConfigForDialect, getWithObjectFromSchema } from './drizzleHelpers'
+
+import db from '#nac/db'
 
 // helper used in this file
 function isMysql() {
@@ -75,22 +78,23 @@ function hasAnyListPermissions(context: QueryContext = {}) {
  * @returns An array of rows from the database.
  */
 export async function nacGetRows(table: TableWithId, context: QueryContext = {}) {
-  const isAuthorizationEnabled = useRuntimeConfig().autoCrud.auth?.authorization
+  const isAuthorizationEnabled = useRuntimeConfig().autoCrud.auth?.authorization;
   if (isAuthorizationEnabled && !context.isPublic && !hasAnyListPermissions(context)) {
-    throw new UnauthorizedAccessError()
+    throw new UnauthorizedAccessError();
   }
+  const getTableConfig = await getTableConfigForDialect();
 
-  const fields = getSelectableFields(table, context)
-  let query = db.select(fields).from(table).$dynamic()
+  const tableName = getTableConfig(table).name;
+  const columns = getSelectableFields(table, context);
+  const filters = getVisibilityFilters(table, context);
+  const withRelations = await getWithObjectFromSchema(table);
 
-  const filters = getVisibilityFilters(table, context)
-  if (filters.length > 0) query = query.where(and(...filters))
-
-  const baseQuery = query.orderBy(desc(table.id))
-  if (isMysql()) {
-    return await baseQuery
-  }
-  return await baseQuery.all()
+  return await db.query[tableName].findMany({
+    columns,
+    with: withRelations,
+    where: filters.length > 0 ? and(...filters) : undefined,
+    orderBy: { id: "desc" },
+  });
 }
 
 /**

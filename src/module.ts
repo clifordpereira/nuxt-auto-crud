@@ -24,6 +24,8 @@ export default defineNuxtModule<ModuleOptions>({
     apiHiddenFields: NAC_API_HIDDEN_FIELDS,
     agenticToken: '',
     schemaPath: 'server/db/schema',
+    relationsPath: 'server/db/relations',
+    dbPath: 'server/db',
     // Public config
     formHiddenFields: NAC_FORM_HIDDEN_FIELDS,
     formReadOnlyFields: NAC_FORM_READ_ONLY_FIELDS,
@@ -38,6 +40,8 @@ export default defineNuxtModule<ModuleOptions>({
     nuxt.options.alias['#nac/shared'] = resolver.resolve('./runtime/shared')
     nuxt.options.alias['#nac/types'] = resolver.resolve('./runtime/server/types')
     nuxt.options.alias['#nac/schema'] = resolver.resolve(nuxt.options.rootDir, options.schemaPath!)
+    nuxt.options.alias['#nac/relations'] = resolver.resolve(nuxt.options.rootDir, options.relationsPath!)
+    nuxt.options.alias['#nac/db'] = resolver.resolve(nuxt.options.rootDir, options.dbPath!)
 
     // 2. Runtime Config (The Concrete State)
     const { formHiddenFields, nacEndpointPrefix, formReadOnlyFields, ...privateOptions } = options

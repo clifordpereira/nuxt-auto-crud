@@ -3,6 +3,8 @@ export interface ModuleOptions {
   statusFiltering: boolean
   realtime: boolean
   schemaPath: string
+  relationsPath: string
+  dbPath: string
   auth: {
     authentication: boolean
     authorization: boolean

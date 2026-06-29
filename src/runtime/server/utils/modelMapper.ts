@@ -11,6 +11,9 @@ import type { ColumnInternal, ZodTypeDef } from '../types'
 import { NAC_SYSTEM_TABLES } from './constants'
 import { ResourceNotFoundError } from '../exceptions'
 
+import { getTableConfigForDialect } from './drizzleHelpers';
+
+
 /**
  * Builds a map of all exported Drizzle tables from the schema.
  * @returns {Record<string, Table>} A mapping of export keys to their corresponding Table instances.
@@ -79,22 +82,18 @@ export function getSelectableFields(table: Table, context: QueryContext = {}): R
  * Maps property keys to target table names.
  */
 export async function resolveTableRelations(table: Table): Promise<Record<string, string>> {
-  const { hub } = useRuntimeConfig() as unknown as { hub: { db: { dialect?: string } | string } }
-  const dbConfig = hub.db
-  const isMysql = dbConfig === 'mysql' || (typeof dbConfig === 'object' && dbConfig?.dialect === 'mysql')
-  const { getTableConfig } = (await (isMysql ? import('drizzle-orm/mysql-core') : import('drizzle-orm/sqlite-core')))
-
-  const config = getTableConfig(table)
-  const columnsMap = getColumns(table)
-  const relations: Record<string, string> = {}
+  const getTableConfig = await getTableConfigForDialect();
+  const config = getTableConfig(table);
+  const columnsMap = getColumns(table);
+  const relations: Record<string, string> = {};
 
   for (const fk of config.foreignKeys) {
-    const targetTable = getTableConfig(fk.reference().foreignTable).name
-    const propertyKey = getForeignKeyPropertyName(fk, columnsMap)
-    if (propertyKey) relations[propertyKey] = targetTable
+    const targetTable = getTableConfig(fk.reference().foreignTable).name;
+    const propertyKey = getForeignKeyPropertyName(fk, columnsMap);
+    if (propertyKey) relations[propertyKey] = targetTable;
   }
 
-  return relations
+  return relations;
 }
 
 /**

@@ -21,3 +21,9 @@ export const relations = defineRelations(schema, (r) => ({
     course: r.one.courses({ from: r.enrollments.course_id, to: r.courses.id }),
   },
 }));
+
+export const tableRelationNames: Record<string, string[]> = {
+  students: ['courses', 'enrollments'],
+  courses: ['students', 'enrollments'],
+  enrollments: ['student', 'course'],
+};
