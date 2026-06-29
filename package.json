@@ -84,8 +84,7 @@
     "playwright-core": "^1.61.1",
     "typescript": "~5.9.3",
     "vitest": "^4.1.9",
-    "vue-tsc": "^3.3.5",
-    "wrangler": "^4.105.0"
+    "vue-tsc": "^3.3.5"
   },
   "sideEffects": false,
   "engines": {
