@@ -22,8 +22,18 @@ export const relations = defineRelations(schema, (r) => ({
   },
 }));
 
-export const tableRelationNames: Record<string, string[]> = {
-  students: ['courses', 'enrollments'],
-  courses: ['students', 'enrollments'],
-  enrollments: ['student', 'course'],
+export const tableRelations: Record<string, {
+  columns?: Record<string, boolean>,
+  with?: Record<string, { columns?: Record<string, boolean> } | true>,
+}> = {
+  enrollments: {
+    columns: {
+      student_id: false,
+      course_id: false,
+    },
+    with: {
+      student: { columns: { name: true } },
+      course: { columns: { title: true } },
+    },
+  },
 };

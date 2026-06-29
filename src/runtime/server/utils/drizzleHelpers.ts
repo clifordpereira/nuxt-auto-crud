@@ -1,5 +1,5 @@
 import type { Table } from "drizzle-orm";
-import { tableRelationNames } from "#nac/relations";
+import { tableRelations } from "#nac/relations";
 import { useRuntimeConfig } from '#imports'
 
 export async function getTableConfigForDialect() {
@@ -18,13 +18,8 @@ export async function getTableConfigForDialect() {
   return getTableConfig;
 }
 
-export async function getRelationsFromSchema(table: Table): Promise<string[]> {
+export async function getQueryOptionsFromSchema(table: Table) {
   const getTableConfig = await getTableConfigForDialect();
   const tableName = getTableConfig(table).name;
-  return tableRelationNames[tableName] ?? [];
-}
-
-export async function getWithObjectFromSchema(table: Table): Promise<Record<string, boolean>> {
-  const relations = await getRelationsFromSchema(table);
-  return Object.fromEntries(relations.map(key => [key, true]));
+  return tableRelations[tableName] ?? {};
 }
