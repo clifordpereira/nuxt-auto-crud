@@ -1,8 +1,12 @@
 import type { Table } from "drizzle-orm";
-import { tableRelations } from "#nac/relations";
+import { tableQueryConfig } from "#nac/relations";
 import { useRuntimeConfig } from '#imports'
 
-export async function getTableConfigForDialect() {
+/**
+ * Get table config for dialect.
+ * @returns 
+ */
+export async function nacGetTableConfigForDialect() {
   const { hub } = useRuntimeConfig() as unknown as {
     hub: { db: { dialect?: string } | string };
   };
@@ -18,8 +22,13 @@ export async function getTableConfigForDialect() {
   return getTableConfig;
 }
 
-export async function getQueryOptionsFromSchema(table: Table) {
-  const getTableConfig = await getTableConfigForDialect();
+/**
+ * Get table query config from relations.
+ * @param table 
+ * @returns 
+ */
+export async function nacGetTableQueryConfig(table: Table) {
+  const getTableConfig = await nacGetTableConfigForDialect();
   const tableName = getTableConfig(table).name;
-  return tableRelations[tableName] ?? {};
+  return tableQueryConfig[tableName] ?? {};
 }

@@ -9,7 +9,7 @@ import { DeletionFailedError, InsertionFailedError, RecordNotFoundError, Unautho
 import type { QueryContext } from '../../shared/utils/types'
 import type { TableWithId } from '../types'
 import { pick } from '#nac/shared/utils/helpers'
-import { getTableConfigForDialect, getQueryOptionsFromSchema } from './drizzleHelpers'
+import { nacGetTableConfigForDialect, nacGetTableQueryConfig } from './drizzleHelpers'
 
 import db from '#nac/db'
 
@@ -20,7 +20,12 @@ function isMysql() {
   return dbConfig === 'mysql' || (typeof dbConfig === 'object' && dbConfig?.dialect === 'mysql')
 }
 
-// helper used in nacGetRows
+/**
+ * Get visibility filters for a table.
+ * @param table - The table to get visibility filters for.
+ * @param context - The context to get visibility filters for.
+ * @returns An array of visibility filters for the table.
+ */
 export function getVisibilityFilters(table: TableWithId, context: QueryContext = {}) {
   const isAuthorizationEnabled = useRuntimeConfig().autoCrud.auth?.authorization
   const isStatusFilteringEnabled = useRuntimeConfig().autoCrud.statusFiltering
@@ -83,15 +88,15 @@ export async function nacGetRows(table: TableWithId, context: QueryContext = {})
     throw new UnauthorizedAccessError();
   }
 
-  const getTableConfig = await getTableConfigForDialect();
+  const getTableConfig = await nacGetTableConfigForDialect();
   const tableName = getTableConfig(table).name;
   const filters = getVisibilityFilters(table, context);
-  const queryOptions = await getQueryOptionsFromSchema(table);
+  const queryOptions = await nacGetTableQueryConfig(table);
 
   return await db.query[tableName].findMany({
+    orderBy: { id: "desc" },
     ...queryOptions,
     where: filters.length > 0 ? and(...filters) : undefined,
-    orderBy: { id: "desc" },
   });
 }
 

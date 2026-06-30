@@ -1,4 +1,4 @@
-import { defineRelations } from 'drizzle-orm';
+import { defineRelations, type DBQueryConfig } from 'drizzle-orm';
 import * as schema from './schema';
 
 export const relations = defineRelations(schema, (r) => ({
@@ -22,10 +22,7 @@ export const relations = defineRelations(schema, (r) => ({
   },
 }));
 
-export const tableRelations: Record<string, {
-  columns?: Record<string, boolean>,
-  with?: Record<string, { columns?: Record<string, boolean> } | true>,
-}> = {
+export const tableQueryConfig: Record<string, DBQueryConfig> = {
   enrollments: {
     columns: {
       student_id: false,
@@ -35,5 +32,9 @@ export const tableRelations: Record<string, {
       student: { columns: { name: true } },
       course: { columns: { title: true } },
     },
+    orderBy: { id: "asc" },
   },
+  students: {
+    orderBy: { id: "asc" },
+  }
 };
