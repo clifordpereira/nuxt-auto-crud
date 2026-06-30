@@ -6,7 +6,7 @@ import { useRuntimeConfig } from '#imports'
  * Get table config for dialect.
  * @returns 
  */
-export async function nacGetTableConfigForDialect() {
+export async function nacGetTableConfigResolver() {
   const { hub } = useRuntimeConfig() as unknown as {
     hub: { db: { dialect?: string } | string };
   };
@@ -23,12 +23,20 @@ export async function nacGetTableConfigForDialect() {
 }
 
 /**
+ * Get table name from a table.
+ * @param table - The table to get the name from.
+ * @returns The name of the table.
+ */
+export async function nacGetTableName(table: Table): Promise<string> {
+  const getTableConfig = await nacGetTableConfigResolver();
+  return getTableConfig(table).name;
+}
+
+/**
  * Get table query config from relations.
  * @param table 
  * @returns 
  */
-export async function nacGetTableQueryConfig(table: Table) {
-  const getTableConfig = await nacGetTableConfigForDialect();
-  const tableName = getTableConfig(table).name;
+export function nacGetTableQueryConfig(tableName: string) {
   return tableQueryConfig[tableName] ?? {};
 }

@@ -9,7 +9,7 @@ import { DeletionFailedError, InsertionFailedError, RecordNotFoundError, Unautho
 import type { QueryContext } from '../../shared/utils/types'
 import type { TableWithId } from '../types'
 import { pick } from '#nac/shared/utils/helpers'
-import { nacGetTableConfigForDialect, nacGetTableQueryConfig } from './drizzleHelpers'
+import { nacGetTableName, nacGetTableQueryConfig } from './drizzleHelpers'
 
 import db from '#nac/db'
 
@@ -88,10 +88,9 @@ export async function nacGetRows(table: TableWithId, context: QueryContext = {})
     throw new UnauthorizedAccessError();
   }
 
-  const getTableConfig = await nacGetTableConfigForDialect();
-  const tableName = getTableConfig(table).name;
+  const tableName = await nacGetTableName(table);
   const filters = getVisibilityFilters(table, context);
-  const queryOptions = await nacGetTableQueryConfig(table);
+  const queryOptions = nacGetTableQueryConfig(tableName);
 
   return await db.query[tableName].findMany({
     orderBy: { id: "desc" },

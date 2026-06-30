@@ -11,7 +11,7 @@ import type { ColumnInternal, ZodTypeDef } from '../types'
 import { NAC_SYSTEM_TABLES } from './constants'
 import { ResourceNotFoundError } from '../exceptions'
 
-import { nacGetTableConfigForDialect } from './drizzleHelpers';
+import { nacGetTableConfigResolver } from './drizzleHelpers';
 
 
 /**
@@ -82,7 +82,7 @@ export function getSelectableFields(table: Table, context: QueryContext = {}): R
  * Maps property keys to target table names.
  */
 export async function resolveTableRelations(table: Table): Promise<Record<string, string>> {
-  const getTableConfig = await nacGetTableConfigForDialect();
+  const getTableConfig = await nacGetTableConfigResolver();
   const config = getTableConfig(table);
   const columnsMap = getColumns(table);
   const relations: Record<string, string> = {};
