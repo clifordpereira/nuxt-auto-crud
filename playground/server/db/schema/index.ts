@@ -1,3 +1,3 @@
-export * from './users';
-export * from './academy';
-export * from './products';
+export * from './users'
+export * from './academy'
+export * from './products'

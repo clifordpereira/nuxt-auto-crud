@@ -9,4 +9,3 @@ export const products = sqliteTable('products', {
   createdAt: integer({ mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
   updatedAt: integer({ mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
 })
-

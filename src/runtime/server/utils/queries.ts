@@ -1,6 +1,6 @@
 import { useRuntimeConfig } from '#imports'
-import { type NuxtHubRuntimeConfig } from '@nuxthub/db'
-import { type Table, eq, desc, and, or, getColumns } from 'drizzle-orm'
+import type { NuxtHubRuntimeConfig } from '@nuxthub/db'
+import { type Table, eq, and, or, getColumns } from 'drizzle-orm'
 
 import { getSelectableFields } from './modelMapper'
 
@@ -83,20 +83,20 @@ function hasAnyListPermissions(context: QueryContext = {}) {
  * @returns An array of rows from the database.
  */
 export async function nacGetRows(table: TableWithId, context: QueryContext = {}) {
-  const isAuthorizationEnabled = useRuntimeConfig().autoCrud.auth?.authorization;
+  const isAuthorizationEnabled = useRuntimeConfig().autoCrud.auth?.authorization
   if (isAuthorizationEnabled && !context.isPublic && !hasAnyListPermissions(context)) {
-    throw new UnauthorizedAccessError();
+    throw new UnauthorizedAccessError()
   }
 
-  const tableName = await nacGetTableName(table);
-  const filters = getVisibilityFilters(table, context);
-  const queryOptions = nacGetTableQueryConfig(tableName);
+  const tableName = await nacGetTableName(table)
+  const filters = getVisibilityFilters(table, context)
+  const queryOptions = nacGetTableQueryConfig(tableName)
 
   return await db.query[tableName].findMany({
-    orderBy: { id: "desc" },
+    orderBy: { id: 'desc' },
     ...queryOptions,
     where: filters.length > 0 ? and(...filters) : undefined,
-  });
+  })
 }
 
 /**

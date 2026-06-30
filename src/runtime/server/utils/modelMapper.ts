@@ -11,8 +11,7 @@ import type { ColumnInternal, ZodTypeDef } from '../types'
 import { NAC_SYSTEM_TABLES } from './constants'
 import { ResourceNotFoundError } from '../exceptions'
 
-import { nacGetTableConfigResolver } from './drizzleHelpers';
-
+import { nacGetTableConfigResolver } from './drizzleHelpers'
 
 /**
  * Builds a map of all exported Drizzle tables from the schema.
@@ -82,18 +81,18 @@ export function getSelectableFields(table: Table, context: QueryContext = {}): R
  * Maps property keys to target table names.
  */
 export async function resolveTableRelations(table: Table): Promise<Record<string, string>> {
-  const getTableConfig = await nacGetTableConfigResolver();
-  const config = getTableConfig(table);
-  const columnsMap = getColumns(table);
-  const relations: Record<string, string> = {};
+  const getTableConfig = await nacGetTableConfigResolver()
+  const config = getTableConfig(table)
+  const columnsMap = getColumns(table)
+  const relations: Record<string, string> = {}
 
   for (const fk of config.foreignKeys) {
-    const targetTable = getTableConfig(fk.reference().foreignTable).name;
-    const propertyKey = getForeignKeyPropertyName(fk, columnsMap);
-    if (propertyKey) relations[propertyKey] = targetTable;
+    const targetTable = getTableConfig(fk.reference().foreignTable).name
+    const propertyKey = getForeignKeyPropertyName(fk, columnsMap)
+    if (propertyKey) relations[propertyKey] = targetTable
   }
 
-  return relations;
+  return relations
 }
 
 /**

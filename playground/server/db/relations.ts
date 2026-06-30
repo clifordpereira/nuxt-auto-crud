@@ -1,7 +1,7 @@
-import { defineRelations, type DBQueryConfig } from 'drizzle-orm';
-import * as schema from './schema';
+import { defineRelations, type DBQueryConfig } from 'drizzle-orm'
+import * as schema from './schema'
 
-export const relations = defineRelations(schema, (r) => ({
+export const relations = defineRelations(schema, r => ({
   students: {
     courses: r.many.courses({
       from: r.students.id.through(r.enrollments.student_id),
@@ -20,7 +20,7 @@ export const relations = defineRelations(schema, (r) => ({
     student: r.one.students({ from: r.enrollments.student_id, to: r.students.id }),
     course: r.one.courses({ from: r.enrollments.course_id, to: r.courses.id }),
   },
-}));
+}))
 
 export const tableQueryConfig: Record<string, DBQueryConfig> = {
   enrollments: {
@@ -32,9 +32,9 @@ export const tableQueryConfig: Record<string, DBQueryConfig> = {
       student: { columns: { name: true } },
       course: { columns: { title: true } },
     },
-    orderBy: { id: "asc" },
+    orderBy: { id: 'asc' },
   },
   students: {
-    orderBy: { id: "asc" },
-  }
-};
+    orderBy: { id: 'asc' },
+  },
+}
