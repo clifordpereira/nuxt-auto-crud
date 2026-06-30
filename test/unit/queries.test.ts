@@ -4,7 +4,7 @@ import { useRuntimeConfig } from '#imports'
 // 2. IMPORTS
 import { nacGetRows, nacGetRow, nacCreateRow, nacUpdateRow, nacDeleteRow } from '../../src/runtime/server/utils/queries'
 import type { TableWithId } from '../../src/runtime/server/types'
-import { db } from '@nuxthub/db'
+import db from '#nac/db'
 import { posts, users } from '#nac/schema'
 import {
   RecordNotFoundError,
@@ -12,6 +12,37 @@ import {
   UpdateFailedError,
   DeletionFailedError,
 } from '../../src/runtime/server/exceptions'
+
+const BASE_RUNTIME_CONFIG = {
+  hub: { db: 'sqlite' },
+  autoCrud: {
+    statusFiltering: false,
+    auth: { authorization: false, ownerKey: 'createdBy' },
+    apiHiddenFields: ['deletedAt'],
+  },
+  public: {
+    autoCrud: {
+      formHiddenFields: ['id', 'createdAt', 'updatedAt'],
+      formReadOnlyFields: ['title'],
+      nacEndpointPrefix: '/api/_nac',
+    },
+  },
+}
+
+const mockConfig = (overrides: Record<string, unknown> = {}) => {
+  const overrideAutoCrud = (overrides.autoCrud ?? {}) as Record<string, unknown>
+  const overrideAuth = (overrideAutoCrud.auth ?? {}) as Record<string, unknown>
+
+  return vi.mocked(useRuntimeConfig).mockReturnValue({
+    ...BASE_RUNTIME_CONFIG,
+    ...overrides,
+    autoCrud: {
+      ...BASE_RUNTIME_CONFIG.autoCrud,
+      ...overrideAutoCrud,
+      auth: { ...BASE_RUNTIME_CONFIG.autoCrud.auth, ...overrideAuth },
+    },
+  } as unknown as ReturnType<typeof useRuntimeConfig>)
+}
 
 // 1. HOISTED MOCK: Intercepts drizzle-orm before queries.ts loads
 vi.mock('drizzle-orm', async () => {
@@ -31,7 +62,8 @@ vi.mock('drizzle-orm', async () => {
 describe('NAC Core Queries - Consolidated Suite', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    // Setup Drizzle Fluent Mock Chain
+    mockConfig()
+
     vi.mocked(db.select).mockReturnThis()
     vi.mocked(db.from).mockReturnThis()
     vi.mocked(db.insert).mockReturnThis()
@@ -46,65 +78,81 @@ describe('NAC Core Queries - Consolidated Suite', () => {
   })
 
   describe('nacGetRows()', () => {
-    it('applies list permission logic (status OR owner)', async () => {
-      // 1. Ensure Config is ON
-      vi.mocked(useRuntimeConfig).mockReturnValue({
-        autoCrud: {
-          statusFiltering: true,
-          auth: { authorization: true, ownerKey: 'createdBy' },
-        },
-      } as unknown as ReturnType<typeof useRuntimeConfig>)
+    it('applies list permission logic (status OR owner) via where clause', async () => {
+      mockConfig({ autoCrud: { statusFiltering: true, auth: { authorization: true, ownerKey: 'createdBy' } } })
 
-      // 2. Ensure Table has the required columns for the logic to trigger
       const mockPosts = {
         ...posts,
         status: { name: 'status' },
         createdBy: { name: 'createdBy' },
       }
 
-      vi.mocked(db.all).mockResolvedValue([])
+      vi.mocked(db.query.posts.findMany).mockResolvedValue([])
 
       await nacGetRows(mockPosts as unknown as TableWithId, {
         userId: '1',
         resourcePermissions: ['list_active'],
       })
 
-      expect(db.where).toHaveBeenCalled()
+      expect(db.query.posts.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ where: expect.anything() }),
+      )
     })
 
     it('applies list_own permission logic strictly', async () => {
-      vi.mocked(db.all).mockResolvedValue([])
+      mockConfig({
+        autoCrud: {
+          statusFiltering: false,
+          auth: { authorization: true, ownerKey: 'createdBy' },
+        },
+      })
+
+      vi.mocked(db.query.posts.findMany).mockResolvedValue([])
+
       await nacGetRows(posts as unknown as TableWithId, { userId: '1', resourcePermissions: ['list_own'] })
-      expect(db.where).toHaveBeenCalled()
+
+      expect(db.query.posts.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ where: expect.anything() }),
+      )
     })
 
     it('bypasses filters for admin (no resourcePermissions provided)', async () => {
-      // Explicitly disable features to test "Admin/Default" bypass
-      vi.mocked(useRuntimeConfig).mockReturnValue({
+      mockConfig({
         autoCrud: { statusFiltering: false, auth: { authorization: false } },
-      } as unknown as ReturnType<typeof useRuntimeConfig>)
+      })
 
-      vi.mocked(db.all).mockResolvedValue([])
+      vi.mocked(db.query.posts.findMany).mockResolvedValue([])
+
       await nacGetRows(posts as unknown as TableWithId, {})
-      expect(db.where).not.toHaveBeenCalled()
+
+      expect(db.query.posts.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ where: undefined }),
+      )
     })
 
     it('handles tables missing status/owner columns gracefully', async () => {
-      vi.mocked(db.all).mockResolvedValue([])
+      vi.mocked(db.query.users.findMany).mockResolvedValue([])
+
       // 'users' fixture lacks 'status' column
       await nacGetRows(users as unknown as TableWithId, { userId: '1', resourcePermissions: ['list_active'] })
-      expect(db.where).not.toHaveBeenCalled()
+
+      expect(db.query.users.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ where: undefined }),
+      )
     })
 
-    it('ensures descending ID order is always applied', async () => {
-      // Use default config
-      vi.mocked(useRuntimeConfig).mockReturnValue({
+    it('ensures descending ID order is applied by default', async () => {
+      mockConfig({
         autoCrud: { statusFiltering: false, auth: { authorization: false } },
-      } as unknown as ReturnType<typeof useRuntimeConfig>)
+      })
 
-      vi.mocked(db.all).mockResolvedValue([])
+      vi.mocked(db.query.posts.findMany).mockResolvedValue([])
+
       await nacGetRows(posts as unknown as TableWithId)
-      expect(db.orderBy).toHaveBeenCalled()
+
+      expect(db.query.posts.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ orderBy: { id: 'desc' } }),
+      )
     })
   })
 

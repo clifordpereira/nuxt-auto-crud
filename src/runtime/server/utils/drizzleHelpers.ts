@@ -1,19 +1,21 @@
 import type { Table } from 'drizzle-orm'
 import { tableQueryConfig } from '#nac/relations'
 import { useRuntimeConfig } from '#imports'
+import type { ResolvedDatabaseConfig } from '@nuxthub/core'
 
 /**
  * Get table config for dialect.
  * @returns The table config resolver.
  */
 export async function nacGetTableConfigResolver() {
-  const { hub } = useRuntimeConfig() as unknown as {
-    hub: { db: { dialect?: string } | string }
+  const { hub } = useRuntimeConfig()
+  const dbConfig = hub.db as ResolvedDatabaseConfig | false
+
+  if (!dbConfig) {
+    throw new Error('NuxtHub db is not enabled')
   }
-  const dbConfig = hub.db
-  const isMysql
-    = dbConfig === 'mysql'
-      || (typeof dbConfig === 'object' && dbConfig?.dialect === 'mysql')
+
+  const isMysql = dbConfig.dialect === 'mysql'
 
   const { getTableConfig } = await (isMysql
     ? import('drizzle-orm/mysql-core')

@@ -18,10 +18,12 @@ export default defineConfig({
             '#nac/shared': r('./src/runtime/shared'),
             '#nac/types': r('./src/runtime/server/types'),
             '#nac/schema': r(`./test/fixtures/${fixture}/server/db/schema.ts`),
+            '#nac/relations': r(`./test/fixtures/${fixture}/server/db/relations.ts`),
 
             // Mocking Nuxt environment
             '#imports': r('./test/mocks/imports.ts'),
             '@nuxthub/db': r('./test/mocks/db.ts'),
+            '#nac/db': r('./test/mocks/db.ts'),
           },
         },
       },
