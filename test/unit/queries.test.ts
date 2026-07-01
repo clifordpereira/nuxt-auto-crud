@@ -25,6 +25,7 @@ const BASE_RUNTIME_CONFIG = {
       formHiddenFields: ['id', 'createdAt', 'updatedAt'],
       formReadOnlyFields: ['title'],
       nacEndpointPrefix: '/api/_nac',
+      apiBase: '/api/_nac',
     },
   },
 }

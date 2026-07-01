@@ -17,6 +17,7 @@ export const useRuntimeConfig = vi.fn(() => ({
       formHiddenFields: ['id', 'createdAt', 'updatedAt'],
       formReadOnlyFields: ['title'],
       nacEndpointPrefix: '/api/_nac',
+      apiBase: '/api/_nac',
     },
   },
 }))

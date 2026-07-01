@@ -24,6 +24,7 @@ export default defineNuxtConfig({
     agenticToken: '',
     formHiddenFields: [],
     nacEndpointPrefix: '/api/_nac',
+    apiBase: '/api/_nac',
     schemaPath: 'server/db/schema',
   },
 })

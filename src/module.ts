@@ -29,7 +29,8 @@ export default defineNuxtModule<ModuleOptions>({
     // Public config
     formHiddenFields: NAC_FORM_HIDDEN_FIELDS,
     formReadOnlyFields: NAC_FORM_READ_ONLY_FIELDS,
-    nacEndpointPrefix: '/api/_nac',
+    nacEndpointPrefix: '/api/_nac', // deprecated: use apiBase instead
+    apiBase: '/api/_nac'
   },
 
   async setup(options, nuxt) {
@@ -44,9 +45,9 @@ export default defineNuxtModule<ModuleOptions>({
     nuxt.options.alias['#nac/db'] = resolver.resolve(nuxt.options.rootDir, options.dbPath!)
 
     // 2. Runtime Config (The Concrete State)
-    const { formHiddenFields, nacEndpointPrefix, formReadOnlyFields, ...privateOptions } = options
+    const { formHiddenFields, formReadOnlyFields, nacEndpointPrefix, apiBase, ...privateOptions } = options
     nuxt.options.runtimeConfig.autoCrud = privateOptions // private runtime
-    nuxt.options.runtimeConfig.public.autoCrud = { formHiddenFields, nacEndpointPrefix, formReadOnlyFields } // public runtime
+    nuxt.options.runtimeConfig.public.autoCrud = { formHiddenFields, formReadOnlyFields, nacEndpointPrefix, apiBase } // public runtime
 
     // 3. Auto-imports (The Engine)
     addImportsDir(resolver.resolve('./runtime/composables'))
