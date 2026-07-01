@@ -2,7 +2,7 @@ import { db } from '@nuxthub/db'
 import { eventHandler, getQuery, getHeader, setResponseHeader } from 'h3'
 import { useRuntimeConfig } from '#imports'
 
-import { nacGetSchemaDefinition, modelTableMap } from '../../utils/modelMapper'
+import { nacGetSchemaDefinition, nacModelTableMap } from '../../utils/modelMapper'
 import type { NacSchemaDefinition, NacField } from '../../../shared/utils/types'
 
 export default eventHandler(async (event) => {
@@ -12,7 +12,7 @@ export default eventHandler(async (event) => {
   const query = getQuery(event)
   const acceptHeader = getHeader(event, 'accept') || ''
 
-  const availableModels = Object.keys(modelTableMap)
+  const availableModels = Object.keys(nacModelTableMap)
   const models = availableModels.length > 0
     ? availableModels
     : Object.keys(db?.query || {})

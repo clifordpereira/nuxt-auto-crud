@@ -1,7 +1,7 @@
 import { eventHandler, getRouterParams, readBody } from 'h3'
 import { useRuntimeConfig } from '#imports'
 
-import { modelTableMap } from '../../../utils/modelMapper'
+import { nacModelTableMap } from '../../../utils/modelMapper'
 import { nacResolveValidatedSchema } from '../../../utils/validator'
 import { nacUpdateRow } from '../../../utils/queries'
 import { nacBroadcast } from '../../../utils/sse-bus'
@@ -14,7 +14,7 @@ export default eventHandler(async (event) => {
   const { model, id } = getRouterParams(event) as { model: string, id: string }
   const body = await readBody(event)
 
-  const table = modelTableMap[model] as NacTableWithId
+  const table = nacModelTableMap[model] as NacTableWithId
   if (!table) throw new NacResourceNotFoundError(model)
 
   const validatedData = await nacResolveValidatedSchema(table, 'patch').parseAsync(body)

@@ -33,7 +33,7 @@ export const buildModelTableMap = (): Record<string, Table> => {
  *
  * @public
  */
-export const modelTableMap = buildModelTableMap()
+export const nacModelTableMap = buildModelTableMap()
 
 /**
  * Resolves the property name for a foreign key's source column.
@@ -182,7 +182,7 @@ function inferFieldType(name: string, col: Column, zodField?: z.ZodTypeAny): {
  * @public
  */
 export async function nacGetSchemaDefinition(modelName: string): Promise<NacSchemaDefinition> {
-  const table = modelTableMap[modelName]
+  const table = nacModelTableMap[modelName]
   if (!table) throw new NacResourceNotFoundError(modelName)
 
   const { autoCrud, public: { autoCrud: publicAutoCrud } } = useRuntimeConfig()
