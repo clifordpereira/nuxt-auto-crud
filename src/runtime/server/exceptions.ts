@@ -1,9 +1,14 @@
 import { createError, type H3Error } from '#imports'
 
 /**
- * Base Auto CRUD Error
+ * Base exception class representing an Auto CRUD operations failure.
+ *
+ * @public
  */
-export class AutoCrudError extends Error {
+export class NacAutoCrudError extends Error {
+  /**
+   * The HTTP status code associated with this error.
+   */
   public readonly statusCode: number
 
   constructor(message: string, statusCode: number = 500) {
@@ -17,7 +22,10 @@ export class AutoCrudError extends Error {
   }
 
   /**
-   * Convert to Nuxt/H3 compatible error
+   * Converts the internal exception into an H3-compatible HTTP error.
+   *
+   * @returns An H3Error response.
+   * @public
    */
   toH3(): H3Error {
     return createError({
@@ -35,13 +43,23 @@ export class AutoCrudError extends Error {
 /*                               AUTH ERRORS                                  */
 /* -------------------------------------------------------------------------- */
 
-export class AuthenticationError extends AutoCrudError {
+/**
+ * Thrown when an operations request fails authentication.
+ *
+ * @public
+ */
+export class NacAuthenticationError extends NacAutoCrudError {
   constructor(message: string = 'Authentication required') {
     super(message, 401)
   }
 }
 
-export class UnauthorizedAccessError extends AutoCrudError {
+/**
+ * Thrown when an authenticated client lacks authorization permissions for a resource.
+ *
+ * @public
+ */
+export class NacUnauthorizedAccessError extends NacAutoCrudError {
   constructor(message: string = 'Forbidden') {
     super(message, 403)
   }
@@ -51,13 +69,23 @@ export class UnauthorizedAccessError extends AutoCrudError {
 /*                             VALIDATION ERRORS                              */
 /* -------------------------------------------------------------------------- */
 
-export class ValidationError extends AutoCrudError {
+/**
+ * Thrown when payload schema validation fails.
+ *
+ * @public
+ */
+export class NacValidationError extends NacAutoCrudError {
   constructor(modelName: string, message?: string) {
     super(message ?? `${modelName} validation failed`, 400)
   }
 }
 
-export class MissingSlugError extends AutoCrudError {
+/**
+ * Thrown when the target model slug or identifier is missing.
+ *
+ * @public
+ */
+export class NacMissingSlugError extends NacAutoCrudError {
   constructor(message: string = 'Missing slug or ID') {
     super(message, 400)
   }
@@ -67,7 +95,12 @@ export class MissingSlugError extends AutoCrudError {
 /*                            RESOURCE / MODEL ERRORS                         */
 /* -------------------------------------------------------------------------- */
 
-export class ResourceNotFoundError extends AutoCrudError {
+/**
+ * Thrown when the requested database table/model cannot be resolved.
+ *
+ * @public
+ */
+export class NacResourceNotFoundError extends NacAutoCrudError {
   constructor(modelName: string) {
     super(`Resource ${modelName} not found`, 404)
   }
@@ -77,32 +110,58 @@ export class ResourceNotFoundError extends AutoCrudError {
 /*                                CRUD ERRORS                                 */
 /* -------------------------------------------------------------------------- */
 
-export class RecordNotFoundError extends AutoCrudError {
+/**
+ * Thrown when a specific database row or record cannot be found.
+ *
+ * @public
+ */
+export class NacRecordNotFoundError extends NacAutoCrudError {
   constructor(message: string = 'Record not found') {
     super(message, 404)
   }
 }
 
-export class RecordAlreadyExistsError extends AutoCrudError {
+/**
+ * Thrown when trying to insert a database record that already exists.
+ *
+ * @public
+ */
+export class NacRecordAlreadyExistsError extends NacAutoCrudError {
   constructor(message: string = 'Record already exists') {
     super(message, 409)
   }
 }
 
-export class InsertionFailedError extends AutoCrudError {
+/**
+ * Thrown when database row insertion fails.
+ *
+ * @public
+ */
+export class NacInsertionFailedError extends NacAutoCrudError {
   constructor(message: string = 'Record insertion failed') {
     super(message, 500)
   }
 }
 
-export class UpdateFailedError extends AutoCrudError {
+/**
+ * Thrown when database row modification/update fails.
+ *
+ * @public
+ */
+export class NacUpdateFailedError extends NacAutoCrudError {
   constructor(message: string = 'Record update failed') {
     super(message, 500)
   }
 }
 
-export class DeletionFailedError extends AutoCrudError {
+/**
+ * Thrown when database row removal/deletion fails.
+ *
+ * @public
+ */
+export class NacDeletionFailedError extends NacAutoCrudError {
   constructor(message: string = 'Record deletion failed') {
     super(message, 500)
   }
 }
+

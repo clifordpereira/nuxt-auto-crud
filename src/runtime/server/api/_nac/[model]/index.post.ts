@@ -2,26 +2,26 @@ import { eventHandler, getRouterParams, readBody } from 'h3'
 import { useRuntimeConfig } from '#imports'
 
 import { modelTableMap } from '../../../utils/modelMapper'
-import { resolveValidatedSchema } from '../../../utils/validator'
+import { nacResolveValidatedSchema } from '../../../utils/validator'
 import { nacCreateRow } from '../../../utils/queries'
-import { broadcast } from '../../../utils/sse-bus'
+import { nacBroadcast } from '../../../utils/sse-bus'
 
-import { ResourceNotFoundError } from '../../../exceptions'
+import { NacResourceNotFoundError } from '../../../exceptions'
 
 export default eventHandler(async (event) => {
   const { model } = getRouterParams(event) as { model: string }
   const body = await readBody(event)
 
   const table = modelTableMap[model]
-  if (!table) throw new ResourceNotFoundError(model)
+  if (!table) throw new NacResourceNotFoundError(model)
 
-  const validatedData = await resolveValidatedSchema(table, 'insert').parseAsync(body)
+  const validatedData = await nacResolveValidatedSchema(table, 'insert').parseAsync(body)
 
   const newRecord = await nacCreateRow(table, validatedData, event.context.nac || {})
 
   const { realtime } = useRuntimeConfig().autoCrud
   if (realtime) {
-    void broadcast({
+    void nacBroadcast({
       table: model,
       action: 'create',
       primaryKey: newRecord.id,

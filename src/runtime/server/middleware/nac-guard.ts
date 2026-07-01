@@ -1,7 +1,7 @@
 import { defineEventHandler, getQuery } from 'h3'
 import { useRuntimeConfig } from '#imports'
 
-import { AuthenticationError } from '../exceptions'
+import { NacAuthenticationError } from '../exceptions'
 
 export default defineEventHandler(async (event) => {
   const pathname = new URL(event.path, 'http://internal').pathname
@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
         event.context.nac.isPublic = true
       }
       else {
-        throw new AuthenticationError('Unauthorized').toH3()
+        throw new NacAuthenticationError('Unauthorized').toH3()
       }
     }
 
@@ -35,7 +35,7 @@ export default defineEventHandler(async (event) => {
   const { agenticToken } = config.autoCrud
 
   if (!validateToken(token, agenticToken)) {
-    throw new AuthenticationError('Invalid agentic token').toH3()
+    throw new NacAuthenticationError('Invalid agentic token').toH3()
   }
 })
 

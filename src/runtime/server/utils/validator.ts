@@ -5,7 +5,15 @@ import { useRuntimeConfig } from '#imports'
 
 const { createInsertSchema } = createSchemaFactory()
 
-export function resolveValidatedSchema(table: Table, intent: 'insert' | 'patch' = 'insert') {
+/**
+ * Resolves a runtime validation schema for inserting or patching database records.
+ *
+ * @param table - The Drizzle database table instance to build the schema for.
+ * @param intent - The database mutation operation intent.
+ * @returns The resolved Zod schema instance.
+ * @public
+ */
+export function nacResolveValidatedSchema(table: Table, intent: 'insert' | 'patch' = 'insert') {
   const columns = getColumns(table)
 
   const timestampOverrides = Object.fromEntries(
@@ -28,3 +36,4 @@ export function resolveValidatedSchema(table: Table, intent: 'insert' | 'patch' 
 
   return intent === 'patch' ? sanitizedSchema.partial() : sanitizedSchema
 }
+

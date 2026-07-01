@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { useRuntimeConfig } from '#imports'
-import type { TableWithId } from '../../src/runtime/server/types'
+import type { NacTableWithId } from '../../src/runtime/server/types'
 import { getVisibilityFilters, nacGetRows } from '../../src/runtime/server/utils/queries'
 
 // Mock table structure
@@ -10,7 +10,7 @@ const mockTable = {
   createdBy: { name: 'createdBy' },
   // Drizzle internal key needed for some helpers
   _: { name: 'posts' },
-} as unknown as TableWithId
+} as unknown as NacTableWithId
 
 describe('getVisibilityFilters()', () => {
   beforeEach(() => {

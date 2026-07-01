@@ -6,16 +6,18 @@ import type { z } from 'zod'
 import { useRuntimeConfig } from '#imports'
 import * as schema from '#nac/schema'
 
-import type { Field, SchemaDefinition, QueryContext } from '../../shared/utils/types'
-import type { ColumnInternal, ZodTypeDef } from '../types'
+import type { NacField, NacSchemaDefinition, NacQueryContext } from '../../shared/utils/types'
+import type { NacColumnInternal, NacZodTypeDef } from '../types'
 import { NAC_SYSTEM_TABLES } from './constants'
-import { ResourceNotFoundError } from '../exceptions'
+import { NacResourceNotFoundError } from '../exceptions'
 
 import { nacGetTableConfigResolver } from './drizzleHelpers'
 
 /**
  * Builds a map of all exported Drizzle tables from the schema.
- * @returns {Record<string, Table>} A mapping of export keys to their corresponding Table instances.
+ *
+ * @returns A mapping of export keys to their corresponding Table instances.
+ * @internal
  */
 export const buildModelTableMap = (): Record<string, Table> => {
   return Object.entries(schema).reduce((acc, [key, value]) => {
@@ -25,11 +27,21 @@ export const buildModelTableMap = (): Record<string, Table> => {
     return acc
   }, {} as Record<string, Table>)
 }
+
+/**
+ * Mapping of database table keys to Table instances.
+ *
+ * @public
+ */
 export const modelTableMap = buildModelTableMap()
 
 /**
  * Resolves the property name for a foreign key's source column.
- * @returns The property name or undefined if not found
+ *
+ * @param fk - The foreign key database configuration.
+ * @param columns - The schema columns mapping to search within.
+ * @returns The property name or undefined if not found.
+ * @internal
  */
 export function getForeignKeyPropertyName(fk: ForeignKey, columns: Record<string, Column>): string | undefined {
   const targetColumnName = fk.reference().columns[0]?.name // TODO: Support composite keys if required in future
@@ -49,13 +61,14 @@ function getPublicFields(resource: string) {
 }
 
 /**
- * Selectable fields to give as api response.
- * Used in nacGetRow (/[model]/[id].get.ts) and nacGetRows (/[model]/index.get.ts).
- * @param table The table to query.
- * @returns An object of field names and their values
- * result example: { field1: users.id, field2: users.name, }
+ * Resolves the fields of a table that are allowed to be selected in queries.
+ *
+ * @param table - The database table instance.
+ * @param context - Optional query-level client context.
+ * @returns An object map of selected column instances.
+ * @internal
  */
-export function getSelectableFields(table: Table, context: QueryContext = {}): Record<string, Column> {
+export function getSelectableFields(table: Table, context: NacQueryContext = {}): Record<string, Column> {
   const { apiHiddenFields } = useRuntimeConfig().autoCrud
   const allColumns = getColumns(table)
   const result: Record<string, Column> = {}
@@ -78,7 +91,10 @@ export function getSelectableFields(table: Table, context: QueryContext = {}): R
 
 /**
  * Resolves table relationships for NAC reflection.
- * Maps property keys to target table names.
+ *
+ * @param table - The table to resolve relations for.
+ * @returns Map of property key to related table name.
+ * @internal
  */
 export async function resolveTableRelations(table: Table): Promise<Record<string, string>> {
   const getTableConfig = await nacGetTableConfigResolver()
@@ -96,22 +112,24 @@ export async function resolveTableRelations(table: Table): Promise<Record<string
 }
 
 /**
- * Resolves the label field for a model.
- * @param columnNames The names of the columns in the model
- * @returns The name of the label field
+ * Resolves the display label field name for a database model schema.
+ *
+ * @param columnNames - The names of all database schema columns.
+ * @returns The field name representing the primary display label.
+ * @internal
  */
 export function getLabelField(columnNames: string[]): string {
   const candidates = ['name', 'title', 'label', 'email']
   return candidates.find(n => columnNames.includes(n)) || 'id'
 }
 
-const ZOD_TYPE_MAP: Record<string, Field['type']> = {
+const ZOD_TYPE_MAP: Record<string, NacField['type']> = {
   ZodDate: 'date',
   ZodNumber: 'number',
   ZodBoolean: 'boolean',
 }
 
-const SEMANTIC_CHECK_MAP: Record<string, Field['type']> = {
+const SEMANTIC_CHECK_MAP: Record<string, NacField['type']> = {
   email: 'email',
   uuid: 'uuid',
   url: 'url',
@@ -120,13 +138,13 @@ const SEMANTIC_CHECK_MAP: Record<string, Field['type']> = {
 const TEXTAREA_HINTS = ['content', 'description', 'bio', 'message']
 
 function inferFieldType(name: string, col: Column, zodField?: z.ZodTypeAny): {
-  type: Field['type']
+  type: NacField['type']
   selectOptions?: string[]
 } {
-  const zodTypeName = (zodField?._def as ZodTypeDef | undefined)?.typeName
-  let type: Field['type'] = ZOD_TYPE_MAP[zodTypeName ?? ''] ?? 'string'
+  const zodTypeName = (zodField?._def as NacZodTypeDef | undefined)?.typeName
+  let type: NacField['type'] = ZOD_TYPE_MAP[zodTypeName ?? ''] ?? 'string'
 
-  const colInternal = col as Column & ColumnInternal
+  const colInternal = col as Column & NacColumnInternal
 
   // DRIZZLE TYPE OVERRIDE FALLBACK
   if (
@@ -144,7 +162,7 @@ function inferFieldType(name: string, col: Column, zodField?: z.ZodTypeAny): {
   const enumValues = colInternal.enumValues || colInternal.config?.enumValues
   if (enumValues) return { type: 'enum', selectOptions: enumValues }
 
-  const checks = (zodField?._def as ZodTypeDef | undefined)?.checks ?? []
+  const checks = (zodField?._def as NacZodTypeDef | undefined)?.checks ?? []
   const semanticMatch = checks.find(c => SEMANTIC_CHECK_MAP[c.kind])
   if (semanticMatch) return { type: SEMANTIC_CHECK_MAP[semanticMatch.kind]! }
   if (TEXTAREA_HINTS.includes(name)) return { type: 'textarea' }
@@ -152,9 +170,20 @@ function inferFieldType(name: string, col: Column, zodField?: z.ZodTypeAny): {
   return { type }
 }
 
-export async function getSchemaDefinition(modelName: string): Promise<SchemaDefinition> {
+/**
+ * Generates the Auto CRUD schema reflection definition for a database table.
+ *
+ * @param modelName - The identifier key of the target database table.
+ * @returns A promise resolving to the schema definition.
+ * @example
+ * ```ts
+ * const schema = await nacGetSchemaDefinition('users');
+ * ```
+ * @public
+ */
+export async function nacGetSchemaDefinition(modelName: string): Promise<NacSchemaDefinition> {
   const table = modelTableMap[modelName]
-  if (!table) throw new ResourceNotFoundError(modelName)
+  if (!table) throw new NacResourceNotFoundError(modelName)
 
   const { autoCrud, public: { autoCrud: publicAutoCrud } } = useRuntimeConfig()
   const columns = getColumns(table)
@@ -163,12 +192,12 @@ export async function getSchemaDefinition(modelName: string): Promise<SchemaDefi
 
   const hiddenFields = new Set([...autoCrud.apiHiddenFields, ...publicAutoCrud.formHiddenFields])
 
-  const fields: Field[] = Object.entries(columns)
+  const fields: NacField[] = Object.entries(columns)
     .filter(([name]) => !hiddenFields.has(name))
     .map(([name, col]) => ({
       name,
       ...inferFieldType(name, col, shape[name]),
-      required: (col as Column & ColumnInternal).notNull ?? false,
+      required: (col as Column & NacColumnInternal).notNull ?? false,
       references: relations[name],
       readonly: publicAutoCrud.formReadOnlyFields.includes(name) || name === 'id',
     }))
@@ -179,3 +208,4 @@ export async function getSchemaDefinition(modelName: string): Promise<SchemaDefi
     fields,
   }
 }
+

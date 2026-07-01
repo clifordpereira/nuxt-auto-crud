@@ -1,10 +1,9 @@
-// test/unit/modelMapper.getSchemaDefinition.spec.ts
 import { describe, it, expect } from 'vitest'
-import { getSchemaDefinition } from '../../src/runtime/server/utils/modelMapper'
+import { nacGetSchemaDefinition } from '../../src/runtime/server/utils/modelMapper'
 
-describe('modelMapper: getSchemaDefinition', () => {
+describe('modelMapper: nacGetSchemaDefinition', () => {
   it('1) should return a complete SchemaDefinition for posts', async () => {
-    const schema = await getSchemaDefinition('posts')
+    const schema = await nacGetSchemaDefinition('posts')
 
     expect(schema.resource).toBe('posts')
     expect(schema.labelField).toBe('title')
@@ -12,14 +11,14 @@ describe('modelMapper: getSchemaDefinition', () => {
   })
 
   it('2) should correctly map relation "categoryId" to "categories"', async () => {
-    const schema = await getSchemaDefinition('posts')
+    const schema = await nacGetSchemaDefinition('posts')
     const catField = schema.fields.find(f => f.name === 'categoryId')
 
     expect(catField?.references).toBe('categories')
   })
 
   it('3) should detect enum types and options', async () => {
-    const schema = await getSchemaDefinition('posts')
+    const schema = await nacGetSchemaDefinition('posts')
     const statusField = schema.fields.find(f => f.name === 'status')
 
     expect(statusField?.type).toBe('enum')
@@ -27,7 +26,7 @@ describe('modelMapper: getSchemaDefinition', () => {
   })
 
   it('4) should filter out fields present in formHiddenFields', async () => {
-    const schema = await getSchemaDefinition('posts')
+    const schema = await nacGetSchemaDefinition('posts')
 
     // id and createdAt should be excluded from the fields array entirely
     const idField = schema.fields.find(f => f.name === 'id')
@@ -38,7 +37,7 @@ describe('modelMapper: getSchemaDefinition', () => {
   })
 
   it('5) should mark fields in formReadOnlyFields as readonly', async () => {
-    const schema = await getSchemaDefinition('posts')
+    const schema = await nacGetSchemaDefinition('posts')
 
     // These fields should exist in the array but have the read-only flag
     const titleField = schema.fields.find(f => f.name === 'title')

@@ -4,8 +4,10 @@ import { useRuntimeConfig } from '#imports'
 import type { ResolvedDatabaseConfig } from '@nuxthub/core'
 
 /**
- * Get table config for dialect.
+ * Get table config for the configured database dialect.
+ *
  * @returns The table config resolver.
+ * @public
  */
 export async function nacGetTableConfigResolver() {
   const { hub } = useRuntimeConfig()
@@ -25,9 +27,11 @@ export async function nacGetTableConfigResolver() {
 }
 
 /**
- * Get table name from a table.
+ * Get table name from a Drizzle table instance.
+ *
  * @param table - The table to get the name from.
  * @returns The name of the table.
+ * @public
  */
 export async function nacGetTableName(table: Table): Promise<string> {
   const getTableConfig = await nacGetTableConfigResolver()
@@ -35,10 +39,13 @@ export async function nacGetTableName(table: Table): Promise<string> {
 }
 
 /**
- * Get table query config from relations.
+ * Get table query config from database relations mapping.
+ *
  * @param tableName - The name of the table to get the query config for.
  * @returns The query config for the table.
+ * @public
  */
 export function nacGetTableQueryConfig(tableName: string) {
   return tableQueryConfig[tableName] ?? {}
 }
+

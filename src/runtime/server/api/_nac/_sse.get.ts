@@ -1,6 +1,6 @@
 import { eventHandler, setResponseHeaders } from 'h3'
 
-import { addClient, removeClient } from '../../utils/sse-bus'
+import { nacAddClient, nacRemoveClient } from '../../utils/sse-bus'
 
 export default eventHandler(async (event) => {
   const id = crypto.randomUUID()
@@ -8,7 +8,7 @@ export default eventHandler(async (event) => {
   const writer = stream.writable.getWriter()
   const encoder = new TextEncoder()
 
-  addClient(id, writer)
+  nacAddClient(id, writer)
 
   // Keep-alive heartbeat to prevent connection timeouts
   const heartbeat = setInterval(async () => {
@@ -22,7 +22,7 @@ export default eventHandler(async (event) => {
 
   const cleanup = () => {
     clearInterval(heartbeat)
-    removeClient(id)
+    nacRemoveClient(id)
     writer.close().catch(() => { /* ignore */ })
   }
 
@@ -38,3 +38,4 @@ export default eventHandler(async (event) => {
 
   return stream.readable
 })
+

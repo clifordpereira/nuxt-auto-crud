@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import {
-  broadcast,
-  addClient,
-  removeClient,
+  nacBroadcast,
+  nacAddClient,
+  nacRemoveClient,
 } from '../../src/runtime/server/utils/sse-bus'
 
 describe('SSE Bus Core', () => {
@@ -23,10 +23,10 @@ describe('SSE Bus Core', () => {
       write: vi.fn().mockRejectedValue(new Error('Stream Closed')),
     }
 
-    addClient('stale-id', mockWriter as unknown as WritableStreamDefaultWriter<Uint8Array>)
+    nacAddClient('stale-id', mockWriter as unknown as WritableStreamDefaultWriter<Uint8Array>)
 
     // First broadcast triggers the catch block
-    await broadcast({ test: true })
+    await nacBroadcast({ test: true })
 
     expect(mockWriter.write).toHaveBeenCalled()
     expect(globalState._nac_sse_clients.has('stale-id')).toBe(false)
@@ -37,10 +37,10 @@ describe('SSE Bus Core', () => {
     const writer2 = { write: vi.fn().mockResolvedValue(undefined) }
     const payload = { msg: 'hello' }
 
-    addClient('c1', writer1 as unknown as WritableStreamDefaultWriter<Uint8Array>)
-    addClient('c2', writer2 as unknown as WritableStreamDefaultWriter<Uint8Array>)
+    nacAddClient('c1', writer1 as unknown as WritableStreamDefaultWriter<Uint8Array>)
+    nacAddClient('c2', writer2 as unknown as WritableStreamDefaultWriter<Uint8Array>)
 
-    await broadcast(payload)
+    await nacBroadcast(payload)
 
     const expectedData = new TextEncoder().encode(
       `event: crud\ndata: ${JSON.stringify(payload)}\n\n`,
@@ -51,15 +51,15 @@ describe('SSE Bus Core', () => {
   })
 
   it('handles empty client map gracefully', async () => {
-    await expect(broadcast({ data: 'none' })).resolves.not.toThrow()
+    await expect(nacBroadcast({ data: 'none' })).resolves.not.toThrow()
   })
 
   it('manually removes clients', async () => {
     const writer = { write: vi.fn() }
-    addClient('temp-id', writer as unknown as WritableStreamDefaultWriter<Uint8Array>)
+    nacAddClient('temp-id', writer as unknown as WritableStreamDefaultWriter<Uint8Array>)
 
-    removeClient('temp-id')
-    await broadcast({ msg: 'test' })
+    nacRemoveClient('temp-id')
+    await nacBroadcast({ msg: 'test' })
 
     expect(writer.write).not.toHaveBeenCalled()
     expect(globalState._nac_sse_clients.size).toBe(0)

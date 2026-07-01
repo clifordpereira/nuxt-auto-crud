@@ -4,10 +4,10 @@ import { type Table, eq, and, or, getColumns } from 'drizzle-orm'
 
 import { getSelectableFields } from './modelMapper'
 
-import { DeletionFailedError, InsertionFailedError, RecordNotFoundError, UnauthorizedAccessError, UpdateFailedError } from '../exceptions'
+import { NacDeletionFailedError, NacInsertionFailedError, NacRecordNotFoundError, NacUnauthorizedAccessError, NacUpdateFailedError } from '../exceptions'
 
-import type { QueryContext } from '../../shared/utils/types'
-import type { TableWithId } from '../types'
+import type { NacQueryContext } from '../../shared/utils/types'
+import type { NacTableWithId } from '../types'
 import { pick } from '#nac/shared/utils/helpers'
 import { nacGetTableName, nacGetTableQueryConfig } from './drizzleHelpers'
 
@@ -22,11 +22,13 @@ function isMysql() {
 
 /**
  * Get visibility filters for a table.
+ *
  * @param table - The table to get visibility filters for.
  * @param context - The context to get visibility filters for.
  * @returns An array of visibility filters for the table.
+ * @internal
  */
-export function getVisibilityFilters(table: TableWithId, context: QueryContext = {}) {
+export function getVisibilityFilters(table: NacTableWithId, context: NacQueryContext = {}) {
   const isAuthorizationEnabled = useRuntimeConfig().autoCrud.auth?.authorization
   const isStatusFilteringEnabled = useRuntimeConfig().autoCrud.statusFiltering
 
@@ -71,21 +73,23 @@ export function getVisibilityFilters(table: TableWithId, context: QueryContext =
 }
 
 // helper used in nacGetRows
-function hasAnyListPermissions(context: QueryContext = {}) {
+function hasAnyListPermissions(context: NacQueryContext = {}) {
   const { resourcePermissions = [] } = context
   return resourcePermissions?.includes('list_all') || resourcePermissions?.includes('list_active') || resourcePermissions?.includes('list_own')
 }
 
 /**
  * Fetches rows from the database based on the provided table and context.
+ *
  * @param table - The table to query.
  * @param context - The context object containing user ID and resourcePermissions.
  * @returns An array of rows from the database.
+ * @public
  */
-export async function nacGetRows(table: TableWithId, context: QueryContext = {}) {
+export async function nacGetRows(table: NacTableWithId, context: NacQueryContext = {}) {
   const isAuthorizationEnabled = useRuntimeConfig().autoCrud.auth?.authorization
   if (isAuthorizationEnabled && !context.isPublic && !hasAnyListPermissions(context)) {
-    throw new UnauthorizedAccessError()
+    throw new NacUnauthorizedAccessError()
   }
 
   const tableName = await nacGetTableName(table)
@@ -101,12 +105,14 @@ export async function nacGetRows(table: TableWithId, context: QueryContext = {})
 
 /**
  * Fetches a single row from the database based on the provided table and ID.
+ *
  * @param table - The table to query.
  * @param id - The ID of the row to fetch.
  * @param context - The context object containing user ID and resourcePermissions.
  * @returns The row from the database.
+ * @public
  */
-export async function nacGetRow(table: TableWithId, id: string, context: QueryContext = {}) {
+export async function nacGetRow(table: NacTableWithId, id: string, context: NacQueryContext = {}) {
   const selectableFields = getSelectableFields(table, context)
 
   // If record exists in context, we still need to sanitize it before returning
@@ -116,18 +122,21 @@ export async function nacGetRow(table: TableWithId, id: string, context: QueryCo
 
   const query = db.select(selectableFields).from(table).where(eq(table.id, Number(id)))
   const record = isMysql() ? (await query)[0] : await query.get()
-  if (!record) throw new RecordNotFoundError()
+  if (!record) throw new NacRecordNotFoundError()
 
   return record
 }
 
 /**
  * Creates a new row in the database based on the provided table and data.
+ *
  * @param table - The table to query.
  * @param data - The data to insert into the table.
  * @param context - The context object containing user ID and resourcePermissions.
+ * @returns The created record.
+ * @public
  */
-export async function nacCreateRow(table: Table, data: Record<string, unknown>, context: QueryContext = {}) {
+export async function nacCreateRow(table: Table, data: Record<string, unknown>, context: NacQueryContext = {}) {
   const ownerKey = useRuntimeConfig().autoCrud.auth?.ownerKey || 'createdBy'
 
   const payload = { ...data }
@@ -149,25 +158,28 @@ export async function nacCreateRow(table: Table, data: Record<string, unknown>, 
     // Fetch manually to simulate .returning()
     const rows = await db.select(selectableFields)
       .from(table)
-      .where(eq((table as TableWithId).id, res.insertId))
+      .where(eq((table as NacTableWithId).id, res.insertId))
 
     return rows[0]
   }
 
   const result = await db.insert(table).values(payload).returning(selectableFields).get()
-  if (!result) throw new InsertionFailedError()
+  if (!result) throw new NacInsertionFailedError()
 
   return result
 }
 
 /**
  * Updates a row in the database based on the provided table and ID.
+ *
  * @param table - The table to query.
  * @param id - The ID of the row to update.
  * @param data - The data to update in the table.
  * @param context - The context object containing user ID and resourcePermissions.
+ * @returns The updated record.
+ * @public
  */
-export async function nacUpdateRow(table: TableWithId, id: string, data: Record<string, unknown>, context: QueryContext = {}) {
+export async function nacUpdateRow(table: NacTableWithId, id: string, data: Record<string, unknown>, context: NacQueryContext = {}) {
   const targetId = Number(id)
   const payload = { ...data }
 
@@ -190,17 +202,20 @@ export async function nacUpdateRow(table: TableWithId, id: string, data: Record<
   }
 
   const [updated] = await db.update(table).set(payload).where(eq(table.id, targetId)).returning(selectableFields)
-  if (!updated) throw new UpdateFailedError()
+  if (!updated) throw new NacUpdateFailedError()
 
   return updated
 }
 
 /**
  * Deletes a row from the database based on the provided table and ID.
+ *
  * @param table - The table to query.
  * @param id - The ID of the row to delete.
+ * @returns The deleted record data.
+ * @public
  */
-export async function nacDeleteRow(table: TableWithId, id: string) {
+export async function nacDeleteRow(table: NacTableWithId, id: string) {
   const targetId = Number(id)
   const fields = getSelectableFields(table)
 
@@ -211,7 +226,8 @@ export async function nacDeleteRow(table: TableWithId, id: string) {
   }
 
   const deletedRecord = await db.delete(table).where(eq(table.id, targetId)).returning(fields).get()
-  if (!deletedRecord) throw new DeletionFailedError()
+  if (!deletedRecord) throw new NacDeletionFailedError()
 
   return deletedRecord
 }
+

@@ -3,23 +3,23 @@ import { useRuntimeConfig } from '#imports'
 
 import { modelTableMap } from '../../../utils/modelMapper'
 import { nacDeleteRow } from '../../../utils/queries'
-import { broadcast } from '../../../utils/sse-bus'
+import { nacBroadcast } from '../../../utils/sse-bus'
 
-import { ResourceNotFoundError } from '../../../exceptions'
+import { NacResourceNotFoundError } from '../../../exceptions'
 
-import type { TableWithId } from '../../../types'
+import type { NacTableWithId } from '../../../types'
 
 export default eventHandler(async (event) => {
   const { model, id } = getRouterParams(event) as { model: string, id: string }
 
-  const table = modelTableMap[model] as TableWithId
-  if (!table) throw new ResourceNotFoundError(model)
+  const table = modelTableMap[model] as NacTableWithId
+  if (!table) throw new NacResourceNotFoundError(model)
 
   const deletedRecord = await nacDeleteRow(table, id)
 
   const { realtime } = useRuntimeConfig().autoCrud
   if (realtime) {
-    void broadcast({
+    void nacBroadcast({
       table: model,
       action: 'delete',
       primaryKey: deletedRecord.id as number | string,

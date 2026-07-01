@@ -1,4 +1,5 @@
-import { onBeforeUnmount, onMounted, useRuntimeConfig, useNacApiBase } from '#imports'
+import { onBeforeUnmount, onMounted } from 'vue'
+import { useNacApiBase } from './useNacApiBase'
 
 /**
  * Represents a real-time database synchronization event broadcasted 

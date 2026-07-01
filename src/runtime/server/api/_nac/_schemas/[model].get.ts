@@ -1,15 +1,15 @@
 import { eventHandler, getRouterParams } from 'h3'
 
-import { getSchemaDefinition } from '../../../utils/modelMapper'
+import { nacGetSchemaDefinition } from '../../../utils/modelMapper'
 
-import { ResourceNotFoundError } from '../../../exceptions'
+import { NacResourceNotFoundError } from '../../../exceptions'
 
 export default eventHandler(async (event) => {
   const { model } = getRouterParams(event)
-  if (!model) throw ResourceNotFoundError
+  if (!model) throw new NacResourceNotFoundError('unknown')
 
-  const schema = getSchemaDefinition(model)
-  if (!schema) throw ResourceNotFoundError
+  const schema = await nacGetSchemaDefinition(model)
+  if (!schema) throw new NacResourceNotFoundError(model)
 
   return schema
 })

@@ -2,8 +2,8 @@ import { db } from '@nuxthub/db'
 import { eventHandler, getQuery, getHeader, setResponseHeader } from 'h3'
 import { useRuntimeConfig } from '#imports'
 
-import { getSchemaDefinition, modelTableMap } from '../../utils/modelMapper'
-import type { SchemaDefinition, Field } from '../../../shared/utils/types'
+import { nacGetSchemaDefinition, modelTableMap } from '../../utils/modelMapper'
+import type { NacSchemaDefinition, NacField } from '../../../shared/utils/types'
 
 export default eventHandler(async (event) => {
   const config = useRuntimeConfig()
@@ -19,8 +19,8 @@ export default eventHandler(async (event) => {
 
   const resourcesResults = await Promise.all(models.map(async (model) => {
     try {
-      const schema: SchemaDefinition = await getSchemaDefinition(model)
-      const fields = schema.fields.map((field: Field) => ({
+      const schema: NacSchemaDefinition = await nacGetSchemaDefinition(model)
+      const fields = schema.fields.map((field: NacField) => ({
         name: field.name,
         type: field.type,
         required: field.required,

@@ -1,28 +1,47 @@
 import type { Table, AnyColumn } from 'drizzle-orm'
 
-export type TableWithId = Table & {
+/**
+ * Represents a Drizzle database table that is guaranteed to contain a primary `id` column.
+ *
+ * @public
+ */
+export type NacTableWithId = Table & {
   id: AnyColumn
   [key: string]: AnyColumn
 }
 
-// Internal Drizzle column shape not exposed in public types
-export interface ColumnInternal {
+/**
+ * Describes Drizzle's internal column metadata configuration.
+ *
+ * @public
+ */
+export interface NacColumnInternal {
   enumValues?: string[]
   notNull?: boolean
-  columnType?: string // Add this for checking 'PgNumeric' / 'MySqlNumeric'
-  mapTo?: string // Add this for custom mappings
-  dataType?: string // Add this for Drizzle's primitive data types
+  columnType?: string
+  mapTo?: string
+  dataType?: string
   config?: {
     enumValues?: string[]
   }
 }
 
-// Zod internal def shape used for type inference
-export interface ZodTypeDef {
+/**
+ * Describes the internal definition layout of a Zod schema type, used for runtime inspection.
+ *
+ * @public
+ */
+export interface NacZodTypeDef {
   typeName: string
-  checks?: ZodCheck[]
+  checks?: NacZodCheck[]
 }
 
-export interface ZodCheck {
+/**
+ * Describes a validation check rule applied to a Zod field.
+ *
+ * @public
+ */
+export interface NacZodCheck {
   kind: string
 }
+
