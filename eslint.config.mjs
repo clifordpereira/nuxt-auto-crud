@@ -1,5 +1,5 @@
-// @ts-check
 import { createConfigForNuxt } from '@nuxt/eslint-config/flat'
+import tsdoc from 'eslint-plugin-tsdoc'
 
 export default createConfigForNuxt({
   features: {
@@ -16,11 +16,18 @@ export default createConfigForNuxt({
   },
 })
   .append(
+    // Block 1: Strict TypeScript / Vue configurations & projectService fallbacks
     {
       files: ['**/*.ts', '**/*.vue'],
       languageOptions: {
         parserOptions: {
-          projectService: true,
+          projectService: {
+            allowWithoutProject: [
+              'eslint.config.mjs',
+              'vitest.config.ts',
+              'test/fixtures/**/*.ts'
+            ]
+          },
           extraFileExtensions: ['.vue'],
         },
       },
@@ -31,4 +38,14 @@ export default createConfigForNuxt({
         '@typescript-eslint/no-explicit-any': 'error',
       },
     },
+    // Block 2: TSDoc Syntax Validation
+    {
+      files: ['**/*.ts', '**/*.vue'],
+      plugins: {
+        tsdoc,
+      },
+      rules: {
+        'tsdoc/syntax': 'warn', 
+      },
+    }
   )

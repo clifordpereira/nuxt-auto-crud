@@ -79,6 +79,7 @@
     "drizzle-kit": "^1.0.0-rc.4",
     "drizzle-orm": "^1.0.0-rc.4",
     "eslint": "^10.6.0",
+    "eslint-plugin-tsdoc": "^0.5.2",
     "happy-dom": "^20.10.6",
     "nuxt": "^4.4.8",
     "playwright-core": "^1.61.1",
