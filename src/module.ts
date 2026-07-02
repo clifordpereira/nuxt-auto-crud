@@ -41,10 +41,9 @@ export default defineNuxtModule<ModuleOptions>({
     agenticToken: '',
     /** Path to your application's Drizzle schema definitions. */
     schemaPath: 'server/db/schema',
-    /** Path to your Drizzle relation files. */
-    relationsPath: 'server/db/relations',
-    /** Path to your main database connection file setup. */
-    dbPath: 'server/db',
+    /** Database dialect to dictate the underlying Drizzle core configuration */
+    dialect: 'libsql',
+
     
     // Public config
     /** Fields excluded from the generated UI metadata to block user input. */
@@ -73,8 +72,13 @@ export default defineNuxtModule<ModuleOptions>({
     nuxt.options.alias['#nac/shared'] = resolver.resolve('./runtime/shared')
     nuxt.options.alias['#nac/types'] = resolver.resolve('./runtime/server/types')
     nuxt.options.alias['#nac/schema'] = resolver.resolve(nuxt.options.rootDir, options.schemaPath!)
-    nuxt.options.alias['#nac/relations'] = resolver.resolve(nuxt.options.rootDir, options.relationsPath!)
-    nuxt.options.alias['#nac/db'] = resolver.resolve(nuxt.options.rootDir, options.dbPath!)
+    nuxt.options.alias['#nac/db'] = resolver.resolve('./runtime/server/utils/db')
+
+    if (options.relationsPath) {
+      nuxt.options.alias['#nac/relations'] = resolver.resolve(nuxt.options.rootDir, options.relationsPath)
+    } else {
+      nuxt.options.alias['#nac/relations'] = resolver.resolve('./runtime/server/utils/empty-stub')
+    }
 
     // 2. Runtime Config (The Concrete State)
     const { formHiddenFields, formReadOnlyFields, nacEndpointPrefix, apiBase, ...privateOptions } = options

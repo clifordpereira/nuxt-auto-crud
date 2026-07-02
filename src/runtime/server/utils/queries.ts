@@ -1,5 +1,4 @@
 import { useRuntimeConfig } from '#imports'
-import type { NuxtHubRuntimeConfig } from '@nuxthub/db'
 import { type Table, eq, and, or, getColumns } from 'drizzle-orm'
 
 import { getSelectableFields } from './modelMapper'
@@ -11,13 +10,12 @@ import type { NacTableWithId } from '../types'
 import { pick } from '#nac/shared/utils/helpers'
 import { nacGetTableName, nacGetTableQueryConfig } from './drizzleHelpers'
 
-import db from '#nac/db'
+import { nacDb as db } from '#nac/db'
 
 // helper used in this file
 function isMysql() {
-  const hub = (useRuntimeConfig() as unknown as NuxtHubRuntimeConfig).hub
-  const dbConfig = hub?.db
-  return dbConfig === 'mysql' || (typeof dbConfig === 'object' && dbConfig?.dialect === 'mysql')
+  const { dialect } = useRuntimeConfig().autoCrud
+  return dialect === 'mysql'
 }
 
 /**

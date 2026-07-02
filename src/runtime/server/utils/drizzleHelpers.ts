@@ -1,7 +1,6 @@
 import type { Table } from 'drizzle-orm'
 import { tableQueryConfig } from '#nac/relations'
 import { useRuntimeConfig } from '#imports'
-import type { ResolvedDatabaseConfig } from '@nuxthub/core'
 
 /**
  * Get table config for the configured database dialect.
@@ -10,14 +9,12 @@ import type { ResolvedDatabaseConfig } from '@nuxthub/core'
  * @public
  */
 export async function nacGetTableConfigResolver() {
-  const { hub } = useRuntimeConfig()
-  const dbConfig = hub.db as ResolvedDatabaseConfig | false
+  const config = useRuntimeConfig().autoCrud
+  const isMysql = config.dialect === 'mysql'
 
-  if (!dbConfig) {
-    throw new Error('NuxtHub db is not enabled')
+  if (isMysql && !config.databaseUrl && !process.env.DATABASE_URL) {
+    throw new Error('[nuxt-auto-crud] Database connection URL is not provided for MySQL dialect.')
   }
-
-  const isMysql = dbConfig.dialect === 'mysql'
 
   const { getTableConfig } = await (isMysql
     ? import('drizzle-orm/mysql-core')
@@ -46,6 +43,7 @@ export async function nacGetTableName(table: Table): Promise<string> {
  * @public
  */
 export function nacGetTableQueryConfig(tableName: string) {
-  return tableQueryConfig[tableName] ?? {}
-}
+  const config = (tableQueryConfig ?? {}) as Record<string, unknown>
 
+  return config[tableName] ?? {}
+}

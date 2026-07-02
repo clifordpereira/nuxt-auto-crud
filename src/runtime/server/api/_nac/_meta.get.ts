@@ -1,4 +1,4 @@
-import { db } from '@nuxthub/db'
+import { nacDb as db } from '#nac/db'
 import { eventHandler, getQuery, getHeader, setResponseHeader } from 'h3'
 import { useRuntimeConfig } from '#imports'
 
@@ -7,7 +7,7 @@ import type { NacSchemaDefinition, NacField } from '../../../shared/utils/types'
 
 export default eventHandler(async (event) => {
   const config = useRuntimeConfig()
-  const nacEndpointPrefix = config.public.autoCrud.nacEndpointPrefix
+  const { apiBase } = config.public.autoCrud
 
   const query = getQuery(event)
   const acceptHeader = getHeader(event, 'accept') || ''
@@ -33,7 +33,7 @@ export default eventHandler(async (event) => {
 
       return {
         resource: model,
-        endpoint: `${nacEndpointPrefix}/${model}`,
+        endpoint: `${apiBase}/${model}`,
         labelField: schema.labelField,
         methods: ['GET', 'POST', 'PATCH', 'DELETE'],
         fields,

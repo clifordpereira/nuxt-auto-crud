@@ -4,7 +4,7 @@ import { useRuntimeConfig } from '#imports'
 // 2. IMPORTS
 import { nacGetRows, nacGetRow, nacCreateRow, nacUpdateRow, nacDeleteRow } from '../../src/runtime/server/utils/queries'
 import type { NacTableWithId } from '../../src/runtime/server/types'
-import db from '#nac/db'
+import { useNacDb } from '#nac/db'
 import { posts, users } from '#nac/schema'
 import {
   NacRecordNotFoundError,
@@ -61,9 +61,12 @@ vi.mock('drizzle-orm', async () => {
 })
 
 describe('NAC Core Queries - Consolidated Suite', () => {
-  beforeEach(() => {
+  let db: any
+  beforeEach(async () => {
     vi.clearAllMocks()
     mockConfig()
+
+    db = await useNacDb()
 
     vi.mocked(db.select).mockReturnThis()
     vi.mocked(db.from).mockReturnThis()

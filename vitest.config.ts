@@ -1,9 +1,13 @@
 import { defineConfig } from 'vitest/config'
 import { defineVitestProject } from '@nuxt/test-utils/config'
 import { resolve } from 'node:path'
+import { existsSync } from 'node:fs'
 
 const fixture = process.env.TEST_FIXTURE || 'basic'
 const r = (p: string) => resolve(import.meta.dirname, p)
+
+const fixtureRelationsPath = r(`./test/fixtures/${fixture}/server/db/relations.ts`);
+const stubPath = r('./src/runtime/server/utils/empty-stub')
 
 export default defineConfig({
   test: {
@@ -18,7 +22,7 @@ export default defineConfig({
             '#nac/shared': r('./src/runtime/shared'),
             '#nac/types': r('./src/runtime/server/types'),
             '#nac/schema': r(`./test/fixtures/${fixture}/server/db/schema.ts`),
-            '#nac/relations': r(`./test/fixtures/${fixture}/server/db/relations.ts`),
+            '#nac/relations': existsSync(fixtureRelationsPath) ? fixtureRelationsPath : stubPath,
 
             // Mocking Nuxt environment
             '#imports': r('./test/mocks/imports.ts'),

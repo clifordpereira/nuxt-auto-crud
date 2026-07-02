@@ -22,12 +22,13 @@ export interface ModuleOptions {
   /**
    * The file path to the Drizzle database relations mapping files.
    */
-  relationsPath: string
+  relationsPath?: string
 
-  /**
-   * The path to the main database folder or configuration.
-   */
-  dbPath: string
+  /** Database dialect to dictate the underlying Drizzle core configuration */
+  dialect: 'libsql' | 'mysql'
+
+  /** Explicit connection URL fallback if different from process.env.DATABASE_URL */
+  databaseUrl?: string
 
   /**
    * Authentication and authorization parameters.
@@ -78,10 +79,10 @@ export interface ModuleOptions {
 
 declare module '@nuxt/schema' {
   interface RuntimeConfig {
-    autoCrud: Omit<ModuleOptions, 'nacEndpointPrefix' | 'formHiddenFields' | 'formReadOnlyFields' | 'apiBase'>
+    autoCrud: Omit<ModuleOptions, 'formHiddenFields' | 'formReadOnlyFields' | 'nacEndpointPrefix' | 'apiBase'>
   }
   interface PublicRuntimeConfig {
-    autoCrud: Pick<ModuleOptions, 'nacEndpointPrefix' | 'formHiddenFields' | 'formReadOnlyFields' | 'apiBase'>
+    autoCrud: Pick<ModuleOptions, 'formHiddenFields' | 'formReadOnlyFields' | 'nacEndpointPrefix' | 'apiBase'>
   }
 }
 
