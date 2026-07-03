@@ -3,8 +3,8 @@ import { url } from '@nuxt/test-utils/e2e'
 import { useRuntimeConfig } from '#imports'
 
 describe('NAC: SSE Smoke Test', () => {
-  const { nacEndpointPrefix } = useRuntimeConfig().public.autoCrud
-  const sseUrl = `${nacEndpointPrefix}/_sse`
+  const { apiBase } = useRuntimeConfig().public.autoCrud
+  const sseUrl = `${apiBase}/_sse`
 
   it('SSE: endpoint is active and protocol compliant', async () => {
     const controller = new AbortController()

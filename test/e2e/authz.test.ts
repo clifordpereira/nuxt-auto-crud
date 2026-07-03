@@ -10,7 +10,7 @@ await setup({
 })
 
 describe('NAC: Public Resources & Auth Guard', () => {
-  const { nacEndpointPrefix } = useRuntimeConfig().public.autoCrud
+  const { apiBase } = useRuntimeConfig().public.autoCrud
 
   it('1) POST & GET: ensures user exists and validates public fields', async () => {
     const payload = {
@@ -19,18 +19,18 @@ describe('NAC: Public Resources & Auth Guard', () => {
     }
 
     // 1. Check if user exists (Idempotency check)
-    const existing = await $fetch<Record<string, unknown>[]>(`${nacEndpointPrefix}/users?email=${payload.email}`)
+    const existing = await $fetch<Record<string, unknown>[]>(`${apiBase}/users?email=${payload.email}`)
 
     if (existing.length === 0) {
       // 2. Insert only if missing
-      await $fetch(`${nacEndpointPrefix}/users`, {
+      await $fetch(`${apiBase}/users`, {
         method: 'POST',
         body: payload,
       })
     }
 
     // 3. Retrieve and Validate
-    const res = await $fetch<Record<string, unknown>[]>(`${nacEndpointPrefix}/users`)
+    const res = await $fetch<Record<string, unknown>[]>(`${apiBase}/users`)
     const user = res.find(u => u.email === payload.email)
 
     expect(user).toBeDefined()
@@ -44,7 +44,7 @@ describe('NAC: Public Resources & Auth Guard', () => {
 
   it('2) GET: denies access to non-public resource "roles" when unauthenticated', async () => {
     try {
-      await $fetch(`${nacEndpointPrefix}/roles`)
+      await $fetch(`${apiBase}/roles`)
       throw new Error('Should have failed with 401')
     }
     catch (err: unknown) {
@@ -57,7 +57,7 @@ describe('NAC: Public Resources & Auth Guard', () => {
   it('3) GET: public response strictly respects apiHiddenFields (Security Layering)', async () => {
     // Even if 'password' was accidentally added to publicResources.users,
     // getSelectableFields processes hiddenSet first.
-    const res = await $fetch<Record<string, unknown>[]>(`${nacEndpointPrefix}/users`)
+    const res = await $fetch<Record<string, unknown>[]>(`${apiBase}/users`)
     const firstUser = res[0]
 
     expect(firstUser).not.toHaveProperty('password')
@@ -65,7 +65,7 @@ describe('NAC: Public Resources & Auth Guard', () => {
 
   it('4) GET: returns 404 for non-existent model to avoid leaking schema info via 401', async () => {
     try {
-      await $fetch(`${nacEndpointPrefix}/ghost_table`)
+      await $fetch(`${apiBase}/ghost_table`)
     }
     catch (err: unknown) {
       expect((err as { status: number }).status).toBe(401)

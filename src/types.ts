@@ -24,12 +24,6 @@ export interface ModuleOptions {
    */
   relationsPath?: string
 
-  /** Database dialect to dictate the underlying Drizzle core configuration */
-  dialect: 'libsql' | 'mysql'
-
-  /** Explicit connection URL fallback if different from process.env.DATABASE_URL */
-  databaseUrl?: string
-
   /**
    * Authentication and authorization parameters.
    */

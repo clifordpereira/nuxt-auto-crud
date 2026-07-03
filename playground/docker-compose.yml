@@ -1,0 +1,32 @@
+services:
+  mysql-starter:
+    image: mysql:8.4
+    container_name: nac-starter-mysql
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: nac_db
+    volumes:
+      - ./.data/db/mysql_data:/var/lib/mysql
+    command: 
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysql", "-h", "localhost", "-u", "root", "-proot", "-e", "SELECT 1"]
+      interval: 5s
+      timeout: 2s
+      retries: 10
+
+  # adminer:
+  #   image: adminer:latest
+  #   container_name: nac-adminer
+  #   restart: always
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     ADMINER_DEFAULT_SERVER: mysql-starter
+  #   depends_on:
+  #     mysql-starter:
+  #       condition: service_healthy

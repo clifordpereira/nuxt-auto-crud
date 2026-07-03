@@ -1,21 +1,27 @@
 import { useRuntimeConfig } from '#imports'
 import { type Table, eq, and, or, getColumns } from 'drizzle-orm'
 
-import { getSelectableFields } from './modelMapper'
-
 import { NacDeletionFailedError, NacInsertionFailedError, NacRecordNotFoundError, NacUnauthorizedAccessError, NacUpdateFailedError } from '../exceptions'
+import { getSelectableFields } from './modelMapper'
 
 import type { NacQueryContext } from '../../shared/utils/types'
 import type { NacTableWithId } from '../types'
-import { pick } from '#nac/shared/utils/helpers'
-import { nacGetTableName, nacGetTableQueryConfig } from './drizzleHelpers'
+import { nacGetTableName, nacGetTableQueryConfig, useNacDb, isMysql } from './db'
 
-import { nacDb as db } from '#nac/db'
 
-// helper used in this file
-function isMysql() {
-  const { dialect } = useRuntimeConfig().autoCrud
-  return dialect === 'mysql'
+/**
+ * Picks only the specified keys from an object.
+ *
+ * @param obj - The object to pick keys from.
+ * @param keys - The keys to pick.
+ * @returns An object with only the specified keys.
+ * @internal
+ */
+const pick = <T extends object, K extends keyof T>(obj: T, keys: K[]): Pick<T, K> => {
+  return keys.reduce((acc, key) => {
+    if (key in obj) acc[key] = obj[key]
+    return acc
+  }, {} as Pick<T, K>)
 }
 
 /**
@@ -94,6 +100,7 @@ export async function nacGetRows(table: NacTableWithId, context: NacQueryContext
   const filters = getVisibilityFilters(table, context)
   const queryOptions = nacGetTableQueryConfig(tableName)
 
+  const db = await useNacDb()
   return await db.query[tableName].findMany({
     orderBy: { id: 'desc' },
     ...queryOptions,
@@ -118,6 +125,7 @@ export async function nacGetRow(table: NacTableWithId, id: string, context: NacQ
     return pick(context.record, Object.keys(selectableFields))
   }
 
+  const db = await useNacDb()
   const query = db.select(selectableFields).from(table).where(eq(table.id, Number(id)))
   const record = isMysql() ? (await query)[0] : await query.get()
   if (!record) throw new NacRecordNotFoundError()
@@ -151,6 +159,7 @@ export async function nacCreateRow(table: Table, data: Record<string, unknown>, 
     payload.updatedAt = new Date()
   }
 
+  const db = await useNacDb()
   if (isMysql()) {
     const [res] = await db.insert(table).values(payload)
     // Fetch manually to simulate .returning()
@@ -194,6 +203,7 @@ export async function nacUpdateRow(table: NacTableWithId, id: string, data: Reco
     payload.updatedAt = new Date()
   }
 
+  const db = await useNacDb()
   if (isMysql()) {
     await db.update(table).set(payload).where(eq(table.id, targetId))
     return await nacGetRow(table, id, context) // Reuse existing fetch logic
@@ -217,6 +227,7 @@ export async function nacDeleteRow(table: NacTableWithId, id: string) {
   const targetId = Number(id)
   const fields = getSelectableFields(table)
 
+  const db = await useNacDb()
   if (isMysql()) {
     const recordToDelete = await nacGetRow(table, id)
     await db.delete(table).where(eq(table.id, targetId))

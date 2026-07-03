@@ -11,7 +11,7 @@ import type { NacColumnInternal, NacZodTypeDef } from '../types'
 import { NAC_SYSTEM_TABLES } from './constants'
 import { NacResourceNotFoundError } from '../exceptions'
 
-import { nacGetTableConfigResolver } from './drizzleHelpers'
+import { nacGetTableConfigResolver } from './db'
 
 /**
  * Builds a map of all exported Drizzle tables from the schema.

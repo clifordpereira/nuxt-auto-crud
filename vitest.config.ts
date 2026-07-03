@@ -19,8 +19,6 @@ export default defineConfig({
           environment: 'node',
           alias: {
             // Match module.ts aliases
-            '#nac/shared': r('./src/runtime/shared'),
-            '#nac/types': r('./src/runtime/server/types'),
             '#nac/schema': r(`./test/fixtures/${fixture}/server/db/schema.ts`),
             '#nac/relations': existsSync(fixtureRelationsPath) ? fixtureRelationsPath : stubPath,
 

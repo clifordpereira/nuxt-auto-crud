@@ -41,9 +41,6 @@ export default defineNuxtModule<ModuleOptions>({
     agenticToken: '',
     /** Path to your application's Drizzle schema definitions. */
     schemaPath: 'server/db/schema',
-    /** Database dialect to dictate the underlying Drizzle core configuration */
-    dialect: 'libsql',
-
     
     // Public config
     /** Fields excluded from the generated UI metadata to block user input. */
@@ -69,8 +66,6 @@ export default defineNuxtModule<ModuleOptions>({
     const resolver = createResolver(import.meta.url)
 
     // 1. Aliases
-    nuxt.options.alias['#nac/shared'] = resolver.resolve('./runtime/shared')
-    nuxt.options.alias['#nac/types'] = resolver.resolve('./runtime/server/types')
     nuxt.options.alias['#nac/schema'] = resolver.resolve(nuxt.options.rootDir, options.schemaPath!)
     nuxt.options.alias['#nac/db'] = resolver.resolve('./runtime/server/utils/db')
 

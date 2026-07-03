@@ -1,14 +1,14 @@
 import { describe, it, expect } from 'vitest'
 import { $fetch } from '@nuxt/test-utils/e2e'
 import { useRuntimeConfig } from '#imports'
-import type { SchemaDefinition } from '#nac/shared/utils/types'
+import type { NacSchemaDefinition } from '../../src/runtime/shared/utils/types'
 
 describe('NAC: Schema Definition Reflection', async () => {
-  const { nacEndpointPrefix } = useRuntimeConfig().public.autoCrud
-  const schemaBase = `${nacEndpointPrefix}/_schemas`
+  const { apiBase } = useRuntimeConfig().public.autoCrud
+  const schemaBase = `${apiBase}/_schemas`
 
   it('GET: retrieves users schema with inferred metadata', async () => {
-    const res = await $fetch<SchemaDefinition>(`${schemaBase}/users`)
+    const res = await $fetch<NacSchemaDefinition>(`${schemaBase}/users`)
 
     expect(res.resource).toBe('users')
     expect(res.labelField).toBe('name')
@@ -19,7 +19,7 @@ describe('NAC: Schema Definition Reflection', async () => {
   })
 
   it('GET: respects hidden fields and read-only status', async () => {
-    const res = await $fetch<SchemaDefinition>(`${schemaBase}/posts`)
+    const res = await $fetch<NacSchemaDefinition>(`${schemaBase}/posts`)
 
     // Check system field protection/visibility
     const idField = res.fields.find(f => f.name === 'id')
@@ -30,7 +30,7 @@ describe('NAC: Schema Definition Reflection', async () => {
   })
 
   it('GET: retrieves posts schema with complex types', async () => {
-    const res = await $fetch<SchemaDefinition>(`${schemaBase}/posts`)
+    const res = await $fetch<NacSchemaDefinition>(`${schemaBase}/posts`)
 
     // Verify Enum detection from status: text(..., { enum: [...] })
     const statusField = res.fields.find(f => f.name === 'status')
