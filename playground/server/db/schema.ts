@@ -1,43 +1,45 @@
-import { mysqlTable, bigint, varchar, decimal, int, timestamp } from 'drizzle-orm/mysql-core'
+import { sqliteTable, text, integer, numeric } from 'drizzle-orm/sqlite-core'
 
-export const products = mysqlTable('products', {
-  id: bigint('id', { mode: 'number' }).primaryKey().autoincrement(),
-  name: varchar('name', { length: 255 }).notNull(),
-  sku: varchar('sku', { length: 100 }).notNull(),
-  price: decimal('price', { precision: 10, scale: 2 }).notNull(),
-  stock: int('stock').notNull(),
-  created_at: timestamp('created_at').notNull().defaultNow(),
-  updated_at: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
+export const products = sqliteTable('products', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  name: text('name').notNull(),
+  sku: text('sku').notNull(),
+  price: numeric('price', { mode: 'number' }).notNull(),
+  stock: integer('stock').notNull(),
+  created_at: integer({ mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  updated_at: integer({ mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
 })
 
-export const customers = mysqlTable('customers', {
-  id: bigint('id', { mode: 'number' }).primaryKey().autoincrement(),
-  name: varchar('name', { length: 255 }).notNull(),
-  email: varchar('email', { length: 255 }).notNull().unique(),
-  phone: varchar('phone', { length: 20 }),
-  created_at: timestamp('created_at').notNull().defaultNow(),
-  updated_at: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
+export const customers = sqliteTable('customers', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  name: text('name').notNull(),
+  email: text('email').notNull().unique(),
+  phone: text('phone'),
+  created_at: integer({ mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  updated_at: integer({ mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
 })
 
-export const orders = mysqlTable('orders', {
-  id: bigint('id', { mode: 'number' }).primaryKey().autoincrement(),
-  customer_id: bigint('customer_id', { mode: 'number' })
+export const orders = sqliteTable('orders', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  customer_id: integer('customer_id')
     .notNull()
     .references(() => customers.id, { onDelete: 'cascade' }),
-  total_amount: decimal('total_amount', { precision: 10, scale: 2 }).notNull(),
-  status: varchar('status', { length: 50 }).notNull().default('pending'),
-  created_at: timestamp('created_at').notNull().defaultNow(),
-  updated_at: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
+  total_amount: numeric('total_amount', { mode: 'number' }).notNull(),
+  status: text('status', { enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'] })
+    .notNull()
+    .default('pending'),
+  created_at: integer({ mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  updated_at: integer({ mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
 })
 
-export const orderitems = mysqlTable('orderitems', {
-  id: bigint('id', { mode: 'number' }).primaryKey().autoincrement(),
-  order_id: bigint('order_id', { mode: 'number' })
+export const orderitems = sqliteTable('orderitems', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  order_id: integer('order_id')
     .notNull()
     .references(() => orders.id, { onDelete: 'cascade' }),
-  product_id: bigint('product_id', { mode: 'number' })
+  product_id: integer('product_id')
     .notNull()
     .references(() => products.id, { onDelete: 'cascade' }),
-  quantity: int('quantity').notNull(),
-  price: decimal('price', { precision: 10, scale: 2 }).notNull(),
+  quantity: integer('quantity').notNull(),
+  price: numeric('price', { mode: 'number' }).notNull(),
 })

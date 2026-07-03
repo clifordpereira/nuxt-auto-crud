@@ -3,7 +3,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   compatibilityDate: '2025-07-15',
   hub: {
-    db: 'mysql',
+    db: 'sqlite',
   },
   autoCrud: {
     relationsPath: 'server/db/relations'

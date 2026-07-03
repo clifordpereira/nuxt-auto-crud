@@ -42,7 +42,7 @@ export function isMysql(): boolean {
  * @internal
  */
 function getDatabaseUrl(): string {
-  const url = process.env.DATABASE_URL
+  const url = process.env.DATABASE_URL || 'file:.data/db/sqlite.db'
   if (!url) {
     throw new Error('[nuxt-auto-crud] Missing database URL. Please set the DATABASE_URL environment variable.')
   }
