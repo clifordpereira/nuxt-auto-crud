@@ -8,7 +8,7 @@
 export const relations = {};
 
 // export empty table query config object
-export const tableQueryConfig = {};
+export const nacTableQueryConfig = {};
 
 // Keep it valid as an explicit ESM module
 export default {};

@@ -22,7 +22,7 @@ export const relations = defineRelations(schema, r => ({
   },
 }))
 
-export const tableQueryConfig: Record<string, DBQueryConfig> = {
+export const nacTableQueryConfig: Record<string, DBQueryConfig> = {
   enrollments: {
     columns: {
       student_id: false,

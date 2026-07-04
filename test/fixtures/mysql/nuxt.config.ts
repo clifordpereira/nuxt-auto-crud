@@ -9,8 +9,5 @@ export default defineNuxtConfig({
   future: {
     compatibilityVersion: 4,
   },
-  compatibilityDate: '2026-01-26',
-  // autoCrud: {
-  //   schemaPath: 'server/database/schema'
-  // }
+  compatibilityDate: '2026-01-26'
 })

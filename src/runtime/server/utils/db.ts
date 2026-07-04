@@ -1,5 +1,5 @@
 import * as schema from '#nac/schema'
-import { relations, tableQueryConfig } from '#nac/relations'
+import { relations, nacTableQueryConfig } from '#nac/relations'
 import type { Table } from 'drizzle-orm'
 
 /**
@@ -121,6 +121,6 @@ export async function nacGetTableName(table: Table): Promise<string> {
  * @public
  */
 export function nacGetTableQueryConfig(tableName: string): Record<string, unknown> {
-  const config = (tableQueryConfig ?? {}) as Record<string, unknown>
+  const config = (nacTableQueryConfig ?? {}) as Record<string, unknown>
   return (config[tableName] ?? {}) as Record<string, unknown>
 }

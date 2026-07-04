@@ -44,7 +44,7 @@ export const relations = defineRelations(schema, r => ({
   },
 }))
 
-export const tableQueryConfig: Record<string, DBQueryConfig> = {
+export const nacTableQueryConfig: Record<string, DBQueryConfig> = {
   orders: {
     orderBy: { id: 'desc' },
     with: {
