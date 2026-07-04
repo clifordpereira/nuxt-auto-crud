@@ -1,4 +1,3 @@
-import * as schema from '#nac/schema'
 import { relations, nacTableQueryConfig } from '#nac/relations'
 import type { Table } from 'drizzle-orm'
 

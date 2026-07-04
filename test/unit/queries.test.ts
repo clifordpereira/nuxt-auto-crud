@@ -4,7 +4,6 @@ import { useRuntimeConfig } from '#imports'
 // 2. IMPORTS
 import { nacGetRows, nacGetRow, nacCreateRow, nacUpdateRow, nacDeleteRow } from '../../src/runtime/server/utils/queries'
 import type { NacTableWithId } from '../../src/runtime/server/types'
-import { getNacDb } from '#nac/db'
 import { posts, users } from '#nac/schema'
 import {
   NacRecordNotFoundError,
@@ -12,6 +11,8 @@ import {
   NacUpdateFailedError,
   NacDeletionFailedError,
 } from '../../src/runtime/server/exceptions'
+
+import { nacGetTableName, nacGetTableQueryConfig, getNacDb, isMysql } from '#nac/db'
 
 const BASE_RUNTIME_CONFIG = {
   hub: { db: 'sqlite' },
@@ -60,13 +61,20 @@ vi.mock('drizzle-orm', async () => {
   }
 })
 
+process.env.DATABASE_URL='file:test/fixtures/basic/.data/db/sqlite.db'
+
 describe('NAC Core Queries - Consolidated Suite', () => {
   let db: any
+
   beforeEach(async () => {
     vi.clearAllMocks()
     mockConfig()
 
     db = await getNacDb()
+    db._ = { relations: { posts: {}, users: {} } }
+
+    vi.mocked(isMysql).mockReturnValue(false)
+    vi.mocked(nacGetTableQueryConfig).mockReturnValue({})
 
     vi.mocked(db.select).mockReturnThis()
     vi.mocked(db.from).mockReturnThis()
@@ -111,9 +119,14 @@ describe('NAC Core Queries - Consolidated Suite', () => {
         },
       })
 
+      const mockPosts = {
+        ...posts,
+        createdBy: { name: 'createdBy' },
+      }
+
       vi.mocked(db.query.posts.findMany).mockResolvedValue([])
 
-      await nacGetRows(posts as unknown as NacTableWithId, { userId: '1', resourcePermissions: ['list_own'] })
+      await nacGetRows(mockPosts as unknown as NacTableWithId, { userId: '1', resourcePermissions: ['list_own'] })
 
       expect(db.query.posts.findMany).toHaveBeenCalledWith(
         expect.objectContaining({ where: expect.anything() }),
@@ -135,6 +148,10 @@ describe('NAC Core Queries - Consolidated Suite', () => {
     })
 
     it('handles tables missing status/owner columns gracefully', async () => {
+      mockConfig({
+        autoCrud: { statusFiltering: true, auth: { authorization: true, ownerKey: 'createdBy' } },
+      })
+
       vi.mocked(db.query.users.findMany).mockResolvedValue([])
 
       // 'users' fixture lacks 'status' column
@@ -206,6 +223,8 @@ describe('NAC Core Queries - Consolidated Suite', () => {
     })
 
     it('sanitizes DB result by passing selectableFields to db.select', async () => {
+      vi.mocked(db.get).mockResolvedValue({ id: 1, name: 'DB_User' })
+
       await nacGetRow(users as unknown as NacTableWithId, '1')
 
       const selectedFields = vi.mocked(db.select).mock.calls[0]![0]

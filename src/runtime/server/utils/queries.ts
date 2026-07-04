@@ -6,7 +6,7 @@ import { getSelectableFields } from './modelMapper'
 
 import type { NacQueryContext } from '../../shared/utils/types'
 import type { NacTableWithId } from '../types'
-import { nacGetTableName, nacGetTableQueryConfig, getNacDb, isMysql } from './db'
+import { nacGetTableName, nacGetTableQueryConfig, getNacDb, isMysql } from '#nac/db'
 
 
 /**
@@ -91,18 +91,22 @@ function hasAnyListPermissions(context: NacQueryContext = {}) {
  * @public
  */
 export async function nacGetRows(table: NacTableWithId, context: NacQueryContext = {}) {
+  // 1. Authorization Guard
   const isAuthorizationEnabled = useRuntimeConfig().autoCrud.auth?.authorization
   if (isAuthorizationEnabled && !context.isPublic && !hasAnyListPermissions(context)) {
     throw new NacUnauthorizedAccessError()
   }
 
+  // 2. Metadata & Filter Resolution
   const tableName = await nacGetTableName(table)
   const filters = getVisibilityFilters(table, context)
-  const queryOptions = nacGetTableQueryConfig(tableName)
+  const queryOptions = nacGetTableQueryConfig(tableName) ?? {} // Secure fallback for spread
 
+  // 3. Database & Relation Instrospection
   const db = await getNacDb()
-  const hasRelations = Object.keys(db._.relations).length > 0
+  const hasRelations = Object.keys(db._.relations || {}).length > 0
   
+  // --- RELATION MODE (Using Drizzle Relational Queries) ---
   if (hasRelations) {
     return await db.query[tableName].findMany({
       orderBy: { id: 'desc' },
@@ -111,11 +115,20 @@ export async function nacGetRows(table: NacTableWithId, context: NacQueryContext
     })
   }
 
-  return db
-    .select()
+  // Apply fields filtering (e.g., hiding password/token columns dynamically)
+  const fields = getSelectableFields(table, context)
+  
+  let query = db
+    .select(fields)
     .from(table)
+    .$dynamic() // Keeps query dynamic for modification if needed
     .orderBy(desc(table.id))
-    .where(filters.length > 0 ? and(...filters) : undefined)
+
+  if (filters.length > 0) {
+    query = query.where(and(...filters))
+  }
+
+  return await query.all()
 }
 
 /**
@@ -172,11 +185,13 @@ export async function nacCreateRow(table: Table, data: Record<string, unknown>, 
   const db = await getNacDb()
   if (isMysql()) {
     const [res] = await db.insert(table).values(payload)
-    // Fetch manually to simulate .returning()
+    if (!res.insertId) throw new NacInsertionFailedError()
+
     const rows = await db.select(selectableFields)
       .from(table)
       .where(eq((table as NacTableWithId).id, res.insertId))
 
+    if (!rows[0]) throw new NacInsertionFailedError()
     return rows[0]
   }
 
@@ -215,8 +230,9 @@ export async function nacUpdateRow(table: NacTableWithId, id: string, data: Reco
 
   const db = await getNacDb()
   if (isMysql()) {
-    await db.update(table).set(payload).where(eq(table.id, targetId))
-    return await nacGetRow(table, id, context) // Reuse existing fetch logic
+    const [res] = await db.update(table).set(payload).where(eq(table.id, targetId))
+    if (!res.affectedRows) throw new NacUpdateFailedError()
+    return await nacGetRow(table, id, context)
   }
 
   const [updated] = await db.update(table).set(payload).where(eq(table.id, targetId)).returning(selectableFields)
@@ -233,13 +249,13 @@ export async function nacUpdateRow(table: NacTableWithId, id: string, data: Reco
  * @returns The deleted record data.
  * @public
  */
-export async function nacDeleteRow(table: NacTableWithId, id: string) {
+export async function nacDeleteRow(table: NacTableWithId, id: string, context: NacQueryContext = {}) {
   const targetId = Number(id)
-  const fields = getSelectableFields(table)
+  const fields = getSelectableFields(table, context)   // was: getSelectableFields(table)
 
   const db = await getNacDb()
   if (isMysql()) {
-    const recordToDelete = await nacGetRow(table, id)
+    const recordToDelete = await nacGetRow(table, id, context)   // was: nacGetRow(table, id)
     await db.delete(table).where(eq(table.id, targetId))
     return recordToDelete
   }

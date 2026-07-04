@@ -1,3 +1,4 @@
+import { getTableName } from 'drizzle-orm'
 import { vi } from 'vitest'
 
 // Cache so the same fn instance is returned every time a table is accessed
@@ -38,4 +39,10 @@ export const db = {
 }
 
 export const getNacDb = () => db
+
+// queries.ts imports these from #nac/db 
+export const isMysql = vi.fn(() => false)
+export const nacGetTableName = vi.fn(async (table: any) => getTableName(table))
+export const nacGetTableQueryConfig = vi.fn(() => ({}))
+
 export default db
