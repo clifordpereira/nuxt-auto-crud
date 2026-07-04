@@ -58,6 +58,8 @@ function getDatabaseUrl(): string {
  */
 async function initDb() {
   const url = getDatabaseUrl()
+  const hasRelations = relations && Object.keys(relations).length > 0
+
   
   if (isMysql()) {
     const { drizzle } = await import('drizzle-orm/mysql2')
@@ -69,7 +71,7 @@ async function initDb() {
   const { drizzle } = await import('drizzle-orm/libsql')
   const { createClient } = await import('@libsql/client')
   const client = createClient({ url })
-  return drizzle({ client, schema, relations })
+  return drizzle({ client })
 }
 
 /**

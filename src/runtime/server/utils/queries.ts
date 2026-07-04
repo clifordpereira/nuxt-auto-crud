@@ -1,5 +1,5 @@
 import { useRuntimeConfig } from '#imports'
-import { type Table, eq, and, or, getColumns } from 'drizzle-orm'
+import { type Table, eq, and, or, getColumns, desc } from 'drizzle-orm'
 
 import { NacDeletionFailedError, NacInsertionFailedError, NacRecordNotFoundError, NacUnauthorizedAccessError, NacUpdateFailedError } from '../exceptions'
 import { getSelectableFields } from './modelMapper'
@@ -101,11 +101,21 @@ export async function nacGetRows(table: NacTableWithId, context: NacQueryContext
   const queryOptions = nacGetTableQueryConfig(tableName)
 
   const db = await useNacDb()
-  return await db.query[tableName].findMany({
-    orderBy: { id: 'desc' },
-    ...queryOptions,
-    where: filters.length > 0 ? and(...filters) : undefined,
-  })
+  const hasRelations = Object.keys(db._.relations).length > 0
+  
+  if (hasRelations) {
+    return await db.query[tableName].findMany({
+      orderBy: { id: 'desc' },
+      ...queryOptions,
+      where: filters.length > 0 ? and(...filters) : undefined,
+    })
+  }
+
+  return db
+    .select()
+    .from(table)
+    .orderBy(desc(table.id))
+    .where(filters.length > 0 ? and(...filters) : undefined)
 }
 
 /**
