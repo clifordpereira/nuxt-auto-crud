@@ -37,5 +37,5 @@ export const db = {
   transaction: vi.fn(cb => cb(db)),
 }
 
-export const useNacDb = () => db
+export const getNacDb = () => db
 export default db

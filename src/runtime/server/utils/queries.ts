@@ -6,7 +6,7 @@ import { getSelectableFields } from './modelMapper'
 
 import type { NacQueryContext } from '../../shared/utils/types'
 import type { NacTableWithId } from '../types'
-import { nacGetTableName, nacGetTableQueryConfig, useNacDb, isMysql } from './db'
+import { nacGetTableName, nacGetTableQueryConfig, getNacDb, isMysql } from './db'
 
 
 /**
@@ -100,7 +100,7 @@ export async function nacGetRows(table: NacTableWithId, context: NacQueryContext
   const filters = getVisibilityFilters(table, context)
   const queryOptions = nacGetTableQueryConfig(tableName)
 
-  const db = await useNacDb()
+  const db = await getNacDb()
   const hasRelations = Object.keys(db._.relations).length > 0
   
   if (hasRelations) {
@@ -135,7 +135,7 @@ export async function nacGetRow(table: NacTableWithId, id: string, context: NacQ
     return pick(context.record, Object.keys(selectableFields))
   }
 
-  const db = await useNacDb()
+  const db = await getNacDb()
   const query = db.select(selectableFields).from(table).where(eq(table.id, Number(id)))
   const record = isMysql() ? (await query)[0] : await query.get()
   if (!record) throw new NacRecordNotFoundError()
@@ -169,7 +169,7 @@ export async function nacCreateRow(table: Table, data: Record<string, unknown>, 
     payload.updatedAt = new Date()
   }
 
-  const db = await useNacDb()
+  const db = await getNacDb()
   if (isMysql()) {
     const [res] = await db.insert(table).values(payload)
     // Fetch manually to simulate .returning()
@@ -213,7 +213,7 @@ export async function nacUpdateRow(table: NacTableWithId, id: string, data: Reco
     payload.updatedAt = new Date()
   }
 
-  const db = await useNacDb()
+  const db = await getNacDb()
   if (isMysql()) {
     await db.update(table).set(payload).where(eq(table.id, targetId))
     return await nacGetRow(table, id, context) // Reuse existing fetch logic
@@ -237,7 +237,7 @@ export async function nacDeleteRow(table: NacTableWithId, id: string) {
   const targetId = Number(id)
   const fields = getSelectableFields(table)
 
-  const db = await useNacDb()
+  const db = await getNacDb()
   if (isMysql()) {
     const recordToDelete = await nacGetRow(table, id)
     await db.delete(table).where(eq(table.id, targetId))

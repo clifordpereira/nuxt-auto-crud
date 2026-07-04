@@ -1,4 +1,4 @@
-import { useNacDb } from '#nac/db'
+import { getNacDb } from '#nac/db'
 import { eventHandler, getQuery, getHeader, setResponseHeader } from 'h3'
 import { useRuntimeConfig } from '#imports'
 
@@ -8,7 +8,7 @@ import type { NacSchemaDefinition, NacField } from '../../../shared/utils/types'
 export default eventHandler(async (event) => {
   const config = useRuntimeConfig()
   const { apiBase } = config.public.autoCrud
-  const db = await useNacDb()
+  const db = await getNacDb()
 
   const query = getQuery(event)
   const acceptHeader = getHeader(event, 'accept') || ''

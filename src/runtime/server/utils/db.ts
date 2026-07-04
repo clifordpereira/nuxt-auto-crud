@@ -81,7 +81,7 @@ async function initDb() {
  * @returns A promise resolving to the shared Drizzle ORM database client.
  * @public
  */
-export async function useNacDb(): Promise<NacDb> {
+export async function getNacDb(): Promise<NacDb> {
   if (!_db) _db = await initDb()
   return _db
 }

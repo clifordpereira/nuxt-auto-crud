@@ -19,8 +19,6 @@ import { useRuntimeConfig } from '#imports'
  * ```
  */
 export function useNacApiBase() {
-  const config = useRuntimeConfig().public?.autoCrud
-  const apiBase = config?.apiBase || config?.nacEndpointPrefix || '/api/_nac'
-
-  return apiBase
+  const { autoCrud } = useRuntimeConfig().public
+  return autoCrud?.apiBase || autoCrud?.nacEndpointPrefix || '/api/_nac'
 }

@@ -4,7 +4,7 @@ import { useRuntimeConfig } from '#imports'
 // 2. IMPORTS
 import { nacGetRows, nacGetRow, nacCreateRow, nacUpdateRow, nacDeleteRow } from '../../src/runtime/server/utils/queries'
 import type { NacTableWithId } from '../../src/runtime/server/types'
-import { useNacDb } from '#nac/db'
+import { getNacDb } from '#nac/db'
 import { posts, users } from '#nac/schema'
 import {
   NacRecordNotFoundError,
@@ -66,7 +66,7 @@ describe('NAC Core Queries - Consolidated Suite', () => {
     vi.clearAllMocks()
     mockConfig()
 
-    db = await useNacDb()
+    db = await getNacDb()
 
     vi.mocked(db.select).mockReturnThis()
     vi.mocked(db.from).mockReturnThis()
