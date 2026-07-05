@@ -41,6 +41,7 @@
     "dev:build": "nuxt build playground",
     "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxt prepare playground",
     "release": "bun run lint && bun run test && bun run prepack && changelogen --release && npm publish && git push --follow-tags",
+    "release:rc": "bun run lint && bun run test && bun run prepack && changelogen --prerelease rc && npm publish --tag rc && git push --follow-tags",
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest watch",
