@@ -1,3 +1,4 @@
+import { useRuntimeConfig } from '#imports'
 import { relations, nacTableQueryConfig } from '#nac/relations'
 import type { Table } from 'drizzle-orm'
 
@@ -56,21 +57,22 @@ function getDatabaseUrl(): string {
  * @internal
  */
 async function initDb() {
-  const url = getDatabaseUrl()
-  const hasRelations = relations && Object.keys(relations).length > 0
-
+  const { relationsPath } = useRuntimeConfig().autoCrud
+  const hasRelations = relationsPath && relations && Object.keys(relations).length > 0
   
+  const url = getDatabaseUrl()
+
   if (isMysql()) {
     const { drizzle } = await import('drizzle-orm/mysql2')
     const mysql = await import('mysql2/promise')
     const pool = mysql.createPool({ uri: url })
-    return drizzle({ client: pool, relations: { ...relations } })
+    return drizzle({ client: pool, relations: hasRelations ? { ...relations } : undefined })
   }
 
   const { drizzle } = await import('drizzle-orm/libsql')
   const { createClient } = await import('@libsql/client')
   const client = createClient({ url })
-  return drizzle({ client })
+  return drizzle({ client, relations: hasRelations ? relations : undefined })
 }
 
 /**
