@@ -148,13 +148,13 @@ describe('db.query mock — orders', () => {
       },
     ]
     const q = db.query as Record<string, Record<string, any>>
-    q.orders.findMany.mockResolvedValueOnce(mockOrders)
+    q.orders?.findMany.mockResolvedValueOnce(mockOrders)
 
     const cfg = nacGetTableQueryConfig('orders')
     const result = await db.query.orders.findMany(cfg)
 
-    expect(q.orders.findMany).toHaveBeenCalledOnce()
-    expect(q.orders.findMany).toHaveBeenCalledWith(cfg)
+    expect(q.orders?.findMany).toHaveBeenCalledOnce()
+    expect(q.orders?.findMany).toHaveBeenCalledWith(cfg)
     expect(result).toHaveLength(1)
     expect(result[0].customer).toMatchObject({ name: 'Alice', email: 'alice@example.com' })
     expect(result[0].orderitems[0].product).toMatchObject({ name: 'Widget' })
@@ -169,18 +169,18 @@ describe('db.query mock — orders', () => {
       orderitems: [],
     }
     const q = db.query as Record<string, Record<string, any>>
-    q.orders.findFirst.mockResolvedValueOnce(mockOrder)
+    q.orders?.findFirst.mockResolvedValueOnce(mockOrder)
 
     const result = await db.query.orders.findFirst({ where: { id: 2 } })
 
-    expect(q.orders.findFirst).toHaveBeenCalledOnce()
+    expect(q.orders?.findFirst).toHaveBeenCalledOnce()
     expect(result?.status).toBe('shipped')
     expect(result?.customer.name).toBe('Bob')
   })
 
   it('findMany returns empty array when no orders', async () => {
     const q = db.query as Record<string, Record<string, any>>
-    q.orders.findMany.mockResolvedValueOnce([])
+    q.orders?.findMany.mockResolvedValueOnce([])
     const result = await db.query.orders.findMany()
     expect(result).toEqual([])
   })
@@ -198,12 +198,12 @@ describe('db.query mock — orderitems', () => {
       },
     ]
     const q = db.query as Record<string, Record<string, any>>
-    q.orderitems.findMany.mockResolvedValueOnce(mockItems)
+    q.orderitems?.findMany.mockResolvedValueOnce(mockItems)
 
     const cfg = nacGetTableQueryConfig('orderitems')
-    const result = await db.query.orderitems.findMany(cfg)
+    const result = await db.query.orderitems?.findMany(cfg)
 
-    expect(q.orderitems.findMany).toHaveBeenCalledWith(cfg)
+    expect(q.orderitems?.findMany).toHaveBeenCalledWith(cfg)
     expect(result[0]).not.toHaveProperty('order_id')
     expect(result[0]).not.toHaveProperty('product_id')
     expect(result[0].product).toEqual({ name: 'Gadget' })
@@ -224,7 +224,7 @@ describe('db.query mock — customers with orders', () => {
       ],
     }
     const q = db.query as Record<string, Record<string, any>>
-    q.customers.findFirst.mockResolvedValueOnce(mockCustomer)
+    q.customers?.findFirst.mockResolvedValueOnce(mockCustomer)
 
     const result = await db.query.customers.findFirst({
       where: { id: 10 },
@@ -256,7 +256,7 @@ describe('db.query mock — products with many-through-orderitems', () => {
       },
     ]
     const q = db.query as Record<string, Record<string, any>>
-    q.products.findMany.mockResolvedValueOnce(mockProducts)
+    q.products?.findMany.mockResolvedValueOnce(mockProducts)
 
     const result = await db.query.products.findMany({
       with: { orderitems: { with: { order: true } } },
