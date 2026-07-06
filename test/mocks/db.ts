@@ -1,16 +1,14 @@
 import { getTableName, type Table } from 'drizzle-orm'
-import { vi, type Mock } from 'vitest' // ← import Mock type
+import { vi, type Mock } from 'vitest'
 
-// ── type ──────────────────────────────────────────────────────────────────────
 type TableQueryMock = {
   findMany: Mock
   findFirst: Mock
 }
 
-// ── query proxy ───────────────────────────────────────────────────────────────
-const queryTableCache = new Map<string, TableQueryMock>() // ← use TableQueryMock
+const queryTableCache = new Map<string, TableQueryMock>()
 
-const queryMock = new Proxy({} as Record<string, TableQueryMock>, { // ← same here
+const queryMock = new Proxy({} as Record<string, TableQueryMock>, {
   get: (_target, prop: string) => {
     if (!queryTableCache.has(prop)) {
       queryTableCache.set(prop, {
@@ -22,8 +20,7 @@ const queryMock = new Proxy({} as Record<string, TableQueryMock>, { // ← same 
   },
 })
 
-// ── db mock ───────────────────────────────────────────────────────────────────
-export const db = {
+const db = {
   select: vi.fn().mockReturnThis(),
   from: vi.fn().mockReturnThis(),
   insert: vi.fn().mockReturnThis(),
@@ -36,22 +33,21 @@ export const db = {
   offset: vi.fn().mockReturnThis(),
   set: vi.fn().mockReturnThis(),
   $dynamic: vi.fn().mockReturnThis(),
-  // terminal methods — do NOT use mockReturnThis
   returning: vi.fn(),
   values: vi.fn(),
   get: vi.fn(),
   all: vi.fn(),
   run: vi.fn(),
-  _: { relations: {} }, // ← needed for db._.relations check in queries.ts
+  _: { relations: {} },
   query: queryMock,
-  transaction: vi.fn(cb => cb(db)),
+  transaction: vi.fn((cb: (tx: typeof db) => unknown) => cb(db)),
 }
+export type MockNacDb = typeof db
 
-export const getNacDb = () => db
+export const getNacDb = vi.fn(async () => db)
 
 export const isMysql = vi.fn(() => false)
 export const nacGetTableName = vi.fn(async (table: Table) => getTableName(table))
 export const hasActiveRelations = vi.fn(() => true)
 export const nacGetTableQueryConfig = vi.fn((_tableName?: string) => ({}))
 
-export default db

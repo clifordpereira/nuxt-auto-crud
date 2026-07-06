@@ -1,4 +1,4 @@
-import { vi, describe, it, expect, beforeEach } from 'vitest'
+import { vi, describe, it, expect, beforeEach, type Mock } from 'vitest'
 import { useRuntimeConfig } from '#imports'
 
 // 2. IMPORTS
@@ -12,7 +12,7 @@ import {
   NacDeletionFailedError,
 } from '../../src/runtime/server/exceptions'
 
-import { nacGetTableQueryConfig, getNacDb, isMysql } from '#nac/db'
+import { nacGetTableQueryConfig, getNacDb, isMysql, type MockNacDb } from '#nac/db'
 
 const BASE_RUNTIME_CONFIG = {
   hub: { db: 'sqlite' },
@@ -64,7 +64,7 @@ vi.mock('drizzle-orm', async () => {
 process.env.DATABASE_URL = 'file:test/fixtures/basic/.data/db/sqlite.db'
 
 describe('NAC Core Queries - Consolidated Suite', () => {
-  let db: any
+  let db: MockNacDb
 
   beforeEach(async () => {
     vi.clearAllMocks()

@@ -19,7 +19,6 @@ const makeUnitProject = (fixtureName: string, includePattern: string, excludePat
         ? r(`./test/fixtures/${fixtureName}/server/db/relations.ts`)
         : stubPath,
       '#imports': r('./test/mocks/imports.ts'),
-      '@nuxthub/db': r('./test/mocks/db.ts'),
       '#nac/db': r('./test/mocks/db.ts'),
     },
   },
