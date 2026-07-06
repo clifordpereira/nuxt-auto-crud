@@ -8,7 +8,6 @@ import type { NacQueryContext } from '../../shared/utils/types'
 import type { NacTableWithId } from '../types'
 import { nacGetTableName, nacGetTableQueryConfig, getNacDb, isMysql, hasActiveRelations } from '#nac/db'
 
-
 /**
  * Picks only the specified keys from an object.
  *
@@ -116,7 +115,7 @@ export async function nacGetRows(table: NacTableWithId, context: NacQueryContext
 
   // Apply fields filtering (e.g., hiding password/token columns dynamically)
   const fields = getSelectableFields(table, context)
-  
+
   let query = db
     .select(fields)
     .from(table)
@@ -250,11 +249,11 @@ export async function nacUpdateRow(table: NacTableWithId, id: string, data: Reco
  */
 export async function nacDeleteRow(table: NacTableWithId, id: string, context: NacQueryContext = {}) {
   const targetId = Number(id)
-  const fields = getSelectableFields(table, context)   // was: getSelectableFields(table)
+  const fields = getSelectableFields(table, context) // was: getSelectableFields(table)
 
   const db = await getNacDb()
   if (isMysql()) {
-    const recordToDelete = await nacGetRow(table, id, context)   // was: nacGetRow(table, id)
+    const recordToDelete = await nacGetRow(table, id, context) // was: nacGetRow(table, id)
     await db.delete(table).where(eq(table.id, targetId))
     return recordToDelete
   }
@@ -264,4 +263,3 @@ export async function nacDeleteRow(table: NacTableWithId, id: string, context: N
 
   return deletedRecord
 }
-

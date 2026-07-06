@@ -36,4 +36,3 @@ export function nacResolveValidatedSchema(table: Table, intent: 'insert' | 'patc
 
   return intent === 'patch' ? sanitizedSchema.partial() : sanitizedSchema
 }
-

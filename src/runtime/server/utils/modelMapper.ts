@@ -208,4 +208,3 @@ export async function nacGetSchemaDefinition(modelName: string): Promise<NacSche
     fields,
   }
 }
-

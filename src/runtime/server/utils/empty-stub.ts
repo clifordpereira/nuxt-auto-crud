@@ -12,4 +12,4 @@ export const relations: unknown[] = []
 export const nacTableQueryConfig: Record<string, DBQueryConfig> = {}
 
 // Keep it valid as an explicit ESM module
-export default {};
+export default {}

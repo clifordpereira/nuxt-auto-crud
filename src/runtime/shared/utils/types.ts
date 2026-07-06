@@ -87,4 +87,3 @@ export interface NacQueryContext {
    */
   isPublic?: boolean
 }
-

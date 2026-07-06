@@ -61,7 +61,7 @@ vi.mock('drizzle-orm', async () => {
   }
 })
 
-process.env.DATABASE_URL='file:test/fixtures/basic/.data/db/sqlite.db'
+process.env.DATABASE_URL = 'file:test/fixtures/basic/.data/db/sqlite.db'
 
 describe('NAC Core Queries - Consolidated Suite', () => {
   let db: any

@@ -52,4 +52,3 @@ export function nacAddClient(id: string, res: WritableStreamDefaultWriter<Uint8A
 export function nacRemoveClient(id: string): void {
   clients.delete(id)
 }
-

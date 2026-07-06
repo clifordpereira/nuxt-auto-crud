@@ -44,4 +44,3 @@ export interface NacZodTypeDef {
 export interface NacZodCheck {
   kind: string
 }
-

@@ -12,5 +12,5 @@ export default defineNuxtConfig({
   },
   autoCrud: {
     relationsPath: 'server/db/relations',
-  }
+  },
 })

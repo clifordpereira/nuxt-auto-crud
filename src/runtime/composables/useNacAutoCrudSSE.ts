@@ -2,14 +2,14 @@ import { onBeforeUnmount, onMounted } from 'vue'
 import { useNacApiBase } from './useNacApiBase'
 
 /**
- * Represents a real-time database synchronization event broadcasted 
+ * Represents a real-time database synchronization event broadcasted
  * by the Nuxt Auto CRUD module during mutations.
- * * @public
+ * @public
  */
 export interface NacAutoCrudEvent {
   /**
    * The name of the database table where the mutation occurred.
-   * * @example
+   * @example
    * ```ts
    * 'products'
    * ```
@@ -33,20 +33,20 @@ export interface NacAutoCrudEvent {
 }
 
 /**
- * A composable that establishes a real-time Server-Sent Events (SSE) connection 
+ * A composable that establishes a real-time Server-Sent Events (SSE) connection
  * to listen for database mutations broadcasted by the Nuxt Auto CRUD module.
- * * @remarks
+ * @remarks
  * - **SSR Safe:** This function automatically guards against execution during Server-Side Rendering.
- * - **Lifecycle Managed:** Automatically opens the connection on component mount (`onMounted`) 
+ * - **Lifecycle Managed:** Automatically opens the connection on component mount (`onMounted`)
  * and cleanly tears it down before unmount (`onBeforeUnmount`) to prevent memory leaks.
- * * @param onEvent - A callback function invoked whenever a valid CRUD event is received.
- * * @example
+ * @param onEvent - A callback function invoked whenever a valid CRUD event is received.
+ * @example
  * ```ts
  * useNacAutoCrudSSE((event) => {
  * console.log(`Action: ${event.action} on table: ${event.table}`);
  * });
  * ```
- * * @public
+ * @public
  */
 export function useNacAutoCrudSSE(onEvent: (e: NacAutoCrudEvent) => void) {
   let source: EventSource | null = null
@@ -60,7 +60,7 @@ export function useNacAutoCrudSSE(onEvent: (e: NacAutoCrudEvent) => void) {
     const sseUrl = `${apiBase.replace(/\/$/, '')}/_sse`
 
     source = new EventSource(sseUrl)
-    
+
     source.onerror = (err) => {
       console.error('[NAC] SSE Connection Error:', err)
     }

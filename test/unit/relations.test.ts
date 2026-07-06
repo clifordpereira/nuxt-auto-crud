@@ -15,9 +15,9 @@ beforeEach(() => {
   q.orderitems?.findMany?.mockReset()
   q.orderitems?.findFirst?.mockReset()
   q.customers?.findMany?.mockReset()
-  q.customers?.findFirst?.mockReset()   // ← was missing
+  q.customers?.findFirst?.mockReset() // ← was missing
   q.products?.findMany?.mockReset()
-  q.products?.findFirst?.mockReset()   // ← was missing
+  q.products?.findFirst?.mockReset() // ← was missing
 
   nacGetTableQueryConfig.mockImplementation((tableName?: string) => {
     return tableName ? (nacTableQueryConfig[tableName] ?? {}) : {}

@@ -24,12 +24,12 @@ let _db: NacDb | null = null
 export function isMysql(): boolean {
   const url = process.env.DATABASE_URL
   if (!url) return false
-  
+
   const lowerUrl = url.toLowerCase()
   return (
-    lowerUrl.startsWith('mysql://') || 
-    lowerUrl.startsWith('mysql2://') || 
-    lowerUrl.startsWith('mysqls://')
+    lowerUrl.startsWith('mysql://')
+    || lowerUrl.startsWith('mysql2://')
+    || lowerUrl.startsWith('mysqls://')
   )
 }
 
@@ -50,7 +50,7 @@ function getDatabaseUrl(): string {
 }
 
 /**
- * Verifies if relational queries are active by validating the runtime 
+ * Verifies if relational queries are active by validating the runtime
  * configuration path and checking for defined database relation schemas.
  *
  * @returns {boolean} True if the relations path is configured and at least one relation definition exists.
@@ -61,13 +61,13 @@ export function hasActiveRelations(): boolean {
 }
 
 /**
- * Initializes the Drizzle ORM client instance with dynamic imports depending on 
+ * Initializes the Drizzle ORM client instance with dynamic imports depending on
  * whether the connection string specifies a MySQL or LibSQL/SQLite backend.
  *
  * @returns The configured Drizzle database interface wrapped with system relations.
  * @internal
  */
-async function initDb() {  
+async function initDb() {
   const url = getDatabaseUrl()
 
   if (isMysql()) {
@@ -84,7 +84,7 @@ async function initDb() {
 }
 
 /**
- * Composable that provides the active, shared singleton instance of the 
+ * Composable that provides the active, shared singleton instance of the
  * Nuxt Auto Crud database abstraction context.
  *
  * @returns A promise resolving to the shared Drizzle ORM database client.
@@ -96,7 +96,7 @@ export async function getNacDb(): Promise<NacDb> {
 }
 
 /**
- * Resolves the dialect-specific `getTableConfig` utility from Drizzle Core using 
+ * Resolves the dialect-specific `getTableConfig` utility from Drizzle Core using
  * lazy dynamic imports depending on the runtime connection.
  *
  * @returns A promise resolving to the specialized `getTableConfig` reflection handler.

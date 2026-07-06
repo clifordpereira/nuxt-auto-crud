@@ -42,4 +42,3 @@ export const NAC_FORM_READ_ONLY_FIELDS = [] // id is managed in code as it shoul
  * @public
  */
 export const NAC_SYSTEM_TABLES = ['_hub_migrations', 'd1_migrations', 'sqlite_sequence']
-

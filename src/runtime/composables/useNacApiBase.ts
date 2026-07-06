@@ -13,7 +13,7 @@ import { useRuntimeConfig } from '#imports'
  * ```ts
  * // Inside a Nuxt component or composable
  * const apiBase = useNacApiBase();
- * * const fetchTableData = async (tableName: string) => {
+ * const fetchTableData = async (tableName: string) => {
  * return await $fetch(`${apiBase}/${tableName}`);
  * };
  * ```

@@ -1,5 +1,5 @@
 import { getTableName } from 'drizzle-orm'
-import { vi, type Mock } from 'vitest'   // ← import Mock type
+import { vi, type Mock } from 'vitest' // ← import Mock type
 
 // ── type ──────────────────────────────────────────────────────────────────────
 type TableQueryMock = {
@@ -8,9 +8,9 @@ type TableQueryMock = {
 }
 
 // ── query proxy ───────────────────────────────────────────────────────────────
-const queryTableCache = new Map<string, TableQueryMock>()  // ← use TableQueryMock
+const queryTableCache = new Map<string, TableQueryMock>() // ← use TableQueryMock
 
-const queryMock = new Proxy({} as Record<string, TableQueryMock>, {  // ← same here
+const queryMock = new Proxy({} as Record<string, TableQueryMock>, { // ← same here
   get: (_target, prop: string) => {
     if (!queryTableCache.has(prop)) {
       queryTableCache.set(prop, {
@@ -42,7 +42,7 @@ export const db = {
   get: vi.fn(),
   all: vi.fn(),
   run: vi.fn(),
-  _: { relations: {} },   // ← needed for db._.relations check in queries.ts
+  _: { relations: {} }, // ← needed for db._.relations check in queries.ts
   query: queryMock,
   transaction: vi.fn(cb => cb(db)),
 }

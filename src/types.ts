@@ -79,5 +79,3 @@ declare module '@nuxt/schema' {
     autoCrud: Pick<ModuleOptions, 'formHiddenFields' | 'formReadOnlyFields' | 'nacEndpointPrefix' | 'apiBase'>
   }
 }
-
-

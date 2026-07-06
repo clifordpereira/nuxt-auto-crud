@@ -6,8 +6,8 @@ export type { ModuleOptions }
 
 /**
  * Nuxt Auto CRUD (NAC) Module
- * * Generates zero-codegen dynamic RESTful CRUD APIs derived directly from your 
- * Drizzle schemas. It hooks into the Nitro engine to provision endpoints 
+ * Generates zero-codegen dynamic RESTful CRUD APIs derived directly from your
+ * Drizzle schemas. It hooks into the Nitro engine to provision endpoints
  * and maps global server utilities.
  *
  * @see {@link https://github.com/clifordpereira/nuxt-auto-crud}
@@ -17,7 +17,7 @@ export default defineNuxtModule<ModuleOptions>({
     name: 'nuxt-auto-crud',
     configKey: 'autoCrud',
   },
-  
+
   /**
    * Default configuration options for Nuxt Auto CRUD.
    */
@@ -41,24 +41,25 @@ export default defineNuxtModule<ModuleOptions>({
     agenticToken: '',
     /** Path to your application's Drizzle schema definitions. */
     schemaPath: 'server/db/schema',
-    
+
     // Public config
     /** Fields excluded from the generated UI metadata to block user input. */
     formHiddenFields: NAC_FORM_HIDDEN_FIELDS,
     /** Fields visible in forms but locked as read-only from user modifications. */
     formReadOnlyFields: NAC_FORM_READ_ONLY_FIELDS,
-    /** * Base path prefix where NAC endpoints are registered.
+    /**
+     * Base path prefix where NAC endpoints are registered.
      * @deprecated Use `apiBase` instead.
      */
-    nacEndpointPrefix: '/api/_nac', 
+    nacEndpointPrefix: '/api/_nac',
     /** Base API path prefix for all auto-generated endpoints. */
-    apiBase: '/api/_nac'
+    apiBase: '/api/_nac',
   },
 
   /**
    * Setup function executed during Nuxt initialization to configure imports,
    * path aliases, middleware, and handlers.
-   * * @param options - Resolved module options combining user choices and defaults.
+   * @param options - Resolved module options combining user choices and defaults.
    * @param nuxt - The current Nuxt instance.
    */
   async setup(options, nuxt) {
@@ -71,7 +72,8 @@ export default defineNuxtModule<ModuleOptions>({
 
     if (options.relationsPath) {
       nuxt.options.alias['#nac/relations'] = resolver.resolve(nuxt.options.rootDir, options.relationsPath)
-    } else {
+    }
+    else {
       nuxt.options.alias['#nac/relations'] = resolver.resolve('./runtime/server/utils/empty-stub')
     }
 
@@ -82,11 +84,11 @@ export default defineNuxtModule<ModuleOptions>({
 
     // 3. Auto-imports (The Engine)
     addImportsDir(resolver.resolve('./runtime/composables'))
-    
+
     /**
      * Registers the runtime server utility directory for auto-importing.
-     * * @note Global Exposure Alert: Because this maps to `addServerImportsDir`,
-     * any named export within `./runtime/server/utils` (e.g., `modelTableMap`) 
+     * @note Global Exposure Alert: Because this maps to `addServerImportsDir`,
+     * any named export within `./runtime/server/utils` (e.g., `modelTableMap`)
      * becomes available globally within the host application's server scope.
      * To prevent conflicts with user code, consider prefixing exports inside this directory.
      */

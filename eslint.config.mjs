@@ -25,8 +25,8 @@ export default createConfigForNuxt({
             allowWithoutProject: [
               'eslint.config.mjs',
               'vitest.config.ts',
-              'test/fixtures/**/*.ts'
-            ]
+              'test/fixtures/**/*.ts',
+            ],
           },
           extraFileExtensions: ['.vue'],
         },
@@ -45,7 +45,7 @@ export default createConfigForNuxt({
         tsdoc,
       },
       rules: {
-        'tsdoc/syntax': 'warn', 
+        'tsdoc/syntax': 'warn',
       },
-    }
+    },
   )
