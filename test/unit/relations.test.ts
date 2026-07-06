@@ -1,9 +1,12 @@
 import { describe, it, expect, beforeEach, vi, type MockInstance } from 'vitest'
 import { db, nacGetTableQueryConfig } from '../mocks/db'
+import type { DBQueryConfig } from 'drizzle-orm'
 
 // ─── fixtures ────────────────────────────────────────────────────────────────
 import * as schema from '#nac/schema'
 import { relations, nacTableQueryConfig } from '#nac/relations'
+
+type MockQueryBridge = Record<string, Record<string, MockInstance>> & Required<typeof db.query>
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
 beforeEach(() => {
@@ -43,14 +46,14 @@ describe('schema tables exist', () => {
   })
 
   it('orders.customer_id references customers.id', () => {
-    const col = (schema.orders as any)?.customer_id
+    const col = (schema.orders)?.customer_id
     expect(col).toBeDefined()
     expect(col.name ?? col.columnName).toBe('customer_id')
   })
 
   it('orderitems has FK columns for order_id and product_id', () => {
-    expect((schema.orderitems as any)?.order_id).toBeDefined()
-    expect((schema.orderitems as any)?.product_id).toBeDefined()
+    expect((schema.orderitems)?.order_id).toBeDefined()
+    expect((schema.orderitems)?.product_id).toBeDefined()
   })
 })
 
@@ -73,10 +76,10 @@ describe('relations are defined', () => {
 // ─── nacTableQueryConfig via nacGetTableQueryConfig ──────────────────────────
 describe('nacTableQueryConfig extraction via nacGetTableQueryConfig', () => {
   describe('orders config', () => {
-    let cfg: Record<string, any>
+    let cfg: DBQueryConfig
 
     beforeEach(() => {
-      cfg = nacGetTableQueryConfig('orders') as Record<string, any>
+      cfg = nacGetTableQueryConfig('orders') ?? {}
     })
 
     it('orders by id desc', () => {
@@ -103,10 +106,10 @@ describe('nacTableQueryConfig extraction via nacGetTableQueryConfig', () => {
   })
 
   describe('orderitems config', () => {
-    let cfg: Record<string, any>
+    let cfg: DBQueryConfig
 
     beforeEach(() => {
-      cfg = nacGetTableQueryConfig('orderitems') as Record<string, any>
+      cfg = nacGetTableQueryConfig('orderitems') ?? {}
     })
 
     it('orders by id asc', () => {
@@ -145,7 +148,7 @@ describe('db.query mock — orders', () => {
         ],
       },
     ]
-    const q = db.query as Record<string, Record<string, any>>
+    const q = db.query as MockQueryBridge
     q.orders?.findMany.mockResolvedValueOnce(mockOrders)
 
     const cfg = nacGetTableQueryConfig('orders')
@@ -166,7 +169,7 @@ describe('db.query mock — orders', () => {
       customer: { name: 'Bob', email: 'bob@example.com' },
       orderitems: [],
     }
-    const q = db.query as Record<string, Record<string, any>>
+    const q = db.query as MockQueryBridge
     q.orders?.findFirst.mockResolvedValueOnce(mockOrder)
 
     const result = await db.query.orders?.findFirst({ where: { id: 2 } })
@@ -177,7 +180,7 @@ describe('db.query mock — orders', () => {
   })
 
   it('findMany returns empty array when no orders', async () => {
-    const q = db.query as Record<string, Record<string, any>>
+    const q = db.query as Record<string, Record<string, MockInstance>> & Required<typeof db.query>
     q.orders?.findMany.mockResolvedValueOnce([])
     const result = await db.query.orders?.findMany()
     expect(result).toEqual([])
@@ -195,7 +198,7 @@ describe('db.query mock — orderitems', () => {
         order: { status: 'processing' },
       },
     ]
-    const q = db.query as Record<string, Record<string, any>>
+    const q = db.query as MockQueryBridge
     q.orderitems?.findMany.mockResolvedValueOnce(mockItems)
 
     const cfg = nacGetTableQueryConfig('orderitems')
@@ -221,7 +224,7 @@ describe('db.query mock — customers with orders', () => {
         { id: 2, status: 'pending', total_amount: 50 },
       ],
     }
-    const q = db.query as Record<string, Record<string, any>>
+    const q = db.query as MockQueryBridge
     q.customers?.findFirst.mockResolvedValueOnce(mockCustomer)
 
     const result = await db.query.customers?.findFirst({
@@ -253,7 +256,7 @@ describe('db.query mock — products with many-through-orderitems', () => {
         ],
       },
     ]
-    const q = db.query as Record<string, Record<string, any>>
+    const q = db.query as MockQueryBridge
     q.products?.findMany.mockResolvedValueOnce(mockProducts)
 
     const result = await db.query.products?.findMany({

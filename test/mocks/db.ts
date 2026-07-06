@@ -1,4 +1,4 @@
-import { getTableName } from 'drizzle-orm'
+import { getTableName, type Table } from 'drizzle-orm'
 import { vi, type Mock } from 'vitest' // ← import Mock type
 
 // ── type ──────────────────────────────────────────────────────────────────────
@@ -50,7 +50,7 @@ export const db = {
 export const getNacDb = () => db
 
 export const isMysql = vi.fn(() => false)
-export const nacGetTableName = vi.fn(async (table: any) => getTableName(table))
+export const nacGetTableName = vi.fn(async (table: Table) => getTableName(table))
 export const hasActiveRelations = vi.fn(() => true)
 export const nacGetTableQueryConfig = vi.fn((_tableName?: string) => ({}))
 

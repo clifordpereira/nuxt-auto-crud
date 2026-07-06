@@ -12,7 +12,7 @@ import {
   NacDeletionFailedError,
 } from '../../src/runtime/server/exceptions'
 
-import { nacGetTableName, nacGetTableQueryConfig, getNacDb, isMysql } from '#nac/db'
+import { nacGetTableQueryConfig, getNacDb, isMysql } from '#nac/db'
 
 const BASE_RUNTIME_CONFIG = {
   hub: { db: 'sqlite' },

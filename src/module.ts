@@ -84,14 +84,6 @@ export default defineNuxtModule<ModuleOptions>({
 
     // 3. Auto-imports (The Engine)
     addImportsDir(resolver.resolve('./runtime/composables'))
-
-    /**
-     * Registers the runtime server utility directory for auto-importing.
-     * @note Global Exposure Alert: Because this maps to `addServerImportsDir`,
-     * any named export within `./runtime/server/utils` (e.g., `modelTableMap`)
-     * becomes available globally within the host application's server scope.
-     * To prevent conflicts with user code, consider prefixing exports inside this directory.
-     */
     addServerImportsDir(resolver.resolve('./runtime/server/utils'))
 
     // 4. Global Type Support (For the Playground/App)

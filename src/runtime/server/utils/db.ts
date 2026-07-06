@@ -37,8 +37,8 @@ export function isMysql(): boolean {
  * Retrieves the database connection URL from the environment.
  * Throws a structured error if the configuration is missing.
  *
- * @returns The active database connection string string.
- * @throws {Error} If `DATABASE_URL` is undefined or empty.
+ * @returns The active database connection string.
+ * @throws Error If `DATABASE_URL` is undefined or empty.
  * @internal
  */
 function getDatabaseUrl(): string {
@@ -53,11 +53,11 @@ function getDatabaseUrl(): string {
  * Verifies if relational queries are active by validating the runtime
  * configuration path and checking for defined database relation schemas.
  *
- * @returns {boolean} True if the relations path is configured and at least one relation definition exists.
+ * @returns True if the relations path is configured and at least one relation definition exists.
  */
 export function hasActiveRelations(): boolean {
   const { relationsPath } = useRuntimeConfig().autoCrud
-  return !!(relationsPath && relations && Object.keys(relations).length > 0)
+  return !!(relationsPath && relations && (Object.keys(relations).length > 0))
 }
 
 /**
@@ -132,6 +132,5 @@ export async function nacGetTableName(table: Table): Promise<string> {
  * @public
  */
 export function nacGetTableQueryConfig(tableName: string): Record<string, unknown> {
-  const config = (nacTableQueryConfig ?? {}) as Record<string, unknown>
-  return (config[tableName] ?? {}) as Record<string, unknown>
+  return nacTableQueryConfig[tableName] ?? {}
 }

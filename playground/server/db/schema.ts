@@ -43,3 +43,8 @@ export const orderitems = sqliteTable('orderitems', {
   quantity: integer('quantity').notNull(),
   price: numeric('price', { mode: 'number' }).notNull(),
 })
+
+export type Product = typeof products.$inferSelect
+export type Customer = typeof customers.$inferSelect
+export type Order = typeof orders.$inferSelect
+export type OrderItem = typeof orderitems.$inferSelect
