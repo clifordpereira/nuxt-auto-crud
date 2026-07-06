@@ -50,29 +50,37 @@ function getDatabaseUrl(): string {
 }
 
 /**
+ * Verifies if relational queries are active by validating the runtime 
+ * configuration path and checking for defined database relation schemas.
+ *
+ * @returns {boolean} True if the relations path is configured and at least one relation definition exists.
+ */
+export function hasActiveRelations(): boolean {
+  const { relationsPath } = useRuntimeConfig().autoCrud
+  return !!(relationsPath && relations && Object.keys(relations).length > 0)
+}
+
+/**
  * Initializes the Drizzle ORM client instance with dynamic imports depending on 
  * whether the connection string specifies a MySQL or LibSQL/SQLite backend.
  *
  * @returns The configured Drizzle database interface wrapped with system relations.
  * @internal
  */
-async function initDb() {
-  const { relationsPath } = useRuntimeConfig().autoCrud
-  const hasRelations = relationsPath && relations && Object.keys(relations).length > 0
-  
+async function initDb() {  
   const url = getDatabaseUrl()
 
   if (isMysql()) {
     const { drizzle } = await import('drizzle-orm/mysql2')
     const mysql = await import('mysql2/promise')
     const pool = mysql.createPool({ uri: url })
-    return drizzle({ client: pool, relations: hasRelations ? { ...relations } : undefined })
+    return drizzle({ client: pool, relations: hasActiveRelations() ? { ...relations } : undefined })
   }
 
   const { drizzle } = await import('drizzle-orm/libsql')
   const { createClient } = await import('@libsql/client')
   const client = createClient({ url })
-  return drizzle({ client, relations: hasRelations ? relations : undefined })
+  return drizzle({ client, relations: hasActiveRelations() ? relations : undefined })
 }
 
 /**

@@ -6,7 +6,7 @@ import { getSelectableFields } from './modelMapper'
 
 import type { NacQueryContext } from '../../shared/utils/types'
 import type { NacTableWithId } from '../types'
-import { nacGetTableName, nacGetTableQueryConfig, getNacDb, isMysql } from '#nac/db'
+import { nacGetTableName, nacGetTableQueryConfig, getNacDb, isMysql, hasActiveRelations } from '#nac/db'
 
 
 /**
@@ -104,10 +104,9 @@ export async function nacGetRows(table: NacTableWithId, context: NacQueryContext
 
   // 3. Database & Relation Instrospection
   const db = await getNacDb()
-  const hasRelations = Object.keys(db._.relations || {}).length > 0
-  
+
   // --- RELATION MODE (Using Drizzle Relational Queries) ---
-  if (hasRelations) {
+  if (hasActiveRelations()) {
     return await db.query[tableName].findMany({
       orderBy: { id: 'desc' },
       ...queryOptions,

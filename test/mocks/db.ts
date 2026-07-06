@@ -17,32 +17,37 @@ const queryMock = new Proxy({} as Record<string, { findMany: ReturnType<typeof v
 })
 
 export const db = {
-  select: vi.fn(),
-  from: vi.fn(),
-  insert: vi.fn(),
-  update: vi.fn(),
-  delete: vi.fn(),
-  innerJoin: vi.fn(),
-  where: vi.fn(),
-  orderBy: vi.fn(),
-  limit: vi.fn(),
-  offset: vi.fn(),
-  set: vi.fn(),
+  select: vi.fn().mockReturnThis(),
+  from: vi.fn().mockReturnThis(),
+  insert: vi.fn().mockReturnThis(),
+  update: vi.fn(() => ({
+    set: vi.fn().mockReturnThis(),
+    where: vi.fn().mockReturnThis(),
+    returning: vi.fn(),
+  })),
+  delete: vi.fn().mockReturnThis(),
+  innerJoin: vi.fn().mockReturnThis(),
+  where: vi.fn().mockReturnThis(),
+  orderBy: vi.fn().mockReturnThis(),
+  limit: vi.fn().mockReturnThis(),
+  offset: vi.fn().mockReturnThis(),
+  set: vi.fn().mockReturnThis(),
+  values: vi.fn().mockReturnThis(),
+  $dynamic: vi.fn().mockReturnThis(),
+
   returning: vi.fn(),
-  values: vi.fn(),
   get: vi.fn(),
   all: vi.fn(),
   run: vi.fn(),
-  $dynamic: vi.fn(),
+  
   query: queryMock,
   transaction: vi.fn(cb => cb(db)),
 }
 
 export const getNacDb = () => db
-
-// queries.ts imports these from #nac/db 
 export const isMysql = vi.fn(() => false)
 export const nacGetTableName = vi.fn(async (table: any) => getTableName(table))
-export const nacGetTableQueryConfig = vi.fn(() => ({}))
+export const hasActiveRelations = vi.fn(() => true)
+export const nacGetTableQueryConfig = vi.fn((_tableName?: string) => ({}))
 
 export default db
