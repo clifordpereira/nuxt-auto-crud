@@ -3,12 +3,13 @@
  * It is imported when the user does not provide a custom relations file in their Nuxt configuration.
  * This prevents TypeScript compilation errors by satisfying the module alias requirements.
  */
+import type { DBQueryConfig } from 'drizzle-orm'
 
 // export empty relations object
-export const relations = {};
+export const relations: unknown[] = []
 
 // export empty table query config object
-export const nacTableQueryConfig = {};
+export const nacTableQueryConfig: Record<string, DBQueryConfig> = {}
 
 // Keep it valid as an explicit ESM module
 export default {};

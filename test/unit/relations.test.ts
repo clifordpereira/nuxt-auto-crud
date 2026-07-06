@@ -20,9 +20,7 @@ beforeEach(() => {
   q.products?.findFirst?.mockReset()   // ← was missing
 
   nacGetTableQueryConfig.mockImplementation((tableName?: string) => {
-    if (!tableName) return {}
-    const config = (nacTableQueryConfig ?? {}) as Record<string, unknown>
-    return (config[tableName] ?? {}) as Record<string, unknown>
+    return tableName ? (nacTableQueryConfig[tableName] ?? {}) : {}
   })
 })
 
@@ -151,7 +149,7 @@ describe('db.query mock — orders', () => {
     q.orders?.findMany.mockResolvedValueOnce(mockOrders)
 
     const cfg = nacGetTableQueryConfig('orders')
-    const result = await db.query.orders.findMany(cfg)
+    const result = await db.query.orders?.findMany(cfg)
 
     expect(q.orders?.findMany).toHaveBeenCalledOnce()
     expect(q.orders?.findMany).toHaveBeenCalledWith(cfg)
@@ -171,7 +169,7 @@ describe('db.query mock — orders', () => {
     const q = db.query as Record<string, Record<string, any>>
     q.orders?.findFirst.mockResolvedValueOnce(mockOrder)
 
-    const result = await db.query.orders.findFirst({ where: { id: 2 } })
+    const result = await db.query.orders?.findFirst({ where: { id: 2 } })
 
     expect(q.orders?.findFirst).toHaveBeenCalledOnce()
     expect(result?.status).toBe('shipped')
@@ -181,7 +179,7 @@ describe('db.query mock — orders', () => {
   it('findMany returns empty array when no orders', async () => {
     const q = db.query as Record<string, Record<string, any>>
     q.orders?.findMany.mockResolvedValueOnce([])
-    const result = await db.query.orders.findMany()
+    const result = await db.query.orders?.findMany()
     expect(result).toEqual([])
   })
 })
@@ -226,7 +224,7 @@ describe('db.query mock — customers with orders', () => {
     const q = db.query as Record<string, Record<string, any>>
     q.customers?.findFirst.mockResolvedValueOnce(mockCustomer)
 
-    const result = await db.query.customers.findFirst({
+    const result = await db.query.customers?.findFirst({
       where: { id: 10 },
       with: { orders: true },
     })
@@ -258,7 +256,7 @@ describe('db.query mock — products with many-through-orderitems', () => {
     const q = db.query as Record<string, Record<string, any>>
     q.products?.findMany.mockResolvedValueOnce(mockProducts)
 
-    const result = await db.query.products.findMany({
+    const result = await db.query.products?.findMany({
       with: { orderitems: { with: { order: true } } },
     })
 
@@ -273,7 +271,7 @@ describe('nacGetTableQueryConfig mock', () => {
   })
 
   it('can be overridden per test', () => {
-    nacGetTableQueryConfig.mockReturnValueOnce(nacTableQueryConfig?.orders ?? { orderBy: { id: 'desc' } })
+    nacGetTableQueryConfig.mockReturnValueOnce(nacTableQueryConfig.orders ?? { orderBy: { id: 'desc' } })
     const cfg = nacGetTableQueryConfig('orders')
     expect(cfg).toHaveProperty('orderBy', { id: 'desc' })
   })
