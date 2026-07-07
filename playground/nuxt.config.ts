@@ -5,4 +5,7 @@ export default defineNuxtConfig({
   hub: {
     db: 'sqlite',
   },
+  autoCrud: {
+    relationsPath: 'server/db/relations'
+  }
 })

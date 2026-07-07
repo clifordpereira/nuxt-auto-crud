@@ -6,7 +6,7 @@
 import type { DBQueryConfig } from 'drizzle-orm'
 
 // export empty relations object
-export const relations: unknown[] = []
+export const relations: Record<string, unknown> = {}
 
 // export empty table query config object
 export const nacTableQueryConfig: Record<string, DBQueryConfig> = {}

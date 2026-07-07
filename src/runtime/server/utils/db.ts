@@ -1,6 +1,9 @@
 import { useRuntimeConfig } from '#imports'
-import { relations, nacTableQueryConfig } from '#nac/relations'
-import type { Table } from 'drizzle-orm'
+import type { Table, TablesRelationalConfig } from 'drizzle-orm'
+import * as nacRelations from '#nac/relations'
+
+const relations = nacRelations.relations ?? {}
+const nacTableQueryConfig = nacRelations.nacTableQueryConfig ?? {}
 
 /**
  * Represents the inferenced type of the initialized Drizzle database instance.
@@ -74,13 +77,16 @@ async function initDb() {
     const { drizzle } = await import('drizzle-orm/mysql2')
     const mysql = await import('mysql2/promise')
     const pool = mysql.createPool({ uri: url })
-    return drizzle({ client: pool, relations: hasActiveRelations() ? { ...relations } : undefined })
+    return drizzle({
+      client: pool,
+      relations: hasActiveRelations() ? ({ ...relations } as TablesRelationalConfig) : undefined,
+    })
   }
 
   const { drizzle } = await import('drizzle-orm/libsql')
   const { createClient } = await import('@libsql/client')
   const client = createClient({ url })
-  return drizzle({ client, relations: hasActiveRelations() ? relations : undefined })
+  return drizzle({ client, relations: hasActiveRelations() ? (relations as TablesRelationalConfig) : undefined })
 }
 
 /**
