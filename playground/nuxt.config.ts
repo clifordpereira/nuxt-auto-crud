@@ -6,6 +6,6 @@ export default defineNuxtConfig({
     db: 'sqlite',
   },
   autoCrud: {
-    relationsPath: 'server/db/relations'
-  }
+    relationsPath: 'server/db/relations',
+  },
 })
