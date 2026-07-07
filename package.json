@@ -1,6 +1,6 @@
 {
   "name": "nuxt-auto-crud",
-  "version": "2.6.0-rc.0",
+  "version": "2.6.0-rc.1",
   "description": "Dynamic RESTful CRUD APIs for Nuxt without code generation, fully schema-driven.",
   "author": "Cliford Pereira",
   "license": "MIT",
@@ -41,7 +41,8 @@
     "dev:build": "nuxt build playground",
     "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxt prepare playground",
     "release": "bun run lint && bun run test && bun run prepack && changelogen --release && npm publish && git push --follow-tags",
-    "release:rc": "bun run lint && bun run test && bun run prepack && changelogen --prerelease rc && npm publish --tag rc && git push --follow-tags",
+    "release:push": "git add package.json CHANGELOG.md && git commit -m 'chore(release): bump rc version' && git push origin main --follow-tags",
+    "release:rc": "bun run lint && bun run test && changelogen --prerelease rc && bun run prepack && npm publish --tag rc && bun run release:push",
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest watch",
