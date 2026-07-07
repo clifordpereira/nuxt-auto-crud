@@ -334,6 +334,6 @@ Create your relations file (e.g., `server/db/relations.ts`).
 > * Your relations config map and query setup must be strictly exported as **`relations`** and **`nacTableQueryConfig`** respectively.
 > * Any valid Drizzle `DBQueryConfig` parameter is supported in `nacTableQueryConfig`.
 >
-eg: (relations.ts)[https://github.com/clifordpereira/nuxt-auto-crud/blob/main/playground/server/db/relations.ts]
+eg: [relations.ts](https://github.com/clifordpereira/nuxt-auto-crud/blob/main/playground/server/db/relations.ts)
 
 ---
