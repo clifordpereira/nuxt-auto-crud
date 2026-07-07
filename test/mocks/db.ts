@@ -50,4 +50,3 @@ export const isMysql = vi.fn(() => false)
 export const nacGetTableName = vi.fn(async (table: Table) => getTableName(table))
 export const hasActiveRelations = vi.fn(() => true)
 export const nacGetTableQueryConfig = vi.fn((_tableName?: string) => ({}))
-
