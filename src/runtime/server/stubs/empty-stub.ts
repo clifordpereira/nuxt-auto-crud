@@ -5,9 +5,6 @@
  */
 import type { DBQueryConfig } from 'drizzle-orm'
 
-// 🟢 FORCE RUNTIME EMISSION: Assigning an object literal guarantees a valid .mjs bundle artifact
-const _runtimeGuard = true
-
 // export empty relations object
 export const relations: Record<string, unknown> = {}
 

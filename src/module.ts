@@ -74,7 +74,7 @@ export default defineNuxtModule<ModuleOptions>({
       nuxt.options.alias['#nac/relations'] = resolver.resolve(nuxt.options.rootDir, options.relationsPath)
     }
     else {
-      nuxt.options.alias['#nac/relations'] = resolver.resolve('./runtime/server/utils/empty-stub')
+      nuxt.options.alias['#nac/relations'] = resolver.resolve('./runtime/server/stubs/empty-stub')
     }
 
     // 2. Runtime Config (The Concrete State)

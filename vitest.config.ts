@@ -5,7 +5,7 @@ import { existsSync } from 'node:fs'
 
 const r = (p: string) => resolve(import.meta.dirname, p)
 
-const stubPath = r('./src/runtime/server/utils/empty-stub')
+const stubPath = r('./src/runtime/server/stubs/empty-stub')
 
 const makeUnitProject = (fixtureName: string, includePattern: string, excludePattern?: string) => ({
   test: {
