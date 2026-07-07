@@ -307,3 +307,33 @@ useNacAutoCrudSSE(({ table, action, data: sseData, primaryKey }) => {
 
 ```
 
+## 🔗 Relations Support
+
+`nuxt-auto-crud` natively supports Drizzle ORM relations, allowing you to fetch nested relational graphs, exclude or pick specific columns, and apply relational ordering automatically.
+
+### 1. Update `nuxt.config.ts`
+
+Define the path to your relations file in the module configuration options:
+
+```typescript
+export default defineNuxtConfig({
+  modules: ['nuxt-auto-crud'],
+  autoCrud: {
+    relationsPath: 'server/db/relations', // Specify the path to your relations configuration
+  },
+})
+
+```
+
+### 2. Define Relations & Query Configurations
+
+Create your relations file (e.g., `server/db/relations.ts`).
+
+> ⚠️ **Important Notes:**
+> * `nuxt-auto-crud` utilizes the Drizzle RC API, so you must define relations using **`defineRelations()`** instead of the older `relations()` wrapper.
+> * Your relations config map and query setup must be strictly exported as **`relations`** and **`nacTableQueryConfig`** respectively.
+> * Any valid Drizzle `DBQueryConfig` parameter is supported in `nacTableQueryConfig`.
+>
+eg: (relations.ts)[https://github.com/clifordpereira/nuxt-auto-crud/blob/main/playground/server/db/relations.ts]
+
+---
