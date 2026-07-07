@@ -1,6 +1,6 @@
 {
   "name": "nuxt-auto-crud",
-  "version": "2.5.6",
+  "version": "2.6.0-rc.0",
   "description": "Dynamic RESTful CRUD APIs for Nuxt without code generation, fully schema-driven.",
   "author": "Cliford Pereira",
   "license": "MIT",
