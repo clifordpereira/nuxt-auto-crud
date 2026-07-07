@@ -1,5 +1,6 @@
-import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest'
-import { nacGetTableQueryConfig, getNacDb, type MockNacDb } from '#nac/db'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { nacGetTableQueryConfig, getNacDb } from '#nac/db'
+import type { MockNacDb } from '../mocks/db'
 import type { DBQueryConfig } from 'drizzle-orm'
 
 // ─── fixtures ────────────────────────────────────────────────────────────────
@@ -13,7 +14,7 @@ describe('NAC Core Queries - Consolidated Suite', () => {
   beforeEach(async () => {
     vi.clearAllMocks()
 
-    db = await getNacDb()
+    db = await getNacDb() as unknown as MockNacDb
     db.query.orders?.findMany?.mockReset()
     db.query.orders?.findFirst?.mockReset()
     db.query.orderitems?.findMany?.mockReset()
@@ -23,7 +24,7 @@ describe('NAC Core Queries - Consolidated Suite', () => {
     db.query.products?.findMany?.mockReset()
     db.query.products?.findFirst?.mockReset() // ← was missing
 
-    nacGetTableQueryConfig.mockImplementation((tableName?: string) => {
+    vi.mocked(nacGetTableQueryConfig).mockImplementation((tableName?: string) => {
       return tableName ? (nacTableQueryConfig[tableName] ?? {}) : {}
     })
   })
@@ -275,7 +276,7 @@ describe('NAC Core Queries - Consolidated Suite', () => {
     })
 
     it('can be overridden per test', () => {
-      nacGetTableQueryConfig.mockReturnValueOnce(nacTableQueryConfig.orders ?? { orderBy: { id: 'desc' } })
+      vi.mocked(nacGetTableQueryConfig).mockReturnValueOnce(nacTableQueryConfig.orders ?? { orderBy: { id: 'desc' } })
       const cfg = nacGetTableQueryConfig('orders')
       expect(cfg).toHaveProperty('orderBy', { id: 'desc' })
     })

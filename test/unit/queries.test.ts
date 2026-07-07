@@ -12,7 +12,8 @@ import {
   NacDeletionFailedError,
 } from '../../src/runtime/server/exceptions'
 
-import { nacGetTableQueryConfig, getNacDb, isMysql, type MockNacDb } from '#nac/db'
+import { nacGetTableQueryConfig, getNacDb, isMysql } from '#nac/db'
+import type { MockNacDb } from '../mocks/db'
 
 const BASE_RUNTIME_CONFIG = {
   hub: { db: 'sqlite' },
@@ -70,7 +71,7 @@ describe('NAC Core Queries - Consolidated Suite', () => {
     vi.clearAllMocks()
     mockConfig()
 
-    db = await getNacDb()
+    db = await getNacDb() as unknown as MockNacDb
     db._ = { relations: { posts: {}, users: {} } }
 
     vi.mocked(isMysql).mockReturnValue(false)
