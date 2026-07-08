@@ -1,3 +1,23 @@
+## v2.6.1
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v2.6.0-rc.0...v2.6.1)
+
+### 🩹 Fixes
+
+- ApiHiddenFields not filtering for relations. ([94bb072](https://github.com/clifordpereira/nuxt-auto-crud/commit/94bb072))
+
+### 🏡 Chore
+
+- Add a dummy variable in emtpy-stub.ts to force compiler to create it as .mjs file ([b1da217](https://github.com/clifordpereira/nuxt-auto-crud/commit/b1da217))
+- **release:** Bump rc version ([4c2aa63](https://github.com/clifordpereira/nuxt-auto-crud/commit/4c2aa63))
+- Move emtpy-stub.ts out or utils folder ([a663002](https://github.com/clifordpereira/nuxt-auto-crud/commit/a663002))
+- Update release:rc script ([7f93817](https://github.com/clifordpereira/nuxt-auto-crud/commit/7f93817))
+- **release:** Bump rc version ([ccead1f](https://github.com/clifordpereira/nuxt-auto-crud/commit/ccead1f))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v2.5.6
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v2.5.5...v2.5.6)
