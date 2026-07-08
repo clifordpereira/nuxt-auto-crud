@@ -104,17 +104,23 @@ export async function nacGetRows(table: NacTableWithId, context: NacQueryContext
   // 3. Database & Relation Instrospection
   const db = await getNacDb()
 
+  // Apply fields filtering (e.g., hiding password/token columns dynamically)
+  const fields = getSelectableFields(table, context)
+
   // --- RELATION MODE (Using Drizzle Relational Queries) ---
   if (hasActiveRelations()) {
+    const columns = Object.keys(fields).reduce((acc, key) => {
+      acc[key] = true
+      return acc
+    }, {} as Record<string, boolean>)
+
     return await db.query[tableName].findMany({
       orderBy: { id: 'desc' },
       ...queryOptions,
+      columns: { ...columns, ...queryOptions.columns },
       where: filters.length > 0 ? and(...filters) : undefined,
     })
   }
-
-  // Apply fields filtering (e.g., hiding password/token columns dynamically)
-  const fields = getSelectableFields(table, context)
 
   let query = db
     .select(fields)
