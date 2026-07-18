@@ -6,9 +6,10 @@ import { NacAuthenticationError } from '../exceptions'
 export default defineEventHandler(async (event) => {
   const pathname = new URL(event.path, 'http://internal').pathname
   const config = useRuntimeConfig(event)
-  const { nacEndpointPrefix } = config.public.autoCrud
+  const { apiBase, nacEndpointPrefix } = config.public.autoCrud
+  const prefix = apiBase || nacEndpointPrefix || '/api/_nac'
 
-  if (!isNacPath(pathname, nacEndpointPrefix)) return
+  if (!isNacPath(pathname, prefix)) return
 
   event.context.nac ||= { userId: null, isPublic: false }
 
@@ -18,7 +19,7 @@ export default defineEventHandler(async (event) => {
     const isUserAuthenticated = Boolean(event.context.nac?.userId)
 
     if (isAuthEnabled && !isUserAuthenticated) {
-      const model = getModelName(pathname, nacEndpointPrefix)
+      const model = getModelName(pathname, prefix)
       if (model && isPublicResource(model, config.autoCrud.publicResources)) {
         event.context.nac.isPublic = true
       }
@@ -54,8 +55,8 @@ function validateToken(token: string, agenticToken: string) {
   return diff === 0
 }
 
-function getModelName(pathname: string, nacEndpointPrefix: string) {
-  const regex = new RegExp(`^${nacEndpointPrefix}/([^/]+)`)
+function getModelName(pathname: string, prefix: string) {
+  const regex = new RegExp(`^${prefix}/([^/]+)`)
   const match = pathname.match(regex)
   return match ? match[1] : null
 }
@@ -65,9 +66,9 @@ function isPublicResource(model: string, publicResources: Record<string, string[
 }
 
 function isAgenticPath(pathname: string) {
-  return pathname.includes('/_meta')
+  return pathname.includes('/_nac/_meta')
 }
 
-function isNacPath(pathname: string, nacEndpointPrefix: string) {
-  return pathname.startsWith(nacEndpointPrefix)
+function isNacPath(pathname: string, prefix: string) {
+  return pathname.startsWith(prefix)
 }

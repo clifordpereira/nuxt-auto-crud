@@ -109,15 +109,24 @@ export async function nacGetRows(table: NacTableWithId, context: NacQueryContext
 
   // --- RELATION MODE (Using Drizzle Relational Queries) ---
   if (hasActiveRelations()) {
+    const { apiHiddenFields } = useRuntimeConfig().autoCrud
+    const hiddenSet = new Set(apiHiddenFields)
+
     const columns = Object.keys(fields).reduce((acc, key) => {
       acc[key] = true
       return acc
     }, {} as Record<string, boolean>)
 
+    // Never let a query config re-introduce a globally hidden field,
+    // even if it's explicitly set to `true` in nacTableQueryConfig.
+    const safeQueryColumns = Object.fromEntries(
+      Object.entries(queryOptions.columns ?? {}).filter(([key]) => !hiddenSet.has(key)),
+    )
+
     return await db.query[tableName].findMany({
       orderBy: { id: 'desc' },
       ...queryOptions,
-      columns: { ...columns, ...queryOptions.columns },
+      columns: { ...columns, ...safeQueryColumns },
       where: filters.length > 0 ? and(...filters) : undefined,
     })
   }
