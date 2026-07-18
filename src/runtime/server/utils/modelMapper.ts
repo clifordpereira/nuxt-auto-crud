@@ -119,7 +119,7 @@ export async function resolveTableRelations(table: Table): Promise<Record<string
  * @internal
  */
 export function getLabelField(columnNames: string[]): string {
-  const candidates = ['name', 'title', 'label', 'email']
+  const candidates = ['name', 'title', 'label', 'num', 'email']
   return candidates.find(n => columnNames.includes(n)) || 'id'
 }
 
