@@ -21,10 +21,10 @@ export const customers = sqliteTable('customers', {
 
 export const orders = sqliteTable('orders', {
   id: integer('id').primaryKey({ autoIncrement: true }),
+  num: text('num').notNull().unique(),
   customer_id: integer('customer_id')
     .notNull()
     .references(() => customers.id, { onDelete: 'cascade' }),
-  total_amount: numeric('total_amount', { mode: 'number' }).notNull(),
   status: text('status', { enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'] })
     .notNull()
     .default('pending'),
@@ -41,7 +41,7 @@ export const orderitems = sqliteTable('orderitems', {
     .notNull()
     .references(() => products.id, { onDelete: 'cascade' }),
   quantity: integer('quantity').notNull(),
-  price: numeric('price', { mode: 'number' }).notNull(),
+  price: numeric('price', { mode: 'number' }),
 })
 
 export type Product = typeof products.$inferSelect
