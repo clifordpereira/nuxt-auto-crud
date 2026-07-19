@@ -1,3 +1,21 @@
+## v2.6.2
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v2.6.1...v2.6.2)
+
+### 🩹 Fixes
+
+- Num not selected in namelist ([7baf9c9](https://github.com/clifordpereira/nuxt-auto-crud/commit/7baf9c9))
+
+### 🏡 Chore
+
+- **release:** V2.6.1 ([fd23d06](https://github.com/clifordpereira/nuxt-auto-crud/commit/fd23d06))
+- Replace nacEndpointPrefix with apiBase ([eeb9b95](https://github.com/clifordpereira/nuxt-auto-crud/commit/eeb9b95))
+- Add num field to orders table. make price field of orderitems table nullable ([fd5c89e](https://github.com/clifordpereira/nuxt-auto-crud/commit/fd5c89e))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v2.6.1
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v2.6.0-rc.0...v2.6.1)
