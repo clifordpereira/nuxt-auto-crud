@@ -124,7 +124,7 @@ export async function nacGetRows(table: NacTableWithId, context: NacQueryContext
       ...(hasIdColumn && !queryOptions.orderBy ? { orderBy: { id: 'desc' } } : {}),
       ...queryOptions,
       columns: { ...columns, ...safeQueryColumns },
-      where: filters.length > 0 ? and(...filters) : undefined,
+      ...(filters.length > 0 ? { where: and(...filters) } : {}),
     })
   }
 
