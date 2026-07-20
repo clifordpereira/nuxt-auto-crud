@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { nacGetSchemaDefinition } from '../../src/runtime/server/utils/modelMapper'
+import { useRuntimeConfig } from '#imports'
 
 describe('modelMapper: nacGetSchemaDefinition', () => {
   it('1) should return a complete SchemaDefinition for posts', async () => {
@@ -28,21 +29,32 @@ describe('modelMapper: nacGetSchemaDefinition', () => {
   it('4) should filter out fields present in formHiddenFields', async () => {
     const schema = await nacGetSchemaDefinition('posts')
 
-    // id and createdAt should be excluded from the fields array entirely
-    const idField = schema.fields.find(f => f.name === 'id')
+    // 'id' is intentionally NOT hidden — it must survive to be marked readonly (see test 5).
+    // Only genuinely UI-irrelevant audit fields are hidden via formHiddenFields.
     const createdAtField = schema.fields.find(f => f.name === 'createdAt')
+    const idField = schema.fields.find(f => f.name === 'id')
 
-    expect(idField).toBeUndefined()
     expect(createdAtField).toBeUndefined()
+    expect(idField).toBeDefined()
   })
 
-  it('5) should mark fields in formReadOnlyFields as readonly', async () => {
-    const schema = await nacGetSchemaDefinition('posts')
+  it('5) marks only "id" as readonly, ignoring deprecated formReadOnlyFields config', async () => {
+    vi.mocked(useRuntimeConfig).mockReturnValueOnce({
+      autoCrud: { apiHiddenFields: [] },
+      public: {
+        autoCrud: {
+          // 'id' intentionally NOT hidden here, so it survives to the readonly check
+          formHiddenFields: ['createdAt', 'updatedAt'],
+          formReadOnlyFields: ['title'], // deprecated — should have zero effect
+        },
+      },
+    } as unknown as ReturnType<typeof useRuntimeConfig>)
 
-    // These fields should exist in the array but have the read-only flag
-    const titleField = schema.fields.find(f => f.name === 'title')
+    const def = await nacGetSchemaDefinition('posts')
+    const idField = def.fields.find(f => f.name === 'id')
+    const titleField = def.fields.find(f => f.name === 'title')
 
-    expect(titleField).toBeDefined()
-    expect(titleField?.readonly).toBe(true)
+    expect(idField?.readonly).toBe(true)
+    expect(titleField?.readonly).toBe(false) // proves formReadOnlyFields is ignored
   })
 })

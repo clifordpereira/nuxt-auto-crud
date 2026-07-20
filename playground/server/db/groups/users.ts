@@ -9,7 +9,7 @@ export const users = snakeCase.table('users', {
   email: text().notNull().unique(),
   password: text(),
   avatar: text(),
-  ...auditFields
+  ...auditFields,
 })
 
 export type User = typeof users.$inferSelect

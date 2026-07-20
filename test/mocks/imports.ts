@@ -6,15 +6,13 @@ export const useRuntimeConfig = vi.fn(() => ({
   },
   autoCrud: {
     statusFiltering: false,
-    auth: {
-      authorization: false,
-      ownerKey: 'createdBy',
-    },
+    apiWriteProtectedFields: ['id', 'createdAt', 'updatedAt', 'deletedAt', 'createdBy', 'updatedBy'],
+    auth: { authentication: false, authorization: false, ownerKey: 'createdBy' },
     apiHiddenFields: ['deletedAt'],
   },
   public: {
     autoCrud: {
-      formHiddenFields: ['id', 'createdAt', 'updatedAt'],
+      formHiddenFields: ['createdAt', 'updatedAt'],
       formReadOnlyFields: ['title'],
       nacEndpointPrefix: '/api/_nac',
       apiBase: '/api/_nac',

@@ -75,6 +75,7 @@
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "latest",
     "@types/pluralize": "^0.0.33",
+    "@vitest/ui": "4.1.9",
     "@vue/test-utils": "^2.4.11",
     "better-sqlite3": "^12.11.1",
     "changelogen": "^0.6.2",

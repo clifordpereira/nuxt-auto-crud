@@ -1,4 +1,4 @@
-import type { NacFieldList } from "../types"
+import type { NacFieldList } from '../types'
 
 /**
  * Strictly internal/sensitive data fields that should never leave the server.

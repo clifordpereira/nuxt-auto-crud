@@ -40,33 +40,31 @@ export const buildModelTableMap = (): Record<string, Table> => {
 export const nacModelTableMap = buildModelTableMap()
 
 /**
- * Reverse lookup: Table instance -> its camelCase schema export key
- * (e.g. the `roleResourcePermissions` in `export const roleResourcePermissions = snakeCase.table(...)`).
- *
- * Needed because relation-mode APIs (`db.query[...]`) and `nacTableQueryConfig`
- * in the user's relations.ts are keyed by this export name, NOT by the physical
- * snake_case SQL table name used in `nacModelTableMap` / routes.
+ * Maps physical (snake_case) table name -> camelCase schema export key.
+ * Name-based (not identity-based) so it still resolves correctly for table
+ * objects that were copied/augmented (e.g. `{ ...posts, extraCol: {} }` in tests),
+ * as long as Drizzle's name metadata carries over — which a plain spread preserves.
  *
  * @internal
  */
-const nacTableExportKeyMap = new Map<Table, string>(
+const nacPhysicalNameToExportKeyMap = new Map<string, string>(
   Object.entries(schema).reduce((acc, [key, value]) => {
-    if (is(value, Table)) acc.push([value, key])
+    if (is(value, Table)) acc.push([getTableName(value), key])
     return acc
-  }, [] as [Table, string][]),
+  }, [] as [string, string][]),
 )
 
 /**
- * Resolves the camelCase schema export key for a table instance.
- * Use this (not the physical table name) whenever looking up `db.query[...]`
+ * Resolves the camelCase schema export key for a table instance, by physical name.
+ * Use this (not the physical table name itself) whenever looking up `db.query[...]`
  * or `nacTableQueryConfig`.
  *
  * @param table - The database table instance.
- * @returns The export key, or undefined if the table isn't in `#nac/schema`.
+ * @returns The export key, or undefined if no schema table matches this name.
  * @internal
  */
 export function getModelExportKey(table: Table): string | undefined {
-  return nacTableExportKeyMap.get(table)
+  return nacPhysicalNameToExportKeyMap.get(getTableName(table))
 }
 
 /**

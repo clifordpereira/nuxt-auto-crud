@@ -70,14 +70,14 @@ export interface ModuleOptions {
   /**
    * UI-facing hint: fields to exclude from generated form metadata (_schemas).
    * Purely cosmetic — has no effect on what the server accepts.
-   * 
+   *
    * @deprecated configure at client side instead
    */
   formHiddenFields: string[]
 
   /**
    * Database columns that are read-only in form views within UI components.
-   * 
+   *
    * @deprecated configure at client side instead
    */
   formReadOnlyFields: string[]
