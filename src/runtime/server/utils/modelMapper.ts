@@ -20,9 +20,13 @@ import { nacGetTableConfigResolver } from './db'
  * @internal
  */
 export const buildModelTableMap = (): Record<string, Table> => {
-  return Object.entries(schema).reduce((acc, [key, value]) => {
-    if (is(value, Table) && !NAC_SYSTEM_TABLES.includes(key)) {
-      acc[key] = value
+  // key is remove (from (acc, [key, value])) to satisfy lint rule
+  return Object.entries(schema).reduce((acc, [, value]) => {
+    if (is(value, Table)) {
+      const tableName = getTableName(value)
+      if (!NAC_SYSTEM_TABLES.includes(tableName)) {
+        acc[tableName] = value
+      }
     }
     return acc
   }, {} as Record<string, Table>)
@@ -34,6 +38,36 @@ export const buildModelTableMap = (): Record<string, Table> => {
  * @public
  */
 export const nacModelTableMap = buildModelTableMap()
+
+/**
+ * Reverse lookup: Table instance -> its camelCase schema export key
+ * (e.g. the `roleResourcePermissions` in `export const roleResourcePermissions = snakeCase.table(...)`).
+ *
+ * Needed because relation-mode APIs (`db.query[...]`) and `nacTableQueryConfig`
+ * in the user's relations.ts are keyed by this export name, NOT by the physical
+ * snake_case SQL table name used in `nacModelTableMap` / routes.
+ *
+ * @internal
+ */
+const nacTableExportKeyMap = new Map<Table, string>(
+  Object.entries(schema).reduce((acc, [key, value]) => {
+    if (is(value, Table)) acc.push([value, key])
+    return acc
+  }, [] as [Table, string][]),
+)
+
+/**
+ * Resolves the camelCase schema export key for a table instance.
+ * Use this (not the physical table name) whenever looking up `db.query[...]`
+ * or `nacTableQueryConfig`.
+ *
+ * @param table - The database table instance.
+ * @returns The export key, or undefined if the table isn't in `#nac/schema`.
+ * @internal
+ */
+export function getModelExportKey(table: Table): string | undefined {
+  return nacTableExportKeyMap.get(table)
+}
 
 /**
  * Resolves the property name for a foreign key's source column.

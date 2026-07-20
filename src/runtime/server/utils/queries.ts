@@ -1,12 +1,12 @@
 import { useRuntimeConfig } from '#imports'
 import { type Table, eq, and, or, getColumns, desc } from 'drizzle-orm'
 
-import { NacDeletionFailedError, NacInsertionFailedError, NacRecordNotFoundError, NacUnauthorizedAccessError, NacUpdateFailedError } from '../exceptions'
-import { getSelectableFields } from './modelMapper'
+import { NacDeletionFailedError, NacInsertionFailedError, NacRecordNotFoundError, NacResourceNotFoundError, NacUnauthorizedAccessError, NacUpdateFailedError } from '../exceptions'
+import { getSelectableFields, getModelExportKey } from './modelMapper'
 
 import type { NacQueryContext } from '../../shared/utils/types'
 import type { NacTableWithId } from '../types'
-import { nacGetTableName, nacGetTableQueryConfig, getNacDb, isMysql, hasActiveRelations } from '#nac/db'
+import { nacGetTableQueryConfig, getNacDb, isMysql, hasActiveRelations } from '#nac/db'
 
 /**
  * Picks only the specified keys from an object.
@@ -90,25 +90,24 @@ function hasAnyListPermissions(context: NacQueryContext = {}) {
  * @public
  */
 export async function nacGetRows(table: NacTableWithId, context: NacQueryContext = {}) {
-  // 1. Authorization Guard
   const isAuthorizationEnabled = useRuntimeConfig().autoCrud.auth?.authorization
   if (isAuthorizationEnabled && !context.isPublic && !hasAnyListPermissions(context)) {
     throw new NacUnauthorizedAccessError()
   }
 
-  // 2. Metadata & Filter Resolution
-  const tableName = await nacGetTableName(table)
+  const exportKey = getModelExportKey(table)
   const filters = getVisibilityFilters(table, context)
-  const queryOptions = nacGetTableQueryConfig(tableName) ?? {} // Secure fallback for spread
+  const queryOptions = exportKey ? (nacGetTableQueryConfig(exportKey) ?? {}) : {}
 
-  // 3. Database & Relation Instrospection
   const db = await getNacDb()
-
-  // Apply fields filtering (e.g., hiding password/token columns dynamically)
   const fields = getSelectableFields(table, context)
+  const hasIdColumn = 'id' in getColumns(table)
 
-  // --- RELATION MODE (Using Drizzle Relational Queries) ---
   if (hasActiveRelations()) {
+    if (!exportKey || !db.query[exportKey]) {
+      throw new NacResourceNotFoundError(exportKey ?? 'unknown')
+    }
+
     const { apiHiddenFields } = useRuntimeConfig().autoCrud
     const hiddenSet = new Set(apiHiddenFields)
 
@@ -117,25 +116,23 @@ export async function nacGetRows(table: NacTableWithId, context: NacQueryContext
       return acc
     }, {} as Record<string, boolean>)
 
-    // Never let a query config re-introduce a globally hidden field,
-    // even if it's explicitly set to `true` in nacTableQueryConfig.
     const safeQueryColumns = Object.fromEntries(
       Object.entries(queryOptions.columns ?? {}).filter(([key]) => !hiddenSet.has(key)),
     )
 
-    return await db.query[tableName].findMany({
-      orderBy: { id: 'desc' },
+    return await db.query[exportKey].findMany({
+      ...(hasIdColumn && !queryOptions.orderBy ? { orderBy: { id: 'desc' } } : {}),
       ...queryOptions,
       columns: { ...columns, ...safeQueryColumns },
       where: filters.length > 0 ? and(...filters) : undefined,
     })
   }
 
-  let query = db
-    .select(fields)
-    .from(table)
-    .$dynamic() // Keeps query dynamic for modification if needed
-    .orderBy(desc(table.id))
+  let query = db.select(fields).from(table).$dynamic()
+
+  if (hasIdColumn) {
+    query = query.orderBy(desc(table.id))
+  }
 
   if (filters.length > 0) {
     query = query.where(and(...filters))

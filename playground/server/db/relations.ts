@@ -2,65 +2,66 @@ import { defineRelations, type DBQueryConfig } from 'drizzle-orm'
 import * as schema from './schema'
 
 export const relations = defineRelations(schema, r => ({
-  customers: {
-    orders: r.many.orders({
-      from: r.customers.id,
-      to: r.orders.customer_id,
+  roles: {
+    users: r.many.users({
+      from: r.roles.id,
+      to: r.users.roleId,
+    }),
+    roleResourcePermissions: r.many.roleResourcePermissions({
+      from: r.roles.id,
+      to: r.roleResourcePermissions.roleId,
     }),
   },
-  products: {
-    orders: r.many.orders({
-      from: r.products.id.through(r.orderitems.product_id),
-      to: r.orders.id.through(r.orderitems.order_id),
-    }),
-    orderitems: r.many.orderitems({
-      from: r.products.id,
-      to: r.orderitems.product_id,
+  resources: {
+    roleResourcePermissions: r.many.roleResourcePermissions({
+      from: r.resources.id,
+      to: r.roleResourcePermissions.resourceId,
     }),
   },
-  orders: {
-    customer: r.one.customers({
-      from: r.orders.customer_id,
-      to: r.customers.id,
-    }),
-    products: r.many.products({
-      from: r.orders.id.through(r.orderitems.order_id),
-      to: r.products.id.through(r.orderitems.product_id),
-    }),
-    orderitems: r.many.orderitems({
-      from: r.orders.id,
-      to: r.orderitems.order_id,
+  permissions: {
+    roleResourcePermissions: r.many.roleResourcePermissions({
+      from: r.permissions.id,
+      to: r.roleResourcePermissions.permissionId,
     }),
   },
-  orderitems: {
-    order: r.one.orders({
-      from: r.orderitems.order_id,
-      to: r.orders.id,
+  roleResourcePermissions: {
+    role: r.one.roles({
+      from: r.roleResourcePermissions.roleId,
+      to: r.roles.id,
     }),
-    product: r.one.products({
-      from: r.orderitems.product_id,
-      to: r.products.id,
+    resource: r.one.resources({
+      from: r.roleResourcePermissions.resourceId,
+      to: r.resources.id,
+    }),
+    permission: r.one.permissions({
+      from: r.roleResourcePermissions.permissionId,
+      to: r.permissions.id,
+    }),
+  },
+  users: {
+    role: r.one.roles({
+      from: r.users.roleId,
+      to: r.roles.id,
     }),
   },
 }))
 
 export const nacTableQueryConfig: Record<string, DBQueryConfig> = {
-  orders: {
-    orderBy: { id: 'desc' },
+  users: {
     with: {
-      customer: { columns: { name: true, email: true } },
-      orderitems: {
-        with: {
-          product: { columns: { name: true, price: true } },
-        },
-      },
+      role: { columns: { name: true } },
     },
   },
-  orderitems: {
-    orderBy: { id: 'asc' },
+  roleResourcePermissions: {
+    columns: {
+      roleId: false,
+      resourceId: false,
+      permissionId: false,
+    },
     with: {
-      product: { columns: { name: true } },
-      order: { columns: { status: true } },
+      role: { columns: { name: true } },
+      resource: { columns: { name: true } },
+      permission: { columns: { code: true } },
     },
   },
 }

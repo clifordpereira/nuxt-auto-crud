@@ -61,16 +61,16 @@ export default defineNuxtConfig({
 Define your schema in `server/db/schema.ts`:
 
 ```typescript
-import { sqliteTable, text, integer, numeric } from 'drizzle-orm/sqlite-core'
+import { snakeCase, text, integer, numeric } from 'drizzle-orm/sqlite-core'
 
-export const products = sqliteTable('products', {
+export const products = snakeCase.table('products', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   name: text('name').notNull(),
   sku: text('sku').notNull(),
   price: numeric('price', { mode: 'number' }).notNull(),
   stock: integer('stock').notNull(),
   createdAt: integer({ mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
-  updatedAt: integer({ mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  updatedAt: integer({ mode: 'timestamp' }).notNull().$onUpdate(() => new Date()),
 })
 
 ```
@@ -85,13 +85,24 @@ nuxt dev
 
 > For MySQL installation instructions, visit [INSTALLATION.md](https://github.com/clifordpereira/nuxt-auto-crud/blob/main/INSTALLATION.md).
 
+### Authentication & Sensitive Fields
+
+NAC automatically filters out `password` fields across all dynamic endpoints, as encryption and authentication logic are deferred to the implementing application.
+
+Consequently, defining a `password` field as `notNull()` in your schema will trigger a database `NOT NULL constraint failed` error during record creation via NAC.
+
+* **Production:** Handle authentication and password persistence in your application-level endpoints, keeping the field outside of NAC's automated scope.
+* **Testing/Checkouts:** If you are testing the core module directly against a schema containing a password, mark the field as optional (nullable). NAC will then leave the column blank without throwing constraint errors.
+
+### Conventions
+
+NAC relies on specific naming conventions to enable zero-config relations and dynamic rendering:
+
+* **Field Naming Case:** All database columns must use `snake_case`.
+* **Dynamic Field Labels:** For parent-child relationship resolution, NAC dynamically falls back through a specific priority chain to resolve the text label of a record: `name` || `title` || `num` || `id`.
+* **Custom Identifiers (e.g., Orders):** While most parent tables naturally expose a `name` or `title` column, tables utilizing tracking numbers (like `orders`) often use `order_number`. To leverage NAC's automatic label mapping for these schemas, name the column exactly `num` instead of `order_number`.
+
 ---
-
-### 🛠️ Critical Stability Update (v2.5+)
-* **The "String-instead-of-Number" Bug is Fixed!** Previous versions had an issue inheriting Drizzle-Zod's underlying behavior where `numeric` and `integer` columns erroneously parsed as `string` types in the UI metadata. This caused type-mismatches with frontend form components and required manual parsing. 
-  
-  **Fixed in recent versions:** The module now fully infers, converts, and enforces native database numeric types strictly as `number` payloads. No more manual casting or frontend form component type hacks are required.
-
 
 ## 🌐 Data APIs (Dynamic RESTful CRUD)
 
@@ -186,8 +197,6 @@ Enabling `authentication` in the `autoCrud` config protects all **nac** routes (
 * **`formHiddenFields`**: Columns excluded from the frontend schema metadata to prevent user input. Defaults to apiHiddenFields plus system-managed fields like `id`, `uuid`, `createdAt`, `updatedAt`, `deletedAt`, `createdBy`, and `updatedBy`.
 * **`formReadOnlyFields`**: Columns visible in the UI for context but protected from user modification (e.g., slug, status).
 * **Response Scrubbing**: If a field is in `apiHiddenFields` or does not exist in the schema, it is silently stripped from the response even if listed in `publicResources`.
-
----
 
 ### ⚙️ Configuration Reference
 
