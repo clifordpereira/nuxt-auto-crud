@@ -1,5 +1,5 @@
 import { defineNuxtModule, createResolver, addServerHandler, addServerImportsDir, addImportsDir } from '@nuxt/kit'
-import { NAC_API_HIDDEN_FIELDS, NAC_FORM_HIDDEN_FIELDS, NAC_FORM_READ_ONLY_FIELDS } from './runtime/server/utils/constants'
+import { NAC_API_HIDDEN_FIELDS, NAC_API_WRITE_PROTECTED_FIELDS, NAC_FORM_HIDDEN_FIELDS, NAC_FORM_READ_ONLY_FIELDS } from './runtime/server/utils/constants'
 import type { ModuleOptions } from './types'
 
 export type { ModuleOptions }
@@ -37,6 +37,8 @@ export default defineNuxtModule<ModuleOptions>({
     publicResources: {},
     /** Sensitive database columns to globally exclude from all API responses. */
     apiHiddenFields: NAC_API_HIDDEN_FIELDS,
+    /** Default write protected fields */
+    apiWriteProtectedFields: NAC_API_WRITE_PROTECTED_FIELDS,
     /** Secret token required to secure and authenticate the markdown context introspector endpoint. */
     agenticToken: '',
     /** Path to your application's Drizzle schema definitions. */

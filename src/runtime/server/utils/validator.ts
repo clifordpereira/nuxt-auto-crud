@@ -1,7 +1,10 @@
 import { z } from 'zod'
 import { createSchemaFactory } from 'drizzle-orm/zod'
-import { getColumns, type Table } from 'drizzle-orm'
+import { getColumns, type Table, getTableName } from 'drizzle-orm'
+
 import { useRuntimeConfig } from '#imports'
+
+import { resolveFieldList, NAC_API_WRITE_PROTECTED_FIELDS } from './constants'
 
 const { createInsertSchema } = createSchemaFactory()
 
@@ -27,8 +30,13 @@ export function nacResolveValidatedSchema(table: Table, intent: 'insert' | 'patc
 
   const baseSchema = createInsertSchema(table, timestampOverrides as unknown as Parameters<typeof createInsertSchema>[1])
 
-  const { formHiddenFields } = useRuntimeConfig().public.autoCrud
-  const fieldsToOmit = formHiddenFields.filter(f => f in columns)
+  const { apiWriteProtectedFields, auth } = useRuntimeConfig().autoCrud
+  const resourceName = getTableName(table)
+
+  const protectedSet = resolveFieldList(apiWriteProtectedFields, resourceName, NAC_API_WRITE_PROTECTED_FIELDS)
+  if (auth?.ownerKey) protectedSet.add(auth.ownerKey) // always protected, regardless of per-resource config
+
+  const fieldsToOmit = [...protectedSet].filter(f => f in columns)
 
   const sanitizedSchema = baseSchema.omit(
     Object.fromEntries(fieldsToOmit.map(f => [f, true])) as Record<string, true>,

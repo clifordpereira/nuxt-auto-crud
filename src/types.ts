@@ -39,6 +39,13 @@ export interface ModuleOptions {
   apiHiddenFields: string[]
 
   /**
+   * Server-enforced: fields a client can never set via POST/PATCH body,
+   * regardless of what the UI does. Protects against mass-assignment
+   * (e.g. a client setting `createdBy`, `id`, `deletedAt` directly).
+   */
+  apiWriteProtectedFields: string[]
+
+  /**
    * The token utilized to validate secure external API connections.
    */
   agenticToken: string
@@ -61,12 +68,17 @@ export interface ModuleOptions {
   apiBase: string
 
   /**
-   * Database columns that will be hidden in form views within UI components.
+   * UI-facing hint: fields to exclude from generated form metadata (_schemas).
+   * Purely cosmetic — has no effect on what the server accepts.
+   * 
+   * @deprecated configure at client side instead
    */
   formHiddenFields: string[]
 
   /**
    * Database columns that are read-only in form views within UI components.
+   * 
+   * @deprecated configure at client side instead
    */
   formReadOnlyFields: string[]
 }

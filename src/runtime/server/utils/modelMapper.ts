@@ -8,7 +8,7 @@ import * as schema from '#nac/schema'
 
 import type { NacField, NacSchemaDefinition, NacQueryContext } from '../../shared/utils/types'
 import type { NacColumnInternal, NacZodTypeDef } from '../types'
-import { NAC_SYSTEM_TABLES } from './constants'
+import { resolveFieldList, NAC_API_HIDDEN_FIELDS, NAC_SYSTEM_TABLES, NAC_FORM_HIDDEN_FIELDS } from './constants'
 import { NacResourceNotFoundError } from '../exceptions'
 
 import { nacGetTableConfigResolver } from './db'
@@ -111,7 +111,7 @@ export function getSelectableFields(table: Table, context: NacQueryContext = {})
   const isPublic = context?.isPublic
   const publicFields = isPublic ? getPublicFields(tableName) : []
 
-  const hiddenSet = new Set(apiHiddenFields)
+  const hiddenSet = resolveFieldList(apiHiddenFields, tableName, NAC_API_HIDDEN_FIELDS)
   const publicSet = new Set(publicFields)
 
   for (const key in allColumns) {
@@ -224,7 +224,10 @@ export async function nacGetSchemaDefinition(modelName: string): Promise<NacSche
   const relations = await resolveTableRelations(table)
   const shape = createInsertSchema(table).shape
 
-  const hiddenFields = new Set([...autoCrud.apiHiddenFields, ...publicAutoCrud.formHiddenFields])
+  // modelName is already the physical (snake_case) resource key here
+  const apiHidden = resolveFieldList(autoCrud.apiHiddenFields, modelName, NAC_API_HIDDEN_FIELDS)
+  const formHidden = resolveFieldList(publicAutoCrud.formHiddenFields, modelName, NAC_FORM_HIDDEN_FIELDS)
+  const hiddenFields = new Set([...apiHidden, ...formHidden])
 
   const fields: NacField[] = Object.entries(columns)
     .filter(([name]) => !hiddenFields.has(name))
@@ -233,7 +236,7 @@ export async function nacGetSchemaDefinition(modelName: string): Promise<NacSche
       ...inferFieldType(name, col, shape[name]),
       required: (col as Column & NacColumnInternal).notNull ?? false,
       references: relations[name],
-      readonly: publicAutoCrud.formReadOnlyFields.includes(name) || name === 'id',
+      readonly: name === 'id',
     }))
 
   return {

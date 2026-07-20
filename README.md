@@ -106,7 +106,7 @@ NAC relies on specific naming conventions to enable zero-config relations and dy
 
 ## 🌐 Data APIs (Dynamic RESTful CRUD)
 
-> Note: All endpoints follow the pattern ${nacEndpointPrefix}/:model. By default, this is /api/_nac/:model.
+> Note: All endpoints follow the pattern ${apiBase}/:model. By default, this is /api/_nac/:model.
 
 | Method | Endpoint | Action |
 | --- | --- | --- |
@@ -193,10 +193,10 @@ Enabling `authentication` in the `autoCrud` config protects all **nac** routes (
 
 ### 🔒 Access Control & Data Safety
 
-* **`apiHiddenFields`**: Globally hides sensitive columns from all API responses. Default: ['password', 'secret', 'token', 'resetToken', 'resetExpires', 'githubId', 'googleId'].
-* **`formHiddenFields`**: Columns excluded from the frontend schema metadata to prevent user input. Defaults to apiHiddenFields plus system-managed fields like `id`, `uuid`, `createdAt`, `updatedAt`, `deletedAt`, `createdBy`, and `updatedBy`.
-* **`formReadOnlyFields`**: Columns visible in the UI for context but protected from user modification (e.g., slug, status).
-* **Response Scrubbing**: If a field is in `apiHiddenFields` or does not exist in the schema, it is silently stripped from the response even if listed in `publicResources`.
+* **`apiHiddenFields`**: Globally hides sensitive columns from all API responses (read). Default: ['password', 'secret', 'token', 'resetToken', 'resetExpires', 'githubId', 'googleId'].
+* **`apiWriteProtectedFields`**: Server-enforced — fields a client can never set via `POST`/`PATCH` body, regardless of the frontend (mass-assignment protection). `auth.ownerKey` is always protected automatically, even if not listed explicitly.
+* **`formHiddenFields`**: Columns excluded from the `_schemas` metadata response, as a UI hint only. This does **not** block writes — use `apiWriteProtectedFields` for that.
+* **`formReadOnlyFields`** *(deprecated)*: Was intended as a UI-only hint and was never enforced server-side. Manage read-only state in your frontend instead (e.g. `nuxt-crud-table`).
 
 ### ⚙️ Configuration Reference
 
@@ -209,10 +209,12 @@ Enabling `authentication` in the `autoCrud` config protects all **nac** routes (
 | `auth.ownerKey` | `'createdBy'` | The column name used to identify the record creator. |
 | `publicResources` | `{}` | Defines tables and specific columns accessible without auth. |
 | `apiHiddenFields` | `NAC_API_HIDDEN_FIELDS` | Arrays of keys to exclude from all API responses. |
+| `apiWriteProtectedFields` | `NAC_API_WRITE_PROTECTED_FIELDS` | Server-enforced fields a client can never set on create/update. `auth.ownerKey` is always included automatically. |
 | `formHiddenFields` | `NAC_FORM_HIDDEN_FIELDS` | Arrays of keys to exclude from dynamic forms. |
-| `formReadOnlyFields` | `NAC_FORM_READ_ONLY_FIELDS` | List of visible but non-editable fields (UI only). |
+| `formReadOnlyFields` | `NAC_FORM_READ_ONLY_FIELDS` | @deprecated — unenforced server-side. Configure in your frontend instead. |
 | `agenticToken` | `''` | Secret key used to secure the /_meta endpoint, preventing unauthorized AI agents from introspecting your schema. |
-| `nacEndpointPrefix` | `'/api/_nac'` | The base path for NAC routes. Access via `useRuntimeConfig().public.autoCrud`. |
+| `nacEndpointPrefix` | `'/api/_nac'` | @deprecated Use `apiBase` instead. |
+| `apiBase` | `'/api/_nac'` | The base path for NAC routes. Access via `useRuntimeConfig().public.autoCrud`. |
 | `schemaPath` | `'server/db/schema'` | Location of your Drizzle schema files. |
 
 ### Example `nuxt.config.ts`
@@ -224,22 +226,40 @@ autoCrud: {
   auth: {
     authentication: false,
     authorization: false,
-    ownerKey: 'createdBy', 
+    ownerKey: 'createdBy', // change it if you want to use another column eg: ownerId
   },
   publicResources: {
+    // guest users can access these tables and fields without authentication, even when auth.athentication is true
     products: ['id', 'name', 'sku', 'price'],
   },
-  apiHiddenFields: ['cost_price'], 
-  formHiddenFields: ['created_at', 'updated_at'],
-  formReadOnlyFields: ['sku'], // Locked for user input after generation
-  agenticToken: '', 
-  nacEndpointPrefix: '/api/_nac',
+  apiHiddenFields: ['created_by'], // these fields are hidden from all API responses globally
+  apiWriteProtectedFields: ['created_by', 'updated_by'], // mass-assignment protection; ownerKey is always included automatically
+  formHiddenFields: ['created_at', 'updated_at'], // @internal
+  formReadOnlyFields: ['sku'], // @deprecated - instead configure at frontend
+  agenticToken: '', // OPTIONAL. required to secure the /_meta endpoint
+  nacEndpointPrefix: '/api/_nac', // @deprecated - use apiBase instead
+  apiBase: '/api/_nac',
   schemaPath: 'server/db/schema',
 }
 
 ```
 
-> **Note**: Modify `nacEndpointPrefix` or `schemaPath` only if the Nuxt/Nitro conventions change.
+> **Note**: Modify `apiBase` or `schemaPath` only if the Nuxt/Nitro conventions change.
+
+### Per-Resource Field Overrides
+
+`apiHiddenFields`, `formHiddenFields`, and `apiWriteProtectedFields` each accept either a flat array (applies to every table) or a scoped object for per-table control:
+
+\```typescript
+apiWriteProtectedFields: {
+  default: ['created_by', 'updated_by'], // replaces the built-in default list; omit to keep it
+  resources: {
+    users: ['role_id'], // additionally protected, users table only
+  },
+},
+\```
+
+`resources` keys must be the **physical snake_case table name** — the same name used in routes (`/api/_nac/:model`) and in `publicResources` — not the camelCase name used in `relations.ts`'s `nacTableQueryConfig` (see note below).
 
 ---
 
@@ -343,6 +363,32 @@ Create your relations file (e.g., `server/db/relations.ts`).
 > * Your relations config map and query setup must be strictly exported as **`relations`** and **`nacTableQueryConfig`** respectively.
 > * Any valid Drizzle `DBQueryConfig` parameter is supported in `nacTableQueryConfig`.
 >
-eg: [relations.ts](https://github.com/clifordpereira/nuxt-auto-crud/blob/main/playground/server/db/relations.ts)
+example for nacTableQueryConfig
+```ts
+// in relations.ts after your normal relations code
+export const nacTableQueryConfig: Record<string, DBQueryConfig> = {
+  users: {
+    with: {
+      role: { columns: { name: true } },
+    },
+  },
+  roleResourcePermissions: {
+    columns: {
+      roleId: false,
+      resourceId: false,
+      permissionId: false,
+    },
+    with: {
+      role: { columns: { name: true } },
+      resource: { columns: { name: true } },
+      permission: { columns: { code: true } },
+    },
+  },
+}
+```
+
+[A full example of relations.ts](https://github.com/clifordpereira/nuxt-auto-crud/blob/main/playground/server/db/relations.ts)
+
+> ⚠️ **Casing note:** `nacTableQueryConfig` keys are the **camelCase schema export names** (e.g. `roleResourcePermissions`), matching Drizzle's `db.query[...]` API. This is different from `apiHiddenFields`/`apiWriteProtectedFields`'s per-resource `resources` keys, which use the **physical snake_case table name** (e.g. `role_resource_permissions`) — the same name used in routes. Double-check which casing applies before copying a key between the two.
 
 ---
