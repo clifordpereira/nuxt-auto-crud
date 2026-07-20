@@ -1,3 +1,23 @@
+## v2.6.4
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v2.6.2...v2.6.4)
+
+### 🩹 Fixes
+
+- Typescript - database column names mismatch. ([c4e5205](https://github.com/clifordpereira/nuxt-auto-crud/commit/c4e5205))
+- Lint errors and test errors ([b5918c9](https://github.com/clifordpereira/nuxt-auto-crud/commit/b5918c9))
+
+### 🏡 Chore
+
+- **release:** V2.6.2 ([867f835](https://github.com/clifordpereira/nuxt-auto-crud/commit/867f835))
+- **release:** V2.6.3 ([01bd795](https://github.com/clifordpereira/nuxt-auto-crud/commit/01bd795))
+- Adjust constants and config names and values. ([fd3edc5](https://github.com/clifordpereira/nuxt-auto-crud/commit/fd3edc5))
+- Remove > character ([0be39e1](https://github.com/clifordpereira/nuxt-auto-crud/commit/0be39e1))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v2.6.3
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v2.6.2...v2.6.3)
