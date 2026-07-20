@@ -40,7 +40,7 @@ export const buildModelTableMap = (): Record<string, Table> => {
 export const nacModelTableMap = buildModelTableMap()
 
 /**
- * Maps physical (snake_case) table name -> camelCase schema export key.
+ * Maps physical (snake_case) table name to camelCase schema export key.
  * Name-based (not identity-based) so it still resolves correctly for table
  * objects that were copied/augmented (e.g. `{ ...posts, extraCol: {} }` in tests),
  * as long as Drizzle's name metadata carries over — which a plain spread preserves.
