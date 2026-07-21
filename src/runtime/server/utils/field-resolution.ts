@@ -25,6 +25,8 @@ export function nacResolveFieldKey(input: string, columnKeys: ReadonlySet<string
   if (columnKeys.has(input)) return input
   const camel = nacToCamelCase(input)
   if (columnKeys.has(camel)) return camel
+  const snake = nacToSnakeCase(input)
+  if (columnKeys.has(snake)) return snake
   return undefined
 }
 

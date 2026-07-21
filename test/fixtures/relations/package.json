@@ -1,10 +1,10 @@
 {
   "private": true,
-  "name": "basic",
+  "name": "relations",
   "type": "module",
   "dependencies": {
     "drizzle-orm": "^1.0.0-rc.4",
-    "@libsql/client": "^0.17.0"
+    "@libsql/client": "^0.17.4"
   },
   "devDependencies": {
     "drizzle-kit": "^1.0.0-rc.4"

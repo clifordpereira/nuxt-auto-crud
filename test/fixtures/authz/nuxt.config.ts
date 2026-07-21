@@ -11,20 +11,6 @@ export default defineNuxtConfig({
     db: 'sqlite',
   },
   autoCrud: {
-    realtime: false,
-    auth: {
-      authentication: true,
-      authorization: true,
-      ownerKey: 'ownerId',
-    },
-    publicResources: {
-      users: ['id', 'name', 'email', 'samoosa'],
-    },
-    apiHiddenFields: ['password'],
-    agenticToken: '',
-    formHiddenFields: [],
-    nacEndpointPrefix: '/api/_nac',
-    apiBase: '/api/_nac',
-    schemaPath: 'server/db/schema',
+    relationsPath: 'server/db/relations',
   },
 })

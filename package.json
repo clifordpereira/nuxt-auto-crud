@@ -50,15 +50,14 @@
   },
   "dependencies": {
     "@nuxt/kit": "^4.5.0",
+    "drizzle-orm": "^1.0.0-rc.4",
     "mysql2": "^3.23.1",
     "pluralize": "^8.0.0",
     "zod": "^4.4.3"
   },
   "peerDependencies": {
     "@nuxthub/core": "^0.10.6",
-    "drizzle-kit": ">=1.0.0-rc.0",
-    "drizzle-orm": ">=1.0.0-rc.0",
-    "nuxt": "^4.3.0"
+    "nuxt": "^4.5.0"
   },
   "devDependencies": {
     "@iconify-json/heroicons": "^1.2.3",
@@ -79,8 +78,7 @@
     "@vue/test-utils": "^2.4.11",
     "better-sqlite3": "^12.11.1",
     "changelogen": "^0.6.2",
-    "drizzle-kit": "^1.0.0-rc.4-ca0f029",
-    "drizzle-orm": "^1.0.0-rc.4-de6c356",
+    "drizzle-kit": "^1.0.0-rc.4",
     "eslint": "^10.7.0",
     "eslint-plugin-tsdoc": "^0.5.2",
     "happy-dom": "^20.11.0",
