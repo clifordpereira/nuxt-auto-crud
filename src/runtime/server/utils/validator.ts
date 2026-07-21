@@ -4,7 +4,8 @@ import { getColumns, type Table, getTableName } from 'drizzle-orm'
 
 import { useRuntimeConfig } from '#imports'
 
-import { resolveFieldList, NAC_API_WRITE_PROTECTED_FIELDS } from './constants'
+import { NAC_API_WRITE_PROTECTED_FIELDS } from './constants'
+import { resolveFieldList } from './field-resolution'
 
 const { createInsertSchema } = createSchemaFactory()
 

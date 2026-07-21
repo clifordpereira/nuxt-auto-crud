@@ -27,8 +27,9 @@ const makeUnitProject = (fixtureName: string, includePattern: string, excludePat
 export default defineConfig({
   test: {
     projects: [
-      makeUnitProject('basic', 'test/unit/*.{test,spec}.ts', 'test/unit/relations.test.ts'),
-      makeUnitProject('relations', 'test/unit/relations.test.ts'),
+      makeUnitProject('basic', 'test/unit/*.{test,spec}.ts', 'test/unit/{relations,authz}*.{test,spec}.ts'),
+      makeUnitProject('relations', 'test/unit/relations*.{test,spec}.ts'),
+      makeUnitProject('authz', 'test/unit/authz*.{test,spec}.ts'),
       {
         test: {
           name: 'e2e',

@@ -8,19 +8,20 @@ import * as schema from '#nac/schema'
 
 import type { NacField, NacSchemaDefinition, NacQueryContext } from '../../shared/utils/types'
 import type { NacColumnInternal, NacZodTypeDef } from '../types'
-import { resolveFieldList, NAC_API_HIDDEN_FIELDS, NAC_SYSTEM_TABLES, NAC_FORM_HIDDEN_FIELDS } from './constants'
+import { NAC_API_HIDDEN_FIELDS, NAC_SYSTEM_TABLES, NAC_FORM_HIDDEN_FIELDS } from './constants'
+import { resolveFieldList } from './field-resolution'
 import { NacResourceNotFoundError } from '../exceptions'
-
 import { nacGetTableConfigResolver } from './db'
+
+/* -------------------------------------------------------------------------- */
+/*                              TABLE MAP (ROOT)                              */
+/* -------------------------------------------------------------------------- */
 
 /**
  * Builds a map of all exported Drizzle tables from the schema.
- *
- * @returns A mapping of export keys to their corresponding Table instances.
  * @internal
  */
 export const buildModelTableMap = (): Record<string, Table> => {
-  // key is remove (from (acc, [key, value])) to satisfy lint rule
   return Object.entries(schema).reduce((acc, [, value]) => {
     if (is(value, Table)) {
       const tableName = getTableName(value)
@@ -33,34 +34,36 @@ export const buildModelTableMap = (): Record<string, Table> => {
 }
 
 /**
- * Mapping of database table keys to Table instances.
- *
+ * Mapping of physical (snake_case) table name → Table instance.
  * @public
  */
 export const nacModelTableMap = buildModelTableMap()
 
-/**
- * Maps physical (snake_case) table name to camelCase schema export key.
- * Name-based (not identity-based) so it still resolves correctly for table
- * objects that were copied/augmented (e.g. `{ ...posts, extraCol: {} }` in tests),
- * as long as Drizzle's name metadata carries over — which a plain spread preserves.
- *
- * @internal
- */
-const nacPhysicalNameToExportKeyMap = new Map<string, string>(
-  Object.entries(schema).reduce((acc, [key, value]) => {
-    if (is(value, Table)) acc.push([getTableName(value), key])
-    return acc
-  }, [] as [string, string][]),
-)
+/* -------------------------------------------------------------------------- */
+/*                          TABLE-KEY RESOLUTION                              */
+/* -------------------------------------------------------------------------- */
 
 /**
- * Resolves the camelCase schema export key for a table instance, by physical name.
- * Use this (not the physical table name itself) whenever looking up `db.query[...]`
- * or `nacTableQueryConfig`.
- *
- * @param table - The database table instance.
- * @returns The export key, or undefined if no schema table matches this name.
+ * Bidirectional lookup between the physical (snake_case) table name and
+ * the camelCase schema export name. Built in a single pass over the
+ * schema so both directions stay in sync from one source of truth.
+ * @internal
+ */
+const nacPhysicalNameToExportKeyMap = new Map<string, string>()
+const nacExportKeyToPhysicalNameMap = new Map<string, string>()
+
+for (const [key, value] of Object.entries(schema)) {
+  if (is(value, Table)) {
+    const physicalName = getTableName(value)
+    nacPhysicalNameToExportKeyMap.set(physicalName, key)
+    nacExportKeyToPhysicalNameMap.set(key, physicalName)
+  }
+}
+
+/**
+ * Resolves the camelCase schema export key for a table instance, by
+ * physical name. Use this (not the physical table name itself) whenever
+ * looking up `db.query[...]` or `nacTableQueryConfig`.
  * @internal
  */
 export function getModelExportKey(table: Table): string | undefined {
@@ -68,15 +71,25 @@ export function getModelExportKey(table: Table): string | undefined {
 }
 
 /**
- * Resolves the property name for a foreign key's source column.
- *
- * @param fk - The foreign key database configuration.
- * @param columns - The schema columns mapping to search within.
- * @returns The property name or undefined if not found.
- * @internal
+ * Resolves a user-supplied resource/table key — either the physical
+ * snake_case table name or the camelCase schema export name — to the
+ * canonical physical name used by nacModelTableMap, routes, and
+ * publicResources. A lookup against the real schema map, not a case
+ * transform: an unrecognized key returns undefined.
+ * @public
  */
+export function nacResolveTableKey(input: string): string | undefined {
+  if (input in nacModelTableMap) return input
+  return nacExportKeyToPhysicalNameMap.get(input)
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                RELATIONS                                   */
+/* -------------------------------------------------------------------------- */
+
+/** @internal — only consumed by resolveTableRelations below */
 export function getForeignKeyPropertyName(fk: ForeignKey, columns: Record<string, Column>): string | undefined {
-  const targetColumnName = fk.reference().columns[0]?.name // TODO: Support composite keys if required in future
+  const targetColumnName = fk.reference().columns[0]?.name
   if (!targetColumnName || !columns) return undefined
 
   for (const key in columns) {
@@ -84,7 +97,29 @@ export function getForeignKeyPropertyName(fk: ForeignKey, columns: Record<string
   }
 }
 
-// helper for getSelectableFields()
+/**
+ * Resolves table relationships for NAC reflection.
+ * @internal
+ */
+export async function resolveTableRelations(table: Table): Promise<Record<string, string>> {
+  const getTableConfig = await nacGetTableConfigResolver()
+  const config = getTableConfig(table)
+  const columnsMap = getColumns(table)
+  const relations: Record<string, string> = {}
+
+  for (const fk of config.foreignKeys) {
+    const targetTable = getTableConfig(fk.reference().foreignTable).name
+    const propertyKey = getForeignKeyPropertyName(fk, columnsMap)
+    if (propertyKey) relations[propertyKey] = targetTable
+  }
+
+  return relations
+}
+
+/* -------------------------------------------------------------------------- */
+/*                          FIELD VISIBILITY                                  */
+/* -------------------------------------------------------------------------- */
+
 function getPublicFields(resource: string) {
   const { publicResources } = useRuntimeConfig().autoCrud as {
     publicResources?: Record<string, string[]>
@@ -94,10 +129,6 @@ function getPublicFields(resource: string) {
 
 /**
  * Resolves the fields of a table that are allowed to be selected in queries.
- *
- * @param table - The database table instance.
- * @param context - Optional query-level client context.
- * @returns An object map of selected column instances.
  * @internal
  */
 export function getSelectableFields(table: Table, context: NacQueryContext = {}): Record<string, Column> {
@@ -121,52 +152,21 @@ export function getSelectableFields(table: Table, context: NacQueryContext = {})
   return result
 }
 
-/**
- * Resolves table relationships for NAC reflection.
- *
- * @param table - The table to resolve relations for.
- * @returns Map of property key to related table name.
- * @internal
- */
-export async function resolveTableRelations(table: Table): Promise<Record<string, string>> {
-  const getTableConfig = await nacGetTableConfigResolver()
-  const config = getTableConfig(table)
-  const columnsMap = getColumns(table)
-  const relations: Record<string, string> = {}
+/* -------------------------------------------------------------------------- */
+/*                          SCHEMA DEFINITION (PUBLIC API)                    */
+/* -------------------------------------------------------------------------- */
 
-  for (const fk of config.foreignKeys) {
-    const targetTable = getTableConfig(fk.reference().foreignTable).name
-    const propertyKey = getForeignKeyPropertyName(fk, columnsMap)
-    if (propertyKey) relations[propertyKey] = targetTable
-  }
-
-  return relations
-}
-
-/**
- * Resolves the display label field name for a database model schema.
- *
- * @param columnNames - The names of all database schema columns.
- * @returns The field name representing the primary display label.
- * @internal
- */
 export function getLabelField(columnNames: string[]): string {
   const candidates = ['name', 'title', 'label', 'num', 'email']
   return candidates.find(n => columnNames.includes(n)) || 'id'
 }
 
 const ZOD_TYPE_MAP: Record<string, NacField['type']> = {
-  ZodDate: 'date',
-  ZodNumber: 'number',
-  ZodBoolean: 'boolean',
+  ZodDate: 'date', ZodNumber: 'number', ZodBoolean: 'boolean',
 }
-
 const SEMANTIC_CHECK_MAP: Record<string, NacField['type']> = {
-  email: 'email',
-  uuid: 'uuid',
-  url: 'url',
+  email: 'email', uuid: 'uuid', url: 'url',
 }
-
 const TEXTAREA_HINTS = ['content', 'description', 'bio', 'message']
 
 function inferFieldType(name: string, col: Column, zodField?: z.ZodTypeAny): {

@@ -1,4 +1,20 @@
 /**
+ * Represents a field-name list, either as a flat global list, or scoped per-resource.
+ *
+ * - `string[]` — flat list, applies identically to every resource (current behavior).
+ * - `{ default, resources }` — `default` replaces the module's built-in list if provided
+ *   (omit to keep the built-in); `resources[key]` fields are *appended* on top of
+ *   whichever default list applies, for that resource only.
+ *
+ * Resource keys match the physical (snake_case) table name — the same key used
+ * in routes and `nacModelTableMap`, not the camelCase schema export name.
+ */
+export type NacFieldList = string[] | {
+  default?: string[]
+  resources?: Record<string, string[]>
+}
+
+/**
  * Configuration options for the NacAutoCrud module.
  *
  * @public

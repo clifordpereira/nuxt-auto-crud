@@ -1,6 +1,9 @@
-import { useRuntimeConfig } from '#imports'
 import type { Table, TablesRelationalConfig } from 'drizzle-orm'
+
+import { useRuntimeConfig } from '#imports'
 import * as nacRelations from '#nac/relations'
+
+import { nacToSnakeCase } from './field-resolution'
 
 const relations = nacRelations.relations ?? {}
 const nacTableQueryConfig = nacRelations.nacTableQueryConfig ?? {}
@@ -138,5 +141,10 @@ export async function nacGetTableName(table: Table): Promise<string> {
  * @public
  */
 export function nacGetTableQueryConfig(tableName: string): Record<string, unknown> {
-  return nacTableQueryConfig[tableName] ?? {}
+  if (nacTableQueryConfig[tableName]) return nacTableQueryConfig[tableName]
+  // tableName here is always the authoritative exportKey (from getModelExportKey),
+  // so converting it to snake_case is a deterministic, unambiguous fallback —
+  // it covers a relations.ts author who keyed nacTableQueryConfig by physical name.
+  const snakeKey = nacToSnakeCase(tableName)
+  return nacTableQueryConfig[snakeKey] ?? {}
 }

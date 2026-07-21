@@ -1,5 +1,3 @@
-import type { NacFieldList } from '../types'
-
 /**
  * Strictly internal/sensitive data fields that should never leave the server.
  *
@@ -42,19 +40,3 @@ export const NAC_FORM_READ_ONLY_FIELDS = []
  * @public
  */
 export const NAC_SYSTEM_TABLES = ['_hub_migrations', 'd1_migrations', 'sqlite_sequence']
-
-/**
- * Resolves a NacFieldList config (flat or per-resource) into a concrete Set
- * for a specific resource.
- */
-export function resolveFieldList(
-  config: NacFieldList,
-  resourceName: string,
-  builtInDefault: string[],
-): Set<string> {
-  if (Array.isArray(config)) return new Set(config)
-
-  const base = config.default ?? builtInDefault
-  const extra = config.resources?.[resourceName] ?? []
-  return new Set([...base, ...extra])
-}
