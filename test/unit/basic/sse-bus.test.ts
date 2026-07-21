@@ -3,7 +3,7 @@ import {
   nacBroadcast,
   nacAddClient,
   nacRemoveClient,
-} from '../../src/runtime/server/utils/sse-bus'
+} from '../../../src/runtime/server/utils/sse-bus'
 
 describe('SSE Bus Core', () => {
   // Access global state to reset between tests

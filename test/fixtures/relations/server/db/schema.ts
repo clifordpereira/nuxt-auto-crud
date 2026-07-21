@@ -1,5 +1,15 @@
 import { sqliteTable, text, integer, numeric } from 'drizzle-orm/sqlite-core'
 
+export const users = sqliteTable('users', {
+  id: integer().primaryKey({ autoIncrement: true }),
+  name: text().notNull(),
+  email: text().notNull().unique(),
+  password: text().notNull(),
+  avatar: text(),
+  created_at: integer({ mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  updated_at: integer({ mode: 'timestamp' }).notNull().$onUpdateFn(() => new Date()),
+})
+
 export const products = sqliteTable('products', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   name: text('name').notNull(),
@@ -7,7 +17,7 @@ export const products = sqliteTable('products', {
   price: numeric('price', { mode: 'number' }).notNull(),
   stock: integer('stock').notNull(),
   created_at: integer({ mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
-  updated_at: integer({ mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  updated_at: integer({ mode: 'timestamp' }).notNull().$onUpdateFn(() => new Date()),
 })
 
 export const customers = sqliteTable('customers', {
@@ -16,20 +26,20 @@ export const customers = sqliteTable('customers', {
   email: text('email').notNull().unique(),
   phone: text('phone'),
   created_at: integer({ mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
-  updated_at: integer({ mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  updated_at: integer({ mode: 'timestamp' }).notNull().$onUpdateFn(() => new Date()),
 })
 
 export const orders = sqliteTable('orders', {
   id: integer('id').primaryKey({ autoIncrement: true }),
+  num: text('num').notNull().unique(),
   customer_id: integer('customer_id')
     .notNull()
     .references(() => customers.id, { onDelete: 'cascade' }),
-  total_amount: numeric('total_amount', { mode: 'number' }).notNull(),
   status: text('status', { enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'] })
     .notNull()
     .default('pending'),
   created_at: integer({ mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
-  updated_at: integer({ mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  updated_at: integer({ mode: 'timestamp' }).notNull().$onUpdateFn(() => new Date()),
 })
 
 export const orderitems = sqliteTable('orderitems', {
@@ -41,5 +51,11 @@ export const orderitems = sqliteTable('orderitems', {
     .notNull()
     .references(() => products.id, { onDelete: 'cascade' }),
   quantity: integer('quantity').notNull(),
-  price: numeric('price', { mode: 'number' }).notNull(),
+  price: numeric('price', { mode: 'number' }), // insert current products.price by 'trigger'
 })
+
+export type User = typeof users.$inferSelect
+export type Product = typeof products.$inferSelect
+export type Customer = typeof customers.$inferSelect
+export type Order = typeof orders.$inferSelect
+export type OrderItem = typeof orderitems.$inferSelect

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { $fetch } from '@nuxt/test-utils/e2e'
 import { useRuntimeConfig } from '#imports'
-import type { NacSchemaDefinition } from '../../src/runtime/shared/utils/types'
+import type { NacSchemaDefinition } from '../../../src/runtime/shared/utils/types'
 
 describe('NAC: Schema Definition Reflection', async () => {
   const { apiBase } = useRuntimeConfig().public.autoCrud

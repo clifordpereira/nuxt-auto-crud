@@ -51,20 +51,16 @@ export const nacTableQueryConfig: Record<string, DBQueryConfig> = {
       customer: { columns: { name: true, email: true } },
       orderitems: {
         with: {
-          product: { columns: { name: true, price: true } },
+          product: { columns: { name: true } },
         },
       },
     },
   },
   orderitems: {
-    columns: {
-      order_id: false,
-      product_id: false,
-    },
     orderBy: { id: 'asc' },
     with: {
       product: { columns: { name: true } },
-      order: { columns: { status: true } },
+      order: { columns: { num: true, status: true } },
     },
   },
 }

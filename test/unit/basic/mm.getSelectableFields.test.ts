@@ -2,7 +2,7 @@
 import { describe, it, expect } from 'vitest'
 import { Column } from 'drizzle-orm'
 import * as schema from '#nac/schema'
-import { getSelectableFields } from '../../src/runtime/server/utils/modelMapper'
+import { getSelectableFields } from '../../../src/runtime/server/utils/modelMapper'
 
 describe('modelMapper: getSelectableFields', () => {
   it('1) should return a Record of Columns', () => {

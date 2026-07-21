@@ -1,7 +1,7 @@
 // test/unit/modelMapper.resolveTableRelations.spec.ts
 import { describe, it, expect } from 'vitest'
 import * as schema from '#nac/schema'
-import { resolveTableRelations } from '../../src/runtime/server/utils/modelMapper'
+import { resolveTableRelations } from '../../../src/runtime/server/utils/modelMapper'
 
 describe('modelMapper: resolveTableRelations', () => {
   it('1) returns record mapping property keys to target table names', async () => {

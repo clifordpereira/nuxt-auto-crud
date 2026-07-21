@@ -7,47 +7,43 @@ const r = (p: string) => resolve(import.meta.dirname, p)
 
 const stubPath = r('./src/runtime/server/stubs/empty-stub')
 
-const makeUnitProject = (fixtureName: string, includePattern: string, excludePattern?: string) => ({
+const makeUnitProject = (fixtureName: string) => ({
   test: {
     name: `unit-${fixtureName}`,
-    include: [includePattern],
-    ...(excludePattern && { exclude: [excludePattern] }),
+    include: [`test/unit/${fixtureName}/*.{test,spec}.ts`],
     environment: 'node',
     alias: {
+      '#nac/db': r('./test/mocks/db.ts'),
       '#nac/schema': r(`./test/fixtures/${fixtureName}/server/db/schema.ts`),
       '#nac/relations': existsSync(r(`./test/fixtures/${fixtureName}/server/db/relations.ts`))
         ? r(`./test/fixtures/${fixtureName}/server/db/relations.ts`)
         : stubPath,
       '#imports': r('./test/mocks/imports.ts'),
-      '#nac/db': r('./test/mocks/db.ts'),
     },
+  },
+})
+
+const makeE2eProject = (fixtureName: string) => ({
+  test: {
+    name: `e2e-${fixtureName}`,
+    include: [`test/e2e/${fixtureName}/*.{test,spec}.ts`],
+    setupFiles: [r(`./test/e2e/${fixtureName}/setup.ts`)],
+    environment: 'node',
+    alias: { '#imports': r('./test/mocks/imports.ts') },
+    fileParallelism: false,
   },
 })
 
 export default defineConfig({
   test: {
     projects: [
-      makeUnitProject('basic', 'test/unit/*.{test,spec}.ts', 'test/unit/{relations,authz}*.{test,spec}.ts'),
-      makeUnitProject('relations', 'test/unit/relations*.{test,spec}.ts'),
-      makeUnitProject('authz', 'test/unit/authz*.{test,spec}.ts'),
-      {
-        test: {
-          name: 'e2e',
-          include: ['test/e2e/*.{test,spec}.ts'],
-          setupFiles: [r('./test/e2e/setup.ts')],
-          environment: 'node',
-          alias: {
-            '#imports': r('./test/mocks/imports.ts'),
-          },
-          fileParallelism: false,
-        },
-      },
+      makeUnitProject('basic'),
+      makeUnitProject('relations'),
+      makeUnitProject('authz'),
+      makeE2eProject('basic'),
+      makeE2eProject('authz'),
       await defineVitestProject({
-        test: {
-          name: 'nuxt',
-          include: ['test/nuxt/*.{test,spec}.ts'],
-          environment: 'nuxt',
-        },
+        test: { name: 'nuxt', include: ['test/nuxt/*.{test,spec}.ts'], environment: 'nuxt' },
       }),
     ],
   },

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { z } from 'zod'
 import * as schema from '#nac/schema'
-import { nacResolveValidatedSchema } from '../../src/runtime/server/utils/validator'
+import { nacResolveValidatedSchema } from '../../../src/runtime/server/utils/validator'
 
 describe('validator: nacResolveValidatedSchema', () => {
   it('1) returns a valid ZodObject', () => {

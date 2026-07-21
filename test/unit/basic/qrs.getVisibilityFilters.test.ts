@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { useRuntimeConfig } from '#imports'
-import type { NacTableWithId } from '../../src/runtime/server/types'
-import { getVisibilityFilters, nacGetRows } from '../../src/runtime/server/utils/queries'
+import type { NacTableWithId } from '../../../src/runtime/server/types'
+import { getVisibilityFilters, nacGetRows } from '../../../src/runtime/server/utils/queries'
 
 // Mock table structure
 const mockTable = {

@@ -2,7 +2,7 @@
 import { describe, it, expect } from 'vitest'
 import { getColumns } from 'drizzle-orm'
 import * as schema from '#nac/schema'
-import { getLabelField } from '../../src/runtime/server/utils/modelMapper'
+import { getLabelField } from '../../../src/runtime/server/utils/modelMapper'
 
 describe('modelMapper: getLabelField', () => {
   it('1) should return "title" for posts table', () => {

@@ -3,7 +3,7 @@ import { describe, it, expect } from 'vitest'
 import { getColumns } from 'drizzle-orm'
 import { getTableConfig } from 'drizzle-orm/sqlite-core'
 import * as schema from '#nac/schema'
-import { getForeignKeyPropertyName } from '../../src/runtime/server/utils/modelMapper'
+import { getForeignKeyPropertyName } from '../../../src/runtime/server/utils/modelMapper'
 
 describe('modelMapper: getForeignKeyPropertyName', () => {
   it('1) schema should load posts table config', () => {

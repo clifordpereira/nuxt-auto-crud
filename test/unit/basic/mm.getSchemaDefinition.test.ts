@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { nacGetSchemaDefinition } from '../../src/runtime/server/utils/modelMapper'
+import { nacGetSchemaDefinition } from '../../../src/runtime/server/utils/modelMapper'
 import { useRuntimeConfig } from '#imports'
 
 describe('modelMapper: nacGetSchemaDefinition', () => {
