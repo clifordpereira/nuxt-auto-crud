@@ -17,8 +17,8 @@ describe('NAC Core Queries - Consolidated Suite', () => {
     db = await getNacDb() as unknown as MockNacDb
     db.query.orders?.findMany?.mockReset()
     db.query.orders?.findFirst?.mockReset()
-    db.query.orderitems?.findMany?.mockReset()
-    db.query.orderitems?.findFirst?.mockReset()
+    db.query.order_items?.findMany?.mockReset()
+    db.query.order_items?.findFirst?.mockReset()
     db.query.customers?.findMany?.mockReset()
     db.query.customers?.findFirst?.mockReset() // ← was missing
     db.query.products?.findMany?.mockReset()
@@ -35,7 +35,7 @@ describe('NAC Core Queries - Consolidated Suite', () => {
       expect(schema.products).toBeDefined()
       expect(schema.customers).toBeDefined()
       expect(schema.orders).toBeDefined()
-      expect(schema.orderitems).toBeDefined()
+      expect(schema.order_items).toBeDefined()
     })
 
     it('products has expected columns', () => {
@@ -53,9 +53,9 @@ describe('NAC Core Queries - Consolidated Suite', () => {
       expect(col.name ?? col.columnName).toBe('customer_id')
     })
 
-    it('orderitems has FK columns for order_id and product_id', () => {
-      expect((schema.orderitems)?.order_id).toBeDefined()
-      expect((schema.orderitems)?.product_id).toBeDefined()
+    it('order_items has FK columns for order_id and product_id', () => {
+      expect((schema.order_items)?.order_id).toBeDefined()
+      expect((schema.order_items)?.product_id).toBeDefined()
     })
   })
 
@@ -71,7 +71,7 @@ describe('NAC Core Queries - Consolidated Suite', () => {
       expect(tables).toContain('customers')
       expect(tables).toContain('products')
       expect(tables).toContain('orders')
-      expect(tables).toContain('orderitems')
+      expect(tables).toContain('order_items')
     })
   })
 
@@ -94,10 +94,10 @@ describe('NAC Core Queries - Consolidated Suite', () => {
         })
       })
 
-      it('includes orderitems with nested product columns', () => {
-        expect(cfg.with?.orderitems).toMatchObject({
+      it('includes order_items with nested product columns', () => {
+        expect(cfg.with?.order_items).toMatchObject({
           with: {
-            product: { columns: { name: true, price: true } },
+            product: { columns: { name: true } },
           },
         })
       })
@@ -107,11 +107,11 @@ describe('NAC Core Queries - Consolidated Suite', () => {
       })
     })
 
-    describe('orderitems config', () => {
+    describe('order_items config', () => {
       let cfg: DBQueryConfig
 
       beforeEach(() => {
-        cfg = nacGetTableQueryConfig('orderitems') ?? {}
+        cfg = nacGetTableQueryConfig('order_items') ?? {}
       })
 
       it('orders by id asc', () => {
@@ -129,8 +129,8 @@ describe('NAC Core Queries - Consolidated Suite', () => {
         expect(cfg.with?.product).toEqual({ columns: { name: true } })
       })
 
-      it('includes nested order with only status', () => {
-        expect(cfg.with?.order).toEqual({ columns: { status: true } })
+      it('includes nested order with num and status', () => {
+        expect(cfg.with?.order).toEqual({ columns: { num: true, status: true } })
       })
     })
   })
@@ -145,7 +145,7 @@ describe('NAC Core Queries - Consolidated Suite', () => {
           total_amount: 99.99,
           status: 'pending',
           customer: { name: 'Alice', email: 'alice@example.com' },
-          orderitems: [
+          order_items: [
             { id: 1, quantity: 2, price: 49.99, product: { name: 'Widget', price: 49.99 } },
           ],
         },
@@ -160,7 +160,7 @@ describe('NAC Core Queries - Consolidated Suite', () => {
       expect(q.orders?.findMany).toHaveBeenCalledWith(cfg)
       expect(result).toHaveLength(1)
       expect(result[0].customer).toMatchObject({ name: 'Alice', email: 'alice@example.com' })
-      expect(result[0].orderitems[0].product).toMatchObject({ name: 'Widget' })
+      expect(result[0].order_items[0].product).toMatchObject({ name: 'Widget' })
     })
 
     it('findFirst returns a single order by id', async () => {
@@ -169,7 +169,7 @@ describe('NAC Core Queries - Consolidated Suite', () => {
         total_amount: 150,
         status: 'shipped',
         customer: { name: 'Bob', email: 'bob@example.com' },
-        orderitems: [],
+        order_items: [],
       }
       const q = db.query
       q.orders?.findFirst.mockResolvedValueOnce(mockOrder)
@@ -189,7 +189,7 @@ describe('NAC Core Queries - Consolidated Suite', () => {
     })
   })
 
-  describe('db.query mock — orderitems', () => {
+  describe('db.query mock — order_items', () => {
     it('findMany returns items with hidden FK columns and nested relations', async () => {
       const mockItems = [
         {
@@ -201,12 +201,12 @@ describe('NAC Core Queries - Consolidated Suite', () => {
         },
       ]
       const q = db.query
-      q.orderitems?.findMany.mockResolvedValueOnce(mockItems)
+      q.order_items?.findMany.mockResolvedValueOnce(mockItems)
 
-      const cfg = nacGetTableQueryConfig('orderitems')
-      const result = await db.query.orderitems?.findMany(cfg)
+      const cfg = nacGetTableQueryConfig('order_items')
+      const result = await db.query.order_items?.findMany(cfg)
 
-      expect(q.orderitems?.findMany).toHaveBeenCalledWith(cfg)
+      expect(q.order_items?.findMany).toHaveBeenCalledWith(cfg)
       expect(result[0]).not.toHaveProperty('order_id')
       expect(result[0]).not.toHaveProperty('product_id')
       expect(result[0].product).toEqual({ name: 'Gadget' })
@@ -239,8 +239,8 @@ describe('NAC Core Queries - Consolidated Suite', () => {
     })
   })
 
-  describe('db.query mock — products with many-through-orderitems', () => {
-    it('findMany returns products with nested orderitems and orders', async () => {
+  describe('db.query mock — products with many-through-order_items', () => {
+    it('findMany returns products with nested order_items and orders', async () => {
       const mockProducts = [
         {
           id: 1,
@@ -248,7 +248,7 @@ describe('NAC Core Queries - Consolidated Suite', () => {
           sku: 'WGT-001',
           price: 49.99,
           stock: 100,
-          orderitems: [
+          order_items: [
             {
               id: 1,
               quantity: 2,
@@ -262,10 +262,10 @@ describe('NAC Core Queries - Consolidated Suite', () => {
       q.products?.findMany.mockResolvedValueOnce(mockProducts)
 
       const result = await db.query.products?.findMany({
-        with: { orderitems: { with: { order: true } } },
+        with: { order_items: { with: { order: true } } },
       })
 
-      expect(result[0].orderitems[0].order.status).toBe('shipped')
+      expect(result[0].order_items[0].order.status).toBe('shipped')
     })
   })
 
