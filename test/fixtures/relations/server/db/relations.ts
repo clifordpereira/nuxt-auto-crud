@@ -10,12 +10,12 @@ export const relations = defineRelations(schema, r => ({
   },
   products: {
     orders: r.many.orders({
-      from: r.products.id.through(r.orderitems.product_id),
-      to: r.orders.id.through(r.orderitems.order_id),
+      from: r.products.id.through(r.order_items.product_id),
+      to: r.orders.id.through(r.order_items.order_id),
     }),
-    orderitems: r.many.orderitems({
+    order_items: r.many.order_items({
       from: r.products.id,
-      to: r.orderitems.product_id,
+      to: r.order_items.product_id,
     }),
   },
   orders: {
@@ -24,21 +24,21 @@ export const relations = defineRelations(schema, r => ({
       to: r.customers.id,
     }),
     products: r.many.products({
-      from: r.orders.id.through(r.orderitems.order_id),
-      to: r.products.id.through(r.orderitems.product_id),
+      from: r.orders.id.through(r.order_items.order_id),
+      to: r.products.id.through(r.order_items.product_id),
     }),
-    orderitems: r.many.orderitems({
+    order_items: r.many.order_items({
       from: r.orders.id,
-      to: r.orderitems.order_id,
+      to: r.order_items.order_id,
     }),
   },
-  orderitems: {
+  order_items: {
     order: r.one.orders({
-      from: r.orderitems.order_id,
+      from: r.order_items.order_id,
       to: r.orders.id,
     }),
     product: r.one.products({
-      from: r.orderitems.product_id,
+      from: r.order_items.product_id,
       to: r.products.id,
     }),
   },
@@ -49,15 +49,19 @@ export const nacTableQueryConfig: Record<string, DBQueryConfig> = {
     orderBy: { id: 'desc' },
     with: {
       customer: { columns: { name: true, email: true } },
-      orderitems: {
+      order_items: {
         with: {
           product: { columns: { name: true } },
         },
       },
     },
   },
-  orderitems: {
+  order_items: {
     orderBy: { id: 'asc' },
+    columns: {
+      order_id: false,
+      product_id: false,
+    },
     with: {
       product: { columns: { name: true } },
       order: { columns: { num: true, status: true } },

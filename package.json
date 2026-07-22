@@ -91,5 +91,11 @@
   "sideEffects": false,
   "engines": {
     "node": ">=18.0.0"
+  },
+  "overrides": {
+    "h3": "1.15.11"
+  },
+  "resolutions": {
+    "h3": "1.15.11"
   }
 }

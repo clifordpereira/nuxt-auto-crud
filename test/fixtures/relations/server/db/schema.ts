@@ -42,7 +42,7 @@ export const orders = sqliteTable('orders', {
   updated_at: integer({ mode: 'timestamp' }).notNull().$onUpdateFn(() => new Date()),
 })
 
-export const orderitems = sqliteTable('orderitems', {
+export const order_items = sqliteTable('order_items', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   order_id: integer('order_id')
     .notNull()
@@ -58,4 +58,4 @@ export type User = typeof users.$inferSelect
 export type Product = typeof products.$inferSelect
 export type Customer = typeof customers.$inferSelect
 export type Order = typeof orders.$inferSelect
-export type OrderItem = typeof orderitems.$inferSelect
+export type OrderItem = typeof order_items.$inferSelect

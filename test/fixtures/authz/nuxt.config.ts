@@ -11,6 +11,12 @@ export default defineNuxtConfig({
     db: 'sqlite',
   },
   autoCrud: {
+    auth: {
+      authentication: true
+    },
     relationsPath: 'server/db/relations',
+    publicResources: {
+      users: ['id', 'name', 'email'],
+    },
   },
 })

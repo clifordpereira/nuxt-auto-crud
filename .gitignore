@@ -32,3 +32,4 @@ Thumbs.db
 **/.data
 
 playground/.data
+test/fixtures/authz/.data
