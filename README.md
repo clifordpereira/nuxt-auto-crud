@@ -232,12 +232,12 @@ autoCrud: {
     // guest users can access these tables and fields without authentication, even when auth.athentication is true
     products: ['id', 'name', 'sku', 'price'],
   },
-  apiHiddenFields: ['created_by'], // these fields are hidden from all API responses globally
-  apiWriteProtectedFields: ['created_by', 'updated_by'], // mass-assignment protection; ownerKey is always included automatically
-  formHiddenFields: ['created_at', 'updated_at'], // @internal
-  formReadOnlyFields: ['sku'], // @deprecated - instead configure at frontend
+  apiHiddenFields: ['createdBy'], // these fields are hidden from all API responses globally
+  apiWriteProtectedFields: ['createdBy', 'updatedBy'], // mass-assignment protection; ownerKey is always included automatically
+  formHiddenFields: ['createdAt', 'updatedAt'], // @deprecated: instead configure at frontend
+  formReadOnlyFields: ['sku'], // @deprecated: instead configure at frontend
   agenticToken: '', // OPTIONAL. required to secure the /_meta endpoint
-  nacEndpointPrefix: '/api/_nac', // @deprecated - use apiBase instead
+  nacEndpointPrefix: '/api/_nac', // @deprecated: instead use apiBase
   apiBase: '/api/_nac',
   schemaPath: 'server/db/schema',
 }
@@ -250,16 +250,41 @@ autoCrud: {
 
 `apiHiddenFields`, `formHiddenFields`, and `apiWriteProtectedFields` each accept either a flat array (applies to every table) or a scoped object for per-table control:
 
-\```typescript
+```typescript
 apiWriteProtectedFields: {
-  default: ['created_by', 'updated_by'], // replaces the built-in default list; omit to keep it
+  default: ['createdBy', 'updatedBy'], // replaces the built-in default list; omit to keep it
   resources: {
-    users: ['role_id'], // additionally protected, users table only
+    users: ['roleId'], // additionally protected, users table only
   },
 },
-\```
+```
 
-`resources` keys must be the **physical snake_case table name** — the same name used in routes (`/api/_nac/:model`) and in `publicResources` — not the camelCase name used in `relations.ts`'s `nacTableQueryConfig` (see note below).
+
+#### Casing flexibility
+
+Both the `resources` object's **keys** and its **field-name values** accept either casing:
+
+* **Table keys** — the physical snake_case table name (e.g. `role_resource_permissions`) or the camelCase schema export name (e.g. `roleResourcePermissions`) both resolve to the same table.
+* **Field names** — snake_case (e.g. `role_id`) or camelCase (e.g. `roleId`) both resolve to the same column, regardless of how that column happens to be declared in your schema.
+
+Both of these are equally valid — different casing, same table, same fields:
+
+```typescript
+apiWriteProtectedFields: {
+  resources: {
+    role_resource_permissions: ['roleId', 'resourceId'],
+  },
+},
+
+// or, identically:
+apiWriteProtectedFields: {
+  resources: {
+    roleResourcePermissions: ['role_id', 'resource_id'],
+  },
+},
+```
+
+`publicResources` follows the same rule for both its keys and values.
 
 ---
 
@@ -389,6 +414,6 @@ export const nacTableQueryConfig: Record<string, DBQueryConfig> = {
 
 [A full example of relations.ts](https://github.com/clifordpereira/nuxt-auto-crud/blob/main/playground/server/db/relations.ts)
 
-> ⚠️ **Casing note:** `nacTableQueryConfig` keys are the **camelCase schema export names** (e.g. `roleResourcePermissions`), matching Drizzle's `db.query[...]` API. This is different from `apiHiddenFields`/`apiWriteProtectedFields`'s per-resource `resources` keys, which use the **physical snake_case table name** (e.g. `role_resource_permissions`) — the same name used in routes. Double-check which casing applies before copying a key between the two.
+> ⚠️ **Casing note:** `nacTableQueryConfig` keys are matched primarily by the camelCase schema export name (e.g. `roleResourcePermissions`), matching Drizzle's `db.query[...]` API — but NAC also falls back to the physical snake_case table name (e.g. `role_resource_permissions`) if no camelCase entry is found, so either form works here too. This matches the same casing flexibility as `apiHiddenFields`/`apiWriteProtectedFields`'s `resources` keys (see [Per-Resource Field Overrides](#per-resource-field-overrides) above) — you no longer need to track which casing rule applies to which config surface.
 
 ---
