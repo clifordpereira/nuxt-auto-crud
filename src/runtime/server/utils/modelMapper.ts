@@ -87,7 +87,7 @@ export function nacResolveTableKey(input: string): string | undefined {
 /*                                RELATIONS                                   */
 /* -------------------------------------------------------------------------- */
 
-/** @internal — only consumed by resolveTableRelations below */
+/** @internal */
 export function getForeignKeyPropertyName(fk: ForeignKey, columns: Record<string, Column>): string | undefined {
   const targetColumnName = fk.reference().columns[0]?.name
   if (!targetColumnName || !columns) return undefined

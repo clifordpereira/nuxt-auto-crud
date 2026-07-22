@@ -36,7 +36,7 @@ export function nacResolveFieldKey(input: string, columnKeys: ReadonlySet<string
  */
 export function resolveFieldList(
   config: NacFieldList,
-  resourceKeys: string[],       // [physicalTableName, exportKey?] — checked in order
+  resourceKeys: string[], // [physicalTableName, exportKey?] — checked in order
   builtInDefault: string[],
   columnKeys?: ReadonlySet<string>,
 ): Set<string> {
@@ -47,7 +47,10 @@ export function resolveFieldList(
   const base = config.default ?? builtInDefault
   let extra: string[] = []
   for (const key of resourceKeys) {
-    if (config.resources?.[key]) { extra = config.resources[key]; break }
+    if (config.resources?.[key]) {
+      extra = config.resources[key]
+      break
+    }
   }
   return new Set([...base, ...extra].map(resolve))
 }

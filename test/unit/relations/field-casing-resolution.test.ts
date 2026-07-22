@@ -71,7 +71,7 @@ describe('nacValidateFieldConfig — order_items has snake_case-only JS keys (no
 
     expect(() => nacValidateFieldConfig()).not.toThrow()
     expect(config.autoCrud.apiHiddenFields).toEqual({
-      resources: { order_items: ['order_id', 'productId'] },  // ← 'productId', not 'product_id' — config is left as-authored, unresolved
+      resources: { order_items: ['order_id', 'productId'] }, // ← 'productId', not 'product_id' — config is left as-authored, unresolved
     })
   })
 

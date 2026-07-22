@@ -12,7 +12,7 @@ export default defineNuxtConfig({
   },
   autoCrud: {
     auth: {
-      authentication: true
+      authentication: true,
     },
     relationsPath: 'server/db/relations',
     publicResources: {
