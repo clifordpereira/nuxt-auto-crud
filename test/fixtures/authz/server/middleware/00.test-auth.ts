@@ -7,6 +7,6 @@ export default defineEventHandler((event) => {
   event.context.nac = {
     userId: Number(testUserId),
     isPublic: false,
-    resourcePermissions: event.req.headers.get('x-test-permissions')?.split(',') ?? [],
+    resourcePermissions: getHeader(event, 'x-test-permissions')?.split(',') ?? [],
   }
 })

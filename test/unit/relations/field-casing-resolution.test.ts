@@ -3,6 +3,7 @@ import { useRuntimeConfig } from '#imports'
 import { nacValidateFieldConfig } from '../../../src/runtime/server/utils/validate-config'
 import { nacGetTableQueryConfig } from '../../../src/runtime/server/utils/db'
 import type { NacFieldList } from '../../../src/types'
+import { nacResolveFieldKey } from '../../../src/runtime/server/utils/field-resolution'
 
 interface TestConfig {
   autoCrud: {
@@ -35,15 +36,30 @@ describe('nacValidateFieldConfig — order_items has snake_case-only JS keys (no
     })
   })
 
-  it('resolves a camelCase guess to the real snake_case key, proving bidirectional resolution', () => {
+  it('resolves a camelCase guess to the real snake_case column at lookup time (not at validation time)', () => {
+    const config = buildConfig({
+      apiWriteProtectedFields: { resources: { order_items: ['orderId'] } },
+    })
+    vi.mocked(useRuntimeConfig).mockReturnValue(config as never)
+    expect(() => nacValidateFieldConfig()).not.toThrow()
+
+    // This is the thing that actually matters: does the guess resolve to a
+    // real column, even though nacValidateFieldConfig left it unchanged?
+    const columnKeys = new Set(['id', 'order_id', 'product_id', 'quantity', 'price'])
+    expect(nacResolveFieldKey('orderId', columnKeys)).toBe('order_id')
+  })
+
+  it('does not throw on a camelCase guess, which resolves live at lookup time rather than at validation time', () => {
     const config = buildConfig({
       apiWriteProtectedFields: { resources: { order_items: ['orderId', 'productId'] } },
     })
     vi.mocked(useRuntimeConfig).mockReturnValue(config as never)
 
+    // Casing resolution now happens live in resolveFieldList/getSelectableFields at request
+    // time, so the config here is expected to remain exactly as authored.
     expect(() => nacValidateFieldConfig()).not.toThrow()
     expect(config.autoCrud.apiWriteProtectedFields).toEqual({
-      resources: { order_items: ['order_id', 'product_id'] },
+      resources: { order_items: ['orderId', 'productId'] },
     })
   })
 
@@ -55,7 +71,7 @@ describe('nacValidateFieldConfig — order_items has snake_case-only JS keys (no
 
     expect(() => nacValidateFieldConfig()).not.toThrow()
     expect(config.autoCrud.apiHiddenFields).toEqual({
-      resources: { order_items: ['order_id', 'product_id'] },
+      resources: { order_items: ['order_id', 'productId'] },  // ← 'productId', not 'product_id' — config is left as-authored, unresolved
     })
   })
 

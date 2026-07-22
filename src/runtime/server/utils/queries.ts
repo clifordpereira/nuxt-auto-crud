@@ -1,21 +1,16 @@
 import { useRuntimeConfig } from '#imports'
-import { type Table, eq, and, or, getColumns, desc } from 'drizzle-orm'
+import { type Table, eq, and, or, getColumns, desc, getTableName } from 'drizzle-orm'
 
 import { NacDeletionFailedError, NacInsertionFailedError, NacRecordNotFoundError, NacResourceNotFoundError, NacUnauthorizedAccessError, NacUpdateFailedError } from '../exceptions'
 import { getSelectableFields, getModelExportKey } from './modelMapper'
+import { resolveFieldList } from './field-resolution'
+import { NAC_API_HIDDEN_FIELDS } from './constants'
 
 import type { NacQueryContext } from '../../shared/utils/types'
 import type { NacTableWithId } from '../types'
 import { nacGetTableQueryConfig, getNacDb, isMysql, hasActiveRelations } from '#nac/db'
 
-/**
- * Picks only the specified keys from an object.
- *
- * @param obj - The object to pick keys from.
- * @param keys - The keys to pick.
- * @returns An object with only the specified keys.
- * @internal
- */
+/** @internal */
 const pick = <T extends object, K extends keyof T>(obj: T, keys: K[]): Pick<T, K> => {
   return keys.reduce((acc, key) => {
     if (key in obj) acc[key] = obj[key]
@@ -23,14 +18,7 @@ const pick = <T extends object, K extends keyof T>(obj: T, keys: K[]): Pick<T, K
   }, {} as Pick<T, K>)
 }
 
-/**
- * Get visibility filters for a table.
- *
- * @param table - The table to get visibility filters for.
- * @param context - The context to get visibility filters for.
- * @returns An array of visibility filters for the table.
- * @internal
- */
+/** @internal */
 export function getVisibilityFilters(table: NacTableWithId, context: NacQueryContext = {}) {
   const isAuthorizationEnabled = useRuntimeConfig().autoCrud.auth?.authorization
   const isStatusFilteringEnabled = useRuntimeConfig().autoCrud.statusFiltering
@@ -39,7 +27,6 @@ export function getVisibilityFilters(table: NacTableWithId, context: NacQueryCon
 
   const { userId, resourcePermissions = [] } = context
 
-  // 1. Full Access Bypass
   if (isAuthorizationEnabled && resourcePermissions?.includes('list_all')) return []
 
   const ownerKey = useRuntimeConfig().autoCrud.auth?.ownerKey || 'createdBy'
@@ -47,7 +34,6 @@ export function getVisibilityFilters(table: NacTableWithId, context: NacQueryCon
   const statusCol = table.status
   const filters = []
 
-  // 2. Hybrid Logic (Auth + Status)
   if (isAuthorizationEnabled && isStatusFilteringEnabled) {
     if (resourcePermissions?.includes('list_active')) {
       if (statusCol && ownerCol && userId != null) {
@@ -61,11 +47,9 @@ export function getVisibilityFilters(table: NacTableWithId, context: NacQueryCon
       filters.push(eq(ownerCol, Number(userId)))
     }
   }
-  // 3. Status Only Logic
   else if (isStatusFilteringEnabled) {
     if (statusCol) filters.push(eq(statusCol, 'active'))
   }
-  // 4. Authorization Only Logic
   else if (isAuthorizationEnabled) {
     if (resourcePermissions?.includes('list_own') && ownerCol && userId != null) {
       filters.push(eq(ownerCol, Number(userId)))
@@ -75,20 +59,12 @@ export function getVisibilityFilters(table: NacTableWithId, context: NacQueryCon
   return filters
 }
 
-// helper used in nacGetRows
 function hasAnyListPermissions(context: NacQueryContext = {}) {
   const { resourcePermissions = [] } = context
   return resourcePermissions?.includes('list_all') || resourcePermissions?.includes('list_active') || resourcePermissions?.includes('list_own')
 }
 
-/**
- * Fetches rows from the database based on the provided table and context.
- *
- * @param table - The table to query.
- * @param context - The context object containing user ID and resourcePermissions.
- * @returns An array of rows from the database.
- * @public
- */
+/** @public */
 export async function nacGetRows(table: NacTableWithId, context: NacQueryContext = {}) {
   const isAuthorizationEnabled = useRuntimeConfig().autoCrud.auth?.authorization
   if (isAuthorizationEnabled && !context.isPublic && !hasAnyListPermissions(context)) {
@@ -101,7 +77,8 @@ export async function nacGetRows(table: NacTableWithId, context: NacQueryContext
 
   const db = await getNacDb()
   const fields = getSelectableFields(table, context)
-  const hasIdColumn = 'id' in getColumns(table)
+  const allColumns = getColumns(table)
+  const hasIdColumn = 'id' in allColumns
 
   if (hasActiveRelations()) {
     if (!exportKey || !db.query[exportKey]) {
@@ -109,7 +86,10 @@ export async function nacGetRows(table: NacTableWithId, context: NacQueryContext
     }
 
     const { apiHiddenFields } = useRuntimeConfig().autoCrud
-    const hiddenSet = new Set(apiHiddenFields)
+    const tableName = getTableName(table) // see note below
+    const resourceKeys = exportKey ? [tableName, exportKey] : [tableName]
+    const columnKeys = new Set(Object.keys(allColumns))
+    const hiddenSet = resolveFieldList(apiHiddenFields, resourceKeys, NAC_API_HIDDEN_FIELDS, columnKeys)
 
     const columns = Object.keys(fields).reduce((acc, key) => {
       acc[key] = true

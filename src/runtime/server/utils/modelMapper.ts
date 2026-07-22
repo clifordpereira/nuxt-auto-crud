@@ -9,7 +9,7 @@ import * as schema from '#nac/schema'
 import type { NacField, NacSchemaDefinition, NacQueryContext } from '../../shared/utils/types'
 import type { NacColumnInternal, NacZodTypeDef } from '../types'
 import { NAC_API_HIDDEN_FIELDS, NAC_SYSTEM_TABLES, NAC_FORM_HIDDEN_FIELDS } from './constants'
-import { resolveFieldList } from './field-resolution'
+import { nacResolveFieldKey, resolveFieldList } from './field-resolution'
 import { NacResourceNotFoundError } from '../exceptions'
 import { nacGetTableConfigResolver } from './db'
 
@@ -120,11 +120,9 @@ export async function resolveTableRelations(table: Table): Promise<Record<string
 /*                          FIELD VISIBILITY                                  */
 /* -------------------------------------------------------------------------- */
 
-function getPublicFields(resource: string) {
-  const { publicResources } = useRuntimeConfig().autoCrud as {
-    publicResources?: Record<string, string[]>
-  }
-  return publicResources?.[resource] || []
+function getPublicFields(physicalName: string, exportKey: string | undefined) {
+  const { publicResources } = useRuntimeConfig().autoCrud as { publicResources?: Record<string, string[]> }
+  return publicResources?.[physicalName] ?? (exportKey ? publicResources?.[exportKey] : undefined) ?? []
 }
 
 /**
@@ -137,11 +135,15 @@ export function getSelectableFields(table: Table, context: NacQueryContext = {})
   const result: Record<string, Column> = {}
 
   const tableName = getTableName(table)
-  const isPublic = context?.isPublic
-  const publicFields = isPublic ? getPublicFields(tableName) : []
+  const exportKey = getModelExportKey(table)
+  const resourceKeys = exportKey ? [tableName, exportKey] : [tableName]
+  const columnKeys = new Set(Object.keys(allColumns))
 
-  const hiddenSet = resolveFieldList(apiHiddenFields, tableName, NAC_API_HIDDEN_FIELDS)
-  const publicSet = new Set(publicFields)
+  const isPublic = context?.isPublic
+  const publicFields = isPublic ? getPublicFields(tableName, exportKey) : []
+  const publicSet = new Set(publicFields.map(f => nacResolveFieldKey(f, columnKeys) ?? f))
+
+  const hiddenSet = resolveFieldList(apiHiddenFields, resourceKeys, NAC_API_HIDDEN_FIELDS, columnKeys)
 
   for (const key in allColumns) {
     if (hiddenSet.has(key)) continue
@@ -223,8 +225,12 @@ export async function nacGetSchemaDefinition(modelName: string): Promise<NacSche
   const shape = createInsertSchema(table).shape
 
   // modelName is already the physical (snake_case) resource key here
-  const apiHidden = resolveFieldList(autoCrud.apiHiddenFields, modelName, NAC_API_HIDDEN_FIELDS)
-  const formHidden = resolveFieldList(publicAutoCrud.formHiddenFields, modelName, NAC_FORM_HIDDEN_FIELDS)
+  const exportKey = getModelExportKey(table)
+  const resourceKeys = exportKey ? [modelName, exportKey] : [modelName]
+  const columnKeys = new Set(Object.keys(columns))
+
+  const apiHidden = resolveFieldList(autoCrud.apiHiddenFields, resourceKeys, NAC_API_HIDDEN_FIELDS, columnKeys)
+  const formHidden = resolveFieldList(publicAutoCrud.formHiddenFields, resourceKeys, NAC_FORM_HIDDEN_FIELDS, columnKeys)
   const hiddenFields = new Set([...apiHidden, ...formHidden])
 
   const fields: NacField[] = Object.entries(columns)
