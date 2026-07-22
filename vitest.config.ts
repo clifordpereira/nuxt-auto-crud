@@ -42,6 +42,7 @@ export default defineConfig({
       makeUnitProject('authz'),
       makeE2eProject('basic'),
       makeE2eProject('authz'),
+      makeE2eProject('relations'),
       await defineVitestProject({
         test: { name: 'nuxt', include: ['test/nuxt/*.{test,spec}.ts'], environment: 'nuxt' },
       }),
