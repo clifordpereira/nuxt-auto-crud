@@ -1,3 +1,36 @@
+## v2.7.0
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v2.6.4...v2.7.0)
+
+### 🚀 Enhancements
+
+- Add automated script for generating migrations freshly without worrying version incompatibilities ([c50a578](https://github.com/clifordpereira/nuxt-auto-crud/commit/c50a578))
+
+### 🩹 Fixes
+
+- Empty filter while listing relations ([1688900](https://github.com/clifordpereira/nuxt-auto-crud/commit/1688900))
+- Snake_case - camelCase inconsistencies ([66e8b4c](https://github.com/clifordpereira/nuxt-auto-crud/commit/66e8b4c))
+
+### 🏡 Chore
+
+- **release:** V2.6.4 ([20e3619](https://github.com/clifordpereira/nuxt-auto-crud/commit/20e3619))
+- Restructure folders of tests ([3b40192](https://github.com/clifordpereira/nuxt-auto-crud/commit/3b40192))
+- Keep only the minimum in child packages.json ([42fb59d](https://github.com/clifordpereira/nuxt-auto-crud/commit/42fb59d))
+- Add schema and relations file to authz fixtures ([24239c8](https://github.com/clifordpereira/nuxt-auto-crud/commit/24239c8))
+- Fine tume migrate-fresh.sh ([0702ea1](https://github.com/clifordpereira/nuxt-auto-crud/commit/0702ea1))
+- Fix lint errors ([cdd0942](https://github.com/clifordpereira/nuxt-auto-crud/commit/cdd0942))
+
+### ✅ Tests
+
+- Field-casing, status-filterig, queries, row authz ([d960a5a](https://github.com/clifordpereira/nuxt-auto-crud/commit/d960a5a))
+- Relations ([04be8be](https://github.com/clifordpereira/nuxt-auto-crud/commit/04be8be))
+- Add auth tests ([b19967c](https://github.com/clifordpereira/nuxt-auto-crud/commit/b19967c))
+- Add e2e tests for relations ([565360c](https://github.com/clifordpereira/nuxt-auto-crud/commit/565360c))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v2.6.4
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v2.6.2...v2.6.4)
