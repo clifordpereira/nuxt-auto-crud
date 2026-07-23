@@ -93,23 +93,15 @@ describe('NAC Core Queries - Consolidated Suite', () => {
   describe('nacGetRows()', () => {
     it('applies list permission logic (status OR owner) via where clause', async () => {
       mockConfig({ autoCrud: { statusFiltering: true, auth: { authorization: true, ownerKey: 'createdBy' } } })
-
-      const mockPosts = {
-        ...posts,
-        status: { name: 'status' },
-        createdBy: { name: 'createdBy' },
-      }
-
+      const mockPosts = { ...posts, status: { name: 'status' }, createdBy: { name: 'createdBy' } }
       vi.mocked(db.query.posts.findMany).mockResolvedValue([])
 
       await nacGetRows(mockPosts as unknown as NacTableWithId, {
         userId: '1',
-        resourcePermissions: ['list_active'],
+        resourcePermissions: ['list'], // was: 'list_active'
       })
 
-      expect(db.query.posts.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({ where: expect.anything() }),
-      )
+      expect(db.query.posts.findMany).toHaveBeenCalledWith(expect.objectContaining({ where: expect.anything() }))
     })
 
     it('applies list_own permission logic strictly', async () => {
@@ -148,14 +140,13 @@ describe('NAC Core Queries - Consolidated Suite', () => {
     })
 
     it('handles tables missing status/owner columns gracefully', async () => {
-      mockConfig({
-        autoCrud: { statusFiltering: true, auth: { authorization: true, ownerKey: 'createdBy' } },
-      })
-
+      mockConfig({ autoCrud: { statusFiltering: true, auth: { authorization: true, ownerKey: 'createdBy' } } })
       vi.mocked(db.query.users.findMany).mockResolvedValue([])
 
-      // 'users' fixture lacks 'status' column
-      await nacGetRows(users as unknown as NacTableWithId, { userId: '1', resourcePermissions: ['list_active'] })
+      await nacGetRows(users as unknown as NacTableWithId, {
+        userId: '1',
+        resourcePermissions: ['list'], // was: 'list_active'
+      })
 
       const callArgs = vi.mocked(db.query.users.findMany).mock.calls[0]![0]
       expect(callArgs.where).toBeUndefined()
@@ -243,7 +234,7 @@ describe('NAC Core Queries - Consolidated Suite', () => {
     })
 
     it('respects runtimeConfig ownerKey override', async () => {
-      vi.mocked(useRuntimeConfig).mockReturnValueOnce({ autoCrud: { auth: { ownerKey: 'authorId' } } } as unknown as ReturnType<typeof useRuntimeConfig>)
+      mockConfig({ autoCrud: { auth: { ownerKey: 'authorId' } } })
       vi.mocked(db.get).mockResolvedValue({ id: 1 })
 
       const mockTable = { authorId: {}, updatedBy: {}, updatedAt: {} }

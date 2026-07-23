@@ -80,21 +80,6 @@ export function nacResolveOwnershipFilter(
 }
 
 /**
- * Config-driven default: restricts to `status = 'active'` when
- * `statusFiltering` is enabled and the table has a status column.
- * Independent of who's asking — this is a feature toggle, not an
- * authorization concern.
- *
- * @internal
- */
-export function nacResolveStatusFilter(table: NacTableWithId) {
-  const isStatusFilteringEnabled = useRuntimeConfig().autoCrud.statusFiltering
-  if (!isStatusFilteringEnabled) return undefined
-  const statusCol = table.status
-  return statusCol ? eq(statusCol, 'active') : undefined
-}
-
-/**
  * Resolves list-operation authorization filters: full bypass (list_all),
  * normal listing (list — combines with the status filter above), or
  * owner-restricted (list_own). When both statusFiltering and list_own

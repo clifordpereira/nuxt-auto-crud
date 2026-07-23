@@ -116,7 +116,7 @@ For every request:
 3. **Agentic paths** (pathname includes `/_meta`): require a timing-safe-equal `token` query param matching `agenticToken`. `agenticToken` must be ≥16 chars or all tokens are rejected.
 4. **All other NAC paths**: if `auth.authentication` is on and the request is unauthenticated, the target model is extracted from the path and checked against `publicResources`. If not public, a 401 is thrown; otherwise `context.nac.isPublic = true`.
 
-Route handlers then consult `event.context.nac` to run `getVisibilityFilters()` (owner/status filtering) and `getSelectableFields()` (column hiding/public-field allow-listing).
+Route handlers then consult `event.context.nac` to run `nacResolveAuthorizationFilters()` (owner/status filtering) and `getSelectableFields()` (column hiding/public-field allow-listing).
 
 ## 6. CRUD Endpoints
 
@@ -154,7 +154,7 @@ interface NacField {
 
 ## 8. Query Engine (`queries.ts`)
 
-- `nacGetRows` — authorization gate → visibility filters (`getVisibilityFilters`) → column selection (`getSelectableFields`) → either Drizzle **relational query mode** (if `hasActiveRelations()`) or a plain `select().from().orderBy(desc(id))`.
+- `nacGetRows` — authorization gate → visibility filters (`nacResolveAuthorizationFilters`) → column selection (`getSelectableFields`) → either Drizzle **relational query mode** (if `hasActiveRelations()`) or a plain `select().from().orderBy(desc(id))`.
 - `nacGetRow` — short-circuits via `context.record` if present (avoids a duplicate DB hit); otherwise selects by numeric `id`.
 - `nacCreateRow` / `nacUpdateRow` — auto-stamp `ownerKey`/`updatedBy`/`updatedAt` when those columns exist and `context.userId` is set; MySQL and SQLite/libSQL paths diverge because MySQL's driver doesn't support `.returning()`.
 - `nacDeleteRow` — MySQL path pre-fetches the row (since MySQL can't `.returning()` on delete) before issuing the delete.
