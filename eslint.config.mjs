@@ -12,6 +12,7 @@ export default createConfigForNuxt({
       './playground',
       './test/fixtures/basic',
       './test/fixtures/authz',
+      './test/fixtures/relations',
     ],
   },
 })

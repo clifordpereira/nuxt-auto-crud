@@ -15,7 +15,7 @@ export default eventHandler(async (event) => {
   const table = nacModelTableMap[model] as NacTableWithId
   if (!table) throw new NacResourceNotFoundError(model)
 
-  const deletedRecord = await nacDeleteRow(table, id)
+  const deletedRecord = await nacDeleteRow(table, id, event.context.nac || {})
 
   const { realtime } = useRuntimeConfig().autoCrud
   if (realtime) {

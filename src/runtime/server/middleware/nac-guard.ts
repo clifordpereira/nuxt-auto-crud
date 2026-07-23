@@ -13,13 +13,12 @@ export default defineEventHandler(async (event) => {
 
   event.context.nac ||= { userId: null, isPublic: false }
 
-  // Non-agentic paths - normal auth
   if (!isAgenticPath(pathname)) {
     const isAuthEnabled = config.autoCrud.auth?.authentication
     const isUserAuthenticated = Boolean(event.context.nac?.userId)
 
     if (isAuthEnabled && !isUserAuthenticated) {
-      const model = getModelName(pathname, prefix)
+      const model = nacGetModelFromPath(pathname, prefix)
       if (model && isPublicResource(model, config.autoCrud.publicResources)) {
         event.context.nac.isPublic = true
       }
@@ -27,36 +26,39 @@ export default defineEventHandler(async (event) => {
         throw new NacAuthenticationError('Unauthorized').toH3()
       }
     }
-
     return
   }
 
-  // Agentic paths - token auth
   const token = getQuery(event).token as string
   const { agenticToken } = config.autoCrud
-
   if (!validateToken(token, agenticToken)) {
     throw new NacAuthenticationError('Invalid agentic token').toH3()
   }
 })
 
 function validateToken(token: string, agenticToken: string) {
-  // 1. Basic presence and length check
   if (!token || !agenticToken || agenticToken.length < 16) return false
-
-  // 2. Exact length match is a prerequisite for timing-safe comparison
   if (token.length !== agenticToken.length) return false
-
-  // 3. Web-standard timing-safe equality (to prevent timing attacks)
   let diff = 0
-  for (let i = 0; i < token.length; i++) {
-    diff |= token.charCodeAt(i) ^ agenticToken.charCodeAt(i)
-  }
+  for (let i = 0; i < token.length; i++) diff |= token.charCodeAt(i) ^ agenticToken.charCodeAt(i)
   return diff === 0
 }
 
-function getModelName(pathname: string, prefix: string) {
-  const regex = new RegExp(`^${prefix}/([^/]+)`)
+/**
+ * Extracts the `:model` segment from a NAC route pathname (e.g.
+ * `/api/_nac/products/5` → `'products'`). Exported so consuming apps'
+ * own middleware can determine which resource a request targets without
+ * re-implementing this parsing themselves — see the README's
+ * "Authorization Middleware" example.
+ *
+ * @public
+ */
+export function nacGetModelFromPath(pathname: string, prefix?: string) {
+  const resolvedPrefix = prefix ?? (() => {
+    const { apiBase, nacEndpointPrefix } = useRuntimeConfig().public.autoCrud
+    return apiBase || nacEndpointPrefix || '/api/_nac'
+  })()
+  const regex = new RegExp(`^${resolvedPrefix}/([^/]+)`)
   const match = pathname.match(regex)
   return match ? match[1] : null
 }

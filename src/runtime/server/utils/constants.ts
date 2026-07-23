@@ -40,3 +40,18 @@ export const NAC_FORM_READ_ONLY_FIELDS = []
  * @public
  */
 export const NAC_SYSTEM_TABLES = ['_hub_migrations', 'd1_migrations', 'sqlite_sequence']
+/**
+ * The full set of permission codes NAC's authorization layer understands.
+ * Matches the `<op>` / `<op>_own` pattern for create/read/update/delete,
+ * plus the three list-specific codes (list_all/list/list_own).
+ * @public
+ */
+export const NAC_PERMISSION_CODES = [
+  'list_all', 'list', 'list_own',
+  'create',
+  'read', 'read_own',
+  'update', 'update_own',
+  'delete', 'delete_own',
+] as const
+
+export type NacPermissionCode = typeof NAC_PERMISSION_CODES[number]

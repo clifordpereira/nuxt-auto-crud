@@ -1,4 +1,3 @@
-// test/unit/authz/get-rows-authorization.test.ts
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { useRuntimeConfig } from '#imports'
 import { nacGetRows } from '../../../src/runtime/server/utils/queries'
@@ -41,21 +40,35 @@ describe('nacGetRows() — authorization filtering (authz fixture: users)', () =
     vi.mocked(nacGetTableQueryConfig).mockReturnValue({})
   })
 
-  it('applies hybrid status-OR-owner filter when list_active is granted', async () => {
+  it('applies hybrid status-OR-owner filter when "list" is granted', async () => {
+    // 'list' (not 'list_active') is the correct code per the schema's
+    // permissions.code enum — see nacResolveAuthorizationFilters.
     mockConfig({ autoCrud: { statusFiltering: true, auth: { authorization: true, ownerKey: 'createdBy' } } })
     vi.mocked(db.query.users.findMany).mockResolvedValue([])
 
-    await nacGetRows(users as unknown as NacTableWithId, { userId: '1', resourcePermissions: ['list_active'] })
+    await nacGetRows(users as unknown as NacTableWithId, { userId: '1', resourcePermissions: ['list'] })
 
     expect(db.query.users.findMany).toHaveBeenCalledWith(expect.objectContaining({ where: expect.anything() }))
   })
 
-  it('applies strict owner-only filter when only list_own is granted', async () => {
+  it('applies strict owner-only filter when only "list_own" is granted', async () => {
     mockConfig({ autoCrud: { statusFiltering: false, auth: { authorization: true, ownerKey: 'createdBy' } } })
     vi.mocked(db.query.users.findMany).mockResolvedValue([])
 
     await nacGetRows(users as unknown as NacTableWithId, { userId: '1', resourcePermissions: ['list_own'] })
 
     expect(db.query.users.findMany).toHaveBeenCalledWith(expect.objectContaining({ where: expect.anything() }))
+  })
+
+  it('applies no filter when "list_all" is granted, even with statusFiltering on', async () => {
+    // list_all is a full bypass — confirms it isn't accidentally caught by
+    // the hybrid statusFiltering+list branch.
+    mockConfig({ autoCrud: { statusFiltering: true, auth: { authorization: true, ownerKey: 'createdBy' } } })
+    vi.mocked(db.query.users.findMany).mockResolvedValue([])
+
+    await nacGetRows(users as unknown as NacTableWithId, { userId: '1', resourcePermissions: ['list_all'] })
+
+    const callArgs = vi.mocked(db.query.users.findMany).mock.calls[0]![0]
+    expect(callArgs.where).toBeUndefined()
   })
 })

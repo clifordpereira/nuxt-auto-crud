@@ -8,7 +8,10 @@ await setup({
   browser: false,
 })
 
-const seedAuthHeaders = { 'x-test-user-id': '1' }
+const seedAuthHeaders = {
+  'x-test-user-id': '1',
+  'x-test-permissions': 'list_all,create',
+}
 
 beforeAll(async () => {
   const existing = await $fetch<Record<string, unknown>[]>('/api/_nac/roles', {
