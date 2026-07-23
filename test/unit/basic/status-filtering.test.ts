@@ -1,6 +1,6 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { useRuntimeConfig } from '#imports'
-import { nacGetRows, getVisibilityFilters } from '../../../src/runtime/server/utils/queries'
+import { nacGetRows, nacResolveAuthorizationFilters } from '../../../src/runtime/server/utils/queries'
 import type { NacTableWithId } from '../../../src/runtime/server/types'
 import { posts, users } from '#nac/schema'
 import { nacGetTableQueryConfig, getNacDb, isMysql, hasActiveRelations } from '#nac/db'
@@ -26,7 +26,7 @@ vi.mock('drizzle-orm', async () => {
   return { ...actual, getColumns: vi.fn(table => table), or: actual.or, and: actual.and, eq: actual.eq, desc: actual.desc }
 })
 
-describe('getVisibilityFilters() — pure status filtering (statusFiltering only, authorization disabled)', () => {
+describe('nacResolveAuthorizationFilters() — pure status filtering (statusFiltering only, authorization disabled)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockConfig()
@@ -34,18 +34,18 @@ describe('getVisibilityFilters() — pure status filtering (statusFiltering only
 
   it('returns no filters when statusFiltering is disabled', () => {
     mockConfig({ autoCrud: { statusFiltering: false } })
-    expect(getVisibilityFilters(posts as unknown as NacTableWithId, {})).toEqual([])
+    expect(nacResolveAuthorizationFilters(posts as unknown as NacTableWithId, {})).toEqual([])
   })
 
   it('filters to active records when statusFiltering is enabled and the table has a status column', () => {
     mockConfig({ autoCrud: { statusFiltering: true } })
-    expect(getVisibilityFilters(posts as unknown as NacTableWithId, {})).toHaveLength(1)
+    expect(nacResolveAuthorizationFilters(posts as unknown as NacTableWithId, {})).toHaveLength(1)
   })
 
   it('applies no filter, gracefully, when statusFiltering is enabled but the table has no status column', () => {
     // 'users' (basic fixture) has no status column
     mockConfig({ autoCrud: { statusFiltering: true } })
-    expect(getVisibilityFilters(users as unknown as NacTableWithId, {})).toEqual([])
+    expect(nacResolveAuthorizationFilters(users as unknown as NacTableWithId, {})).toEqual([])
   })
 })
 
