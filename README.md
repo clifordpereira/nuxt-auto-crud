@@ -11,6 +11,43 @@ A Nuxt.js module providing dynamic **RESTful CRUD APIs** derived directly from y
 * **Constant Bundle Size**: Since no code is generated, the bundle size remains virtually identical whether you have one table or one hundred (scaling only with your schema definitions).
 ---
 
+---
+
+## ⚠️ Upgrading to 3.0.0 — Breaking Change
+
+**`GET` list endpoints (`/api/_nac/:model`) no longer return a bare array.** They now return:
+
+```typescript
+interface NacPaginatedResponse<T> {
+  data: T[]
+  meta: {
+    mode: 'offset' | 'simple' | 'cursor'
+    perPage: number
+    total?: number       // only present when the request includes ?total=true
+    page?: number         // present in 'offset' and 'simple' modes
+    nextCursor?: string   // present in 'cursor' mode, when more results exist
+    hasMore: boolean
+  }
+}
+```
+
+**Migration:** anywhere your frontend does `const items = await $fetch('/api/_nac/products')`, change it to:
+```typescript
+const { data: items } = await $fetch('/api/_nac/products')
+```
+
+This does **not** affect `GET /:model/:id`, `POST`, `PATCH`, or `DELETE` — those still return a single record object directly, unchanged.
+
+**Why:** a bare array gave clients no way to know if more results existed without over-fetching, and no way to page reliably. 
+
+**Fixes:**
+* CRUD authorization (`create`/`read`/`update`/`delete`, and their `_own` variants) was previously enforced only on list operations — `nacGetRow`/`nacCreateRow`/`nacUpdateRow`/`nacDeleteRow` now consistently check permissions too.
+* The `list_active` permission code has been renamed to `list`, matching the intended vocabulary (`list_all` / `list` / `list_own`) — update any `resourcePermissions` arrays your app supplies.
+
+See [🛡 Filtering & Performance Optimization](#-filtering--performance-optimization) for the full CRUD permission model, and [📄 Pagination & Filtering](#-pagination--filtering) for the new response shape's fields.
+
+---
+
 ## Supported Databases
 * **SQLite (libSQL)**
 * **MySQL**
@@ -125,6 +162,37 @@ NAC relies on specific naming conventions to enable zero-config relations and dy
 | **Fetch One** | `GET` | `/api/_nac/products/1` | Details of product with `id: 1` |
 | **Update** | `PATCH` | `/api/_nac/products/1` | Partial update to product `1` |
 | **Delete** | `DELETE` | `/api/_nac/products/1` | Product `1` removed from DB |
+
+---
+
+## 📄 Pagination & Filtering
+
+`GET /api/_nac/:model` accepts query-string params for pagination and simple equality filtering.
+
+### Pagination modes
+
+| Mode | Triggered by | `meta` fields |
+| --- | --- | --- |
+| `simple` | No pagination params at all | `perPage`, `hasMore`, `page` |
+| `offset` | `?page=` or `?offset=` present | `perPage`, `hasMore`, `page` |
+| `cursor` | `?cursor=` present (and the table has an `id` column) | `perPage`, `hasMore`, `nextCursor` |
+
+**Examples:**
+`GET /api/_nac/products?limit=20` → mode: 'simple'
+`GET /api/_nac/products?page=2&limit=20` → mode: 'offset'
+`GET /api/_nac/products?offset=40&limit=20` → mode: 'offset'
+`GET /api/_nac/products?cursor=118&limit=20` → mode: 'cursor'
+
+**Fields:**
+* **`limit`** — defaults to 50, capped at 200.
+* **`hasMore`** — always present; computed by fetching one row past `limit`, at no extra query cost.
+* **`total`** — a `COUNT(*)` query, so it's **opt-in only**: add `?total=true` to any request, regardless of mode, to include it.
+* **Cursor pagination** returns `id`-descending results by default and only supports that default ordering — a resource whose `nacTableQueryConfig` sets a custom `orderBy` should use `offset`/`page` instead, since a cursor built against a different sort order would return a mismatched page.
+* Cursor mode currently returns `nextCursor` only (forward paging). Backward navigation is left to the client keeping its own history of visited cursors — the same pattern used by Stripe and GitHub's REST APIs.
+
+### Equality filtering
+
+Any other query param matching a visible column name is applied as an equality filter, e.g. `?status=active`. Filters are resolved only against fields the caller can actually see (post hidden-field / public-resource narrowing) — an unrecognized or hidden key is silently ignored, never partially honored, so filtering can't be used to infer a hidden field's value.
 
 ---
 
@@ -290,34 +358,54 @@ apiWriteProtectedFields: {
 
 ## 🛡 Filtering & Performance Optimization
 
+### CRUD Authorization
+
+When `auth.authorization` is enabled, every operation is gated by `event.context.nac.resourcePermissions` — a flat array of codes scoped to the current resource, supplied by your app's own middleware (see [Authorization Middleware](#authorization-middleware) below).
+
+| Code | Grants |
+| --- | --- |
+| `create` | Create records |
+| `read` / `read_own` | Read any record / only records you own |
+| `update` / `update_own` | Update any record / only records you own |
+| `delete` / `delete_own` | Delete any record / only records you own |
+| `list_all` | List all records, full bypass |
+| `list` | List records, respecting `statusFiltering` if enabled |
+| `list_own` | List only records you own |
+
+A caller with neither the full nor `_own` code for an operation is rejected with `403`. For `_own`-scoped read/update/delete, a request against a record the caller doesn't own returns **`404`, not `403`** — this is deliberate: it never confirms a not-owned record's existence to a caller who isn't authorized to see it.
+
 ### Automatic Status Filtering
 
-If `statusFiltering` is enabled, **nac** applies global visibility constraints. When a status column exists, queries are automatically restricted to `active` records. This logic integrates with the authorization layer, allowing users to see their own records (regardless of status) if they possess the `list_active` permission.
+If `statusFiltering` is enabled, **nac** applies global visibility constraints. When a status column exists, queries are automatically restricted to `active` records. When both `statusFiltering` and the `list` permission apply together, hybrid OR logic is used: a caller sees all active records OR any record they own, regardless of its status.
 
-### Ownership & Permissions
+### Authorization Middleware
 
-While the implementing app handles the authentication & authorization layer, **nac** provides a standardized way to enforce record ownership and granular access.
-
-If your middleware populates `event.context.nac` with `resourcePermissions`, **nac** automatically injects the necessary SQL filters.
-
-**Example: Restricting users to their own records**
-If the permissions array includes `'list_own'`, **nac** appends a filter where `ownerKey` (defaulting to `createdBy`) matches the `userId`.
-
-If `list_active` is present, it applies a hybrid OR logic: users can see all active records OR any record they own, regardless of its status.
+Populate `event.context.nac` from your own app's session/permission logic, before NAC's own guard runs. `nacGetModelFromPath` (exported from `nuxt-auto-crud`) resolves the `:model` a request targets, so your middleware never needs to re-implement NAC's route parsing:
 
 ```typescript
-// Example: Setting context in your Auth Middleware
-event.context.nac = {
-  userId: user.id,
-  resourcePermissions: user.permissions[model], // e.g., ['list_own', 'list_active']
-  record: null, // Optional: Pre-fetched record to prevent double-hitting the DB
-}
+// server/middleware/00.nac-permissions.ts
+// import { nacGetModelFromPath } from 'nuxt-auto-crud'
 
+export default defineEventHandler(async (event) => {
+  const model = nacGetModelFromPath(event.path)
+  if (!model) return // not a NAC route
+
+  const user = await resolveSessionUser(event) // your own session logic, eg: getUserSession() from nuxt-auth-utils
+  if (!user) return
+
+  // Merge, don't overwrite — NAC's own guard may already have set
+  // event.context.nac.isPublic before or after this runs.
+  event.context.nac = {
+    ...event.context.nac,
+    userId: user.id,
+    resourcePermissions: await resolvePermissionsForModel(user, model), // eg: user.permissions[model] (store permissions in user on login)
+  }
+})
 ```
 
 ### Optimization: Skip Redundant Fetches
 
-If your middleware has already fetched the record, pass it to `event.context.nac.record` (as shown above). **nac** will use this object instead of executing an additional database query.
+If your middleware has already fetched the record, pass it to `event.context.nac.record` — **nac** will use this object instead of executing an additional database query.
 
 ---
 
