@@ -1,18 +1,20 @@
 import { useRuntimeConfig } from '#imports'
-import { type Table, type Column, eq, lt, and, or, getColumns, desc, getTableName } from 'drizzle-orm'
+import { type Table, type Column, type SQL, sql, eq, lt, and, or, getColumns, desc, getTableName } from 'drizzle-orm'
 import type { QueryObject } from 'h3'
+
+import type { NacPaginatedResponse, NacPaginationMeta } from '../../shared/utils/types'
 
 import { NacDeletionFailedError, NacInsertionFailedError, NacRecordNotFoundError, NacResourceNotFoundError, NacUnauthorizedAccessError, NacUpdateFailedError } from '../exceptions'
 import { getSelectableFields, getModelExportKey } from './modelMapper'
 import { resolveFieldList } from './field-resolution'
 import { NAC_API_HIDDEN_FIELDS } from './constants'
-import { nacResolvePagination, nacResolveCursorPagination } from './pagination'
+import { nacResolvePagination, nacResolveCursorPagination, nacSplitPage } from './pagination'
 
 import type { NacQueryContext } from '../../shared/utils/types'
 import type { NacTableWithId } from '../types'
 import { nacGetTableQueryConfig, getNacDb, isMysql, hasActiveRelations } from '#nac/db'
 
-const NAC_RESERVED_QUERY_KEYS = new Set(['limit', 'offset', 'page', 'cursor'])
+const NAC_RESERVED_QUERY_KEYS = new Set(['limit', 'offset', 'page', 'cursor', 'total'])
 
 type NacCrudOperation = 'create' | 'read' | 'update' | 'delete'
 
@@ -179,8 +181,21 @@ export function getEqualityFilters(query: QueryObject, selectableFields: Record<
 /*                                   CRUD                                     */
 /* -------------------------------------------------------------------------- */
 
+/** @internal — COUNT(*) query, honoring the same filters as the main fetch */
+async function nacCountRows(table: NacTableWithId, filters: (SQL | undefined)[]): Promise<number> {
+  const db = await getNacDb()
+  let countQuery = db.select({ count: sql<number>`count(*)` }).from(table).$dynamic()
+  if (filters.length > 0) countQuery = countQuery.where(and(...filters))
+  const row = isMysql() ? (await countQuery)[0] : await countQuery.get()
+  return Number(row?.count ?? 0)
+}
+
 /** @public */
-export async function nacGetRows(table: NacTableWithId, context: NacQueryContext = {}, query: QueryObject = {}) {
+export async function nacGetRows(
+  table: NacTableWithId,
+  context: NacQueryContext = {},
+  query: QueryObject = {},
+): Promise<NacPaginatedResponse<Record<string, unknown>>> {
   const isAuthorizationEnabled = useRuntimeConfig().autoCrud.auth?.authorization
   if (isAuthorizationEnabled && !context.isPublic && !hasAnyListPermissions(context)) {
     throw new NacUnauthorizedAccessError()
@@ -191,27 +206,29 @@ export async function nacGetRows(table: NacTableWithId, context: NacQueryContext
   const allColumns = getColumns(table)
   const hasIdColumn = 'id' in allColumns
 
-  // Cursor pagination requires an id column to seek against — falls back
-  // to null (→ offset-based) on tables without one.
   const cursorPagination = hasIdColumn ? nacResolveCursorPagination(query) : null
 
   const filters = [
     ...nacResolveAuthorizationFilters(table, context),
     ...getEqualityFilters(query, fields),
   ]
-  if (cursorPagination) {
-    filters.push(lt(table.id, cursorPagination.cursor))
-  }
+  if (cursorPagination) filters.push(lt(table.id, cursorPagination.cursor))
 
-  // Cursor and offset pagination are mutually exclusive per request —
-  // when a valid cursor is present, offset/page params are ignored.
   const { limit, offset } = cursorPagination
     ? { limit: cursorPagination.limit, offset: 0 }
     : nacResolvePagination(query)
 
-  const queryOptions = exportKey ? (nacGetTableQueryConfig(exportKey) ?? {}) : {}
+  // Fetch one extra row past `limit` to detect hasMore without a second query.
+  const fetchLimit = limit + 1
 
+  const mode: NacPaginationMeta['mode'] = cursorPagination
+    ? 'cursor'
+    : (query.page !== undefined || query.offset !== undefined) ? 'offset' : 'simple'
+
+  const queryOptions = exportKey ? (nacGetTableQueryConfig(exportKey) ?? {}) : {}
   const db = await getNacDb()
+
+  let rows: Record<string, unknown>[]
 
   if (hasActiveRelations()) {
     if (!exportKey || !db.query[exportKey]) {
@@ -233,23 +250,41 @@ export async function nacGetRows(table: NacTableWithId, context: NacQueryContext
       Object.entries(queryOptions.columns ?? {}).filter(([key]) => !hiddenSet.has(key)),
     )
 
-    return await db.query[exportKey].findMany({
+    rows = await db.query[exportKey].findMany({
       ...(hasIdColumn && !queryOptions.orderBy ? { orderBy: { id: 'desc' } } : {}),
       ...queryOptions,
       columns: { ...columns, ...safeQueryColumns },
-      limit,
-      ...(cursorPagination ? {} : { offset }), // omit entirely for cursor mode, not offset: 0
+      limit: fetchLimit,
+      ...(cursorPagination ? {} : { offset }),
       ...(filters.length > 0 ? { where: and(...filters) } : {}),
     })
   }
+  else {
+    let dynamicQuery = db.select(fields).from(table).$dynamic()
+    if (hasIdColumn) dynamicQuery = dynamicQuery.orderBy(desc(table.id))
+    if (filters.length > 0) dynamicQuery = dynamicQuery.where(and(...filters))
+    dynamicQuery = dynamicQuery.limit(fetchLimit)
+    if (!cursorPagination) dynamicQuery = dynamicQuery.offset(offset)
 
-  let dynamicQuery = db.select(fields).from(table).$dynamic()
-  if (hasIdColumn) dynamicQuery = dynamicQuery.orderBy(desc(table.id))
-  if (filters.length > 0) dynamicQuery = dynamicQuery.where(and(...filters))
-  dynamicQuery = dynamicQuery.limit(limit)
-  if (!cursorPagination) dynamicQuery = dynamicQuery.offset(offset)
+    rows = await dynamicQuery.all()
+  }
 
-  return await dynamicQuery.all()
+  const { data, hasMore } = nacSplitPage(rows, limit)
+
+  const meta: NacPaginationMeta = { mode, perPage: limit, hasMore }
+
+  if (mode !== 'cursor') {
+    meta.page = Math.floor(offset / limit) + 1
+  }
+  if (mode === 'cursor' && hasMore) {
+    const lastRow = data[data.length - 1]
+    if (lastRow && 'id' in lastRow) meta.nextCursor = String(lastRow.id)
+  }
+  if (query.total === 'true') {
+    meta.total = await nacCountRows(table, filters)
+  }
+
+  return { data, meta }
 }
 
 /** @public */

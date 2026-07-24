@@ -57,3 +57,15 @@ export function nacResolveCursorPagination(query: Record<string, unknown>): NacC
 
   return { cursor, limit }
 }
+
+/**
+ * Splits a fetched row set (fetched with limit+1 rows) into the real page
+ * of `limit` rows plus a hasMore flag — avoids a separate COUNT-style
+ * query just to know whether another page exists.
+ */
+export function nacSplitPage<T>(rows: T[], limit: number): { data: T[], hasMore: boolean } {
+  if (rows.length > limit) {
+    return { data: rows.slice(0, limit), hasMore: true }
+  }
+  return { data: rows, hasMore: false }
+}

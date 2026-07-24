@@ -39,7 +39,7 @@ describe('nacGetRows() — pagination (relations fixture, relational branch)', (
     await nacGetRows(products as unknown as NacTableWithId, {}, { limit: '3', page: '2' })
 
     expect(db.query.products.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({ limit: 3, offset: 3, orderBy: { id: 'desc' } }),
+      expect.objectContaining({ limit: 4, offset: 3, orderBy: { id: 'desc' } }),
     )
   })
 
@@ -49,7 +49,7 @@ describe('nacGetRows() — pagination (relations fixture, relational branch)', (
     await nacGetRows(products as unknown as NacTableWithId, {}, {})
 
     expect(db.query.products.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({ limit: 50, offset: 0 }),
+      expect.objectContaining({ limit: 51, offset: 0 }),
     )
   })
 })

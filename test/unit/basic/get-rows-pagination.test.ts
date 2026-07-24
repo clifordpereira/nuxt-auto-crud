@@ -43,25 +43,25 @@ describe('nacGetRows() — pagination (basic fixture, plain-select branch)', () 
 
   it('applies the default limit/offset when no query params are given', async () => {
     await nacGetRows(posts as unknown as NacTableWithId, {}, {})
-    expect(db.limit).toHaveBeenCalledWith(50)
+    expect(db.limit).toHaveBeenCalledWith(51) // was: 50
     expect(db.offset).toHaveBeenCalledWith(0)
   })
 
   it('applies an explicit limit/offset from query params', async () => {
     await nacGetRows(posts as unknown as NacTableWithId, {}, { limit: '5', offset: '15' })
-    expect(db.limit).toHaveBeenCalledWith(5)
+    expect(db.limit).toHaveBeenCalledWith(6) // was: 5
     expect(db.offset).toHaveBeenCalledWith(15)
   })
 
   it('applies page-based pagination correctly', async () => {
     await nacGetRows(posts as unknown as NacTableWithId, {}, { page: '2', limit: '10' })
-    expect(db.limit).toHaveBeenCalledWith(10)
+    expect(db.limit).toHaveBeenCalledWith(11) // was: 10
     expect(db.offset).toHaveBeenCalledWith(10)
   })
 
   it('uses a cursor filter and skips offset entirely when a valid cursor is given', async () => {
     await nacGetRows(posts as unknown as NacTableWithId, {}, { cursor: '10', limit: '5' })
-    expect(db.limit).toHaveBeenCalledWith(5)
+    expect(db.limit).toHaveBeenCalledWith(6)
     expect(db.offset).not.toHaveBeenCalled()
     expect(db.where).toHaveBeenCalled()
   })

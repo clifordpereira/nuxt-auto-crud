@@ -87,3 +87,48 @@ export interface NacQueryContext {
    */
   isPublic?: boolean
 }
+
+export interface NacPaginationMeta {
+  mode: 'offset' | 'simple' | 'cursor'
+  perPage: number
+  total?: number
+  page?: number
+  nextCursor?: string
+  hasMore: boolean
+}
+
+/**
+ * Represents metadata for a paginated database response.
+ * This interface is intentionally kept lightweight and flexible
+ * to accommodate different pagination strategies (offset, simple, cursor).
+ *
+ * @template T - The type of the data items.
+ *
+ * @property {"offset" | "simple" | "cursor"} mode - The pagination strategy used.
+ * @property {number} perPage - The number of items per page.
+ * @property {number} [total] - The total number of items available.
+ * @property {number} [page] - The current page number (for simple pagination).
+ * @property {string} [nextCursor] - A cursor value for fetching the next page (for cursor pagination).
+ * @property {boolean} hasMore - Indicates if there are more pages available.
+ */
+export interface NacPaginationMeta {
+  mode: "offset" | "simple" | "cursor"
+  perPage: number
+  total?: number
+  page?: number
+  nextCursor?: string
+  hasMore: boolean
+}
+
+/**
+ * Represents a paginated response containing data records and pagination metadata.
+ *
+ * @template T - The type of the data records.
+ *
+ * @property {T[]} data - An array of data records.
+ * @property {NacPaginationMeta} meta - Pagination metadata.
+ */
+export interface NacPaginatedResponse<T> {
+  data: T[]
+  meta: NacPaginationMeta
+}

@@ -24,9 +24,9 @@ describe('NAC: Basic Fixture Lifecycle', async () => {
   })
 
   it('GET: lists records with default ordering', async () => {
-    const res = await $fetch<{ id: number }[]>(`${apiBase}/${model}`)
-    expect(Array.isArray(res)).toBe(true)
-    expect(res.find(r => r.id === recordId)).toBeDefined()
+    const { data } = await $fetch<{ data: { id: number }[] }>(`${apiBase}/${model}`)
+    expect(Array.isArray(data)).toBe(true)
+    expect(data.find(r => r.id === recordId)).toBeDefined()
   })
 
   it('PATCH: updates record and returns sanitized data', async () => {

@@ -6,31 +6,27 @@ describe('NAC: Public Resources & Auth Guard', () => {
 
   it('1) POST & GET: ensures user exists and validates public fields', async () => {
     const payload = {
-      role_id: 1,
       name: 'Cliford Pereira',
       email: 'cliford@clifland.com',
     }
 
-    // 1. Check if user exists (Idempotency check)
-    const existing = await $fetch<Record<string, unknown>[]>(`${apiBase}/users?email=${payload.email}`)
+    // GET /users?email=... is a list endpoint — wrapped in {data, meta}
+    const { data: existing } = await $fetch<{ data: Record<string, unknown>[] }>(`${apiBase}/users?email=${payload.email}`)
 
     if (existing.length === 0) {
-      // 2. Insert only if missing
       await $fetch(`${apiBase}/users`, {
         method: 'POST',
         body: payload,
       })
     }
 
-    // 3. Retrieve and Validate
-    const res = await $fetch<Record<string, unknown>[]>(`${apiBase}/users`)
+    const { data: res } = await $fetch<{ data: Record<string, unknown>[] }>(`${apiBase}/users`)
     const user = res.find(u => u.email === payload.email)
 
     expect(user).toBeDefined()
     if (!user) throw new Error('User not found')
     const keys = Object.keys(user)
 
-    // Verify core visibility rules (Drizzle-Zod / nuxt.config.ts)
     expect(keys).toEqual(expect.arrayContaining(['id', 'name', 'email']))
     expect(keys).not.toEqual(expect.arrayContaining(['password', 'createdAt', 'updatedAt']))
   })
@@ -48,9 +44,7 @@ describe('NAC: Public Resources & Auth Guard', () => {
   })
 
   it('3) GET: public response strictly respects apiHiddenFields (Security Layering)', async () => {
-    // Even if 'password' was accidentally added to publicResources.users,
-    // getSelectableFields processes hiddenSet first.
-    const res = await $fetch<Record<string, unknown>[]>(`${apiBase}/users`)
+    const { data: res } = await $fetch<{ data: Record<string, unknown>[] }>(`${apiBase}/users`)
     const firstUser = res[0]
 
     expect(firstUser).not.toHaveProperty('password')

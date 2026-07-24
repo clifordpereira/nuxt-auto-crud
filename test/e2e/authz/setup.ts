@@ -14,7 +14,7 @@ const seedAuthHeaders = {
 }
 
 beforeAll(async () => {
-  const existing = await $fetch<Record<string, unknown>[]>('/api/_nac/roles', {
+  const { data: existing } = await $fetch<{ data: Record<string, unknown>[] }>('/api/_nac/roles', {
     headers: seedAuthHeaders,
   })
   if (existing.length === 0) {

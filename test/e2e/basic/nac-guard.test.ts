@@ -41,8 +41,9 @@ describe('NAC: Agentic Guard Security', () => {
   })
 
   it('PASS: does not block standard CRUD endpoints', async () => {
-    // Standard GET list should not be intercepted by nac-guard
-    const res = await $fetch(`/api/_nac/posts`)
-    expect(Array.isArray(res)).toBe(true)
+    // /_meta is unaffected — it's a single manifest object, not a list
+    // endpoint, so it was never wrapped in {data, meta} and needs no change.
+    const { data } = await $fetch<{ data: unknown[] }>(`/api/_nac/posts`)
+    expect(Array.isArray(data)).toBe(true)
   })
 })
