@@ -29,8 +29,12 @@
       ]
     }
   },
+  "bin": {
+    "nac-migrate-fresh": "./bin/migrate-fresh.sh"
+  },
   "files": [
-    "dist"
+    "dist",
+    "bin"
   ],
   "workspaces": [
     "playground"

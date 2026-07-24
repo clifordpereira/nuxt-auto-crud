@@ -6,7 +6,7 @@ A Nuxt.js module providing dynamic **RESTful CRUD APIs** derived directly from y
 
 ## 🚀 Core Features
 
-* **Zero-Codegen Dynamic RESTful CRUD APIs**: nuxt-auto-crud leverages Drizzle ORM, Zod, Nuxt, and Nitro to eliminate the need for manual CRUD coding.
+* **Zero-Codegen Dynamic RESTful CRUD APIs**: nuxt-auto-crud leverages Drizzle ORM, Zod, Nuxt, and Ni eliminate the need for manual CRUD coding.
 * **Single Source of Truth (SSOT)**: Your Drizzle schemas (`server/db/schema`) define the entire API structure and validation.
 * **Constant Bundle Size**: Since no code is generated, the bundle size remains virtually identical whether you have one table or one hundred (scaling only with your schema definitions).
 ---
@@ -505,3 +505,14 @@ export const nacTableQueryConfig: Record<string, DBQueryConfig> = {
 > ⚠️ **Casing note:** `nacTableQueryConfig` keys are matched primarily by the camelCase schema export name (e.g. `roleResourcePermissions`), matching Drizzle's `db.query[...]` API — but NAC also falls back to the physical snake_case table name (e.g. `role_resource_permissions`) if no camelCase entry is found, so either form works here too. This matches the same casing flexibility as `apiHiddenFields`/`apiWriteProtectedFields`'s `resources` keys (see [Per-Resource Field Overrides](#per-resource-field-overrides) above) — you no longer need to track which casing rule applies to which config surface.
 
 ---
+
+## Troubleshooting
+### For apps using `nuxt-auto-crud`
+
+If you hit the same `drizzle-kit`/`drizzle-orm` version mismatch in your own project, a bun-based fixer script ships with this package:
+
+```bash
+npx nac-migrate-fresh
+```
+
+Run it from your app's root (where your `bun.lock` lives). It's bun-specific — see the script's own header comment (`node_modules/.bin/nac-migrate-fresh` after install, or view it [on GitHub](https://github.com/clifordpereira/nuxt-auto-crud/blob/main/bin/migrate-fresh.sh)) for more details.

@@ -2,6 +2,7 @@ import { defineEventHandler, getQuery } from 'h3'
 import { useRuntimeConfig } from '#imports'
 
 import { NacAuthenticationError } from '../exceptions'
+import { nacGetModelFromPath } from '../utils/modelMapper'
 
 export default defineEventHandler(async (event) => {
   const pathname = new URL(event.path, 'http://internal').pathname
@@ -42,25 +43,6 @@ function validateToken(token: string, agenticToken: string) {
   let diff = 0
   for (let i = 0; i < token.length; i++) diff |= token.charCodeAt(i) ^ agenticToken.charCodeAt(i)
   return diff === 0
-}
-
-/**
- * Extracts the `:model` segment from a NAC route pathname (e.g.
- * `/api/_nac/products/5` → `'products'`). Exported so consuming apps'
- * own middleware can determine which resource a request targets without
- * re-implementing this parsing themselves — see the README's
- * "Authorization Middleware" example.
- *
- * @public
- */
-export function nacGetModelFromPath(pathname: string, prefix?: string) {
-  const resolvedPrefix = prefix ?? (() => {
-    const { apiBase, nacEndpointPrefix } = useRuntimeConfig().public.autoCrud
-    return apiBase || nacEndpointPrefix || '/api/_nac'
-  })()
-  const regex = new RegExp(`^${resolvedPrefix}/([^/]+)`)
-  const match = pathname.match(regex)
-  return match ? match[1] : null
 }
 
 function isPublicResource(model: string, publicResources: Record<string, string[]> = {}) {

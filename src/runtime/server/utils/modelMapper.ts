@@ -13,6 +13,28 @@ import { nacResolveFieldKey, resolveFieldList } from './field-resolution'
 import { NacResourceNotFoundError } from '../exceptions'
 import { nacGetTableConfigResolver } from './db'
 
+
+
+/**
+ * Extracts the `:model` segment from a NAC route pathname (e.g.
+ * `/api/_nac/products/5` → `'products'`). Exported so consuming apps'
+ * own middleware can determine which resource a request targets without
+ * re-implementing this parsing themselves — see the README's
+ * "Authorization Middleware" example.
+ *
+ * @public
+ */
+export function nacGetModelFromPath(pathname: string, prefix?: string) {
+  const resolvedPrefix = prefix ?? (() => {
+    const { apiBase, nacEndpointPrefix } = useRuntimeConfig().public.autoCrud
+    return apiBase || nacEndpointPrefix || '/api/_nac'
+  })()
+  const regex = new RegExp(`^${resolvedPrefix}/([^/]+)`)
+  const match = pathname.match(regex)
+  return match ? match[1] : null
+}
+
+
 /* -------------------------------------------------------------------------- */
 /*                              TABLE MAP (ROOT)                              */
 /* -------------------------------------------------------------------------- */
