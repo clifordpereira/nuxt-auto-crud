@@ -58,4 +58,21 @@ describe('nacGetRows() — pagination (basic fixture, plain-select branch)', () 
     expect(db.limit).toHaveBeenCalledWith(10)
     expect(db.offset).toHaveBeenCalledWith(10)
   })
+
+  it('uses a cursor filter and skips offset entirely when a valid cursor is given', async () => {
+    await nacGetRows(posts as unknown as NacTableWithId, {}, { cursor: '10', limit: '5' })
+    expect(db.limit).toHaveBeenCalledWith(5)
+    expect(db.offset).not.toHaveBeenCalled()
+    expect(db.where).toHaveBeenCalled()
+  })
+
+  it('ignores offset/page params when a cursor is also present', async () => {
+    await nacGetRows(posts as unknown as NacTableWithId, {}, { cursor: '10', offset: '999', page: '5' })
+    expect(db.offset).not.toHaveBeenCalled()
+  })
+
+  it('falls back to offset-based pagination when no cursor is given', async () => {
+    await nacGetRows(posts as unknown as NacTableWithId, {}, { limit: '5' })
+    expect(db.offset).toHaveBeenCalledWith(0)
+  })
 })

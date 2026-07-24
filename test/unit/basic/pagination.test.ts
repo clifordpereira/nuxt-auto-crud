@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { nacResolvePagination } from '../../../src/runtime/server/utils/pagination'
+import { nacResolvePagination, nacResolveCursorPagination } from '../../../src/runtime/server/utils/pagination'
 
 describe('nacResolvePagination()', () => {
   it('defaults to limit 50, offset 0 with no query params', () => {
@@ -40,5 +40,35 @@ describe('nacResolvePagination()', () => {
 
   it('ignores page 0 or negative page, falling back to offset logic', () => {
     expect(nacResolvePagination({ page: '0', offset: '15' })).toEqual({ limit: 50, offset: 15 })
+  })
+})
+
+describe('nacResolveCursorPagination()', () => {
+  it('returns null when no cursor param is present', () => {
+    expect(nacResolveCursorPagination({})).toBeNull()
+  })
+
+  it('returns null for an empty-string cursor', () => {
+    expect(nacResolveCursorPagination({ cursor: '' })).toBeNull()
+  })
+
+  it('returns null for a non-numeric cursor', () => {
+    expect(nacResolveCursorPagination({ cursor: 'not-a-number' })).toBeNull()
+  })
+
+  it('resolves a valid cursor with the default limit', () => {
+    expect(nacResolveCursorPagination({ cursor: '42' })).toEqual({ cursor: 42, limit: 50 })
+  })
+
+  it('respects an explicit limit under the cap', () => {
+    expect(nacResolveCursorPagination({ cursor: '42', limit: '10' })).toEqual({ cursor: 42, limit: 10 })
+  })
+
+  it('caps limit at 200 even when a higher value is requested', () => {
+    expect(nacResolveCursorPagination({ cursor: '42', limit: '9999' })).toEqual({ cursor: 42, limit: 200 })
+  })
+
+  it('falls back to the default limit for an invalid limit', () => {
+    expect(nacResolveCursorPagination({ cursor: '42', limit: 'bogus' })).toEqual({ cursor: 42, limit: 50 })
   })
 })

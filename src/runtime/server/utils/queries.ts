@@ -1,18 +1,18 @@
 import { useRuntimeConfig } from '#imports'
-import { type Table, type Column, eq, and, or, getColumns, desc } from 'drizzle-orm'
+import { type Table, type Column, eq, lt, and, or, getColumns, desc, getTableName } from 'drizzle-orm'
 import type { QueryObject } from 'h3'
 
 import { NacDeletionFailedError, NacInsertionFailedError, NacRecordNotFoundError, NacResourceNotFoundError, NacUnauthorizedAccessError, NacUpdateFailedError } from '../exceptions'
 import { getSelectableFields, getModelExportKey } from './modelMapper'
 import { resolveFieldList } from './field-resolution'
 import { NAC_API_HIDDEN_FIELDS } from './constants'
-import { nacResolvePagination } from './pagination'
+import { nacResolvePagination, nacResolveCursorPagination } from './pagination'
 
 import type { NacQueryContext } from '../../shared/utils/types'
 import type { NacTableWithId } from '../types'
-import { nacGetTableQueryConfig, getNacDb, isMysql, hasActiveRelations, nacGetTableName } from '#nac/db'
+import { nacGetTableQueryConfig, getNacDb, isMysql, hasActiveRelations } from '#nac/db'
 
-const NAC_RESERVED_QUERY_KEYS = new Set(['limit', 'offset', 'page'])
+const NAC_RESERVED_QUERY_KEYS = new Set(['limit', 'offset', 'page', 'cursor'])
 
 type NacCrudOperation = 'create' | 'read' | 'update' | 'delete'
 
@@ -188,18 +188,30 @@ export async function nacGetRows(table: NacTableWithId, context: NacQueryContext
 
   const exportKey = getModelExportKey(table)
   const fields = getSelectableFields(table, context)
+  const allColumns = getColumns(table)
+  const hasIdColumn = 'id' in allColumns
+
+  // Cursor pagination requires an id column to seek against — falls back
+  // to null (→ offset-based) on tables without one.
+  const cursorPagination = hasIdColumn ? nacResolveCursorPagination(query) : null
 
   const filters = [
     ...nacResolveAuthorizationFilters(table, context),
     ...getEqualityFilters(query, fields),
   ]
-  const { limit, offset } = nacResolvePagination(query)
+  if (cursorPagination) {
+    filters.push(lt(table.id, cursorPagination.cursor))
+  }
+
+  // Cursor and offset pagination are mutually exclusive per request —
+  // when a valid cursor is present, offset/page params are ignored.
+  const { limit, offset } = cursorPagination
+    ? { limit: cursorPagination.limit, offset: 0 }
+    : nacResolvePagination(query)
 
   const queryOptions = exportKey ? (nacGetTableQueryConfig(exportKey) ?? {}) : {}
 
   const db = await getNacDb()
-  const allColumns = getColumns(table)
-  const hasIdColumn = 'id' in allColumns
 
   if (hasActiveRelations()) {
     if (!exportKey || !db.query[exportKey]) {
@@ -207,7 +219,7 @@ export async function nacGetRows(table: NacTableWithId, context: NacQueryContext
     }
 
     const { apiHiddenFields } = useRuntimeConfig().autoCrud
-    const tableName = nacGetTableName(table)
+    const tableName = getTableName(table)
     const resourceKeys = exportKey ? [tableName, exportKey] : [tableName]
     const columnKeys = new Set(Object.keys(allColumns))
     const hiddenSet = resolveFieldList(apiHiddenFields, resourceKeys, NAC_API_HIDDEN_FIELDS, columnKeys)
@@ -226,7 +238,7 @@ export async function nacGetRows(table: NacTableWithId, context: NacQueryContext
       ...queryOptions,
       columns: { ...columns, ...safeQueryColumns },
       limit,
-      offset,
+      ...(cursorPagination ? {} : { offset }), // omit entirely for cursor mode, not offset: 0
       ...(filters.length > 0 ? { where: and(...filters) } : {}),
     })
   }
@@ -234,7 +246,8 @@ export async function nacGetRows(table: NacTableWithId, context: NacQueryContext
   let dynamicQuery = db.select(fields).from(table).$dynamic()
   if (hasIdColumn) dynamicQuery = dynamicQuery.orderBy(desc(table.id))
   if (filters.length > 0) dynamicQuery = dynamicQuery.where(and(...filters))
-  dynamicQuery = dynamicQuery.limit(limit).offset(offset)
+  dynamicQuery = dynamicQuery.limit(limit)
+  if (!cursorPagination) dynamicQuery = dynamicQuery.offset(offset)
 
   return await dynamicQuery.all()
 }
