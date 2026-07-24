@@ -45,8 +45,8 @@ export interface ModuleOptions {
    */
   auth: {
     authentication: boolean
-    authorization: boolean
-    ownerKey: string
+    authorization?: boolean
+    ownerKey?: string
   }
 
   /**
