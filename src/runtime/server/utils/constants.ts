@@ -55,3 +55,5 @@ export const NAC_PERMISSION_CODES = [
 ] as const
 
 export type NacPermissionCode = typeof NAC_PERMISSION_CODES[number]
+
+export const NAC_RESERVED_QUERY_KEYS = new Set(['limit', 'offset', 'page', 'cursor', 'total'])

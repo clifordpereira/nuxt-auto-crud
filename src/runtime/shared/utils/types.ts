@@ -88,15 +88,6 @@ export interface NacQueryContext {
   isPublic?: boolean
 }
 
-export interface NacPaginationMeta {
-  mode: 'offset' | 'simple' | 'cursor'
-  perPage: number
-  total?: number
-  page?: number
-  nextCursor?: string
-  hasMore: boolean
-}
-
 /**
  * Represents metadata for a paginated database response.
  * This interface is intentionally kept lightweight and flexible
@@ -132,3 +123,5 @@ export interface NacPaginatedResponse<T> {
   data: T[]
   meta: NacPaginationMeta
 }
+
+export type NacCrudOperation = 'create' | 'read' | 'update' | 'delete'

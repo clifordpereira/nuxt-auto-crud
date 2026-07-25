@@ -1,4 +1,4 @@
-# nuxt-auto-crud (nac 2.x)
+# nuxt-auto-crud (nac 3.x)
 
 A Nuxt.js module providing dynamic **RESTful CRUD APIs** derived directly from your Drizzle schemas, without writing any code for CRUD operations.
 

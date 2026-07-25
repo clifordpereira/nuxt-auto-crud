@@ -1,22 +1,27 @@
-import { useRuntimeConfig } from '#imports'
-import { type Table, type Column, type SQL, sql, eq, lt, and, or, getColumns, desc, getTableName } from 'drizzle-orm'
+// third party imports
+import { type Table, type SQL, sql, eq, lt, and, getColumns, desc, getTableName } from 'drizzle-orm'
 import type { QueryObject } from 'h3'
 
-import type { NacPaginatedResponse, NacPaginationMeta } from '../../shared/utils/types'
-
-import { NacDeletionFailedError, NacInsertionFailedError, NacRecordNotFoundError, NacResourceNotFoundError, NacUnauthorizedAccessError, NacUpdateFailedError } from '../exceptions'
-import { getSelectableFields, getModelExportKey } from './modelMapper'
-import { resolveFieldList } from './field-resolution'
-import { NAC_API_HIDDEN_FIELDS } from './constants'
-import { nacResolvePagination, nacResolveCursorPagination, nacSplitPage } from './pagination'
-
-import type { NacQueryContext } from '../../shared/utils/types'
-import type { NacTableWithId } from '../types'
+// project imports
+import { useRuntimeConfig } from '#imports'
 import { nacGetTableQueryConfig, getNacDb, isMysql, hasActiveRelations } from '#nac/db'
 
-const NAC_RESERVED_QUERY_KEYS = new Set(['limit', 'offset', 'page', 'cursor', 'total'])
+// exceptions
+import { NacDeletionFailedError, NacInsertionFailedError, NacRecordNotFoundError, NacResourceNotFoundError, NacUnauthorizedAccessError, NacUpdateFailedError } from '../exceptions'
 
-type NacCrudOperation = 'create' | 'read' | 'update' | 'delete'
+// types
+import type { NacPaginatedResponse, NacPaginationMeta, NacQueryContext, NacCrudOperation } from '../../shared/utils/types'
+import type { NacTableWithId } from '../types'
+
+// constants
+import { NAC_API_HIDDEN_FIELDS } from './constants'
+
+// utils
+import { getSelectableFields, getModelExportKey } from './modelMapper'
+import { resolveFieldList } from './field-resolution'
+import { nacResolvePagination, nacResolveCursorPagination, nacSplitPage } from './pagination'
+import { getEqualityFilters, nacResolveAuthorizationFilters, nacResolveOwnershipFilter } from './query-filters'
+import { getEqualityConditions, nacResolveAuthorizationConditions, nacMergeRqbConditions } from './query-conditions'
 
 /** @internal */
 const pick = <T extends object, K extends keyof T>(obj: T, keys: K[]): Pick<T, K> => {
@@ -43,90 +48,10 @@ export function nacRequireOperationPermission(operation: NacCrudOperation, conte
   if (!isAuthorizationEnabled || context.isPublic) return
 
   const { resourcePermissions = [] } = context
-  const hasFull = resourcePermissions.includes(operation)
-  const hasOwn = operation !== 'create' && resourcePermissions.includes(`${operation}_own`)
+  const hasFull = resourcePermissions?.includes(operation)
+  const hasOwn = operation !== 'create' && resourcePermissions?.includes(`${operation}_own`)
 
   if (!hasFull && !hasOwn) throw new NacUnauthorizedAccessError()
-}
-
-/**
- * Resolves the ownership filter for read/update/delete. Returns undefined
- * when the caller has full access (no restriction needed) or when
- * authorization is disabled/public. Returns `eq(ownerCol, userId)` when
- * the caller only holds the '<op>_own' code.
- *
- * Contract: call nacRequireOperationPermission first — this function does
- * not itself reject a caller with neither code; it simply returns
- * undefined in that case, relying on the gate above to have already
- * thrown.
- *
- * @internal
- */
-export function nacResolveOwnershipFilter(
-  table: NacTableWithId,
-  context: NacQueryContext = {},
-  operation: Exclude<NacCrudOperation, 'create'>,
-) {
-  const isAuthorizationEnabled = useRuntimeConfig().autoCrud.auth?.authorization
-  if (!isAuthorizationEnabled || context.isPublic) return undefined
-
-  const { resourcePermissions = [], userId } = context
-  if (resourcePermissions.includes(operation)) return undefined // full access
-
-  if (resourcePermissions.includes(`${operation}_own`) && userId != null) {
-    const ownerKey = useRuntimeConfig().autoCrud.auth?.ownerKey || 'createdBy'
-    const ownerCol = table[ownerKey]
-    if (ownerCol) return eq(ownerCol, Number(userId))
-  }
-  return undefined
-}
-
-/**
- * Resolves list-operation authorization filters: full bypass (list_all),
- * normal listing (list — combines with the status filter above), or
- * owner-restricted (list_own). When both statusFiltering and list_own
- * apply together, uses hybrid OR logic (active OR owned).
- *
- * @internal
- */
-export function nacResolveAuthorizationFilters(table: NacTableWithId, context: NacQueryContext = {}) {
-  const isAuthorizationEnabled = useRuntimeConfig().autoCrud.auth?.authorization
-  const isStatusFilteringEnabled = useRuntimeConfig().autoCrud.statusFiltering
-
-  if (!isAuthorizationEnabled && !isStatusFilteringEnabled) return []
-
-  const { userId, resourcePermissions = [] } = context
-
-  if (isAuthorizationEnabled && resourcePermissions?.includes('list_all')) return []
-
-  const ownerKey = useRuntimeConfig().autoCrud.auth?.ownerKey || 'createdBy'
-  const ownerCol = table[ownerKey]
-  const statusCol = table.status
-  const filters = []
-
-  if (isAuthorizationEnabled && isStatusFilteringEnabled) {
-    if (resourcePermissions?.includes('list')) {
-      if (statusCol && ownerCol && userId != null) {
-        filters.push(or(eq(statusCol, 'active'), eq(ownerCol, Number(userId))))
-      }
-      else if (statusCol) {
-        filters.push(eq(statusCol, 'active'))
-      }
-    }
-    else if (resourcePermissions?.includes('list_own') && ownerCol && userId != null) {
-      filters.push(eq(ownerCol, Number(userId)))
-    }
-  }
-  else if (isStatusFilteringEnabled) {
-    if (statusCol) filters.push(eq(statusCol, 'active'))
-  }
-  else if (isAuthorizationEnabled) {
-    if (resourcePermissions?.includes('list_own') && ownerCol && userId != null) {
-      filters.push(eq(ownerCol, Number(userId)))
-    }
-  }
-
-  return filters
 }
 
 function hasAnyListPermissions(context: NacQueryContext = {}) {
@@ -134,48 +59,6 @@ function hasAnyListPermissions(context: NacQueryContext = {}) {
   return resourcePermissions?.includes('list_all') || resourcePermissions?.includes('list') || resourcePermissions?.includes('list_own')
 }
 
-/* -------------------------------------------------------------------------- */
-/*                                FILTERING                                   */
-/* -------------------------------------------------------------------------- */
-
-/** @internal */
-function coerceFilterValue(raw: string, col: Column): unknown {
-  switch (col.dataType) {
-    case 'number': {
-      const n = Number(raw)
-      return Number.isNaN(n) ? raw : n
-    }
-    case 'boolean':
-      if (raw === 'true') return true
-      if (raw === 'false') return false
-      return raw
-    default:
-      return raw
-  }
-}
-
-/**
- * Builds equality filters from raw query-string params, restricted to
- * fields the caller can actually see (post hidden-field / public-resource
- * narrowing) — never the full column set, so filtering can't be used to
- * infer a hidden field's value. Unrecognized or invisible keys are
- * silently ignored. `limit`/`offset`/`page` are reserved for pagination.
- *
- * @internal
- */
-export function getEqualityFilters(query: QueryObject, selectableFields: Record<string, Column>) {
-  const filters = []
-  for (const [key, rawValue] of Object.entries(query)) {
-    if (NAC_RESERVED_QUERY_KEYS.has(key)) continue
-    if (Array.isArray(rawValue) || rawValue === undefined) continue
-
-    const col = selectableFields[key]
-    if (!col) continue
-
-    filters.push(eq(col, coerceFilterValue(rawValue, col)))
-  }
-  return filters
-}
 
 /* -------------------------------------------------------------------------- */
 /*                                   CRUD                                     */
@@ -188,6 +71,20 @@ async function nacCountRows(table: NacTableWithId, filters: (SQL | undefined)[])
   if (filters.length > 0) countQuery = countQuery.where(and(...filters))
   const row = isMysql() ? (await countQuery)[0] : await countQuery.get()
   return Number(row?.count ?? 0)
+}
+
+/**
+ * post-update MySQL re-fetch below, where the caller was already
+ * authorized for this exact row by the update that just succeeded.
+ * @internal
+ */
+async function nacFetchRowByIdUnchecked(table: NacTableWithId, id: string, context: NacQueryContext = {}) {
+  const selectableFields = getSelectableFields(table, context)
+  const db = await getNacDb()
+  const query = db.select(selectableFields).from(table).where(eq(table.id, Number(id)))
+  const record = isMysql() ? (await query)[0] : await query.get()
+  if (!record) throw new NacRecordNotFoundError()
+  return record
 }
 
 /** @public */
@@ -250,13 +147,20 @@ export async function nacGetRows(
       Object.entries(queryOptions.columns ?? {}).filter(([key]) => !hiddenSet.has(key)),
     )
 
+    const rqbConditions = [
+      ...nacResolveAuthorizationConditions(table, context),
+      ...getEqualityConditions(query, fields),
+    ]
+    if (cursorPagination) rqbConditions.push({ id: { lt: cursorPagination.cursor } })
+    const rqbWhere = nacMergeRqbConditions(rqbConditions)
+
     rows = await db.query[exportKey].findMany({
       ...(hasIdColumn && !queryOptions.orderBy ? { orderBy: { id: 'desc' } } : {}),
       ...queryOptions,
       columns: { ...columns, ...safeQueryColumns },
       limit: fetchLimit,
       ...(cursorPagination ? {} : { offset }),
-      ...(filters.length > 0 ? { where: and(...filters) } : {}),
+      ...(rqbWhere ? { where: rqbWhere } : {}),
     })
   }
   else {
@@ -288,41 +192,6 @@ export async function nacGetRows(
 }
 
 /** @public */
-export async function nacGetRow(table: NacTableWithId, id: string, context: NacQueryContext = {}) {
-  nacRequireOperationPermission('read', context)
-
-  const selectableFields = getSelectableFields(table, context)
-
-  if (context.record) {
-    return pick(context.record, Object.keys(selectableFields))
-  }
-
-  const ownershipFilter = nacResolveOwnershipFilter(table, context, 'read')
-  const whereClause = ownershipFilter ? and(eq(table.id, Number(id)), ownershipFilter) : eq(table.id, Number(id))
-
-  const db = await getNacDb()
-  const query = db.select(selectableFields).from(table).where(whereClause)
-  const record = isMysql() ? (await query)[0] : await query.get()
-  if (!record) throw new NacRecordNotFoundError() // not-found, not forbidden — avoids confirming a not-owned row exists
-
-  return record
-}
-
-/**
- * post-update MySQL re-fetch below, where the caller was already
- * authorized for this exact row by the update that just succeeded.
- * @internal
- */
-async function nacFetchRowByIdUnchecked(table: NacTableWithId, id: string, context: NacQueryContext = {}) {
-  const selectableFields = getSelectableFields(table, context)
-  const db = await getNacDb()
-  const query = db.select(selectableFields).from(table).where(eq(table.id, Number(id)))
-  const record = isMysql() ? (await query)[0] : await query.get()
-  if (!record) throw new NacRecordNotFoundError()
-  return record
-}
-
-/** @public */
 export async function nacCreateRow(table: Table, data: Record<string, unknown>, context: NacQueryContext = {}) {
   nacRequireOperationPermission('create', context)
 
@@ -351,6 +220,27 @@ export async function nacCreateRow(table: Table, data: Record<string, unknown>, 
   const result = await db.insert(table).values(payload).returning(selectableFields).get()
   if (!result) throw new NacInsertionFailedError()
   return result
+}
+
+/** @public */
+export async function nacGetRow(table: NacTableWithId, id: string, context: NacQueryContext = {}) {
+  nacRequireOperationPermission('read', context)
+
+  const selectableFields = getSelectableFields(table, context)
+
+  if (context.record) {
+    return pick(context.record, Object.keys(selectableFields))
+  }
+
+  const ownershipFilter = nacResolveOwnershipFilter(table, context, 'read')
+  const whereClause = ownershipFilter ? and(eq(table.id, Number(id)), ownershipFilter) : eq(table.id, Number(id))
+
+  const db = await getNacDb()
+  const query = db.select(selectableFields).from(table).where(whereClause)
+  const record = isMysql() ? (await query)[0] : await query.get()
+  if (!record) throw new NacRecordNotFoundError() // not-found, not forbidden — avoids confirming a not-owned row exists
+
+  return record
 }
 
 /** @public */

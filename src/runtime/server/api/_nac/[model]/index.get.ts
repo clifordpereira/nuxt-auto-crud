@@ -13,6 +13,6 @@ export default eventHandler(async (event) => {
   const table = nacModelTableMap[model] as NacTableWithId
   if (!table) throw new NacResourceNotFoundError(model)
 
-  const results = await nacGetRows(table, event.context.nac || {})
-  return results
+  const query = Object.fromEntries(new URL(event.path, 'http://internal').searchParams)
+  return await nacGetRows(table, event.context.nac || {}, query)
 })
