@@ -22,6 +22,7 @@ import { resolveFieldList } from './field-resolution'
 import { nacResolvePagination, nacResolveCursorPagination, nacSplitPage } from './pagination'
 import { getEqualityFilters, nacResolveAuthorizationFilters, nacResolveOwnershipFilter } from './query-filters'
 import { getEqualityConditions, nacResolveAuthorizationConditions, nacMergeRqbConditions } from './query-conditions'
+import { hasAnyListPermissions, nacRequireOperationPermission } from './query-authorize'
 
 /** @internal */
 const pick = <T extends object, K extends keyof T>(obj: T, keys: K[]): Pick<T, K> => {
@@ -29,34 +30,6 @@ const pick = <T extends object, K extends keyof T>(obj: T, keys: K[]): Pick<T, K
     if (key in obj) acc[key] = obj[key]
     return acc
   }, {} as Pick<T, K>)
-}
-
-/* -------------------------------------------------------------------------- */
-/*                              AUTHORIZATION                                 */
-/* -------------------------------------------------------------------------- */
-
-/**
- * Gate for create/read/update/delete. Throws NacUnauthorizedAccessError
- * unless the caller holds the operation's full-access code (e.g. 'update')
- * or its own-only code (e.g. 'update_own'). A no-op when authorization is
- * disabled or the request is on a public resource.
- *
- * @internal
- */
-export function nacRequireOperationPermission(operation: NacCrudOperation, context: NacQueryContext = {}): void {
-  const isAuthorizationEnabled = useRuntimeConfig().autoCrud.auth?.authorization
-  if (!isAuthorizationEnabled || context.isPublic) return
-
-  const { resourcePermissions = [] } = context
-  const hasFull = resourcePermissions?.includes(operation)
-  const hasOwn = operation !== 'create' && resourcePermissions?.includes(`${operation}_own`)
-
-  if (!hasFull && !hasOwn) throw new NacUnauthorizedAccessError()
-}
-
-function hasAnyListPermissions(context: NacQueryContext = {}) {
-  const { resourcePermissions = [] } = context
-  return resourcePermissions?.includes('list_all') || resourcePermissions?.includes('list') || resourcePermissions?.includes('list_own')
 }
 
 /* -------------------------------------------------------------------------- */
