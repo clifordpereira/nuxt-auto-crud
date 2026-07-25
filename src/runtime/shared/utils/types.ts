@@ -89,39 +89,77 @@ export interface NacQueryContext {
 }
 
 /**
- * Represents metadata for a paginated database response.
- * This interface is intentionally kept lightweight and flexible
- * to accommodate different pagination strategies (offset, simple, cursor).
+ * Describes the pagination state of a {@link NacPaginatedResponse}.
  *
- * @template T - The type of the data items.
+ * @remarks
+ * Intentionally lightweight and flexible to accommodate different
+ * pagination strategies — offset, simple, and cursor. Which optional
+ * fields are populated depends on `mode`: `page` for `offset`/`simple`,
+ * `nextCursor` for `cursor`, and `total` only when explicitly requested
+ * by the caller (`?total=true`).
  *
- * @property {"offset" | "simple" | "cursor"} mode - The pagination strategy used.
- * @property {number} perPage - The number of items per page.
- * @property {number} [total] - The total number of items available.
- * @property {number} [page] - The current page number (for simple pagination).
- * @property {string} [nextCursor] - A cursor value for fetching the next page (for cursor pagination).
- * @property {boolean} hasMore - Indicates if there are more pages available.
+ * @public
  */
 export interface NacPaginationMeta {
-  mode: "offset" | "simple" | "cursor"
+  /**
+   * The pagination strategy used to produce this response.
+   */
+  mode: 'offset' | 'simple' | 'cursor'
+
+  /**
+   * The number of items requested per page.
+   */
   perPage: number
+
+  /**
+   * The total number of items available. Only present when the caller
+   * explicitly opts in (`?total=true`) — computing it requires a
+   * separate `COUNT(*)` query.
+   */
   total?: number
+
+  /**
+   * The current page number. Present in `offset` and `simple` modes.
+   */
   page?: number
+
+  /**
+   * A cursor value for fetching the next page. Present in `cursor` mode
+   * when further results exist.
+   */
   nextCursor?: string
+
+  /**
+   * Indicates whether more results exist beyond the current page.
+   */
   hasMore: boolean
 }
 
 /**
- * Represents a paginated response containing data records and pagination metadata.
+ * A paginated response containing data records and pagination metadata.
  *
- * @template T - The type of the data records.
+ * @typeParam T - The type of each data record.
  *
- * @property {T[]} data - An array of data records.
- * @property {NacPaginationMeta} meta - Pagination metadata.
+ * @public
  */
 export interface NacPaginatedResponse<T> {
+  /**
+   * The records for the current page.
+   */
   data: T[]
+
+  /**
+   * Pagination metadata describing how to fetch subsequent pages.
+   */
   meta: NacPaginationMeta
 }
 
+/**
+ * The CRUD operations gated by NAC's authorization layer. Each has a
+ * corresponding full-access permission code (e.g. `'update'`) and,
+ * except for `'create'`, an own-only variant (e.g. `'update_own'`) — see
+ * {@link NacQueryContext.resourcePermissions}.
+ *
+ * @public
+ */
 export type NacCrudOperation = 'create' | 'read' | 'update' | 'delete'
