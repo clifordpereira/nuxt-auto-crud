@@ -1,6 +1,7 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { useRuntimeConfig } from '#imports'
-import { nacGetRows, nacResolveAuthorizationFilters } from '../../../src/runtime/server/utils/queries'
+import { nacGetRows } from '../../../src/runtime/server/utils/queries'
+import { nacResolveAuthorizationFilters } from '../../../src/runtime/server/utils/query-filters'
 import type { NacTableWithId } from '../../../src/runtime/server/types'
 import { posts, users } from '#nac/schema'
 import { nacGetTableQueryConfig, getNacDb, isMysql, hasActiveRelations } from '#nac/db'

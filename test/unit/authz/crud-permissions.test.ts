@@ -2,12 +2,12 @@ import { vi, describe, it, expect, beforeEach } from 'vitest'
 import { useRuntimeConfig } from '#imports'
 import {
   nacRequireOperationPermission,
-  nacResolveOwnershipFilter,
   nacGetRow,
   nacCreateRow,
   nacUpdateRow,
   nacDeleteRow,
 } from '../../../src/runtime/server/utils/queries'
+import { nacResolveOwnershipFilter } from '../../../src/runtime/server/utils/query-filters'
 import type { NacTableWithId } from '../../../src/runtime/server/types'
 import { users } from '#nac/schema'
 import { NacUnauthorizedAccessError, NacRecordNotFoundError, NacUpdateFailedError } from '../../../src/runtime/server/exceptions'

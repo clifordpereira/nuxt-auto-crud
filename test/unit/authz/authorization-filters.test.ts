@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { useRuntimeConfig } from '#imports'
 import type { NacTableWithId } from '../../../src/runtime/server/types'
-import { nacResolveAuthorizationFilters } from '../../../src/runtime/server/utils/queries'
+import { nacResolveAuthorizationFilters } from '../../../src/runtime/server/utils/query-filters'
 
 const mockTable = {
   id: { name: 'id' },
