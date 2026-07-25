@@ -57,3 +57,14 @@ export const NAC_PERMISSION_CODES = [
 export type NacPermissionCode = typeof NAC_PERMISSION_CODES[number]
 
 export const NAC_RESERVED_QUERY_KEYS = new Set(['limit', 'offset', 'page', 'cursor', 'total'])
+
+/**
+ * NAC's own system route segments — not real CRUD resources, so they
+ * should never be resolved as a `:model` name by nacGetModelFromPath.
+ * Consuming apps' own permission middleware relies on this: a `null`
+ * result means "not a data route," matching the early-return pattern
+ * already used for non-NAC paths.
+ * 
+ * @public
+ */
+export const NAC_RESERVED_ROUTE_SEGMENTS = new Set(['_schemas', '_meta', '_sse'])

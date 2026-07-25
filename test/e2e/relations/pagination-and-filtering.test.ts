@@ -1,4 +1,3 @@
-// test/e2e/relations/pagination-and-filtering.test.ts
 import { describe, it, expect, beforeAll } from 'vitest'
 import { $fetch } from '@nuxt/test-utils/e2e'
 

@@ -8,7 +8,7 @@ import * as schema from '#nac/schema'
 
 import type { NacField, NacSchemaDefinition, NacQueryContext } from '../../shared/utils/types'
 import type { NacColumnInternal, NacZodTypeDef } from '../types'
-import { NAC_API_HIDDEN_FIELDS, NAC_SYSTEM_TABLES, NAC_FORM_HIDDEN_FIELDS } from './constants'
+import { NAC_API_HIDDEN_FIELDS, NAC_SYSTEM_TABLES, NAC_FORM_HIDDEN_FIELDS, NAC_RESERVED_ROUTE_SEGMENTS } from './constants'
 import { nacResolveFieldKey, resolveFieldList } from './field-resolution'
 import { NacResourceNotFoundError } from '../exceptions'
 import { nacGetTableConfigResolver } from './db'
@@ -22,14 +22,15 @@ import { nacGetTableConfigResolver } from './db'
  *
  * @public
  */
-export function nacGetModelFromPath(pathname: string, prefix?: string) {
+export function nacGetModelFromPath(pathname: string, prefix?: string): string | null {
   const resolvedPrefix = prefix ?? (() => {
     const { apiBase, nacEndpointPrefix } = useRuntimeConfig().public.autoCrud
     return apiBase || nacEndpointPrefix || '/api/_nac'
   })()
   const regex = new RegExp(`^${resolvedPrefix}/([^/]+)`)
   const match = pathname.match(regex)
-  return match ? match[1] : null
+  const model = match ? match[1] : null
+  return model && !NAC_RESERVED_ROUTE_SEGMENTS.has(model) ? model : null
 }
 
 /* -------------------------------------------------------------------------- */
