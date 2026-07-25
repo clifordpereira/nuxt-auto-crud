@@ -247,6 +247,8 @@ export interface SchemaDefinition {
 
 ```
 
+> `_schemas` endpoints are always accessible, regardless of `auth.authentication` — they return field metadata (names, types, required/readonly flags), never row data. `_meta` is separately gated by its own `agenticToken`, independent of session auth.
+
 ### 2. Agentic Discovery
 
 * **Manifest**: `GET /api/_nac/_meta?format=md`

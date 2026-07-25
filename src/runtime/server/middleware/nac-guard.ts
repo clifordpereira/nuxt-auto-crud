@@ -13,8 +13,10 @@ export default defineEventHandler(async (event) => {
   if (!isNacPath(pathname, prefix)) return
 
   event.context.nac ||= { userId: null, isPublic: false }
+  
+  if (isSchemaPath(pathname, prefix)) return
 
-  if (!isAgenticPath(pathname)) {
+  if (!isAgenticPath(pathname, prefix)) {
     const isAuthEnabled = config.autoCrud.auth?.authentication
     const isUserAuthenticated = Boolean(event.context.nac?.userId)
 
@@ -49,8 +51,12 @@ function isPublicResource(model: string, publicResources: Record<string, string[
   return Object.keys(publicResources).includes(model)
 }
 
-function isAgenticPath(pathname: string) {
-  return pathname.includes('/_nac/_meta')
+function isSchemaPath(pathname: string, prefix: string) {
+  return pathname.startsWith(`${prefix}/_schemas`)
+}
+
+function isAgenticPath(pathname: string, prefix: string) {
+  return pathname.startsWith(`${prefix}/_meta`)
 }
 
 function isNacPath(pathname: string, prefix: string) {
