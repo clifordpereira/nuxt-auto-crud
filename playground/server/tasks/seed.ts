@@ -1,17 +1,17 @@
 export default defineTask({
   meta: {
     name: 'db:seed',
-    description: 'Seed database with initial data'
+    description: 'Seed database with initial data',
   },
   async run() {
     console.log('Seeding database...')
 
     // const hashed_password = await hashPassword('$1Password')
-    const hashed_password = "hashed_password"
+    const hashed_password = 'hashed_password'
 
     const roles = [{ name: 'Admin' }, { name: 'Manager' }, { name: 'Editor' }, { name: 'Guest' }]
 
-    const resources = [ { name: 'users' }, { name: 'roles' }, { name: 'resources' }, { name: 'permissions' }, { name: 'role_resource_permissions' } ]
+    const resources = [{ name: 'users' }, { name: 'roles' }, { name: 'resources' }, { name: 'permissions' }, { name: 'role_resource_permissions' }]
 
     const permissions = [
       { code: 'create' },
@@ -35,7 +35,7 @@ export default defineTask({
 
     role_resource_permissions = [
       ...role_resource_permissions,
-      { roleId: 2, resourceId: 1, permissionId: 4 }
+      { roleId: 2, resourceId: 1, permissionId: 4 },
     ]
 
     const users = [
@@ -52,7 +52,7 @@ export default defineTask({
         email: 'editor@example.com',
         password: hashed_password,
         avatar: 'https://i.pravatar.cc/150?img=2',
-      }
+      },
     ]
 
     await db.insert(schema.roles).values(roles)
@@ -62,5 +62,5 @@ export default defineTask({
     await db.insert(schema.roleResourcePermissions).values(role_resource_permissions)
 
     return { result: 'Database seeded successfully' }
-  }
+  },
 })

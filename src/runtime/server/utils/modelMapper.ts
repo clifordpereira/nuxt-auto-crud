@@ -13,8 +13,6 @@ import { nacResolveFieldKey, resolveFieldList } from './field-resolution'
 import { NacResourceNotFoundError } from '../exceptions'
 import { nacGetTableConfigResolver } from './db'
 
-
-
 /**
  * Extracts the `:model` segment from a NAC route pathname (e.g.
  * `/api/_nac/products/5` → `'products'`). Exported so consuming apps'
@@ -33,7 +31,6 @@ export function nacGetModelFromPath(pathname: string, prefix?: string) {
   const match = pathname.match(regex)
   return match ? match[1] : null
 }
-
 
 /* -------------------------------------------------------------------------- */
 /*                              TABLE MAP (ROOT)                              */

@@ -53,12 +53,12 @@ export function getEqualityFilters(query: QueryObject, selectableFields: Record<
 }
 
 /**
- * 
+ *
  * Resolves list-operation authorization filters: full bypass (list_all),
  * normal listing (list — combines with the status filter above), or
  * owner-restricted (list_own). When both statusFiltering and list_own
  * apply together, uses hybrid OR logic (active OR owned).
- * 
+ *
  * @remarks (plain-select branch) Has a structural twin: nacResolveAuthorizationConditions in
  * query-conditions.ts implements identical branching logic for the RQB
  * shorthand form. Any change to the authorization rules here must be

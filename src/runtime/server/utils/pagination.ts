@@ -39,7 +39,7 @@ export function nacResolvePagination(query: Record<string, unknown>): Required<N
  * the two are mutually exclusive per request.
  *
  * Cursor pagination assumes NAC's default `id desc` ordering: "next page"
- * means "rows with id < cursor". This is NOT valid for a resource whose
+ * means "rows with id less than cursor". This is NOT valid for a resource whose
  * `nacTableQueryConfig` sets a custom, non-id `orderBy` — using `?cursor`
  * there would silently return a page that doesn't match the actual sort.
  * Offset-based pagination has no such restriction.

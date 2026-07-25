@@ -59,12 +59,11 @@ function hasAnyListPermissions(context: NacQueryContext = {}) {
   return resourcePermissions?.includes('list_all') || resourcePermissions?.includes('list') || resourcePermissions?.includes('list_own')
 }
 
-
 /* -------------------------------------------------------------------------- */
 /*                                   CRUD                                     */
 /* -------------------------------------------------------------------------- */
 
-/** @internal — COUNT(*) query, honoring the same filters as the main fetch */
+/** @internal */
 async function nacCountRows(table: NacTableWithId, filters: (SQL | undefined)[]): Promise<number> {
   const db = await getNacDb()
   let countQuery = db.select({ count: sql<number>`count(*)` }).from(table).$dynamic()

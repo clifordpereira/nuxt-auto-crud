@@ -12,7 +12,7 @@ import { coerceFilterValue } from './query-filters'
 
 type NacRqbCondition = Record<string, unknown>
 
-/** @internal — merges RQB shorthand conditions; same-column conditions merge their operator objects instead of overwriting */
+/** @internal */
 export function nacMergeRqbConditions(conditions: NacRqbCondition[]): NacRqbCondition | undefined {
   if (conditions.length === 0) return undefined
   const merged: NacRqbCondition = {}
@@ -34,7 +34,7 @@ export function nacMergeRqbConditions(conditions: NacRqbCondition[]): NacRqbCond
  * branching logic, but emits conditions keyed by column name for
  * db.query[x].findMany()'s own `where`, instead of SQL built against the
  * unaliased table object (which breaks under RQB's internal aliasing).
- * 
+ *
  * @remarks Has a structural twin: nacResolveAuthorizationFilters in
  * query-filters.ts implements identical branching logic for the RQB
  * shorthand form. Any change to the authorization rules here must be
