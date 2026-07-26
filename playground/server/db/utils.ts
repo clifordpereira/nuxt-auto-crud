@@ -1,4 +1,4 @@
-import { integer, text } from 'drizzle-orm/sqlite-core'
+import { integer, text, type AnySQLiteColumn } from 'drizzle-orm/sqlite-core'
 // import { uuidv7 } from 'uuidv7'
 
 /**
@@ -6,15 +6,23 @@ import { integer, text } from 'drizzle-orm/sqlite-core'
  *
  * System fields are used to store system information.
  */
-export const auditFields = {
+export const auditFields = (userRef: () => AnySQLiteColumn) => ({
   // uuid: text('uuid').notNull().$defaultFn(() => uuidv7()), // Global Identifier [bun add uuidv7]
   status: text('status', { enum: ['active', 'inactive'] }).default('active'),
+  ...timestamps,
+  ...ownership(userRef)
+})
+
+export const timestamps = {
   createdAt: integer({ mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
   updatedAt: integer({ mode: 'timestamp' }).notNull().$onUpdate(() => new Date()),
-  deletedAt: integer('deleted_at', { mode: 'timestamp' }), // Soft delete
-  createdBy: integer('created_by'), // Track who created this
-  updatedBy: integer('updated_by'), // Track who last updated this
+  deletedAt: integer('deleted_at', { mode: 'timestamp' }),
 }
+
+export const ownership = (user: () => AnySQLiteColumn) => ({
+  createdBy: integer('created_by').references(user, { onDelete: 'set null' }),
+  updatedBy: integer('updated_by').references(user, { onDelete: 'set null' }),
+})
 
 /**
  * Base Fields

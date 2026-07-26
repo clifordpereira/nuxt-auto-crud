@@ -53,11 +53,6 @@ export const nacTableQueryConfig: Record<string, DBQueryConfig> = {
     },
   },
   roleResourcePermissions: {
-    columns: {
-      roleId: false,
-      resourceId: false,
-      permissionId: false,
-    },
     with: {
       role: { columns: { name: true } },
       resource: { columns: { name: true } },
