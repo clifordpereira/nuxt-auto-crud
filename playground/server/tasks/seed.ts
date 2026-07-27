@@ -8,7 +8,7 @@ export default defineTask({
   async run() {
     console.log('Seeding database...')
 
-    await seedAuthz({
+    await nacSeedAuthz({
       db,
       schema,
       config: seedConfig,

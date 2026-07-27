@@ -1,5 +1,4 @@
-import { defineAuthzSeed } from '../../../src/runtime/shared/authz/define-authz-seed'
-// import { defineAuthzSeed } from 'nuxt-auto-crud'
+import { defineAuthzSeed } from '#imports'
 
 export default defineAuthzSeed({
   usersToSeed: [
@@ -9,7 +8,7 @@ export default defineAuthzSeed({
     { name: 'Customer User', email: 'customer@example.com', password: "$1Password", role: 'standarduser' },
   ],
 
-  // Additional tables other than users, roles, resources, permissions, role_resource_permissions
+  // Additional tables other than authz tables (users, roles, resources, permissions, role_resource_permissions)
   resources: [],
 
   presets: {

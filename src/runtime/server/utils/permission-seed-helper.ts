@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm'
 
 import { NAC_PERMISSION_CODES } from './constants'
-import type { NacAuthzSeedConfig, NacAuthzSchema } from '../../shared/authz/types'
+import type { NacAuthzSeedConfig, NacAuthzSchema } from '../../types/authz'
 import type { NacTableWithId } from '../types'
 
 
@@ -194,7 +194,7 @@ export function buildRolePermissions({
  * `defineAuthzSeed` config.
  * @public
  */
-export async function seedAuthz(options: NacSeedAuthzOptions) {
+export async function nacSeedAuthz(options: NacSeedAuthzOptions) {
   const [seededPermissions, seededResources, seededRoles] = await Promise.all([
     seedPermissions(options),
     seedResources(options),

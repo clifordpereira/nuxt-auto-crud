@@ -1,4 +1,4 @@
-import type { NacAuthzSeedConfig } from './types'
+import type { NacAuthzSeedConfig } from '../../types/authz'
 
 /**
  * Type-safe helper to define IAM (Identity and Access Management) seed configuration.

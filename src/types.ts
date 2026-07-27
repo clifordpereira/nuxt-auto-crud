@@ -47,6 +47,7 @@ export interface ModuleOptions {
     authentication: boolean
     authorization?: boolean
     ownerKey?: string
+    useNacSchema?: boolean
   }
 
   /**
@@ -105,5 +106,11 @@ declare module '@nuxt/schema' {
   }
   interface PublicRuntimeConfig {
     autoCrud: Pick<ModuleOptions, 'formHiddenFields' | 'formReadOnlyFields' | 'nacEndpointPrefix' | 'apiBase'>
+  }
+  interface NuxtHooks {
+    'hub:db:schema:extend': (ctx: {
+      dialect: string
+      paths: string[]
+    }) => void | Promise<void>
   }
 }
