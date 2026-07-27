@@ -87,6 +87,7 @@
     "eslint-plugin-tsdoc": "^0.5.2",
     "happy-dom": "^20.11.0",
     "nuxt": "^4.5.0",
+    "nuxt-auth-utils": "^0.5.29",
     "playwright-core": "^1.61.1",
     "typescript": "~5.9.3",
     "vitest": "^4.1.10",

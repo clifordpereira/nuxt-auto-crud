@@ -144,3 +144,5 @@ export default defineNuxtModule<ModuleOptions>({
     }
   },
 })
+
+export { defineAuthzSeed } from './runtime/shared/authz/define-authz-seed'
