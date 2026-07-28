@@ -277,6 +277,8 @@ Enabling `authentication` in the `autoCrud` config protects all **nac** routes (
 | `auth.authentication` | `false` | Requires a valid session for all NAC routes. |
 | `auth.authorization` | `false` | Enables role/owner-based access checks. |
 | `auth.ownerKey` | `'createdBy'` | The column name used to identify the record creator. |
+| `auth.useNacSchema` | `false` | Injects NAC's built-in authz schema (`users`, `roles`, `resources`, `permissions`, `role_resource_permissions`) into your database automatically. See [🔐 Authorization Schema & Seeding](#-authorization-schema--seeding). |
+| `db.dialect` | `'sqlite'` | Target database dialect. Supported: `'sqlite'` (libSQL) and `'mysql'`. |
 | `publicResources` | `{}` | Defines tables and specific columns accessible without auth. |
 | `apiHiddenFields` | `NAC_API_HIDDEN_FIELDS` | Arrays of keys to exclude from all API responses. |
 | `apiWriteProtectedFields` | `NAC_API_WRITE_PROTECTED_FIELDS` | Server-enforced fields a client can never set on create/update. `auth.ownerKey` is always included automatically. |
@@ -297,6 +299,10 @@ autoCrud: {
     authentication: false,
     authorization: false,
     ownerKey: 'createdBy', // change it if you want to use another column eg: ownerId
+    useNacSchema: false, // set true to let NAC provide the roles/permissions tables for you
+  },
+  db: {
+    dialect: 'sqlite', // 'sqlite' | 'mysql' (default is 'sqlite')
   },
   publicResources: {
     // guest users can access these tables and fields without authentication, even when auth.athentication is true
@@ -386,8 +392,6 @@ Populate `event.context.nac` from your own app's session/permission logic, befor
 
 ```typescript
 // server/middleware/00.nac-permissions.ts
-// import { nacGetModelFromPath } from 'nuxt-auto-crud'
-
 export default defineEventHandler(async (event) => {
   const model = nacGetModelFromPath(event.path)
   if (!model) return // not a NAC route
@@ -408,6 +412,140 @@ export default defineEventHandler(async (event) => {
 ### Optimization: Skip Redundant Fetches
 
 If your middleware has already fetched the record, pass it to `event.context.nac.record` — **nac** will use this object instead of executing an additional database query.
+
+---
+
+## 🔐 Authorization Schema & Seeding
+
+NAC can also provide the IAM (Identity and Access Management) tables your app's own authorization middleware relies on, plus helpers to fetch a user's permissions and to seed roles/permissions/users in one go.
+
+### 1. Built-in Authz Schema (`auth.useNacSchema`)
+
+Set `auth.useNacSchema: true` and NAC injects its own `roles`, `resources`, `permissions`, and `role_resource_permissions` tables straight into your Drizzle schema — you don't need to hand-write them (the `users` table must be provided by you and it should have a `role_id` column):
+
+```typescript
+autoCrud: {
+  auth: {
+    authentication: true,
+    authorization: true,
+    useNacSchema: true,
+  },
+}
+```
+
+> Leave this `false` if you already manage your own authz tables — NAC's authz helpers (below) work with any schema shaped like `NacAuthzSchema` (`users`, `roles`, `resources`, `permissions`, `role_resource_permissions`), whether NAC provided them or you defined them yourself.
+
+If you use relations, add your relations path in `relationsPath`. Then add your relations and `nacAuthzTableQueryConfig` as shown below:
+
+```typescript
+// server/db/relations.ts
+import { defineRelations } from 'drizzle-orm'
+import { nacAuthzRelationsConfig, nacAuthzTableQueryConfig } from '#nac/authz-relations'
+
+export const relations = defineRelations(schema, r => ({
+  ...nacAuthzRelationsConfig(r),
+  // your app's own tables, added alongside
+}))
+
+export const nacTableQueryConfig = {
+  ...nacAuthzTableQueryConfig,
+  // your app's own tableQueryConfig, added alongside
+}
+```
+
+Please note that you may use schemas (`schema.ts`) as usual.
+
+### 2. Fetching a User's Permissions (`nacGetPermissionsForUser`)
+
+Your Authorization Middleware just needs `event.context.nac.resourcePermissions` populated for the current user — how you resolve that is entirely up to you. `nacGetPermissionsForUser` is an auto-imported convenience helper for a quick start.
+
+```typescript
+// server/api/login.post.ts
+export default defineEventHandler(async (event) => {
+  const { email, password } = await readBody(event)
+  const user = await verifyCredentials(email, password) // your own logic
+
+  const permissions = await nacGetPermissionsForUser(db, schema, user.id) // Then you can pass permissions[model] to event.context.nac.resourcePermissions in your auth middleware
+
+  await setUserSession(event, { user, permissions })
+  return { ok: true }
+})
+```
+
+`permissions` resolves to a map of resource name → permission codes, e.g.:
+
+```json
+{
+  "products": ["list", "read"],
+  "orders": ["list_own", "read_own", "update_own"]
+}
+```
+
+### 3. Seeding Roles, Permissions & Users (`defineAuthzSeed` + `nacSeedAuthz`)
+
+Declare your app's roles, resources, presets, and the users to seed with the auto-imported `defineAuthzSeed` helper — it's fully type-safe, so your editor will flag unknown roles or malformed permission codes as you write:
+
+```typescript
+// server/config/authz-seed.ts - you can choose where this config lives, just import it in seed.ts
+import { defineAuthzSeed } from 'nuxt-auto-crud'
+
+export default defineAuthzSeed({
+  usersToSeed: [
+    { name: 'Admin User', email: 'admin@example.com', password: '$1Password', role: 'admin' },
+    { name: 'Customer User', email: 'customer@example.com', password: '$1Password', role: 'user' },
+  ],
+
+  // Additional app tables beyond NAC's own authz tables (users, roles, resources, permissions, role_resource_permissions)
+  resources: ['posts', 'comments'],
+
+  // Optional shorthand groups, expanded into concrete codes below
+  presets: {
+    readOnly: ['list', 'read'],
+  },
+
+  roles: {
+    admin: {
+      permissions: 'all', // full access to every resource/permission combination
+    },
+    user: {
+      permissions: {
+        posts: ['readOnly'],
+        comments: ['create', 'read_own', 'update_own'],
+      },
+    },
+  },
+})
+```
+
+Then run it from a Nitro task — `nacSeedAuthz` is auto-imported, so no extra import is needed (requires `nitro.experimental.tasks: true` in `nuxt.config.ts`):
+
+```typescript
+// server/tasks/seed.ts
+import seedConfig from '../config/authz-seed' // import from where you defined the config
+
+export default defineTask({
+  meta: {
+    name: 'db:seed',
+    description: 'Seed database with initial data',
+  },
+  async run() {
+    console.log('Seeding database...')
+
+    await nacSeedAuthz({
+      db,
+      schema,
+      config: seedConfig,
+      hashPassword, // your own hashing function, eg: hashPassword() from nuxt-auth-utils
+    })
+
+    return { result: 'Database seeded successfully' }
+  },
+})
+```
+
+`nacSeedAuthz` seeds permissions, resources, roles, one row per entry in `usersToSeed`, and then expands `roles` into the full `role_resource_permissions` grid — resolving any `presets` shorthand into concrete permission codes along the way.
+
+> `nacSeedAuthz` writes directly to `users`, `roles`, `resources`, `permissions`, and `role_resource_permissions`, so your `schema` needs those five tables — either from `auth.useNacSchema: true` or your own equivalent definitions.
 
 ---
 
@@ -509,12 +647,25 @@ export const nacTableQueryConfig: Record<string, DBQueryConfig> = {
 ---
 
 ## Troubleshooting
+
+### Known Issues
+
+`drizzle-kit`'s RC releases (`^1.0.0-rc.4`) can resolve to an internal `drizzle-orm` snapshot pairing that's incompatible with the independently-resolved `drizzle-orm` version packet manager (eg: bun) installs for your app — this shows up as `nuxt db generate` throwing `SQLiteSyncDialect is not a constructor`, or an untagged `rc.4` throwing `event.req.text is not a function` at runtime instead. `nac-migrate-fresh` (below) works around this by temporarily switching to the migration-capable build to generate migrations, then reinstalling to restore the app-compatible pairing.
+
 ### For apps using `nuxt-auto-crud`
 
-If you hit the same `drizzle-kit`/`drizzle-orm` version mismatch in your own project, a bun-based fixer script ships with this package:
+If you hit the same `drizzle-kit`/`drizzle-orm` version mismatch in your own project, a bun-based fixer script ships with this package, exposed via its `package.json` `bin` field:
+
+```json
+"bin": {
+  "nac-migrate-fresh": "./bin/migrate-fresh.sh"
+}
+```
+
+Run it from your app's root (where your `bun.lock` lives):
 
 ```bash
 npx nac-migrate-fresh
 ```
 
-Run it from your app's root (where your `bun.lock` lives). It's bun-specific — see the script's own header comment (`node_modules/.bin/nac-migrate-fresh` after install, or view it [on GitHub](https://github.com/clifordpereira/nuxt-auto-crud/blob/main/bin/migrate-fresh.sh)) for more details.
+For more details — see the script's own header comment (`node_modules/.bin/nac-migrate-fresh` after install, or view it [on GitHub](https://github.com/clifordpereira/nuxt-auto-crud/blob/main/bin/migrate-fresh.sh))
