@@ -1,4 +1,5 @@
 import { getTableName, type Table } from 'drizzle-orm'
+import { getTableConfig } from 'drizzle-orm/sqlite-core'
 import { vi, type Mock } from 'vitest'
 
 type TableQueryMock = {
@@ -50,3 +51,4 @@ export const isMysql = vi.fn(() => false)
 export const nacGetTableName = vi.fn(async (table: Table) => getTableName(table))
 export const hasActiveRelations = vi.fn(() => true)
 export const nacGetTableQueryConfig = vi.fn((_tableName?: string) => ({}))
+export const nacGetTableConfigResolver = vi.fn(async () => getTableConfig)
