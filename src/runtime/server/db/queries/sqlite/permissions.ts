@@ -1,13 +1,14 @@
 import { eq } from 'drizzle-orm'
 import type { DrizzleD1Database } from 'drizzle-orm/d1'
-import * as NacSchema from '#nac/schema'
+import type { NacSchema } from '#nac/schema'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function nacGetPermissionsForUser(
   db: DrizzleD1Database<any>,
+  schema: NacSchema,
   userId: number
 ): Promise<Record<string, string[]>> {
-  const { users, roles, roleResourcePermissions, resources, permissions } = NacSchema
+  const { users, roles, roleResourcePermissions, resources, permissions } = schema
 
   const rows = await db
     .select({ resourceName: resources.name, permissionCode: permissions.code })

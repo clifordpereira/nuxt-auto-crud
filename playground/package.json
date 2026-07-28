@@ -1,12 +1,5 @@
 {
   "name": "playground",
   "type": "module",
-  "private": true,
-  "dependencies": {
-    "drizzle-orm": "^1.0.0-rc.4",
-    "@libsql/client": "^0.17.4"
-  },
-  "devDependencies": {
-    "drizzle-kit": "^1.0.0-rc.4"
-  }
+  "private": true
 }

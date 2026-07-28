@@ -50,6 +50,10 @@ export interface ModuleOptions {
     useNacSchema?: boolean
   }
 
+  db: {
+    dialect: 'sqlite' | 'postgresql' | 'mysql'
+  }
+
   /**
    * Highly sensitive database columns that should never be exposed in API responses.
    */
