@@ -1,4 +1,3 @@
-
 import type { Table } from 'drizzle-orm'
 
 export interface NacAuthzSeedUser {

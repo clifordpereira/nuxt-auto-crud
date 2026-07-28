@@ -12,7 +12,7 @@ const nacTableQueryConfig = nacRelations.nacTableQueryConfig ?? {}
  * Represents the inferenced type of the initialized Drizzle database instance.
  * @internal
  */
-type NacDb = Awaited<ReturnType<typeof initDb>>
+export type NacDb = Awaited<ReturnType<typeof initDb>>
 
 /**
  * Internal cache for the singleton database instance.

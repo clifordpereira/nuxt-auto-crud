@@ -64,7 +64,7 @@ export const NAC_RESERVED_QUERY_KEYS = new Set(['limit', 'offset', 'page', 'curs
  * Consuming apps' own permission middleware relies on this: a `null`
  * result means "not a data route," matching the early-return pattern
  * already used for non-NAC paths.
- * 
+ *
  * @public
  */
 export const NAC_RESERVED_ROUTE_SEGMENTS = new Set(['_schemas', '_meta', '_sse'])

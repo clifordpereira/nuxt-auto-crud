@@ -137,8 +137,8 @@ export default defineNuxtModule<ModuleOptions>({
     addServerImports([
       {
         name: 'nacGetPermissionsForUser',
-        from: resolve(`./runtime/server/db/queries/${dialect}/permissions`)
-      }
+        from: resolve(`./runtime/server/db/queries/${dialect}/permissions`),
+      },
     ])
 
     // ── 4. Boot plugin ────────────────────────────────────────────────────
@@ -166,16 +166,16 @@ export default defineNuxtModule<ModuleOptions>({
 
     const routes = [
       // Dynamic CRUD
-      { path: '/:model',     method: 'get',    handler: '[model]/index.get' },
-      { path: '/:model',     method: 'post',   handler: '[model]/index.post' },
-      { path: '/:model/:id', method: 'get',    handler: '[model]/[id].get' },
-      { path: '/:model/:id', method: 'patch',  handler: '[model]/[id].patch' },
+      { path: '/:model', method: 'get', handler: '[model]/index.get' },
+      { path: '/:model', method: 'post', handler: '[model]/index.post' },
+      { path: '/:model/:id', method: 'get', handler: '[model]/[id].get' },
+      { path: '/:model/:id', method: 'patch', handler: '[model]/[id].patch' },
       { path: '/:model/:id', method: 'delete', handler: '[model]/[id].delete' },
       // System
-      { path: '/_schemas',        method: 'get', handler: '_schemas/index.get' },
+      { path: '/_schemas', method: 'get', handler: '_schemas/index.get' },
       { path: '/_schemas/:model', method: 'get', handler: '_schemas/[model].get' },
-      { path: '/_meta',           method: 'get', handler: '_meta.get' },
-      { path: '/_sse',            method: 'get', handler: '_sse.get' },
+      { path: '/_meta', method: 'get', handler: '_meta.get' },
+      { path: '/_sse', method: 'get', handler: '_sse.get' },
     ] as const
 
     for (const route of routes) {

@@ -31,7 +31,7 @@ export const roleResourcePermissions = snakeCase.table('role_resource_permission
   permissionId: integer().notNull().references(() => permissions.id, { onDelete: 'cascade' }),
   ...auditFields(() => users.id),
 }, t => [
-  uniqueIndex('unq_role_res_perm').on(t.roleId, t.resourceId, t.permissionId)
+  uniqueIndex('unq_role_res_perm').on(t.roleId, t.resourceId, t.permissionId),
 ])
 
 export type Role = typeof roles.$inferSelect

@@ -2,10 +2,10 @@ import { defineAuthzSeed } from '#imports'
 
 export default defineAuthzSeed({
   usersToSeed: [
-    { name: 'Admin User', email: 'admin@example.com', password: "$1Password", role: 'superadmin' },
-    { name: 'Manager User', email: 'manager@example.com', password: "$1Password", role: 'useradmin' },
-    { name: 'Moderator User', email: 'moderator@example.com', password: "$1Password", role: 'securityauditor' },
-    { name: 'Customer User', email: 'customer@example.com', password: "$1Password", role: 'standarduser' },
+    { name: 'Admin User', email: 'admin@example.com', password: '$1Password', role: 'superadmin' },
+    { name: 'Manager User', email: 'manager@example.com', password: '$1Password', role: 'useradmin' },
+    { name: 'Moderator User', email: 'moderator@example.com', password: '$1Password', role: 'securityauditor' },
+    { name: 'Customer User', email: 'customer@example.com', password: '$1Password', role: 'standarduser' },
   ],
 
   // Additional tables other than authz tables (users, roles, resources, permissions, role_resource_permissions)
@@ -49,5 +49,5 @@ export default defineAuthzSeed({
         resources: ['list', 'read'],
       },
     },
-  }
+  },
 })

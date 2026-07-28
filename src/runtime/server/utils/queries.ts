@@ -10,7 +10,7 @@ import { nacGetTableQueryConfig, getNacDb, isMysql, hasActiveRelations } from '#
 import { NacDeletionFailedError, NacInsertionFailedError, NacRecordNotFoundError, NacResourceNotFoundError, NacUnauthorizedAccessError, NacUpdateFailedError } from '../exceptions'
 
 // types
-import type { NacPaginatedResponse, NacPaginationMeta, NacQueryContext, NacCrudOperation } from '../../shared/utils/types'
+import type { NacPaginatedResponse, NacPaginationMeta, NacQueryContext } from '../../shared/utils/types'
 import type { NacTableWithId } from '../types'
 
 // constants

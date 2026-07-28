@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm'
 import { NAC_PERMISSION_CODES } from './constants'
 import type { NacAuthzSeedConfig, NacAuthzSchema } from '../../types/authz'
 import type { NacTableWithId } from '../types'
-
+import type { NacDb } from '#nac/db'
 
 /* -------------------------------------------------------------------------- */
 /*                                   TYPES                                    */
@@ -18,11 +18,10 @@ interface NacNamedRow extends NacSeedRow { name: string }
 /** @internal */
 interface NacCodedRow extends NacSeedRow { code: string }
 
-
 /** @public */
 export interface NacSeedAuthzOptions {
   /** Live Drizzle database instance (already connected). */
-  db: any
+  db: NacDb
   /** The consuming app's schema tables, matching {@link NacAuthzSchema}. */
   schema: NacAuthzSchema
   /** The authz seed definition — see `defineAuthzSeed`. */

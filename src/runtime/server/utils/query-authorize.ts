@@ -27,7 +27,7 @@ export function nacRequireOperationPermission(operation: NacCrudOperation, conte
 
 /**
  * Checks if the caller has any list permissions.
- * 
+ *
  * @internal
  */
 export function hasAnyListPermissions(context: NacQueryContext = {}) {

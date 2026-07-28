@@ -10,7 +10,7 @@ export const auditFields = (userRef: () => AnySQLiteColumn) => ({
   // uuid: text('uuid').notNull().$defaultFn(() => uuidv7()), // Global Identifier [bun add uuidv7]
   status: text('status', { enum: ['active', 'inactive'] }).default('active'),
   ...timestamps,
-  ...ownership(userRef)
+  ...ownership(userRef),
 })
 
 export const timestamps = {

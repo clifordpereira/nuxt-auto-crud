@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
   if (!isNacPath(pathname, prefix)) return
 
   event.context.nac ||= { userId: null, isPublic: false }
-  
+
   if (isSchemaPath(pathname, prefix)) return
 
   if (!isAgenticPath(pathname, prefix)) {
