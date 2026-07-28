@@ -4,7 +4,7 @@ import { createInsertSchema } from 'drizzle-orm/zod'
 import type { z } from 'zod'
 
 import { useRuntimeConfig } from '#imports'
-import * as schema from '#nac/schema'
+import { schema } from '@nuxthub/db'
 
 import type { NacField, NacSchemaDefinition, NacQueryContext } from '../../shared/utils/types'
 import type { NacColumnInternal, NacZodTypeDef } from '../types'
