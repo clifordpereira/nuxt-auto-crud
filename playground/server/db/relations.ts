@@ -1,62 +1,12 @@
-import { defineRelations, type DBQueryConfig } from 'drizzle-orm'
-import * as schema from './schema'
+import { defineRelations } from 'drizzle-orm'
+import { nacAuthzRelationsConfig, nacAuthzTableQueryConfig } from '#nac/authz-relations'
 
 export const relations = defineRelations(schema, r => ({
-  roles: {
-    users: r.many.users({
-      from: r.roles.id,
-      to: r.users.roleId,
-    }),
-    roleResourcePermissions: r.many.roleResourcePermissions({
-      from: r.roles.id,
-      to: r.roleResourcePermissions.roleId,
-    }),
-  },
-  resources: {
-    roleResourcePermissions: r.many.roleResourcePermissions({
-      from: r.resources.id,
-      to: r.roleResourcePermissions.resourceId,
-    }),
-  },
-  permissions: {
-    roleResourcePermissions: r.many.roleResourcePermissions({
-      from: r.permissions.id,
-      to: r.roleResourcePermissions.permissionId,
-    }),
-  },
-  roleResourcePermissions: {
-    role: r.one.roles({
-      from: r.roleResourcePermissions.roleId,
-      to: r.roles.id,
-    }),
-    resource: r.one.resources({
-      from: r.roleResourcePermissions.resourceId,
-      to: r.resources.id,
-    }),
-    permission: r.one.permissions({
-      from: r.roleResourcePermissions.permissionId,
-      to: r.permissions.id,
-    }),
-  },
-  users: {
-    role: r.one.roles({
-      from: r.users.roleId,
-      to: r.roles.id,
-    }),
-  },
+  ...nacAuthzRelationsConfig(r),
+  // app's own tables, added alongside
 }))
 
-export const nacTableQueryConfig: Record<string, DBQueryConfig> = {
-  users: {
-    with: {
-      role: { columns: { name: true } },
-    },
-  },
-  roleResourcePermissions: {
-    with: {
-      role: { columns: { name: true } },
-      resource: { columns: { name: true } },
-      permission: { columns: { code: true } },
-    },
-  },
+export const nacTableQueryConfig = {
+  ...nacAuthzTableQueryConfig,
+  // app's own tableQueryConfig, added alongside
 }
