@@ -2,16 +2,19 @@ import { getColumns, type Column, Table, is, getTableName } from 'drizzle-orm'
 import type { ForeignKey } from 'drizzle-orm/sqlite-core'
 import { createInsertSchema } from 'drizzle-orm/zod'
 import type { z } from 'zod'
+import { schema } from '@nuxthub/db'
 
 import { useRuntimeConfig } from '#imports'
-import { schema } from '@nuxthub/db'
+import { nacGetTableConfigResolver } from '#nac/db'
+
+import { NacResourceNotFoundError } from '../exceptions'
 
 import type { NacField, NacSchemaDefinition, NacQueryContext } from '../../shared/utils/types'
 import type { NacColumnInternal, NacZodTypeDef } from '../types'
+
 import { NAC_API_HIDDEN_FIELDS, NAC_SYSTEM_TABLES, NAC_FORM_HIDDEN_FIELDS, NAC_RESERVED_ROUTE_SEGMENTS } from './constants'
+
 import { nacResolveFieldKey, resolveFieldList } from './field-resolution'
-import { NacResourceNotFoundError } from '../exceptions'
-import { nacGetTableConfigResolver } from './db'
 
 /**
  * Extracts the `:model` segment from a NAC route pathname (e.g.

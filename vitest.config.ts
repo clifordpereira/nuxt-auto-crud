@@ -18,6 +18,9 @@ const makeUnitProject = (fixtureName: string) => ({
       '#nac/relations': existsSync(r(`./test/fixtures/${fixtureName}/server/db/relations.ts`))
         ? r(`./test/fixtures/${fixtureName}/server/db/relations.ts`)
         : stubPath,
+      '@nuxthub/db': existsSync(r(`./test/fixtures/${fixtureName}/server/db/nuxthub-db.ts`))
+        ? r(`./test/fixtures/${fixtureName}/server/db/nuxthub-db.ts`)
+        : r('./test/mocks/nuxthub-db-empty.ts'),
       '#imports': r('./test/mocks/imports.ts'),
     },
   },
