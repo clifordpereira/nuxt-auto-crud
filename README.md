@@ -9,7 +9,6 @@ A Nuxt.js module providing dynamic **RESTful CRUD APIs** derived directly from y
 * **Zero-Codegen Dynamic RESTful CRUD APIs**: nuxt-auto-crud leverages Drizzle ORM, Zod, Nuxt, and Ni eliminate the need for manual CRUD coding.
 * **Single Source of Truth (SSOT)**: Your Drizzle schemas (`server/db/schema`) define the entire API structure and validation.
 * **Constant Bundle Size**: Since no code is generated, the bundle size remains virtually identical whether you have one table or one hundred (scaling only with your schema definitions).
----
 
 ---
 
@@ -266,7 +265,7 @@ Enabling `authentication` in the `autoCrud` config protects all **nac** routes (
 * **`apiHiddenFields`**: Globally hides sensitive columns from all API responses (read). Default: ['password', 'secret', 'token', 'resetToken', 'resetExpires', 'githubId', 'googleId'].
 * **`apiWriteProtectedFields`**: Server-enforced — fields a client can never set via `POST`/`PATCH` body, regardless of the frontend (mass-assignment protection). `auth.ownerKey` is always protected automatically, even if not listed explicitly.
 * **`formHiddenFields`**: Columns excluded from the `_schemas` metadata response, as a UI hint only. This does **not** block writes — use `apiWriteProtectedFields` for that.
-* **`formReadOnlyFields`** *(deprecated)*: Was intended as a UI-only hint and was never enforced server-side. Manage read-only state in your frontend instead (e.g. `nuxt-crud-table`).
+* **`formReadOnlyFields`** *(deprecated)*: Was intended as a UI-only hint and was never enforced server-side. Manage read-only state in your frontend instead (e.g. [`nuxt-crud-table`](https://github.com/Clifland/nuxt-crud-table)).
 
 ### ⚙️ Configuration Reference
 
@@ -669,3 +668,12 @@ npx nac-migrate-fresh
 ```
 
 For more details — see the script's own header comment (`node_modules/.bin/nac-migrate-fresh` after install, or view it [on GitHub](https://github.com/clifordpereira/nuxt-auto-crud/blob/main/bin/migrate-fresh.sh))
+
+
+## 🎨 Companion Frontend: nuxt-crud-table (nct)
+
+[`nuxt-crud-table`](https://github.com/Clifland/nuxt-crud-table) is a Nuxt UI component that renders CRUD tables and forms from an API's schema metadata. It is backend-agnostic: it reads whatever `_schemas`-shaped response the API provides and builds the table/form from that, so it works with NAC, Laravel, FastAPI, or any backend that returns metadata matching the expected format (see [Schema Interface](#schema-interface) above).
+
+Installing both `nuxt-auto-crud` and `nuxt-crud-table` in the same Nuxt project gives you generated CRUD APIs on the backend and a matching CRUD UI on the frontend, without hand-writing either.
+
+---
