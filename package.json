@@ -69,6 +69,7 @@
     "@iconify-json/simple-icons": "^1.2.91",
     "@iconify-json/vscode-icons": "^1.2.67",
     "@libsql/client": "^0.17.4",
+    "@libsql/linux-x64-gnu": "^0.5.29",
     "@nuxt/devtools": "^3.2.4",
     "@nuxt/eslint-config": "^1.16.0",
     "@nuxt/module-builder": "^1.0.2",
