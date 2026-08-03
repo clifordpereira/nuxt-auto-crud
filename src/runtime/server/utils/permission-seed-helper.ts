@@ -82,10 +82,13 @@ async function seedResources({ db, schema, config }: NacSeedAuthzOptions): Promi
 
 /** @internal */
 async function seedRoles({ db, schema, config }: NacSeedAuthzOptions): Promise<NacNamedRow[]> {
-  const names = Object.keys(config.roles)
+  const entries = Object.entries(config.roles)
   return db
     .insert(schema.roles)
-    .values(names.map(name => ({ name })))
+    .values(entries.map(([name, role]) => ({
+      name,
+      isSuperadmin: role.isSuperadmin ?? false,
+    })))
     .returning()
 }
 
@@ -155,7 +158,7 @@ export function buildRolePermissions({
     const roleId = roleMap.get(roleName)
     if (roleId === undefined) continue
 
-    if (role.permissions === 'all') {
+    if (role.isSuperadmin) {
       for (const resource of seededResources) {
         for (const permission of seededPermissions) {
           result.push({ roleId, resourceId: resource.id, permissionId: permission.id })
@@ -164,7 +167,7 @@ export function buildRolePermissions({
       continue
     }
 
-    for (const [resourceName, codes] of Object.entries(role.permissions)) {
+    for (const [resourceName, codes] of Object.entries(role.permissions ?? {})) {
       const resourceId = resourceMap.get(resourceName)
       if (resourceId === undefined) continue
 
@@ -194,6 +197,22 @@ export function buildRolePermissions({
  * @public
  */
 export async function nacSeedAuthz(options: NacSeedAuthzOptions) {
+  // validate role config
+  for (const [roleName, role] of Object.entries(options.config.roles)) {
+    const r = role as { isSuperadmin?: boolean, permissions?: unknown }
+    if (r.isSuperadmin && r.permissions !== undefined) {
+      throw new Error(
+        `[nuxt-auto-crud] Role "${roleName}" sets both isSuperadmin and permissions. `
+        + `A superadmin role's grid is derived automatically — remove "permissions" from this role.`,
+      )
+    }
+    if (!r.isSuperadmin && r.permissions === undefined) {
+      throw new Error(
+        `[nuxt-auto-crud] Role "${roleName}" must set either isSuperadmin: true or a permissions map.`,
+      )
+    }
+  }
+
   const [seededPermissions, seededResources, seededRoles] = await Promise.all([
     seedPermissions(options),
     seedResources(options),

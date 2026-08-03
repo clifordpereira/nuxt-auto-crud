@@ -7,8 +7,12 @@ export interface NacAuthzSeedUser {
   role: string
 }
 
+export type NacRoleConfig =
+  | { isSuperadmin: true }
+  | { isSuperadmin?: false, permissions: Record<string, string[] | string> }
+
 export interface NacAuthzSeedConfig {
-  roles: Record<string, { permissions: 'all' | Record<string, string[] | string> }>
+  roles: Record<string, NacRoleConfig>
   presets?: Record<string, string[]>
   resources: string[]
   usersToSeed: NacAuthzSeedUser[]
