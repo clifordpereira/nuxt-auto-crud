@@ -87,7 +87,7 @@ async function seedRoles({ db, schema, config }: NacSeedAuthzOptions): Promise<N
     .insert(schema.roles)
     .values(entries.map(([name, role]) => ({
       name,
-      isSuperadmin: role.isSuperadmin ?? false,
+      isSuperAdmin: role.isSuperAdmin ?? false,
     })))
     .returning()
 }
@@ -158,7 +158,7 @@ export function buildRolePermissions({
     const roleId = roleMap.get(roleName)
     if (roleId === undefined) continue
 
-    if (role.isSuperadmin) {
+    if (role.isSuperAdmin) {
       for (const resource of seededResources) {
         for (const permission of seededPermissions) {
           result.push({ roleId, resourceId: resource.id, permissionId: permission.id })
@@ -199,16 +199,16 @@ export function buildRolePermissions({
 export async function nacSeedAuthz(options: NacSeedAuthzOptions) {
   // validate role config
   for (const [roleName, role] of Object.entries(options.config.roles)) {
-    const r = role as { isSuperadmin?: boolean, permissions?: unknown }
-    if (r.isSuperadmin && r.permissions !== undefined) {
+    const r = role as { isSuperAdmin?: boolean, permissions?: unknown }
+    if (r.isSuperAdmin && r.permissions !== undefined) {
       throw new Error(
-        `[nuxt-auto-crud] Role "${roleName}" sets both isSuperadmin and permissions. `
+        `[nuxt-auto-crud] Role "${roleName}" sets both isSuperAdmin and permissions. `
         + `A superadmin role's grid is derived automatically — remove "permissions" from this role.`,
       )
     }
-    if (!r.isSuperadmin && r.permissions === undefined) {
+    if (!r.isSuperAdmin && r.permissions === undefined) {
       throw new Error(
-        `[nuxt-auto-crud] Role "${roleName}" must set either isSuperadmin: true or a permissions map.`,
+        `[nuxt-auto-crud] Role "${roleName}" must set either isSuperAdmin: true or a permissions map.`,
       )
     }
   }

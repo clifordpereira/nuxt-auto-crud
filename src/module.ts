@@ -112,7 +112,7 @@ export default defineNuxtModule<ModuleOptions>({
     // Inject authz schema if the consumer opted in via `auth.useNacSchema: true`
     if (options.auth?.useNacSchema) {
       nuxt.hook('hub:db:schema:extend', ({ paths, dialect: hubDialect }) => {
-        paths.push(resolve(`./runtime/server/db/schema/${hubDialect}/authz.ts`))
+        paths.push(resolve(`./runtime/server/db/schema/${hubDialect}/authz.js`))
       })
     }
 

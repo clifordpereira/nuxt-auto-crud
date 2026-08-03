@@ -4,7 +4,7 @@ import { timestamps } from './utils'
 export const roles = snakeCase.table('roles', {
   id: integer().primaryKey({ autoIncrement: true }),
   name: text().notNull().unique(),
-  isSuperadmin: integer('is_superadmin', { mode: 'boolean' }).notNull().default(false),
+  isSuperAdmin: integer('is_super_admin', { mode: 'boolean' }).notNull().default(false),
   status: text('status', { enum: ['active', 'inactive'] }).default('active'),
   ...timestamps,
 })

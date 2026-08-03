@@ -8,8 +8,8 @@ export interface NacAuthzSeedUser {
 }
 
 export type NacRoleConfig =
-  | { isSuperadmin: true }
-  | { isSuperadmin?: false, permissions: Record<string, string[] | string> }
+  | { isSuperAdmin: true }
+  | { isSuperAdmin?: false, permissions: Record<string, string[] | string> }
 
 export interface NacAuthzSeedConfig {
   roles: Record<string, NacRoleConfig>

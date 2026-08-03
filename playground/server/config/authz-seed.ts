@@ -18,7 +18,7 @@ export default defineAuthzSeed({
 
   roles: {
     superadmin: {
-      isSuperadmin: true,
+      isSuperAdmin: true,
     },
 
     useradmin: {
