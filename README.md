@@ -6,7 +6,7 @@ A Nuxt.js module providing dynamic **RESTful CRUD APIs** derived directly from y
 
 ## 🚀 Core Features
 
-* **Zero-Codegen Dynamic RESTful CRUD APIs**: nuxt-auto-crud leverages Drizzle ORM, Zod, Nuxt, and Ni eliminate the need for manual CRUD coding.
+* **Zero-Codegen Dynamic RESTful CRUD APIs**: nuxt-auto-crud leverages Drizzle ORM, Zod, Nuxt, and Nitro to eliminate the need for manual CRUD coding.
 * **Single Source of Truth (SSOT)**: Your Drizzle schemas (`server/db/schema`) define the entire API structure and validation.
 * **Constant Bundle Size**: Since no code is generated, the bundle size remains virtually identical whether you have one table or one hundred (scaling only with your schema definitions).
 
