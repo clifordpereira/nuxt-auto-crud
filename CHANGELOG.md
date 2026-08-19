@@ -1,3 +1,61 @@
+## v3.1.0
+
+[compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v2.7.0...v3.1.0)
+
+### 🚀 Enhancements
+
+- Add support for cursor pagination ([528d7a6](https://github.com/clifordpereira/nuxt-auto-crud/commit/528d7a6))
+- Create command for drizzle version resolution ([902d3ff](https://github.com/clifordpereira/nuxt-auto-crud/commit/902d3ff))
+- Add seeding helpers ([18e16b7](https://github.com/clifordpereira/nuxt-auto-crud/commit/18e16b7))
+
+### 🩹 Fixes
+
+- Add missing permission codes ([2431852](https://github.com/clifordpereira/nuxt-auto-crud/commit/2431852))
+- Lint errors ([171e7ef](https://github.com/clifordpereira/nuxt-auto-crud/commit/171e7ef))
+- Query params not being captured. ([b8c29b1](https://github.com/clifordpereira/nuxt-auto-crud/commit/b8c29b1))
+- Lint errors ([5b1e81e](https://github.com/clifordpereira/nuxt-auto-crud/commit/5b1e81e))
+- _schemas path is incorrectly considered as model in nacGetModelFromPath() ([acd3985](https://github.com/clifordpereira/nuxt-auto-crud/commit/acd3985))
+- _schema path was unnecessarily guarded ([9e6895a](https://github.com/clifordpereira/nuxt-auto-crud/commit/9e6895a))
+- Import error of schema ([f1a03a6](https://github.com/clifordpereira/nuxt-auto-crud/commit/f1a03a6))
+- Lint errors ([16f2498](https://github.com/clifordpereira/nuxt-auto-crud/commit/16f2498))
+- Add mock for '@nuxthub/db' ([68209f6](https://github.com/clifordpereira/nuxt-auto-crud/commit/68209f6))
+- Add missing functions to mock - nacGetTableConfigResolver, mock schema export from  nuxthub ([fa50a84](https://github.com/clifordpereira/nuxt-auto-crud/commit/fa50a84))
+- Lint errors ([6d7448c](https://github.com/clifordpereira/nuxt-auto-crud/commit/6d7448c))
+- Lint errors ([9e7027b](https://github.com/clifordpereira/nuxt-auto-crud/commit/9e7027b))
+
+### 🏡 Chore
+
+- **release:** V2.7.0 ([8a84ec8](https://github.com/clifordpereira/nuxt-auto-crud/commit/8a84ec8))
+- Make authorization and ownerkey optional ([27b5658](https://github.com/clifordpereira/nuxt-auto-crud/commit/27b5658))
+- Replace jsdoc with tsdoc ([cbfff11](https://github.com/clifordpereira/nuxt-auto-crud/commit/cbfff11))
+- Offload nacRequireOperationPermission to new file ([72cfe2e](https://github.com/clifordpereira/nuxt-auto-crud/commit/72cfe2e))
+- Update authz schema to include createBy ([8de0ce1](https://github.com/clifordpereira/nuxt-auto-crud/commit/8de0ce1))
+- Make authz reusable for consuming app ([0b75d94](https://github.com/clifordpereira/nuxt-auto-crud/commit/0b75d94))
+- Remove type error for nacGetPermissionsForUser ([0160fd7](https://github.com/clifordpereira/nuxt-auto-crud/commit/0160fd7))
+- Refactor module.ts , restructure server/db folder, add dialect in config, fix nacGetPermissionsForUser() ([69e9889](https://github.com/clifordpereira/nuxt-auto-crud/commit/69e9889))
+- Bump to  "version": "3.0.0-rc.1" ([0ba3e8e](https://github.com/clifordpereira/nuxt-auto-crud/commit/0ba3e8e))
+- Update playground's schema and relations according to new changes ([e45dc0b](https://github.com/clifordpereira/nuxt-auto-crud/commit/e45dc0b))
+- Add auth.useNacSchema to install authz tables ([313b981](https://github.com/clifordpereira/nuxt-auto-crud/commit/313b981))
+- Remove groups folder from playground/schema, add @libsql/linux-x64-gnu ([f1ab54b](https://github.com/clifordpereira/nuxt-auto-crud/commit/f1ab54b))
+- Add super admin facitlity ([dc47c73](https://github.com/clifordpereira/nuxt-auto-crud/commit/dc47c73))
+- Change isSuperadmin to isSuperAdmin ([6d0189c](https://github.com/clifordpereira/nuxt-auto-crud/commit/6d0189c))
+- Bump version to 3.0.0 ([81b8d5e](https://github.com/clifordpereira/nuxt-auto-crud/commit/81b8d5e))
+
+### ✅ Tests
+
+- Pagination ([d5b6d14](https://github.com/clifordpereira/nuxt-auto-crud/commit/d5b6d14))
+- Status-filtering ([479e31a](https://github.com/clifordpereira/nuxt-auto-crud/commit/479e31a))
+- Adjust tests according to new change ([44d3f99](https://github.com/clifordpereira/nuxt-auto-crud/commit/44d3f99))
+- Replace old function name with new ([ee117eb](https://github.com/clifordpereira/nuxt-auto-crud/commit/ee117eb))
+- Cursor pagination ([fb64111](https://github.com/clifordpereira/nuxt-auto-crud/commit/fb64111))
+- Adjust the import part according to latest changes ([4ba50d6](https://github.com/clifordpereira/nuxt-auto-crud/commit/4ba50d6))
+- Pagination and filtering with relations ([76e916f](https://github.com/clifordpereira/nuxt-auto-crud/commit/76e916f))
+- Add unit test for permission. Also add mysql version of permission.ts ([67ed537](https://github.com/clifordpereira/nuxt-auto-crud/commit/67ed537))
+
+### ❤️ Contributors
+
+- Cliford Pereira ([@clifordpereira](https://github.com/clifordpereira))
+
 ## v2.7.0
 
 [compare changes](https://github.com/clifordpereira/nuxt-auto-crud/compare/v2.6.4...v2.7.0)
